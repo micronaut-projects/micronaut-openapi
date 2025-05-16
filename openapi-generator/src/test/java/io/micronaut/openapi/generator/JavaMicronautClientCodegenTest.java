@@ -101,7 +101,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             CodegenConstants.APIS);
 
         // Files are not generated
-        assertFileNotExists(outputPath + "/src/main/java/org/openapitools/auth/");
+        assertFileDoesntExist(outputPath + "/src/main/java/org/openapitools/auth/");
         assertFileNotContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java", "@Authorization");
     }
 

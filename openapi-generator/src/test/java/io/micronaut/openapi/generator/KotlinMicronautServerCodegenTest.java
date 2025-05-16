@@ -276,12 +276,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         // Verify files are generated only for the required tags
         assertFileExists(apiPath + "AuthorsApi.kt");
         assertFileExists(apiPath + "BooksApi.kt");
-        assertFileNotExists(apiPath + "SearchApi.kt");
+        assertFileDoesntExist(apiPath + "SearchApi.kt");
 
         // Verify the same for test files
         assertFileExists(apiTestPath + "AuthorsApiTest.kt");
         assertFileExists(apiTestPath + "BooksApiTest.kt");
-        assertFileNotExists(apiTestPath + "SearchApiTest.kt");
+        assertFileDoesntExist(apiTestPath + "SearchApiTest.kt");
 
         // Verify all the methods are generated only ones
         assertFileContains(apiPath + "AuthorsApi.kt",
@@ -938,5 +938,61 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     ): String
                 """
         );
+    }
+
+    @Test
+    void testUseTags() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUseTags(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "api/UserApi.kt");
+        assertFileExists(path + "api/StoreApi.kt");
+        assertFileExists(path + "api/PetApi.kt");
+    }
+
+    @Test
+    void testGenerateOperationOnlyForFirstTagFalse() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateOperationOnlyForFirstTag(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        // Verify all the tags created
+        assertFileExists(path + "api/AuthorsApi.kt");
+        assertFileExists(path + "api/BooksApi.kt");
+        assertFileExists(path + "api/SearchApi.kt");
+
+        // Verify all the methods are repeated for each of the tags
+        assertFileContains(path + "api/AuthorsApi.kt",
+            "authorSearchGet", "getAuthor", "getAuthorBooks");
+        assertFileContains(path + "api/BooksApi.kt",
+            "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable", "getAuthorBooks");
+        assertFileContains(path + "api/SearchApi.kt",
+            "authorSearchGet", "bookSearchGet");
+    }
+
+    @Test
+    void testGenerateOperationOnlyForFirstTagTrue() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateOperationOnlyForFirstTag(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        // Verify all the tags created
+        assertFileExists(path + "api/AuthorsApi.kt");
+        assertFileExists(path + "api/BooksApi.kt");
+        assertFileDoesntExist(path + "api/SearchApi.kt");
+
+        // Verify all the methods are repeated for each of the tags
+        assertFileContains(path + "api/AuthorsApi.kt",
+            "authorSearchGet", "getAuthor", "getAuthorBooks");
+        assertFileContains(path + "api/BooksApi.kt",
+            "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable");
+        assertFileNotContains(path + "api/BooksApi.kt", "getAuthorBooks");
     }
 }

@@ -154,6 +154,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_IMPLICIT_HEADERS_REGEX = "implicitHeadersRegex";
     public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_KSP = "ksp";
+    public static final String OPT_USE_TAGS = "useTags";
     public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS = "additionalOneOfTypeAnnotations";
     public static final String ADDITIONAL_ENUM_TYPE_ANNOTATIONS = "additionalEnumTypeAnnotations";
@@ -170,6 +171,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected String title;
     protected boolean useBeanValidation;
     protected boolean visitable;
+    protected boolean useTags = true;
     protected boolean plural = true;
     protected boolean fluxForArrays;
     protected boolean generatedAnnotation = true;
@@ -315,6 +317,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
         cliOptions.add(CliOption.newBoolean(OPT_KSP, "Generate code compatible only with KSP", ksp));
+        cliOptions.add(CliOption.newBoolean(OPT_USE_TAGS, "Whether to use tags for creating interface and controller class names", useTags));
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
@@ -486,6 +489,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         updateOption(PACKAGE_NAME, packageName);
     }
 
+    public void setUseTags(boolean useTags) {
+        this.useTags = useTags;
+    }
+
+    public void setGenerateOperationOnlyForFirstTag(boolean generateOperationOnlyForFirstTag) {
+        this.generateOperationOnlyForFirstTag = generateOperationOnlyForFirstTag;
+    }
+
     public void setPlural(boolean plural) {
         this.plural = plural;
     }
@@ -580,6 +591,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             ksp = convertPropertyToBoolean(OPT_KSP);
         }
         writePropertyBack(OPT_KSP, ksp);
+
+        if (additionalProperties.containsKey(OPT_USE_TAGS)) {
+            useTags = convertPropertyToBoolean(OPT_USE_TAGS);
+        }
+        writePropertyBack(OPT_USE_TAGS, useTags);
 
         if (additionalProperties.containsKey(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS)) {
             jsonIncludeAlwaysForRequiredFields = convertPropertyToBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS);
@@ -915,6 +931,29 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
                                     Map<String, List<CodegenOperation>> operations) {
+
+         if (!useTags) {
+             String basePath = resourcePath;
+             if (basePath.startsWith("/")) {
+                 basePath = basePath.substring(1);
+             }
+             int pos = basePath.indexOf("/");
+             if (pos > 0) {
+                 basePath = basePath.substring(0, pos);
+             }
+
+             if (basePath.isEmpty()) {
+                 basePath = "default";
+             } else {
+                 co.subresourceOperation = !co.path.isEmpty();
+             }
+             basePath = super.sanitizeTag(basePath);
+             List<CodegenOperation> opList = operations.computeIfAbsent(basePath, k -> new ArrayList<>());
+             opList.add(co);
+             co.baseName = basePath;
+             return;
+         }
+
         if (generateOperationOnlyForFirstTag && !co.tags.get(0).getName().equals(tag)) {
             // This is not the first assigned to this operation tag;
             return;

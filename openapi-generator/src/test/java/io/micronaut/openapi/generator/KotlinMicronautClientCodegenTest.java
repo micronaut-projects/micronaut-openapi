@@ -98,7 +98,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             CodegenConstants.APIS);
 
         // Files are not generated
-        assertFileNotExists(outputPath + "/src/main/kotlin/org/openapitools/auth/");
+        assertFileDoesntExist(outputPath + "/src/main/kotlin/org/openapitools/auth/");
         assertFileNotContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt", "@Authorization");
     }
 

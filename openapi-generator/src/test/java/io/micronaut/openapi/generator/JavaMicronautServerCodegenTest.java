@@ -277,12 +277,12 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         // Verify files are generated only for the required tags
         assertFileExists(apiPath + "AuthorsApi.java");
         assertFileExists(apiPath + "BooksApi.java");
-        assertFileNotExists(apiPath + "SearchApi.java");
+        assertFileDoesntExist(apiPath + "SearchApi.java");
 
         // Verify the same for test files
         assertFileExists(apiTestPath + "AuthorsApiTest.java");
         assertFileExists(apiTestPath + "BooksApiTest.java");
-        assertFileNotExists(apiTestPath + "SearchApiTest.java");
+        assertFileDoesntExist(apiTestPath + "SearchApiTest.java");
 
         // Verify all the methods are generated only ones
         assertFileContains(apiPath + "AuthorsApi.java",
@@ -794,5 +794,61 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     this.name = name;
                 }
             """);
+    }
+
+    @Test
+    void testUseTags() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUseTags(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "api/UserApi.java");
+        assertFileExists(path + "api/StoreApi.java");
+        assertFileExists(path + "api/PetApi.java");
+    }
+
+    @Test
+    void testGenerateOperationOnlyForFirstTagFalse() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setGenerateOperationOnlyForFirstTag(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        // Verify all the tags created
+        assertFileExists(path + "api/AuthorsApi.java");
+        assertFileExists(path + "api/BooksApi.java");
+        assertFileExists(path + "api/SearchApi.java");
+
+        // Verify all the methods are repeated for each of the tags
+        assertFileContains(path + "api/AuthorsApi.java",
+            "authorSearchGet", "getAuthor", "getAuthorBooks");
+        assertFileContains(path + "api/BooksApi.java",
+            "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable", "getAuthorBooks");
+        assertFileContains(path + "api/SearchApi.java",
+            "authorSearchGet", "bookSearchGet");
+    }
+
+    @Test
+    void testGenerateOperationOnlyForFirstTagTrue() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setGenerateOperationOnlyForFirstTag(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        // Verify all the tags created
+        assertFileExists(path + "api/AuthorsApi.java");
+        assertFileExists(path + "api/BooksApi.java");
+        assertFileDoesntExist(path + "api/SearchApi.java");
+
+        // Verify all the methods are repeated for each of the tags
+        assertFileContains(path + "api/AuthorsApi.java",
+            "authorSearchGet", "getAuthor", "getAuthorBooks");
+        assertFileContains(path + "api/BooksApi.java",
+            "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable");
+        assertFileNotContains(path + "api/BooksApi.java", "getAuthorBooks");
     }
 }
