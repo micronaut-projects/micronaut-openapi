@@ -258,7 +258,7 @@ public final class SchemaDefinitionUtils {
     /**
      * Stores class name counters for schema suffix, when found classes with same name in different packages.
      */
-    private static Map<String, Integer> shemaNameSuffixCounterMap = new HashMap<>();
+    private static Map<String, Integer> schemaNameSuffixCounterMap = new HashMap<>();
     /**
      * {@link PropertyNamingStrategy} instances cache.
      */
@@ -273,7 +273,7 @@ public final class SchemaDefinitionUtils {
     public static void clean() {
         inProgressSchemas = new ArrayList<>(10);
         schemaNameToClassNameMap = new HashMap<>();
-        shemaNameSuffixCounterMap = new HashMap<>();
+        schemaNameSuffixCounterMap = new HashMap<>();
         propertyNamingStrategyInstances = new HashMap<>();
     }
 
@@ -553,18 +553,57 @@ public final class SchemaDefinitionUtils {
             }
         }
 
-        String storedClassName = schemaNameToClassNameMap.get(resultSchemaName);
+        return computeResultSchemaName(context, resultSchemaName, fullClassNameWithGenerics);
+    }
+
+    /**
+     * Computes the result schema name by resolving conflicts, if any, when multiple classes
+     * share the same base schema name. If conflicting schema names exist, a suffix is appended
+     * to ensure uniqueness. Schema names are stored and checked against a mapping of class names
+     * to schema names.
+     *
+     * @param context the context object providing metadata and configuration necessary to resolve schema names
+     * @param resultSchemaName the initial schema name to be checked and potentially modified for uniqueness
+     * @param fullClassNameWithGenerics the fully qualified class name, including generics, that corresponds to the schema name
+     * @return the resolved schema name, potentially modified with a suffix to ensure uniqueness
+     * @throws ConfigurationException if a duplicate schema name conflict is encountered, and the configured
+     *         resolution strategy does not allow duplicates
+     */
+    private static String computeResultSchemaName(VisitorContext context, String resultSchemaName, String fullClassNameWithGenerics) {
+        var genericSeparator = getGenericSeparator(context);
+
+        var storedClassName = schemaNameToClassNameMap.get(resultSchemaName);
         // Check if the class exists in other packages. If so, you need to add a suffix,
         // because there are two classes in different packages, but with the same class name.
         if (storedClassName != null && !storedClassName.equals(fullClassNameWithGenerics)) {
             if (getSchemaDuplicateResolution(context) == ConfigUtils.DuplicateResolution.ERROR) {
                 throw new ConfigurationException("Found 2 schemas with same name \"" + resultSchemaName + "\" for classes " + storedClassName + " and " + fullClassNameWithGenerics);
             }
-            int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
-            index++;
-            shemaNameSuffixCounterMap.put(resultSchemaName, index);
-            resultSchemaName += genericSeparator + index;
+
+            // Before adding a new entry to schemaNameToClassNameMap, check all the existing
+            // entries for this resultSchemaName.
+            var lastIndex = schemaNameSuffixCounterMap.putIfAbsent(resultSchemaName, 1);
+            // if there is no existing value, there is nothing else to check
+            if (lastIndex == null) {
+                resultSchemaName += genericSeparator + "1";
+            } else {
+                for (int i = 1; i <= lastIndex; i++) {
+                    var existingSchemaName = resultSchemaName + genericSeparator + i;
+                    var existingClassName = schemaNameToClassNameMap.get(existingSchemaName);
+                    // Check if this package matches the expected package, and if so,
+                    // return this matching entry.
+                    if (fullClassNameWithGenerics.equals(existingClassName)) {
+                        return existingSchemaName;
+                    }
+                }
+
+                // If we made it here, it means no existing entry was found.
+                // Increment the counter.
+                int index = schemaNameSuffixCounterMap.merge(resultSchemaName, 1, Integer::sum);
+                resultSchemaName += genericSeparator + index;
+            }
         }
+
         schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
 
         return resultSchemaName;
