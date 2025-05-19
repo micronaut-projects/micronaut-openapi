@@ -1188,7 +1188,7 @@ class PersonController {
             ),
             @Parameter(
                 name = "userUuid",
-                style = ParameterStyle.DEEPOBJECT,
+                style = ParameterStyle.MATRIX,
                 description = "The user identifier",
                 schema = @Schema(implementation = String.class),
                 in = ParameterIn.PATH
@@ -1227,7 +1227,7 @@ public class MyBean {}
         op.parameters.get(1).name == 'userUuid'
         op.parameters.get(1).schema.type == 'string'
         op.parameters.get(1).in == 'path'
-        op.parameters.get(1).style == Parameter.StyleEnum.DEEPOBJECT
+        op.parameters.get(1).style == Parameter.StyleEnum.MATRIX
         op.parameters.get(1).description == 'The user identifier'
         op.parameters.get(1).example == null
         op.parameters.get(1).$ref == null
@@ -1703,7 +1703,8 @@ public class MyBean {}
 
         then:
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.type == 'object'
-        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties == true
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties.type == 'object'
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.default == null
     }
 

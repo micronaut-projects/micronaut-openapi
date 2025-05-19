@@ -94,7 +94,7 @@ class MyController {
     @Operation(
         summary = "Delete a thing",
         description = "description test",
-        parameters = @Parameter(name = "id", description = "id description", style = ParameterStyle.LABEL)
+        parameters = @Parameter(name = "id", description = "id description", style = ParameterStyle.PIPEDELIMITED)
     )
     @Parameter(name = "param1", description = "my desc", style = ParameterStyle.DEEPOBJECT)
     public void deleteObj(@QueryValue int id, @QueryValue int param1) {
@@ -118,7 +118,7 @@ class MyBean {}
         operation.parameters.size() == 2
         operation.parameters[0].name == 'id'
         operation.parameters[0].description == 'id description'
-        operation.parameters[0].style == Parameter.StyleEnum.LABEL
+        operation.parameters[0].style == Parameter.StyleEnum.PIPEDELIMITED
         operation.parameters[1].name == 'param1'
         operation.parameters[1].description == 'my desc'
         operation.parameters[1].style == Parameter.StyleEnum.DEEPOBJECT

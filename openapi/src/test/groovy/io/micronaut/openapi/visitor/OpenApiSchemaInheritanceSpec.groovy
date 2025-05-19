@@ -892,7 +892,8 @@ class MyBean {}
         document.properties.modified
         document.properties.schema
         document.properties.expands
-        document.properties.expands.additionalProperties == true
+        document.properties.expands.additionalProperties
+        document.properties.expands.additionalProperties.type == 'object'
 
         def myDocument = schemas.MyDocument
         myDocument.allOf.size() == 3

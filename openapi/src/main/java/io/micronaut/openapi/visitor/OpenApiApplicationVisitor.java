@@ -128,6 +128,8 @@ import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
+import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
