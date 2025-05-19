@@ -6,7 +6,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 
-@Path("/user")
+@Path("/model")
 class ModelController {
     @GET
     @Path("/model-one")
