@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -22,6 +23,52 @@ public abstract class AbstractMicronautCodegenTest {
      * Path to a common test configuration file
      */
     protected final String PETSTORE_PATH = "src/test/resources/petstore.json";
+
+    /**
+     * @param codegen - the code generator
+     * @param opts codegen options
+     * @param configPath - the path to the config starting from src/test/resources
+     * @param filesToGenerate - which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
+     *
+     * @return - the path to the generated folder
+     */
+    protected String generateWithOpts(MicronautCodeGenerator<?> codegen, Map<String, Object> opts, String configPath, String... filesToGenerate) {
+        if (opts == null) {
+            throw new IllegalArgumentException("Codegen options are required");
+        }
+        File output = null;
+        try {
+            output = Files.createTempDirectory("test").toFile().getCanonicalFile();
+        } catch (IOException e) {
+            fail("Unable to create temporary directory for output");
+        }
+        output.deleteOnExit();
+
+        MicronautCodeGeneratorEntryPoint.builder()
+            .withOptions(optsBuilder -> {
+                if (opts.containsKey("useUrlConnectionCache")) {
+                    optsBuilder.withUseUrlConnectionCache((boolean) opts.get("useUrlConnectionCache"));
+                }
+                if (opts.containsKey("additionalProperties")) {
+                    optsBuilder.withAdditionalProperties((Map<String, Object>) opts.get("additionalProperties"));
+                }
+            })
+            .forCodeGenerator(codegen, unused -> {
+            })
+            .withDefinitionFile(new File(configPath).toURI())
+            .withOutputDirectory(output)
+            .withOutputs(Arrays.stream(filesToGenerate)
+                .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
+                .toArray(MicronautCodeGeneratorEntryPoint.OutputKind[]::new)
+            )
+            .build()
+            .generate();
+
+        // Create parser
+        String outputPath = output.getAbsolutePath().replace('\\', '/');
+
+        return outputPath + "/";
+    }
 
     /**
      * @param codegen - the code generator

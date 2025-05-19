@@ -26,6 +26,7 @@ import org.openapitools.codegen.DefaultGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -33,10 +34,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import static io.micronaut.openapi.generator.Utils.readBooleanProperty;
+
 /**
  * Main entry point for Micronaut OpenAPI code generation.
  */
 public final class MicronautCodeGeneratorEntryPoint {
+
+    public static final String OPT_USE_URL_CONNECTION_CACHE = "useUrlConnectionCache";
 
     private final URI definitionFile;
     private final File outputDirectory;
@@ -133,6 +138,13 @@ public final class MicronautCodeGeneratorEntryPoint {
         if (options.apiPackage != null) {
             codeGenerator.setApiPackage(options.apiPackage);
         }
+
+        boolean useUrlConnectionCache = options.useUrlConnectionCache;
+        if (options.additionalProperties != null && options.additionalProperties.containsKey(OPT_USE_URL_CONNECTION_CACHE)) {
+            useUrlConnectionCache = readBooleanProperty(OPT_USE_URL_CONNECTION_CACHE, options.additionalProperties, false);
+        }
+        URLConnection.setDefaultUseCaches("jar", useUrlConnectionCache);
+        URLConnection.setDefaultUseCaches("file", useUrlConnectionCache);
 
         if ((options.lang == null || options.lang == GeneratorLanguage.JAVA) && codeGenerator instanceof AbstractMicronautJavaCodegen<?> javaCodeGen) {
 
@@ -594,6 +606,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean implicitHeaders;
             private String implicitHeadersRegex;
 
+            private boolean useUrlConnectionCache;
             private boolean optional;
             private boolean reactive = true;
             private boolean useSealed;
@@ -622,6 +635,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean ensureUniqueParams = true;
             private boolean allowUnicodeIdentifiers;
             private boolean prependFormOrBodyParameters;
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseUrlConnectionCache(boolean useUrlConnectionCache) {
+                this.useUrlConnectionCache = useUrlConnectionCache;
+                return this;
+            }
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withLang(GeneratorLanguage lang) {
@@ -943,6 +962,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private Options build() {
                 return new Options(
+                    useUrlConnectionCache,
                     lang,
                     apiPackage,
                     modelPackage,
@@ -1022,6 +1042,7 @@ public final class MicronautCodeGeneratorEntryPoint {
     }
 
     private record Options(
+        boolean useUrlConnectionCache,
         GeneratorLanguage lang,
         String apiPackage,
         String modelPackage,

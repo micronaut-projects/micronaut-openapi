@@ -23,6 +23,8 @@ import org.openapitools.codegen.CodegenModelType;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +59,8 @@ public final class Utils {
     public static final String EXT_ANNOTATIONS_CLASS = "x-class-extra-annotation";
     public static final String EXT_ANNOTATIONS_FIELD = "x-field-extra-annotation";
     public static final String EXT_ANNOTATIONS_SETTER = "x-setter-extra-annotation";
+
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {
     }
@@ -513,5 +517,21 @@ public final class Utils {
             }
         }
         return additionalOneOfTypeAnnotationsList;
+    }
+
+    public static boolean readBooleanProperty(String propertyKey, Map<String, Object> additionalProperties, boolean defaultValue) {
+        var value = additionalProperties.get(propertyKey);
+        if (value instanceof Boolean boolValue) {
+            return boolValue;
+        } else if (value instanceof String strValue) {
+            try {
+                return Boolean.parseBoolean(strValue);
+            } catch (NumberFormatException e) {
+                LOG.warn("Can't parse generator's option {}. Value: {}", propertyKey, value);
+                return defaultValue;
+            }
+        }
+        LOG.warn("The value (generator's option {}) must be either boolean or string. Default to `{}`.", propertyKey, defaultValue);
+        return defaultValue;
     }
 }
