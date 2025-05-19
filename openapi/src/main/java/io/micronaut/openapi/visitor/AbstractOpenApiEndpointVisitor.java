@@ -264,9 +264,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             if (CollectionUtils.isNotEmpty(superTypes)) {
                 ContextUtils.put(MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS, true, context);
-                List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS);
-                for (MethodElement method : methods) {
-                    visitMethod(method, context);
+                var hasSuperMethods = false;
+                for (var superType : superTypes) {
+                    if (CollectionUtils.isNotEmpty(superType.getMethods())) {
+                        hasSuperMethods = true;
+                        break;
+                    }
+                }
+                if (hasSuperMethods) {
+                    List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS);
+                    for (MethodElement method : methods) {
+                        visitMethod(method, context);
+                    }
                 }
                 ContextUtils.remove(MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS, context);
             }

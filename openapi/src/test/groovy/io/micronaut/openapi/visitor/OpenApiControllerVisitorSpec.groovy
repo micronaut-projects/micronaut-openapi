@@ -2999,4 +2999,38 @@ class MyBean {}
         operation2.responses."205".content."application/json".schema.type == 'string'
         operation2.responses."500".content."application/json".schema.type == 'string'
     }
+
+    void "test read body property"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+
+@OpenAPIGroup(value = {"Child"})
+@Controller
+interface Child extends Parent {
+  @Post
+  void doSomething(@Body("a") String a);
+}
+
+interface Parent {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.post
+
+        then:
+        operation
+        operation.requestBody.content."application/json".schema.type == "object"
+        operation.requestBody.content."application/json".schema.properties.a
+        operation.requestBody.content."application/json".schema.properties.a.type == "string"
+        !operation.requestBody.content."application/json".schema.oneOf
+    }
 }
