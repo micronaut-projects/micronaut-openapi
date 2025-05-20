@@ -376,6 +376,11 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Whether to use tags for creating interface and controller class names.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUseUrlConnectionCache(boolean)" class="member-name-link">withUseUrlConnectionCache</a><wbr>(boolean&nbsp;useUrlConnectionCache)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Use URLConnection cache or not.</div>
+</div>
 </div>
 </div>
 </div>
@@ -390,6 +395,23 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="withUseUrlConnectionCache(boolean)">
+<h3>withUseUrlConnectionCache</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withUseUrlConnectionCache</span><wbr><span class="parameters">(boolean&nbsp;useUrlConnectionCache)</span></div>
+<div class="block">Use URLConnection cache or not. It uses for URLConnectionClassLoader.
+ With enabled cache sometimes you can have exception
+ like that: java.lang.IllegalStateException: zip file closed.
+ <p>
+ Default: false</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>useUrlConnectionCache</code> - Use URLConnection cache or not</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="withLang(io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage)">
 <h3>withLang</h3>
