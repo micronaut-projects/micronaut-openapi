@@ -25,6 +25,19 @@ import java.util.Map;
 public interface MicronautCodeGeneratorOptionsBuilder {
 
     /**
+     * Use URLConnection cache or not. It uses for URLConnectionClassLoader.
+     * With enabled cache sometimes you can have exception
+     * like that: java.lang.IllegalStateException: zip file closed.
+     * <p>
+     * Default: false
+     *
+     * @param useUrlConnectionCache Use URLConnection cache or not
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withUseUrlConnectionCache(boolean useUrlConnectionCache);
+
+    /**
      * Sets the generator language.
      *
      * @param lang generator language
