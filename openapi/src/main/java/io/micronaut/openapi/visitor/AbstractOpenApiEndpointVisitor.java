@@ -272,7 +272,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                 }
                 if (hasSuperMethods) {
-                    List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS);
+                    List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS.onlyInstance());
                     for (MethodElement method : methods) {
                         visitMethod(method, context);
                     }
