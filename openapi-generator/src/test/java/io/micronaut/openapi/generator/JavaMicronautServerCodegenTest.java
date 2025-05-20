@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
-    static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yaml";
-    static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yaml";
+    static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yml";
+    static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yml";
 
     @Test
     void clientOptsUniqueness() {
@@ -523,7 +523,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 Mono<@Valid SuccessResetPassword> profilePasswordPost(
                     @Header("WCToken") @NotNull String wcToken,
                     @Header("WCTrustedToken") @NotNull String wcTrustedToken,
-                    @Part("name") @Nullable(inherited = true) String name,
+                    @Part("name") @NotNull String name,
+                    @Part("title") @Nullable(inherited = true) String title,
                     @Part("file") @Nullable(inherited = true) CompletedFileUpload file
                 );
             """);
@@ -814,7 +815,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         // Verify all the tags created
@@ -836,7 +837,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         // Verify all the tags created

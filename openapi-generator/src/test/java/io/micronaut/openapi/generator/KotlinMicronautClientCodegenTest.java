@@ -182,7 +182,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateMultipleContentTypes() {
         var codegen = new KotlinMicronautClientCodegen();
 
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/content-type.yaml", CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/content-type.yml", CodegenConstants.APIS);
 
         // body and response content types should be properly annotated using @Consumes and @Produces micronaut annotations
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
@@ -195,7 +195,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
 
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/oauth2.yaml", CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/oauth2.yml", CodegenConstants.SUPPORTING_FILES);
 
         // micronaut yaml property names shouldn't contain any dots
         String resourcesPath = outputPath + "src/main/resources/";
@@ -1369,7 +1369,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/pet/findByStatus")
                     @Consumes("application/json", "application/xml")
                     fun findPetsByStatus(
-                        @QueryValue("status") @Nullable status: List<@NotNull String>? = null,
+                        @QueryValue(value = "status", defaultValue = "available") @Nullable status: List<@NotNull String>? = arrayListOf("available"),
                     ): Mono<List<Pet>>
                 """);
     }
