@@ -60,6 +60,8 @@ public final class Utils {
     public static final String EXT_ANNOTATIONS_FIELD = "x-field-extra-annotation";
     public static final String EXT_ANNOTATIONS_SETTER = "x-setter-extra-annotation";
 
+    public static final String NULL_STRING = "null";
+
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {

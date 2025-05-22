@@ -24,9 +24,14 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              required:
+                - name
               properties:
                 name:
                   type: string
+                title:
+                  type: string
+                  default: "bla-bla"
                 file:
                   type: string
                   format: binary

@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
-    static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yaml";
-    static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yaml";
+    static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yml";
+    static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yml";
 
     @Test
     void clientOptsUniqueness() {
@@ -644,7 +644,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 fun profilePasswordPost(
                     @Header("WCToken") @NotNull wcToken: String,
                     @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
-                    @Part("name") @Nullable name: String? = null,
+                    @Part("name") @NotNull name: String,
+                    @Part("title") @Nullable title: String? = "bla-bla",
                     @Part("file") @Nullable file: CompletedFileUpload? = null,
                 ): Mono<SuccessResetPassword>
             """);
@@ -826,7 +827,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue("status") @Nullable status: List<@NotNull String>? = null,
+                        @QueryValue(value = "status", defaultValue = "available") @Nullable status: List<@NotNull String>? = arrayListOf("available"),
                     ): Mono<List<Pet>>
                 """);
     }
@@ -958,7 +959,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new KotlinMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         // Verify all the tags created
@@ -980,7 +981,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new KotlinMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yaml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         // Verify all the tags created
@@ -994,5 +995,29 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "api/BooksApi.kt",
             "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable");
         assertFileNotContains(path + "api/BooksApi.kt", "getAuthorBooks");
+    }
+
+    @Test
+    void testOperationParameterWithDefaultValue() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/parameter-list-with-default.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "api/PetApi.kt");
+        assertFileContains(path + "api/PetApi.kt",
+            "@QueryValue(value = \"status\", defaultValue = \"available\") @Nullable status: List<@NotNull String>? = arrayListOf(\"available\"),");
+    }
+
+    @Test
+    void testOperationParameterWithDefaultValueSwagger2() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/parameter-list-with-default-swagger2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "api/PetApi.kt");
+        assertFileContains(path + "api/PetApi.kt",
+            "@QueryValue(value = \"status\", defaultValue = \"available\") @Nullable status: List<@NotNull String>? = arrayListOf(\"available\"),");
     }
 }

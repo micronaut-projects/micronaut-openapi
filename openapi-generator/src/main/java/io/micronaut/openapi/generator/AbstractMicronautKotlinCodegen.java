@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.generator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableMap;
@@ -32,6 +33,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.parser.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
@@ -101,6 +103,7 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
+import static io.micronaut.openapi.generator.Utils.NULL_STRING;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
@@ -166,6 +169,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
 
+    protected ObjectMapper objectMapper = ObjectMapperFactory.createJson();
     protected SecureRandom random = new SecureRandom();
     protected String dateLibrary;
     protected String title;
@@ -932,27 +936,27 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
                                     Map<String, List<CodegenOperation>> operations) {
 
-         if (!useTags) {
-             String basePath = resourcePath;
-             if (basePath.startsWith("/")) {
-                 basePath = basePath.substring(1);
-             }
-             int pos = basePath.indexOf("/");
-             if (pos > 0) {
-                 basePath = basePath.substring(0, pos);
-             }
+        if (!useTags) {
+            String basePath = resourcePath;
+            if (basePath.startsWith("/")) {
+                basePath = basePath.substring(1);
+            }
+            int pos = basePath.indexOf("/");
+            if (pos > 0) {
+                basePath = basePath.substring(0, pos);
+            }
 
-             if (basePath.isEmpty()) {
-                 basePath = "default";
-             } else {
-                 co.subresourceOperation = !co.path.isEmpty();
-             }
-             basePath = super.sanitizeTag(basePath);
-             List<CodegenOperation> opList = operations.computeIfAbsent(basePath, k -> new ArrayList<>());
-             opList.add(co);
-             co.baseName = basePath;
-             return;
-         }
+            if (basePath.isEmpty()) {
+                basePath = "default";
+            } else {
+                co.subresourceOperation = !co.path.isEmpty();
+            }
+            basePath = super.sanitizeTag(basePath);
+            List<CodegenOperation> opList = operations.computeIfAbsent(basePath, k -> new ArrayList<>());
+            opList.add(co);
+            co.baseName = basePath;
+            return;
+        }
 
         if (generateOperationOnlyForFirstTag && !co.tags.get(0).getName().equals(tag)) {
             // This is not the first assigned to this operation tag;
@@ -1057,7 +1061,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (producesInfo != null && !producesInfo.isEmpty()) {
             return producesInfo.toArray(new String[] {});
         }
-        return new String[] { CONTENT_TYPE_APPLICATION_JSON }; // default media type
+        return new String[] {CONTENT_TYPE_APPLICATION_JSON}; // default media type
     }
 
     @Override
@@ -1167,7 +1171,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 processGenericAnnotations(param, useBeanValidation, false, param.isNullable || !param.required,
                     param.required, false, true);
                 param.vendorExtensions.put("isString", "string".equalsIgnoreCase(param.dataType));
-                param.vendorExtensions.put("withoutExample", param.example == null || param.example.equals("null"));
+                param.vendorExtensions.put("withoutExample", param.example == null || param.example.equals(NULL_STRING));
                 if (useBeanValidation && ((!param.isContainer && param.isModel)
                     || (param.getIsArray() && param.getComplexType() != null && models.containsKey(param.getComplexType())))) {
                     param.vendorExtensions.put("withValid", true);
@@ -1597,7 +1601,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             rqBody.required = body.getRequired();
         }
         if (!rqBody.required) {
-            rqBody.vendorExtensions.put("defaultValueInit", "null");
+            rqBody.vendorExtensions.put("defaultValueInit", NULL_STRING);
         } else {
             codegenProperty.isNullable = false;
             rqBody.isNullable = false;
@@ -1680,7 +1684,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
         }
         if (defaultValueInit == null && !parameter.required) {
-            defaultValueInit = "null";
+            defaultValueInit = NULL_STRING;
         }
         if (defaultValueInit != null) {
             parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -1696,6 +1700,17 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         var resp = super.fromResponse(responseCode, response);
         checkPrimitives(resp, (Schema) resp.schema);
         return resp;
+    }
+
+    @Override
+    public List<CodegenParameter> fromRequestBodyToFormParameters(RequestBody body, Set<String> imports) {
+        var params = super.fromRequestBodyToFormParameters(body, imports);
+        for (var param : params) {
+            if (param.required && NULL_STRING.equals(param.vendorExtensions.get("defaultValueInit"))) {
+                param.vendorExtensions.put("defaultValueInit", null);
+            }
+        }
+        return params;
     }
 
     @Override
@@ -1734,12 +1749,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 defaultValueInit = property.dataType + "." + enumVarName;
             }
         }
-        if (defaultValueInit == null && property.isDiscriminator
+        if (defaultValueInit == null
+            && (property.isDiscriminator
             || property.isNullable
             || property.required && property.isReadOnly
             || !property.required
-        ) {
-            defaultValueInit = "null";
+        )) {
+            defaultValueInit = NULL_STRING;
         }
         if (defaultValueInit != null) {
             property.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -2340,12 +2356,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("withRequiredAndOptionalVars", model.vendorExtensions.get("withRequiredAndOptionalVars"));
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
-        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals(NULL_STRING));
 
         var isParentVar = (Boolean) property.vendorExtensions.get("isParentVar");
         property.vendorExtensions.put("fieldAnnPrefix", isParentVar != null && isParentVar ? "" : "field:");
         property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
-        if ("null".equals(property.example)) {
+        if (NULL_STRING.equals(property.example)) {
             property.example = null;
         }
         if (useBeanValidation && (
@@ -2458,7 +2474,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     }
                     if (isDiscriminator && !parentIsOneOfInterface) {
                         copyVar.isNullable = true;
-                        copyVar.vendorExtensions.put("defaultValueInit", "null");
+                        copyVar.vendorExtensions.put("defaultValueInit", NULL_STRING);
                     }
                     copyVar.isOverridden = true;
                     copyVar.vendorExtensions.put("overridden", true);
@@ -2473,7 +2489,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     if (copyVar.isOverridden != null && copyVar.isOverridden && (!parentIsOneOfInterface || isDiscriminator)) {
                         if (isDiscriminator && !parentIsOneOfInterface) {
                             copyVar.isNullable = true;
-                            copyVar.vendorExtensions.put("defaultValueInit", "null");
+                            copyVar.vendorExtensions.put("defaultValueInit", NULL_STRING);
                         }
                     }
                     requiredVarsWithoutDiscriminator.add(copyVar);
@@ -2501,7 +2517,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 v.isDiscriminator = true;
                 if (!parentIsOneOfInterface) {
                     v.isNullable = true;
-                    v.vendorExtensions.put("defaultValueInit", "null");
+                    v.vendorExtensions.put("defaultValueInit", NULL_STRING);
                 }
             }
             v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
@@ -2619,7 +2635,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     private boolean withExample(String example) {
-        return example != null && !example.equals("null");
+        return example != null && !example.equals(NULL_STRING);
     }
 
     public String getExampleValue(
@@ -2704,7 +2720,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         } else if ("Map".equals(containerType)) {
             example = "HashMap<Any, Any>()";
         } else if (example == null) {
-            example = "null";
+            example = NULL_STRING;
         }
 
         return example;
@@ -2794,18 +2810,31 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     // left - initStr, right - defaultStr
     private Pair<String, String> toArrayDefaultValue(String itemsDatatypeWithEnum, String itemsDataType, boolean itemsIsEnumOrRef, Schema schema) {
         if (schema.getDefault() != null) {
-            String arrInstantiationType = ModelUtils.isSet(schema) ? "set" : "arrayList";
+            var isSet = ModelUtils.isSet(schema);
+            String arrInstantiationType = isSet ? "set" : "arrayList";
 
-            if (!(schema.getDefault() instanceof ArrayNode def)) {
-                return Pair.of(null, null);
+            ArrayNode defaultArrayNode;
+            if (schema.getDefault() instanceof String strValue) {
+                try {
+                    defaultArrayNode = objectMapper.readValue(strValue, ArrayNode.class);
+                } catch (Exception e) {
+                    return Pair.of(null, null);
+                }
+            } else {
+                if (!(schema.getDefault() instanceof ArrayNode def)) {
+                    return Pair.of(null, null);
+                }
+                defaultArrayNode = def;
             }
-            if (def.isEmpty()) {
+
+            if (defaultArrayNode.isEmpty()) {
                 return Pair.of(arrInstantiationType + "Of()", null);
             }
 
             var defaultContent = new StringBuilder();
+            var defaultContentInit = new StringBuilder();
             Schema<?> itemsSchema = ModelUtils.getSchemaItems(schema);
-            def.elements().forEachRemaining((element) -> {
+            defaultArrayNode.elements().forEachRemaining((element) -> {
                 String defaultValue = element.asText();
                 if (defaultValue != null) {
                     if (itemsIsEnumOrRef) {
@@ -2813,18 +2842,29 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         String enumVarName = toEnumVarName(defaultValue, itemsDataType);
                         if (enumVarName != null) {
                             defaultContent.append(className).append(".").append(enumVarName).append(",");
+                            defaultContentInit.append(className).append(".").append(enumVarName).append(",");
                         } else {
-                            defaultContent.append("null").append(",");
+                            defaultContent.append(NULL_STRING).append(",");
+                            defaultContentInit.append(NULL_STRING).append(",");
                         }
                     } else {
                         itemsSchema.setDefault(defaultValue);
                         defaultValue = calcDefaultValues(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, itemsSchema).getRight();
                         defaultContent.append(defaultValue).append(",");
+                        if ("string".equalsIgnoreCase(itemsDataType)) {
+                            defaultContentInit.append('"');
+                        }
+                        defaultContentInit.append(defaultValue);
+                        if ("string".equalsIgnoreCase(itemsDataType)) {
+                            defaultContentInit.append('"');
+                        }
+                        defaultContentInit.append(",");
                     }
                 }
             });
             defaultContent.deleteCharAt(defaultContent.length() - 1); // remove trailing comma
-            return Pair.of(arrInstantiationType + "Of(" + defaultContent + ")", defaultContent.toString());
+            defaultContentInit.deleteCharAt(defaultContentInit.length() - 1); // remove trailing comma
+            return Pair.of(arrInstantiationType + "Of(" + defaultContentInit + ")", defaultContent.toString());
         }
         return Pair.of(null, null);
     }
