@@ -45,12 +45,12 @@ micronaut-docs = "2.0.0"
 sonatype-scan = "3.1.1"
 
 # javascript libraries
-js-swagger-ui = "5.21.0"
-js-openapi-explorer = "2.2.734"
+js-swagger-ui = "5.22.0"
+js-openapi-explorer = "2.2.757"
 js-redoc = "2.5.0"
 js-rapidoc = "9.3.8"
 js-rapipdf = "2.2.1"
-js-scalar = "1.28.24"
+js-scalar = "1.29.1"
 
 [libraries]
 # Managed
