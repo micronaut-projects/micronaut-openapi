@@ -19,17 +19,13 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.UrlUtils.OpPath;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.parboiled.common.StringUtils;
 
 import java.util.ArrayList;
@@ -89,25 +85,6 @@ abstract class AbstractOpenApiVisitor {
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
-    }
-
-    /**
-     * Reads the security requirements annotation of the specified element.
-     *
-     * @param element The Element to process.
-     *
-     * @return A list of SecurityRequirement
-     */
-    List<SecurityRequirement> readSecurityRequirements(Element element) {
-        return readSecurityRequirements(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class));
-    }
-
-    List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
-        var result = new ArrayList<SecurityRequirement>(annotations.size());
-        for (var ann : annotations) {
-            result.add(ConvertUtils.mapToSecurityRequirement(ann));
-        }
-        return result;
     }
 
     Map<String, Object> readExtensions(List<AnnotationValue<Extension>> annotations) {
@@ -186,18 +163,5 @@ abstract class AbstractOpenApiVisitor {
         }
 
         return resultPathItemsMap;
-    }
-
-    /**
-     * Processes {@link SecurityScheme}
-     * annotations.
-     *
-     * @param element The element
-     * @param context The visitor context
-     */
-    protected void processSecuritySchemes(ClassElement element, VisitorContext context) {
-        var values = element.getAnnotationValuesByType(SecurityScheme.class);
-        final OpenAPI openApi = Utils.resolveOpenApi(context);
-        ConvertUtils.addSecuritySchemes(openApi, values, context);
     }
 }

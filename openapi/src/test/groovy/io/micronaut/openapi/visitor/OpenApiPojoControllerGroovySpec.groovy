@@ -199,7 +199,8 @@ public class MyBean {}
 
         then:
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.type == 'object'
-        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties == true
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties.type == "object"
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.default == null
     }
 

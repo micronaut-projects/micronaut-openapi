@@ -374,15 +374,15 @@ class MyBean {}
 
         petSchema.properties['freeForm'].type == "object"
         petSchema.properties['freeForm'].description == "A free-form object"
-        petSchema.properties['freeForm'].getAdditionalProperties() == true
+        petSchema.properties['freeForm'].additionalProperties.type == "object"
 
         petSchema.properties['dictionariesPlain'].type == "object"
         petSchema.properties['dictionariesPlain'].description == "A string-to-string dictionary"
-        petSchema.properties['dictionariesPlain'].getAdditionalProperties().getType() == "string"
+        petSchema.properties['dictionariesPlain'].additionalProperties.type == "string"
 
         petSchema.properties['tags'].type == "object"
         petSchema.properties['tags'].description == "A string-to-object dictionary"
-        petSchema.properties['tags'].getAdditionalProperties().$ref == "#/components/schemas/Tag"
+        petSchema.properties['tags'].additionalProperties.$ref == "#/components/schemas/Tag"
 
         tagSchema.properties['name'].type == "string"
         tagSchema.properties['name'].description == "The Tag Name"
@@ -390,8 +390,8 @@ class MyBean {}
 
         petSchema.properties['tagArrays'].type == "object"
         petSchema.properties['tagArrays'].description == "A string-to-array dictionary"
-        petSchema.properties['tagArrays'].getAdditionalProperties().getType() == "array"
-        petSchema.properties['tagArrays'].getAdditionalProperties().getItems().$ref == "#/components/schemas/Tag"
+        petSchema.properties['tagArrays'].additionalProperties.type == "array"
+        petSchema.properties['tagArrays'].additionalProperties.items.$ref == "#/components/schemas/Tag"
     }
 
     void "test build OpenAPI doc for POJO type with jakarta.constraints"() {

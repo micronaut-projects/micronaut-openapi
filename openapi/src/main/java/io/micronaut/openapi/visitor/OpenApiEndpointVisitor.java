@@ -191,10 +191,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
         if (additionalSecurityRequirements != null) {
             if (securityRequirements == null) {
-                securityRequirements = readSecurityRequirements(additionalSecurityRequirements);
+                securityRequirements = SecurityUtils.readSecurityRequirements(additionalSecurityRequirements);
             } else {
                 securityRequirements = new ArrayList<>(securityRequirements);
-                securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
+                securityRequirements.addAll(SecurityUtils.readSecurityRequirements(additionalSecurityRequirements));
             }
         }
         super.visitClass(element, context);

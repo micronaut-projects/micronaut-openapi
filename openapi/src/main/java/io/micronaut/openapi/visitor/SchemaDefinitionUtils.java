@@ -2817,7 +2817,7 @@ public final class SchemaDefinitionUtils {
                                               VisitorContext context) {
         var schema = setSpecVersion(new Schema<>());
         if (CollectionUtils.isEmpty(typeArgs)) {
-            schema.setAdditionalProperties(true);
+            schema.setAdditionalProperties(PrimitiveType.OBJECT.createProperty());
             return schema;
         }
         // Case, when map key is enumeration
@@ -2838,7 +2838,7 @@ public final class SchemaDefinitionUtils {
             }
         }
         if (valueType.getName().equals(Object.class.getName())) {
-            schema.setAdditionalProperties(true);
+            schema.setAdditionalProperties(setSpecVersion(PrimitiveType.OBJECT.createProperty()));
         } else {
             schema.setAdditionalProperties(resolveSchema(openApi, type, valueType, context, mediaTypes, jsonViewClass, null, classJavadoc, null));
         }

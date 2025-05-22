@@ -21,14 +21,11 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
-import io.micronaut.core.naming.NameUtils;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.core.reflect.ClassUtils;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.core.version.annotation.Version;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
@@ -50,31 +47,20 @@ import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MethodElement;
-import io.micronaut.inject.ast.PackageElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
+import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
-import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
-import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
-import io.micronaut.openapi.visitor.group.EndpointInfo;
-import io.micronaut.openapi.visitor.group.GroupProperties;
-import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
-import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
-import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
-import io.micronaut.openapi.visitor.security.SecurityProperties;
-import io.micronaut.openapi.visitor.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Webhook;
 import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -94,7 +80,6 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
@@ -103,7 +88,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -112,9 +96,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
-import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
-import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isResponseReadSuccessfulFromCode;
@@ -143,6 +124,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
 import static io.micronaut.openapi.visitor.ElementUtils.isWrappedBodyParameter;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addOperationDeprecatedExtension;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addParameterDeprecatedExtension;
+import static io.micronaut.openapi.visitor.GroupUtils.processMicronautVersionAndGroup;
 import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
@@ -155,9 +137,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXPLODE;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IMPLEMENTATION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
@@ -174,6 +154,10 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.ParamUtils.calcIn;
+import static io.micronaut.openapi.visitor.ParamUtils.getHeaderName;
+import static io.micronaut.openapi.visitor.ParamUtils.paramStyle;
+import static io.micronaut.openapi.visitor.ParamUtils.paramStyleByFormat;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
@@ -186,10 +170,10 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
-import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
-import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
+import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
+import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
@@ -202,7 +186,7 @@ import static io.micronaut.openapi.visitor.Utils.getMediaType;
 import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
 
 /**
- * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
+ * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
  *
  * @author graemerocher
  * @since 1.0
@@ -508,7 +492,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openApi);
 
-                readSecurityRequirements(element, pathItemEntry.getKey(), swaggerOperation, context);
+                readSecurityRequirements(element, httpMethod, pathItemEntry.getKey(), swaggerOperation, methodSecurityRequirements(element, context), context);
 
                 readApiResponses(element, context, swaggerOperation, jsonViewClass);
 
@@ -665,7 +649,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 if (schema.get$ref() != null) {
                     if (isRequestBodySchemaSet) {
-                        schema = SchemaUtils.getSchemaByRef(schema, openAPI);
+                        schema = getSchemaByRef(schema, openAPI);
                     } else {
                         var composedSchema = setSpecVersion(new ComposedSchema());
                         var extraBodyParametersSchema = setSpecVersion(new Schema<>());
@@ -802,7 +786,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             paramAnn.booleanValue(PROP_ALLOW_RESERVED).ifPresent(value -> parameter.setAllowReserved(value ? true : null));
             paramAnn.stringValue(PROP_EXAMPLE).ifPresent(parameter::example);
             paramAnn.stringValue(PROP_REF).ifPresent(parameter::$ref);
-            paramAnn.enumValue(PROP_STYLE, ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
+            paramAnn.enumValue(PROP_STYLE, ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style, parameter.getIn())));
             var examples = readExamples(paramAnn.getAnnotations(PROP_EXAMPLES, ExampleObject.class), element, context);
             if (examples != null) {
                 examples.forEach(parameter::addExample);
@@ -1003,7 +987,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                        List<UriMatchTemplate> matchTemplates) {
 
         boolean isBodyParameter = false;
-
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -1228,23 +1211,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             addParameterDeprecatedExtension(parameter, newParameter, context);
         }
 
+        if (newParameter != null) {
+            var mnFormatValue = parameter.stringValue(Format.class, PROP_VALUE).orElse(null);
+            var style = paramStyleByFormat(mnFormatValue, newParameter.getIn());
+            // case, when FORMAT_CSV
+            if ("query".equalsIgnoreCase(newParameter.getIn()) && (mnFormatValue == null || MnParamFormat.getByName(mnFormatValue) == MnParamFormat.CSV)) {
+                if (newParameter.getExplode() == null) {
+                    newParameter.setExplode(false);
+                }
+            }
+            if (style != null && newParameter.getStyle() == null) {
+                newParameter.setStyle(style);
+            }
+        }
+
         return newParameter;
-    }
-
-    private String getHeaderName(TypedElement parameter, String parameterName) {
-        // skip params like this: @Header Map<String, String>
-        if (isIgnoredParameter(parameter)) {
-            return null;
-        }
-        String headerName = parameter.stringValue(Header.class, PROP_NAME)
-            .orElse(parameter.stringValue(Header.class)
-                .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-
-        if (isIgnoredHeader(headerName)) {
-            return null;
-        }
-
-        return headerName;
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,
@@ -1587,10 +1568,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (examples != null) {
                                 examples.forEach(swaggerParam::addExample);
                             }
-                            var style = paramAnn.get(PROP_STYLE, ParameterStyle.class).orElse(ParameterStyle.DEFAULT);
-                            if (style != ParameterStyle.DEFAULT) {
-                                swaggerParam.setStyle(paramStyle(style));
-                            }
                             paramAnn.stringValue(PROP_REF).ifPresent(swaggerParam::set$ref);
                             Optional<ParameterIn> inOpt = paramAnn.get(PROP_IN, ParameterIn.class);
                             if (inOpt.isPresent()) {
@@ -1600,6 +1577,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 } else {
                                     swaggerParam.setIn(in.toString());
                                 }
+                            }
+                            var style = paramAnn.get(PROP_STYLE, ParameterStyle.class).orElse(ParameterStyle.DEFAULT);
+                            if (style != ParameterStyle.DEFAULT) {
+                                swaggerParam.setStyle(paramStyle(style, swaggerParam.getIn()));
                             }
                         }
                         if (swaggerParam != null && StringUtils.isEmpty(swaggerParam.getIn())) {
@@ -1642,184 +1623,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return swaggerOperations;
     }
 
-    private String calcIn(String path, HttpMethod httpMethod, ParameterElement methodParam) {
-        String paramName = methodParam.getName();
-        Set<String> paramAnnNames = methodParam.getAnnotationNames();
-        if (CollectionUtils.isNotEmpty(paramAnnNames)) {
-            if (paramAnnNames.contains(QueryValue.class.getName())) {
-                return ParameterIn.QUERY.toString();
-            } else if (paramAnnNames.contains(PathVariable.class.getName())) {
-                return ParameterIn.PATH.toString();
-            } else if (paramAnnNames.contains(Header.class.getName())) {
-                return ParameterIn.HEADER.toString();
-            } else if (paramAnnNames.contains(CookieValue.class.getName())) {
-                return ParameterIn.COOKIE.toString();
-            }
-        }
-        if (httpMethod == HttpMethod.GET) {
-            if (path.contains(OPEN_BRACE + paramName + CLOSE_BRACE)) {
-                return ParameterIn.PATH.toString();
-            } else {
-                return ParameterIn.QUERY.toString();
-            }
-        } else {
-            if (path.contains(OPEN_BRACE + paramName + CLOSE_BRACE)) {
-                return ParameterIn.PATH.toString();
-            }
-        }
-
-        return null;
-    }
-
-    private Parameter.StyleEnum paramStyle(ParameterStyle paramAnnStyle) {
-        if (paramAnnStyle == null) {
-            return null;
-        }
-        return switch (paramAnnStyle) {
-            case MATRIX -> Parameter.StyleEnum.MATRIX;
-            case LABEL -> Parameter.StyleEnum.LABEL;
-            case FORM -> Parameter.StyleEnum.FORM;
-            case SPACEDELIMITED -> Parameter.StyleEnum.SPACEDELIMITED;
-            case PIPEDELIMITED -> Parameter.StyleEnum.PIPEDELIMITED;
-            case DEEPOBJECT -> Parameter.StyleEnum.DEEPOBJECT;
-            case SIMPLE -> Parameter.StyleEnum.SIMPLE;
-            case DEFAULT -> null;
-        };
-    }
-
     private ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
         var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class).orElse(null);
         if (externalDocsAnn == null) {
             return null;
         }
         return toValue(externalDocsAnn.getAnnotationName(), externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
-    }
-
-    private void readSecurityRequirements(MethodElement element, String path, Operation operation, VisitorContext context) {
-        List<SecurityRequirement> securityRequirements = methodSecurityRequirements(element, context);
-        if (CollectionUtils.isNotEmpty(securityRequirements)) {
-            for (SecurityRequirement securityItem : securityRequirements) {
-                operation.addSecurityItem(securityItem);
-            }
-            return;
-        }
-
-        processMicronautSecurityConfig(element, path, operation, context);
-    }
-
-    private void processMicronautSecurityConfig(MethodElement element, String path, Operation operation, VisitorContext context) {
-
-        SecurityProperties securityProperties = getSecurityProperties(context);
-        if (!securityProperties.isEnabled()
-            || !securityProperties.isMicronautSecurityEnabled()
-            || (!securityProperties.isTokenEnabled()
-            && !securityProperties.isJwtEnabled()
-            && !securityProperties.isBasicAuthEnabled()
-            && !securityProperties.isOauth2Enabled()
-        )) {
-            return;
-        }
-
-        OpenAPI openAPI = Utils.resolveOpenApi(context);
-        Components components = openAPI.getComponents();
-
-        String securitySchemeName;
-        if (components != null && CollectionUtils.isNotEmpty(components.getSecuritySchemes())) {
-            securitySchemeName = components.getSecuritySchemes().keySet().iterator().next();
-        } else {
-            if (components == null) {
-                components = new Components();
-                openAPI.setComponents(components);
-            }
-            if (components.getSecuritySchemes() == null) {
-                components.setSecuritySchemes(new HashMap<>());
-            }
-            securitySchemeName = securityProperties.getDefaultSchemaName();
-            SecurityScheme securityScheme = components.getSecuritySchemes().get(securitySchemeName);
-            if (securityScheme == null) {
-                securityScheme = new SecurityScheme();
-                if (securityProperties.isOauth2Enabled()) {
-                    securityScheme.setType(SecurityScheme.Type.OAUTH2);
-                } else if (securityProperties.isBasicAuthEnabled()
-                    || securityProperties.isTokenEnabled()
-                    || securityProperties.isJwtEnabled()) {
-
-                    securityScheme.setType(SecurityScheme.Type.HTTP);
-                    if (securityProperties.isJwtEnabled()) {
-                        securityScheme.setBearerFormat("JWT");
-                    }
-                }
-                if (securityProperties.isJwtEnabled() || securityProperties.isJwtBearerEnabled()) {
-                    securityScheme.setScheme("bearer");
-                } else if (securityProperties.isBasicAuthEnabled()) {
-                    securityScheme.setScheme("basic");
-                }
-
-                components.addSecuritySchemes(securitySchemeName, securityScheme);
-            }
-        }
-
-        var classLevelSecuredAnn = element.getOwningType().getAnnotation("io.micronaut.security.annotation.Secured");
-        var methodLevelSecuredAnn = element.getAnnotation("io.micronaut.security.annotation.Secured");
-        List<String> access = Collections.emptyList();
-        if (methodLevelSecuredAnn != null) {
-            access = methodLevelSecuredAnn.getValue(Argument.LIST_OF_STRING).orElse(null);
-        } else if (classLevelSecuredAnn != null) {
-            access = classLevelSecuredAnn.getValue(Argument.LIST_OF_STRING).orElse(null);
-        }
-        processSecurityAccess(securitySchemeName, access, operation);
-
-        List<InterceptUrlMapPattern> securityRules = securityProperties.getInterceptUrlMapPatterns();
-        if (CollectionUtils.isNotEmpty(securityRules)) {
-            HttpMethod httpMethod = httpMethod(element);
-            for (InterceptUrlMapPattern securityRule : securityRules) {
-                if (PathMatcher.ANT.matches(securityRule.getPattern(), path)
-                    && (httpMethod == null || securityRule.getHttpMethod() == null || httpMethod == securityRule.getHttpMethod())) {
-
-                    processSecurityAccess(securitySchemeName, securityRule.getAccess(), operation);
-                }
-            }
-        }
-    }
-
-    private void processSecurityAccess(String securitySchemeName, List<String> access, Operation operation) {
-        if (securitySchemeName == null || CollectionUtils.isEmpty(access)) {
-            return;
-        }
-        String firstAccessItem = access.get(0);
-        if (access.size() == 1 && (firstAccessItem.equals(SecurityRule.IS_ANONYMOUS) || firstAccessItem.equals(SecurityRule.DENY_ALL))) {
-            return;
-        }
-        if (access.size() == 1 && firstAccessItem.equals(SecurityRule.IS_AUTHENTICATED)) {
-            access = Collections.emptyList();
-        }
-        SecurityRequirement existedSecurityRequirement = null;
-        List<String> existedSecList = null;
-        if (CollectionUtils.isNotEmpty(operation.getSecurity())) {
-            for (SecurityRequirement securityRequirement : operation.getSecurity()) {
-                if (securityRequirement.containsKey(securitySchemeName)) {
-                    existedSecList = securityRequirement.get(securitySchemeName);
-                    existedSecurityRequirement = securityRequirement;
-                    break;
-                }
-            }
-        }
-        if (existedSecList != null) {
-            if (access.isEmpty()) {
-                return;
-            }
-            if (existedSecList.isEmpty()) {
-                existedSecurityRequirement.put(securitySchemeName, access);
-            } else {
-                var finalAccess = new HashSet<>(existedSecList);
-                finalAccess.addAll(access);
-                existedSecurityRequirement.put(securitySchemeName, new ArrayList<>(finalAccess));
-            }
-        } else {
-            var securityRequirement = new SecurityRequirement();
-            securityRequirement.put(securitySchemeName, access);
-            operation.addSecurityItem(securityRequirement);
-        }
     }
 
     private void processExplode(AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn, Map<CharSequence, Object> paramValues) {
@@ -2037,158 +1846,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return callbacks;
     }
 
-    private void processMicronautVersionAndGroup(Operation swaggerOperation, String url,
-                                                 HttpMethod httpMethod,
-                                                 List<MediaType> consumesMediaTypes,
-                                                 List<MediaType> producesMediaTypes,
-                                                 MethodElement methodEl, VisitorContext context) {
-
-        String methodKey = httpMethod.name()
-            + '#' + url
-            + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes)
-            + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(producesMediaTypes) ? DEFAULT_MEDIA_TYPES : producesMediaTypes);
-
-        Map<String, GroupProperties> groupPropertiesMap = getGroupsPropertiesMap(context);
-        var groups = new HashMap<String, EndpointGroupInfo>();
-        var excludedGroups = new ArrayList<String>();
-
-        ClassElement classEl = methodEl.getDeclaringType();
-        PackageElement packageEl = classEl.getPackage();
-        String packageName = packageEl.getName();
-
-        processGroups(groups, excludedGroups, methodEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
-        processGroups(groups, excludedGroups, packageEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
-
-        processGroupsFromIncludedEndpoints(groups, excludedGroups, classEl.getName());
-
-        // properties from system properties or from environment more priority than annotations
-        for (GroupProperties groupProperties : groupPropertiesMap.values()) {
-            if (CollectionUtils.isNotEmpty(groupProperties.getPackages())) {
-                for (PackageProperties groupPackage : groupProperties.getPackages()) {
-                    boolean isInclude = groupPackage.isIncludeSubpackages() ? packageName.startsWith(groupPackage.getName()) : packageName.equals(groupPackage.getName());
-                    if (isInclude) {
-                        groups.put(groupProperties.getName(), new EndpointGroupInfo(groupProperties.getName()));
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(groupProperties.getPackagesExclude())) {
-                for (PackageProperties excludePackage : groupProperties.getPackagesExclude()) {
-                    boolean isExclude = excludePackage.isIncludeSubpackages() ? packageName.startsWith(excludePackage.getName()) : packageName.equals(excludePackage.getName());
-                    if (isExclude) {
-                        excludedGroups.add(groupProperties.getName());
-                    }
-                }
-            }
-        }
-
-        RouterVersioningProperties versioningProperties = getRouterVersioningProperties(context);
-        boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersioningEnabled()
-            && (versioningProperties.isHeaderEnabled() || versioningProperties.isParameterEnabled());
-
-        String version = null;
-
-        if (isVersioningEnabled) {
-
-            List<AnnotationValue<Version>> versionAnns = methodEl.getAnnotationValuesByType(Version.class);
-            if (CollectionUtils.isNotEmpty(versionAnns)) {
-                version = versionAnns.get(0).stringValue().orElse(null);
-            }
-            if (version != null) {
-                Utils.getAllKnownVersions().add(version);
-            }
-            if (versioningProperties.isParameterEnabled()) {
-                addVersionParameters(swaggerOperation, versioningProperties.getParameterNames(), false);
-            }
-            if (versioningProperties.isHeaderEnabled()) {
-                addVersionParameters(swaggerOperation, versioningProperties.getHeaderNames(), true);
-            }
-        }
-
-        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
-        if (endpointInfosMap == null) {
-            endpointInfosMap = new HashMap<>();
-            Utils.setEndpointInfos(endpointInfosMap);
-        }
-        List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
-        endpointInfos.add(new EndpointInfo(
-            url,
-            httpMethod,
-            methodEl,
-            swaggerOperation,
-            version,
-            groups,
-            excludedGroups
-        ));
-    }
-
-    private void processGroups(Map<String, EndpointGroupInfo> groups,
-                               List<String> excludedGroups,
-                               List<AnnotationValue<OpenAPIGroup>> annotationValues,
-                               Map<String, GroupProperties> groupPropertiesMap) {
-        if (CollectionUtils.isEmpty(annotationValues)) {
-            return;
-        }
-        for (AnnotationValue<OpenAPIGroup> groupAnn : annotationValues) {
-            excludedGroups.addAll(List.of(groupAnn.stringValues(PROP_EXCLUDE)));
-
-            var extensionAnns = groupAnn.getAnnotations(PROP_EXTENSIONS);
-            for (var groupName : groupAnn.stringValues(PROP_VALUE)) {
-                var extensions = new HashMap<String, Object>();
-                if (CollectionUtils.isNotEmpty(extensionAnns)) {
-                    for (Object extensionAnn : extensionAnns) {
-                        processExtensions(extensions, (AnnotationValue<Extension>) extensionAnn);
-                    }
-                }
-                var groupInfo = groups.get(groupName);
-                if (groupInfo == null) {
-                    groupInfo = new EndpointGroupInfo(groupName);
-                    groups.put(groupName, groupInfo);
-                }
-
-                groupInfo.getExtensions().putAll(extensions);
-            }
-        }
-        Set<String> allKnownGroups = Utils.getAllKnownGroups();
-        allKnownGroups.addAll(groups.keySet());
-        allKnownGroups.addAll(excludedGroups);
-    }
-
-    private void processGroupsFromIncludedEndpoints(Map<String, EndpointGroupInfo> groups, List<String> excludedGroups, String className) {
-        if (CollectionUtils.isEmpty(Utils.getIncludedClassesGroups()) && CollectionUtils.isEmpty(Utils.getIncludedClassesGroupsExcluded())) {
-            return;
-        }
-
-        List<String> classGroups = Utils.getIncludedClassesGroups() != null ? Utils.getIncludedClassesGroups().get(className) : Collections.emptyList();
-        List<String> classExcludedGroups = Utils.getIncludedClassesGroupsExcluded() != null ? Utils.getIncludedClassesGroupsExcluded().get(className) : Collections.emptyList();
-
-        for (var classGroup : classGroups) {
-            if (groups.containsKey(classGroup)) {
-                continue;
-            }
-            groups.put(classGroup, new EndpointGroupInfo(classGroup));
-        }
-        excludedGroups.addAll(classExcludedGroups);
-
-        Set<String> allKnownGroups = Utils.getAllKnownGroups();
-        allKnownGroups.addAll(classGroups);
-        allKnownGroups.addAll(classExcludedGroups);
-    }
-
-    private void addVersionParameters(Operation swaggerOperation, List<String> names, boolean isHeader) {
-
-        String in = isHeader ? ParameterIn.HEADER.toString() : ParameterIn.QUERY.toString();
-
-        for (String parameterName : names) {
-            var parameter = new Parameter()
-                .in(in)
-                .description("API version")
-                .name(parameterName)
-                .schema(setSpecVersion(PrimitiveType.STRING.createProperty()));
-
-            swaggerOperation.addParametersItem(parameter);
-        }
-    }
-
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var content = new Content();
         for (var mediaType : mediaTypes) {
@@ -2198,5 +1855,4 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         return content;
     }
-
 }

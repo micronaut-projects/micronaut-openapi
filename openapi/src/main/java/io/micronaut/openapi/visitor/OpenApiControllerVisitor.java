@@ -270,10 +270,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
-        List<SecurityRequirement> securityRequirements = readSecurityRequirements(element);
+        List<SecurityRequirement> securityRequirements = SecurityUtils.readSecurityRequirements(element);
         if (!additionalSecurityRequirements.isEmpty()) {
             securityRequirements = new ArrayList<>(securityRequirements);
-            securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
+            securityRequirements.addAll(SecurityUtils.readSecurityRequirements(additionalSecurityRequirements));
         }
         return securityRequirements;
     }
