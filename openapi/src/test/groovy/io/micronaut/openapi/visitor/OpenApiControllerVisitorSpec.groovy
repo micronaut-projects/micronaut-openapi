@@ -2999,4 +2999,102 @@ class MyBean {}
         operation2.responses."205".content."application/json".schema.type == 'string'
         operation2.responses."500".content."application/json".schema.type == 'string'
     }
+
+    void "test read body property"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+
+@OpenAPIGroup(value = {"Child"})
+@Controller
+interface Child extends Parent {
+  @Post
+  void doSomething(@Body("a") String a);
+}
+
+interface Parent {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.post
+
+        then:
+        operation
+        operation.requestBody.content."application/json".schema.type == "object"
+        operation.requestBody.content."application/json".schema.properties.a
+        operation.requestBody.content."application/json".schema.properties.a.type == "string"
+        !operation.requestBody.content."application/json".schema.oneOf
+    }
+
+    void "test Schema names for classes with same name in different packages"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.model.one.Response;
+
+@Controller("/model")
+class ModelController {
+
+    @Get("/model-one")
+    @Produces("application/json")
+    public Response getResponseOne() {
+        return new Response("one");
+    }
+
+    @Get("/model-one-b")
+    @Produces("application/json")
+    public Response getResponseOneB() {
+        return new Response("one-b");
+    }
+
+    @Get("/model-two")
+    @Produces("application/json")
+    public io.micronaut.openapi.model.two.Response getResponseTwo() {
+        return new io.micronaut.openapi.model.two.Response("two");
+    }
+
+    @Get("/model-two-b")
+    @Produces("application/json")
+    public io.micronaut.openapi.model.two.Response getResponseTwoB() {
+        return new io.micronaut.openapi.model.two.Response("two-b");
+    }
+
+    @Get("/model-two-c")
+    @Produces("application/json")
+    public io.micronaut.openapi.model.two.Response getResponseTwoC() {
+        return new io.micronaut.openapi.model.two.Response("two-c");
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        openApi
+
+        openApi.paths."/model/model-one".get.responses."200".content."application/json".schema.$ref == "#/components/schemas/Response"
+        openApi.paths."/model/model-one-b".get.responses."200".content."application/json".schema.$ref == "#/components/schemas/Response"
+        openApi.paths."/model/model-two".get.responses."200".content."application/json".schema.$ref == "#/components/schemas/Response_1"
+        openApi.paths."/model/model-two-b".get.responses."200".content."application/json".schema.$ref == "#/components/schemas/Response_1"
+        openApi.paths."/model/model-two-c".get.responses."200".content."application/json".schema.$ref == "#/components/schemas/Response_1"
+
+        openApi.components.schemas.size() == 2
+        openApi.components.schemas.containsKey("Response")
+        openApi.components.schemas.containsKey("Response_1")
+    }
 }

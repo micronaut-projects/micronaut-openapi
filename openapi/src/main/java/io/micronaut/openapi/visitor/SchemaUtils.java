@@ -70,6 +70,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
@@ -647,6 +648,97 @@ public final class SchemaUtils {
         return c1;
     }
 
+    public static boolean isEquals(Schema<?> s1, Schema<?> s2) {
+        if (s1 == s2) {
+            return true;
+        }
+        if (s1 == null) {
+            return false;
+        }
+        var t1 = s1.getType();
+        if (t1 == null) {
+            t1 = TYPE_OBJECT;
+        }
+        var t2 = s2.getType();
+        if (t2 == null) {
+            t2 = TYPE_OBJECT;
+        }
+        var types1 = s1.getTypes();
+        if (types1 == null) {
+            types1 = Set.of(TYPE_OBJECT);
+        }
+        var types2 = s2.getTypes();
+        if (types2 == null) {
+            types2 = Set.of(TYPE_OBJECT);
+        }
+
+        return Objects.equals(t1, t2)
+            && Objects.equals(types1, types2)
+            && Objects.equals(s1.getTitle(), s2.getTitle())
+            && Objects.equals(s1.getMultipleOf(), s2.getMultipleOf())
+            && Objects.equals(s1.getMaximum(), s2.getMaximum())
+            && Objects.equals(s1.getExclusiveMaximum(), s2.getExclusiveMaximum())
+            && Objects.equals(s1.getExclusiveMaximumValue(), s2.getExclusiveMaximumValue())
+            && Objects.equals(s1.getMinimum(), s2.getMinimum())
+            && Objects.equals(s1.getExclusiveMinimum(), s2.getExclusiveMinimum())
+            && Objects.equals(s1.getExclusiveMinimumValue(), s2.getExclusiveMinimumValue())
+            && Objects.equals(s1.getMaxLength(), s2.getMaxLength())
+            && Objects.equals(s1.getMinLength(), s2.getMinLength())
+            && Objects.equals(s1.getPattern(), s2.getPattern())
+            && Objects.equals(s1.getMaxItems(), s2.getMaxItems())
+            && Objects.equals(s1.getMinItems(), s2.getMinItems())
+            && Objects.equals(s1.getUniqueItems(), s2.getUniqueItems())
+            && Objects.equals(s1.getMaxProperties(), s2.getMaxProperties())
+            && Objects.equals(s1.getMinProperties(), s2.getMinProperties())
+            && Objects.equals(s1.getRequired(), s2.getRequired())
+            && Objects.equals(s1.getNot(), s2.getNot())
+            && Objects.equals(s1.getProperties(), s2.getProperties())
+            && Objects.equals(s1.getAdditionalProperties(), s2.getAdditionalProperties())
+            && Objects.equals(s1.getDescription(), s2.getDescription())
+            && Objects.equals(s1.getFormat(), s2.getFormat())
+            && Objects.equals(s1.get$ref(), s2.get$ref())
+            && Objects.equals(s1.getNullable(), s2.getNullable())
+            && Objects.equals(s1.getReadOnly(), s2.getReadOnly())
+            && Objects.equals(s1.getWriteOnly(), s2.getWriteOnly())
+            && Objects.equals(s1.getExample(), s2.getExample())
+            && Objects.equals(s1.getExternalDocs(), s2.getExternalDocs())
+            && Objects.equals(s1.getDeprecated(), s2.getDeprecated())
+            && Objects.equals(s1.getXml(), s2.getXml())
+            && Objects.equals(s1.getExtensions(), s2.getExtensions())
+            && Objects.equals(s1.getDiscriminator(), s2.getDiscriminator())
+            && Objects.equals(s1.getEnum(), s2.getEnum())
+            && Objects.equals(s1.getContains(), s2.getContains())
+            && Objects.equals(s1.getPatternProperties(), s2.getPatternProperties())
+            && Objects.equals(s1.get$id(), s2.get$id())
+            && Objects.equals(s1.get$anchor(), s2.get$anchor())
+            && Objects.equals(s1.get$schema(), s2.get$schema())
+            && Objects.equals(s1.get$vocabulary(), s2.get$vocabulary())
+            && Objects.equals(s1.get$dynamicAnchor(), s2.get$dynamicAnchor())
+            && Objects.equals(s1.getAllOf(), s2.getAllOf())
+            && Objects.equals(s1.getAnyOf(), s2.getAnyOf())
+            && Objects.equals(s1.getOneOf(), s2.getOneOf())
+            && Objects.equals(s1.getConst(), s2.getConst())
+            && Objects.equals(s1.getDefault(), s2.getDefault())
+            && Objects.equals(s1.getContentEncoding(), s2.getContentEncoding())
+            && Objects.equals(s1.getContentMediaType(), s2.getContentMediaType())
+            && Objects.equals(s1.getContentSchema(), s2.getContentSchema())
+            && Objects.equals(s1.getPropertyNames(), s2.getPropertyNames())
+            && Objects.equals(s1.getUnevaluatedProperties(), s2.getUnevaluatedProperties())
+            && Objects.equals(s1.getMaxContains(), s2.getMaxContains())
+            && Objects.equals(s1.getMinContains(), s2.getMinContains())
+            && Objects.equals(s1.getAdditionalItems(), s2.getAdditionalItems())
+            && Objects.equals(s1.getUnevaluatedItems(), s2.getUnevaluatedItems())
+            && Objects.equals(s1.getIf(), s2.getIf())
+            && Objects.equals(s1.getElse(), s2.getElse())
+            && Objects.equals(s1.getThen(), s2.getThen())
+            && Objects.equals(s1.getDependentRequired(), s2.getDependentRequired())
+            && Objects.equals(s1.getDependentSchemas(), s2.getDependentSchemas())
+            && Objects.equals(s1.get$comment(), s2.get$comment())
+            && Objects.equals(s1.getExamples(), s2.getExamples())
+            && Objects.equals(s1.getPrefixItems(), s2.getPrefixItems())
+            && Objects.equals(s1.getItems(), s2.getItems());
+    }
+
     public static Schema<?> mergeSchema(Schema<?> s1, Schema<?> s2) {
         if (s1 == null) {
             return s2;
@@ -654,7 +746,7 @@ public final class SchemaUtils {
         if (s2 == null) {
             return null;
         }
-        if (s1.equals(s2)) {
+        if (isEquals(s1, s2)) {
             return s1;
         }
         if (s1 instanceof ComposedSchema && CollectionUtils.isNotEmpty(s1.getOneOf())) {
@@ -678,7 +770,7 @@ public final class SchemaUtils {
         if (s2 == null) {
             return null;
         }
-        if (s1.equals(s2)) {
+        if (isEquals(s1, s2)) {
             return s1;
         }
 
