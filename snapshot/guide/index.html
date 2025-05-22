@@ -459,7 +459,7 @@ to add controllers be compiled with the <code>-parameters</code> flag. For examp
 
 
 <div class="paragraph">
-<p>Once dependencies have been configured a minimum requirement is to add a <code>@OpenAPIDefinition</code> annotation to your <code>Application</code> class:</p>
+<p>You can add a <code>@OpenAPIDefinition</code> annotation to your <code>Application</code> class or another class to describe global components (security schemas, servers etc.) and common information, like license, contact, version etc.:</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="title">Example @OpenAPIDefinition usage</div>
@@ -550,7 +550,10 @@ object Application {
 <p>For Java <code>build/classes/java/main/META-INF/swagger/hello-world-0.0.yml</code></p>
 </li>
 <li>
-<p>For Kotlin <code>build/tmp/kapt3/classes/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+<p>For Kotlin KAPT <code>build/tmp/kapt3/classes/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+</li>
+<li>
+<p>For Kotlin KSP <code>build/generated/ksp/main/resources/META-INF/swagger/hello-world-0.0.yml</code></p>
 </li>
 </ul>
 </div>
@@ -560,7 +563,7 @@ object Application {
 <div class="listingblock">
 <div class="title">Generated OpenAPI YAML</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.3
 info:
   title: the title
   description: My API
