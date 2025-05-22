@@ -1,6 +1,6 @@
 {{#isDeprecated}}@Deprecated{{/isDeprecated}}
 {{^isEnum}}{{^isDateTime}}{{^isDate}}
-    {{{vendorExtensions.typeWithGenericAnnotations}}}
+    {{#vendorExtensions.format}}@Format({{{vendorExtensions.format}}}) {{/vendorExtensions.format}}{{{vendorExtensions.typeWithGenericAnnotations}}}
 {{/isDate}}{{/isDateTime}}{{/isEnum}}
 {{#isDateTime}}
     {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{.}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}

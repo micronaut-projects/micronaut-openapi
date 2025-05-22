@@ -98,6 +98,7 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
+import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
@@ -352,6 +353,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         importMapping.put("LocalDate", "java.time.LocalDate");
         importMapping.put("LocalTime", "java.time.LocalTime");
         importMapping.put("Function", "java.util.function.Function");
+        importMapping.put("MultiValuesConverterFactory", "static io.micronaut.core.convert.converters.MultiValuesConverterFactory.*");
     }
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
@@ -1436,6 +1438,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             .collect(Collectors.toMap(v -> v.classname, v -> v));
         OperationMap operations = objs.getOperations();
         List<CodegenOperation> operationList = operations.getOperation();
+        var needToAddImportFormat = false;
 
         for (CodegenOperation op : operationList) {
             // Set whether body is supported in request
@@ -1537,6 +1540,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (useBeanValidation && !param.isContainer && param.isModel) {
                     param.vendorExtensions.put("withValid", true);
                 }
+
+                String queryValueFormat = null;
+
                 // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
                 if (isDateType(param.dataType)) {
                     if (StringUtils.isNotEmpty(param.pattern)) {
@@ -1548,11 +1554,20 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     param.minLength = null;
                     param.maxLength = null;
                 }
+                queryValueFormat = calcQueryValueFormat(param);
+                if (queryValueFormat != null) {
+                    needToAddImportFormat = true;
+                    param.vendorExtensions.put("format", queryValueFormat);
+                }
             }
             if (op.returnProperty != null) {
                 processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
+        }
+
+        if (needToAddImportFormat) {
+            objs.getImports().add(Map.of("import", "static io.micronaut.core.convert.converters.MultiValuesConverterFactory.*", "classname", "MultiValuesConverterFactory"));
         }
 
         return objs;
