@@ -172,7 +172,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
                 return;
             }
-            if (ignore(element, context)) {
+            if (ignore(element)) {
                 return;
             }
             incrementVisitedElements(context);
@@ -231,8 +231,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private boolean ignore(ClassElement element, VisitorContext context) {
-
+    private boolean ignore(ClassElement element) {
         return !element.isAnnotationPresent(OpenAPIDefinition.class)
             && !element.isAnnotationPresent(OpenAPIGroupInfo.class)
             && !element.isAnnotationPresent(OpenAPIGroupInfos.class);
