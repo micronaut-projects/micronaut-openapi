@@ -2748,7 +2748,7 @@ class MyBean {}
         op.requestBody
         op.requestBody.content."application/json;charset=UTF-8"
         op.requestBody.content."application/json;charset=UTF-8".schema
-        !op.requestBody.content."application/json;charset=UTF-8".schema.type
+        op.requestBody.content."application/json;charset=UTF-8".schema.type == 'object'
         op.requestBody.content."application/json;charset=UTF-8".schema.nullable
         op.requestBody.content."application/json;charset=UTF-8".schema.properties
         op.requestBody.content."application/json;charset=UTF-8".schema.properties.payload

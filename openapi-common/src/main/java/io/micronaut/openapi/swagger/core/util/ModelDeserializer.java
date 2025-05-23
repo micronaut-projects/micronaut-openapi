@@ -15,15 +15,16 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import io.micronaut.openapi.OpenApiUtils;
-import io.micronaut.openapi.SimpleSchema;
+import io.swagger.v3.oas.models.media.ArbitrarySchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
@@ -40,14 +41,12 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is copied from swagger-core library.
@@ -56,7 +55,17 @@ import com.fasterxml.jackson.databind.node.TextNode;
  */
 public class ModelDeserializer extends JsonDeserializer<Schema> {
 
-    protected boolean openapi31;
+    static Boolean useArbitrarySchema = false;
+
+    static {
+        if (System.getenv(Schema.USE_ARBITRARY_SCHEMA_PROPERTY) != null) {
+            useArbitrarySchema = Boolean.parseBoolean(System.getenv(Schema.USE_ARBITRARY_SCHEMA_PROPERTY));
+        } else if (System.getProperty(Schema.USE_ARBITRARY_SCHEMA_PROPERTY) != null) {
+            useArbitrarySchema = Boolean.parseBoolean(System.getProperty(Schema.USE_ARBITRARY_SCHEMA_PROPERTY));
+        }
+    }
+
+    protected boolean openapi31 = false;
 
     @Override
     public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
@@ -109,18 +118,18 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                     schema = OpenApiUtils.getJsonMapper().convertValue(node, StringSchema.class);
                 }
             } else if (type.textValue().equals("object")) {
-                schema = deserializeObjectSchema(node, true);
+                schema = deserializeArbitraryOrObjectSchema(node, true);
             }
         } else if (node.get("$ref") != null) {
             schema = new Schema().$ref(node.get("$ref").asText());
-        } else { // assume object
-            schema = deserializeObjectSchema(node, false);
+        } else {
+            schema = deserializeArbitraryOrObjectSchema(node, false);
         }
 
         return schema;
     }
 
-    private Schema deserializeObjectSchema(JsonNode node, boolean withType) {
+    private Schema deserializeArbitraryOrObjectSchema(JsonNode node, boolean alwaysObject) {
         JsonNode additionalProperties = node.get("additionalProperties");
         Schema schema;
         if (additionalProperties != null) {
@@ -130,10 +139,10 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 if (additionalPropsBoolean) {
                     schema = OpenApiUtils.getJsonMapper().convertValue(node, MapSchema.class);
                 } else {
-                    if (withType) {
+                    if (alwaysObject) {
                         schema = OpenApiUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
                     } else {
-                        schema = OpenApiUtils.getJsonMapper().convertValue(node, SimpleSchema.class);
+                        schema = OpenApiUtils.getJsonMapper().convertValue(node, ArbitrarySchema.class);
                     }
                 }
                 schema.setAdditionalProperties(additionalPropsBoolean);
@@ -145,10 +154,10 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 schema = ms;
             }
         } else {
-            if (withType) {
+            if (!Boolean.TRUE.equals(useArbitrarySchema) || alwaysObject) {
                 schema = OpenApiUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
             } else {
-                schema = OpenApiUtils.getJsonMapper().convertValue(node, SimpleSchema.class);
+                schema = OpenApiUtils.getJsonMapper().convertValue(node, ArbitrarySchema.class);
             }
         }
         if (schema != null) {

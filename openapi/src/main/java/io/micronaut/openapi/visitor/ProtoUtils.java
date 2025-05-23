@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.micronaut.openapi.visitor.SchemaUtils.setNullable;
-import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 
 /**
  * Protobuf util methods.
@@ -110,34 +109,36 @@ public final class ProtoUtils {
             return null;
         }
 
+        var openapi31 = Utils.isOpenapi31();
+
         var typeName = type.getName();
         switch (typeName) {
             case "com.google.protobuf.ByteString" -> {
-                return setSpecVersion(PrimitiveType.BYTE.createProperty());
+                return PrimitiveType.BYTE.createProperty(openapi31);
             }
             // wrapper types
             case "com.google.protobuf.BytesValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.BYTE.createProperty()));
+                return setNullable(PrimitiveType.BYTE.createProperty(openapi31));
             }
             case "com.google.protobuf.DoubleValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.DOUBLE.createProperty()));
+                return setNullable(PrimitiveType.DOUBLE.createProperty(openapi31));
             }
             case "com.google.protobuf.FloatValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.FLOAT.createProperty()));
+                return setNullable(PrimitiveType.FLOAT.createProperty(openapi31));
             }
             case "com.google.protobuf.BoolValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.BOOLEAN.createProperty()));
+                return setNullable(PrimitiveType.BOOLEAN.createProperty(openapi31));
             }
             case "com.google.protobuf.StringValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.STRING.createProperty()));
+                return setNullable(PrimitiveType.STRING.createProperty(openapi31));
             }
             case "com.google.protobuf.Int32ValueOrBuilder",
                  "com.google.protobuf.UInt32ValueOrBuilder" -> {
-                return setNullable(setSpecVersion(PrimitiveType.INT.createProperty()));
+                return setNullable(PrimitiveType.INT.createProperty(openapi31));
             }
             case "com.google.protobuf.Int64ValueOrBuilder",
                  "com.google.protobuf.UInt64ValueOrBuilder" -> {
-                return setSpecVersion(PrimitiveType.LONG.createProperty());
+                return PrimitiveType.LONG.createProperty(openapi31);
             }
             case "com.google.protobuf.AnyOrBuilder",
                  "com.google.protobuf.ApiOrBuilder",

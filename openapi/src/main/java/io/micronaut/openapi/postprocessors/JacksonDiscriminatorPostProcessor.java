@@ -17,14 +17,14 @@ package io.micronaut.openapi.postprocessors;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
+import io.micronaut.openapi.visitor.Utils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -59,7 +59,7 @@ public class JacksonDiscriminatorPostProcessor {
         for (String s : schemasToUpdate) {
             Schema<?> schema = openAPI.getComponents().getSchemas().get(extractComponentSchemaName(s));
             if (schema.getProperties() != null && !schema.getProperties().containsKey(discriminatorProperty)) {
-                schema.addProperty(discriminatorProperty, setSpecVersion(new StringSchema()));
+                schema.addProperty(discriminatorProperty, PrimitiveType.STRING.createProperty(Utils.isOpenapi31()));
             }
         }
     }

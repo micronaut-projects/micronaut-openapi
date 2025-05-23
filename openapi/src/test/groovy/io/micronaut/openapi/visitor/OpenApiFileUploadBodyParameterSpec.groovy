@@ -4,8 +4,6 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
-import io.swagger.v3.oas.models.media.BinarySchema
-import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.parameters.RequestBody
 import spock.lang.Issue
 

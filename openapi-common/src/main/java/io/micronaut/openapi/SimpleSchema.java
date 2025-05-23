@@ -15,15 +15,18 @@
  */
 package io.micronaut.openapi;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.models.media.Schema;
+
+import java.util.Objects;
 
 /**
  * Copy of MapSchema but without type 'object'. Need this class to correct deserializing schema without type.
  *
  * @since 4.8.7
+ *
+ * @deprecated Use {@link io.swagger.v3.oas.models.media.ArbitrarySchema} instead.
  */
+@Deprecated(forRemoval = true)
 public class SimpleSchema extends Schema<Object> {
 
     public SimpleSchema() {
