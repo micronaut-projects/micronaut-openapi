@@ -152,7 +152,7 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;vendorExtensions)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(java.lang.String,java.lang.String,boolean,java.lang.String,org.openapitools.codegen.CodegenProperty,java.util.Map,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataType,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(java.lang.String,java.lang.String,boolean,java.lang.String,org.openapitools.codegen.CodegenProperty,java.util.Map,boolean,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataTypeWithEnum,
  boolean&nbsp;isMap,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containerType,
@@ -163,25 +163,28 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</code></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(org.openapitools.codegen.CodegenParameter,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(org.openapitools.codegen.CodegenParameter,boolean,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;parameter,
  boolean&nbsp;useBeanValidation,
  boolean&nbsp;isGenerateHardNullable,
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</code></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(org.openapitools.codegen.CodegenProperty,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;property,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processGenericAnnotations(org.openapitools.codegen.CodegenProperty,boolean,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">processGenericAnnotations</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;property,
  boolean&nbsp;useBeanValidation,
  boolean&nbsp;isGenerateHardNullable,
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</code></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static org.apache.commons.lang3.tuple.Pair&lt;org.openapitools.codegen.CodegenParameter,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processMultipartBody(org.openapitools.codegen.CodegenOperation,java.util.Collection,boolean)" class="member-name-link">processMultipartBody</a><wbr>(org.openapitools.codegen.CodegenOperation&nbsp;op,
@@ -351,7 +354,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="processGenericAnnotations(org.openapitools.codegen.CodegenParameter,boolean,boolean,boolean,boolean,boolean,boolean)">
+<section class="detail" id="processGenericAnnotations(org.openapitools.codegen.CodegenParameter,boolean,boolean,boolean,boolean,boolean,boolean,boolean)">
 <h3>processGenericAnnotations</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">processGenericAnnotations</span><wbr><span class="parameters">(org.openapitools.codegen.CodegenParameter&nbsp;parameter,
  boolean&nbsp;useBeanValidation,
@@ -359,11 +362,12 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</span></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="processGenericAnnotations(org.openapitools.codegen.CodegenProperty,boolean,boolean,boolean,boolean,boolean,boolean)">
+<section class="detail" id="processGenericAnnotations(org.openapitools.codegen.CodegenProperty,boolean,boolean,boolean,boolean,boolean,boolean,boolean)">
 <h3>processGenericAnnotations</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">processGenericAnnotations</span><wbr><span class="parameters">(org.openapitools.codegen.CodegenProperty&nbsp;property,
  boolean&nbsp;useBeanValidation,
@@ -371,11 +375,12 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</span></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="processGenericAnnotations(java.lang.String,java.lang.String,boolean,java.lang.String,org.openapitools.codegen.CodegenProperty,java.util.Map,boolean,boolean,boolean,boolean,boolean,boolean)">
+<section class="detail" id="processGenericAnnotations(java.lang.String,java.lang.String,boolean,java.lang.String,org.openapitools.codegen.CodegenProperty,java.util.Map,boolean,boolean,boolean,boolean,boolean,boolean,boolean)">
 <h3>processGenericAnnotations</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">processGenericAnnotations</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataTypeWithEnum,
@@ -388,7 +393,8 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;isNullable,
  boolean&nbsp;isRequired,
  boolean&nbsp;isReadonly,
- boolean&nbsp;withNullablePostfix)</span></div>
+ boolean&nbsp;withNullablePostfix,
+ boolean&nbsp;ksp)</span></div>
 </section>
 </li>
 <li>
