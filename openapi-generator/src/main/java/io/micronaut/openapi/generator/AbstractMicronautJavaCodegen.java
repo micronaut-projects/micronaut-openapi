@@ -1533,7 +1533,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (param.isEnumRef) {
                     param.isEnum = true;
                 }
-                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
                 if (useBeanValidation && !param.isContainer && param.isModel) {
                     param.vendorExtensions.put("withValid", true);
                 }
@@ -1550,7 +1550,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
             }
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
@@ -2305,7 +2305,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             property.maxLength = null;
         }
 
-        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
 
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, false, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, false, property.vendorExtensions);

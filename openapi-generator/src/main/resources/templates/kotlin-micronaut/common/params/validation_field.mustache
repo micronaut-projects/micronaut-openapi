@@ -1,5 +1,6 @@
 
 {{^vendorExtensions.isPrimitiveArray}}
+    {{^vendorExtensions.valueWithDefaultValue}}
 {{#isNullable}}
     @{{{vendorExtensions.fieldAnnPrefix}}}Nullable
 {{/isNullable}}
@@ -13,6 +14,7 @@
     @{{{vendorExtensions.fieldAnnPrefix}}}Nullable
     {{/required}}
 {{/isNullable}}
+    {{/vendorExtensions.valueWithDefaultValue}}
 {{/vendorExtensions.isPrimitiveArray}}
 {{!All the validation}}
 {{#useBeanValidation}}

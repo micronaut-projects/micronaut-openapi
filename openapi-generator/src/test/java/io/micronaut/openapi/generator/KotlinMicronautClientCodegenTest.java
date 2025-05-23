@@ -1811,4 +1811,62 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testPropsWithDefaultValueAreOptionalKsp() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setKsp(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
+            "@Body @NotNull @Valid teSTRequest: TESTRequest,",
+            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
+            "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
+        );
+
+        assertFileContains(path + "model/TESTRequest.kt",
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_VALUE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var `value`: String? = null,
+                
+                    @field:JsonProperty(JSON_PROPERTY_CURRENCY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var currency: MyCur = MyCur.USD,
+                """
+        );
+    }
+
+    @Test
+    void testPropsWithDefaultValueAreOptionalKapt() {
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
+            "@Body @NotNull @Valid teSTRequest: TESTRequest,",
+            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
+            "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
+        );
+
+        assertFileContains(path + "model/TESTRequest.kt",
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_VALUE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var `value`: String? = null,
+                
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_CURRENCY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var currency: MyCur? = MyCur.USD,
+                """
+        );
+    }
 }

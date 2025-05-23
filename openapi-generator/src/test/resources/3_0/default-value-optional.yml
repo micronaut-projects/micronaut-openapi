@@ -1,0 +1,74 @@
+openapi: 3.0.1
+info:
+  title: TEST
+  description: TEST
+  version: 1.0.0
+paths:
+  /test:
+    post:
+      summary: TEST
+      description: TEST
+      operationId: TEST
+      parameters:
+        - name: optParamWithDefault
+          in: query
+          schema:
+            type: string
+            default: test
+        - name: optParam
+          in: query
+          schema:
+            type: string
+        - name: reqParamWithDefault
+          in: query
+          required: true
+          schema:
+            type: string
+            default: test-req
+        - name: reqParam
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                currency:
+                  $ref: "#/components/schemas/MyCur"
+      responses:
+        "200":
+          description: Test
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+components:
+  schemas:
+    Test:
+      type: object
+      properties:
+        id:
+          type: string
+          description: TEST
+        currency:
+          type: string
+          enum:
+            - USD
+            - SAR
+          default: USD
+          description: TEST
+    MyCur:
+      type: string
+      enum:
+        - USD
+        - SAR
+      default: USD
+      description: TEST
