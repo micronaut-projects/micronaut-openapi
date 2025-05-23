@@ -1169,7 +1169,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     param.isEnum = true;
                 }
                 processGenericAnnotations(param, useBeanValidation, false, param.isNullable || !param.required,
-                    param.required, false, true);
+                    param.required, false, true, ksp);
                 param.vendorExtensions.put("isString", "string".equalsIgnoreCase(param.dataType));
                 param.vendorExtensions.put("withoutExample", param.example == null || param.example.equals(NULL_STRING));
                 if (useBeanValidation && ((!param.isContainer && param.isModel)
@@ -1187,10 +1187,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     param.minLength = null;
                     param.maxLength = null;
                 }
+                var paramDefaultValueInit = (String) param.vendorExtensions.get("defaultValueInit");
+                param.vendorExtensions.put("valueWithDefaultValue", ksp && (paramDefaultValueInit != null  && !paramDefaultValueInit.equals(NULL_STRING)));
             }
 
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false, ksp);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
@@ -1687,7 +1689,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             defaultValueInit = NULL_STRING;
         }
         if (defaultValueInit != null) {
+            if (ksp && !defaultValueInit.equals(NULL_STRING)) {
+                parameter.isNullable = false;
+            }
             parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
+            parameter.vendorExtensions.put("defaultValueIsNotNull", !defaultValueInit.equals(NULL_STRING));
         }
 
         addStrValueToEnum(parameter.items);
@@ -2388,10 +2394,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         processGenericAnnotations(property, useBeanValidation, false, property.isNullable || property.isDiscriminator,
-            property.required, property.isReadOnly, true);
+            property.required, property.isReadOnly, true, ksp);
 
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, true, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);
+
+        var defaultValueInit = (String) property.vendorExtensions.get("defaultValueInit");
+        property.vendorExtensions.put("valueWithDefaultValue", ksp && defaultValueInit != null && !defaultValueInit.equals(NULL_STRING));
     }
 
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,

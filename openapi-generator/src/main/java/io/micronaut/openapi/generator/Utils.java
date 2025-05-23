@@ -111,7 +111,8 @@ public final class Utils {
     }
 
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
-                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
+                                                 boolean ksp) {
         var ext = parameter.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(parameter.dataType) || isKotlinPrimitiveArray(parameter.dataType));
@@ -119,11 +120,12 @@ public final class Utils {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
-            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
-                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
+                                                 boolean ksp) {
         var ext = property.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(property.dataType) || isKotlinPrimitiveArray(property.dataType));
@@ -131,21 +133,21 @@ public final class Utils {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
-                                                 boolean withNullablePostfix) {
+                                                 boolean withNullablePostfix, boolean ksp) {
         String genericAnnotations = null;
         dataType = addAnnotationsToPrimitiveArray(dataType, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         dataTypeWithEnum = addAnnotationsToPrimitiveArray(dataTypeWithEnum, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
-            genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
-            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
+            genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable, ksp);
+            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix, ksp);
             if (isMap) {
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
@@ -156,6 +158,11 @@ public final class Utils {
         }
 
         var isNullableType = withNullablePostfix && (isNullable || isRequired && isReadonly || (genericAnnotations != null && !genericAnnotations.contains("NotNull") && !isRequired));
+        // properties with default value are optional, but it works fine only with KSP
+        if (ksp) {
+            var hasDefaultValue = (Boolean) ext.get("defaultValueIsNotNull");
+            isNullableType = isNullableType && (hasDefaultValue == null || !hasDefaultValue);
+        }
 
         ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations + (isNullableType ? "?" : ""));
         ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations + (isNullableType ? "?" : ""));
@@ -193,7 +200,7 @@ public final class Utils {
         };
     }
 
-    private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable) {
+    private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable, boolean ksp) {
 
         var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
 
@@ -276,12 +283,16 @@ public final class Utils {
                 result.append(") ");
             }
         }
-        if (!isPrimitiveArray && !(Boolean) prop.vendorExtensions.get("isPrimitive")) {
+        if (!isPrimitiveArray && !(boolean) prop.vendorExtensions.get("isPrimitive")) {
             if (prop.isNullable) {
-                if (isGenerateHardNullable) {
-                    result.append("@Nullable(inherited = true) ");
-                } else {
-                    result.append("@Nullable ");
+                // properties with default value are optional, but it works fine only with KSP
+                var hasDefaultValue = (Boolean) prop.vendorExtensions.get("defaultValueIsNotNull");
+                if (!ksp || hasDefaultValue == null || !hasDefaultValue) {
+                    if (isGenerateHardNullable) {
+                        result.append("@Nullable(inherited = true) ");
+                    } else {
+                        result.append("@Nullable ");
+                    }
                 }
             } else if (!containsNotEmpty) {
                 result.append("@NotNull");
