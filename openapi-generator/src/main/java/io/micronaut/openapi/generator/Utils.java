@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.generator;
 
+import io.swagger.v3.oas.models.parameters.Parameter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openapitools.codegen.CodegenModel;
@@ -187,6 +188,9 @@ public final class Utils {
     }
 
     private static boolean isJavaPrimitiveArray(String dataType) {
+        if (dataType == null) {
+            return false;
+        }
         return switch (dataType) {
             case "byte[]", "short[]", "int[]", "long[]", "boolean[]", "char[]", "float[]", "double[]" -> true;
             default -> false;
@@ -194,6 +198,9 @@ public final class Utils {
     }
 
     private static boolean isKotlinPrimitiveArray(String dataType) {
+        if (dataType == null) {
+            return false;
+        }
         return switch (dataType) {
             case "ByteArray", "ShortArray", "IntArray", "LongArray", "BooleanArray", "CharArray", "FloatArray", "DoubleArray" -> true;
             default -> false;
@@ -508,6 +515,9 @@ public final class Utils {
     }
 
     public static boolean isDateType(String type) {
+        if (type == null) {
+            return false;
+        }
         return DATE_TIME_TYPES.contains(type);
     }
 
@@ -546,5 +556,24 @@ public final class Utils {
         }
         LOG.warn("The value (generator's option {}) must be either boolean or string. Default to `{}`.", propertyKey, defaultValue);
         return defaultValue;
+    }
+
+    public static String calcQueryValueFormat(CodegenParameter param) {
+        if (!param.isArray && !param.isMap && !param.isFreeFormObject) {
+            return null;
+        }
+        if (!param.isQueryParam) {
+            return null;
+        }
+        if (param.style == null || Parameter.StyleEnum.FORM.toString().equalsIgnoreCase(param.style)) {
+            return param.isExplode ? "FORMAT_MULTI" : null; // Don't need to add FORMAT_CSV - it is default value
+        } else if (Parameter.StyleEnum.SPACEDELIMITED.toString().equalsIgnoreCase(param.style)) {
+            return "FORMAT_SSV";
+        } else if (Parameter.StyleEnum.PIPEDELIMITED.toString().equalsIgnoreCase(param.style)) {
+            return "FORMAT_PIPES";
+        } else if (Parameter.StyleEnum.DEEPOBJECT.toString().equalsIgnoreCase(param.style)) {
+            return "FORMAT_DEEP_OBJECT";
+        }
+        return null;
     }
 }

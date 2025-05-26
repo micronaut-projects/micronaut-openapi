@@ -74,6 +74,7 @@ interface {{classname}} {
         {{^vendorExtensions.formatPattern}}
             {{#isDateTime}}{{#dateTimeFormat}}@Format("{{{dateTimeFormat}}}"){{/dateTimeFormat}}{{/isDateTime}}
             {{#isDate}}{{#dateFormat}}@Format("{{{dateFormat}}}"){{/dateFormat}}{{/isDate}}
+            {{^isDateTime}}{{^isDate}}{{#vendorExtensions.format}}@Format({{{vendorExtensions.format}}}) {{/vendorExtensions.format}}{{/isDate}}{{/isDateTime}}
         {{/vendorExtensions.formatPattern}}
         {{#isDeprecated}}
             @java.lang.Deprecated

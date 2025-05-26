@@ -1,4 +1,4 @@
 {{#isDeprecated}}@Deprecated{{/isDeprecated}}
-{{^isDate}}{{^isDateTime}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isDateTime}}{{/isDate}}
+{{^isDate}}{{^isDateTime}}{{#vendorExtensions.format}}@Format({{{vendorExtensions.format}}}) {{/vendorExtensions.format}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isDateTime}}{{/isDate}}
 {{#isDateTime}}{{#vendorExtensions.formatPattern}}@Format("{{{vendorExtensions.formatPattern}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{dateTimeFormat}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{{vendorExtensions.baseType}}} {{/isDateTime}}
 {{#isDate}}{{#vendorExtensions.formatPattern}}@Format("{{{vendorExtensions.formatPattern}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateFormat}}@Format("{{{dateFormat}}}"){{/dateFormat}}{{/vendorExtensions.formatPattern}} {{{vendorExtensions.baseType}}} {{/isDate}}

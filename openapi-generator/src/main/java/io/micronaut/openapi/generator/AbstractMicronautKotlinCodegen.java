@@ -105,6 +105,7 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.NULL_STRING;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
+import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
@@ -434,6 +435,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
         importMapping.put("LocalDate", "java.time.LocalDate");
         importMapping.put("LocalTime", "java.time.LocalTime");
+        importMapping.put("MultiValuesConverterFactory", "static io.micronaut.core.convert.converters.MultiValuesConverterFactory.*");
     }
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
@@ -1073,6 +1075,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             .collect(Collectors.toMap(v -> v.classname, v -> v));
         OperationMap operations = objs.getOperations();
         List<CodegenOperation> operationList = operations.getOperation();
+        var needToAddImportFormat = false;
 
         for (CodegenOperation op : operationList) {
 
@@ -1176,6 +1179,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     || (param.getIsArray() && param.getComplexType() != null && models.containsKey(param.getComplexType())))) {
                     param.vendorExtensions.put("withValid", true);
                 }
+
                 // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
                 if (isDateType(param.dataType)) {
                     if (StringUtils.isNotEmpty(param.pattern)) {
@@ -1189,12 +1193,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
                 var paramDefaultValueInit = (String) param.vendorExtensions.get("defaultValueInit");
                 param.vendorExtensions.put("valueWithDefaultValue", ksp && (paramDefaultValueInit != null  && !paramDefaultValueInit.equals(NULL_STRING)));
+                var queryValueFormat = calcQueryValueFormat(param);
+                if (queryValueFormat != null) {
+                    needToAddImportFormat = true;
+                    param.vendorExtensions.put("format", queryValueFormat);
+                }
             }
 
             if (op.returnProperty != null) {
                 processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false, ksp);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
+        }
+
+        if (needToAddImportFormat) {
+            objs.getImports().add(Map.of("import", "io.micronaut.core.convert.converters.MultiValuesConverterFactory.*", "classname", "MultiValuesConverterFactory"));
         }
 
         return objs;

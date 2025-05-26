@@ -427,7 +427,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
             "@PathVariable(\"id\") @NotNull String id,",
-            "@QueryValue(\"hourly\") @Nullable(inherited = true) List<V1ForecastIdGetHourlyParameterInner> hourly,");
+            "@QueryValue(\"hourly\") @Nullable(inherited = true) List<V1ForecastIdGetHourlyParameterInner> hourly,",
+            "@QueryValue(\"daily\") @Nullable(inherited = true) @Format(FORMAT_MULTI) List<V1ForecastIdGetDailyParameterInner> daily,"
+        );
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.java",
             "public enum V1ForecastIdGetHourlyParameterInner {",
@@ -652,37 +654,37 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/BooksApi.java",
             """
-                @QueryValue("emailParam") @NotNull List<@Email(regexp = "email@dot.com", message = "This is email pattern message") @Size(min = 5, max = 10, message = "This is min max email length message") @NotNull(message = "This is required email message") String> emailParam,
+                @QueryValue("emailParam") @NotNull @Format(FORMAT_MULTI) List<@Email(regexp = "email@dot.com", message = "This is email pattern message") @Size(min = 5, max = 10, message = "This is min max email length message") @NotNull(message = "This is required email message") String> emailParam,
                 """,
             """
-                @QueryValue("strParam") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam,
+                @QueryValue("strParam") @NotNull @Format(FORMAT_MULTI) List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam,
                 """,
             """
-                @QueryValue("strParam2") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam2,
+                @QueryValue("strParam2") @NotNull @Format(FORMAT_MULTI) List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam2,
                 """,
             """
-                @QueryValue("strParam3") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam3,
+                @QueryValue("strParam3") @NotNull @Format(FORMAT_MULTI) List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam3,
                 """,
             """
-                @QueryValue("intParam") @NotNull List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Integer> intParam,
+                @QueryValue("intParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Integer> intParam,
                 """,
             """
-                @QueryValue("decimalParam") @NotNull List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal> decimalParam,
+                @QueryValue("decimalParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal> decimalParam,
                 """,
             """
-                    @QueryValue("decimalParam2") @NotNull(message = "This is required param message") List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal> decimalParam2,
+                    @QueryValue("decimalParam2") @NotNull(message = "This is required param message") @Format(FORMAT_MULTI) List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal> decimalParam2,
                 """,
             """
-                @QueryValue("positiveParam") @NotNull List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Integer> positiveParam,
+                @QueryValue("positiveParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Integer> positiveParam,
                 """,
             """
-                @QueryValue("positiveOrZeroParam") @NotNull List<@NotNull(message = "This is required int message") @PositiveOrZero(message = "This is positive or zero message") Integer> positiveOrZeroParam,
+                @QueryValue("positiveOrZeroParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required int message") @PositiveOrZero(message = "This is positive or zero message") Integer> positiveOrZeroParam,
                 """,
             """
-                @QueryValue("negativeParam") @NotNull List<@NotNull(message = "This is required int message") @Negative(message = "This is negative message") Integer> negativeParam,
+                @QueryValue("negativeParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required int message") @Negative(message = "This is negative message") Integer> negativeParam,
                 """,
             """
-                @QueryValue("negativeOrZeroParam") @NotNull List<@NotNull(message = "This is required int message") @NegativeOrZero(message = "This is negative or zero message") Integer> negativeOrZeroParam,
+                @QueryValue("negativeOrZeroParam") @NotNull @Format(FORMAT_MULTI) List<@NotNull(message = "This is required int message") @NegativeOrZero(message = "This is negative or zero message") Integer> negativeOrZeroParam,
                 """);
     }
 
@@ -714,7 +716,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces({"application/json", "application/xml"})
                     @Secured({"write:pets", "read:pets"})
                     Mono<@NotNull List<@Valid Pet>> findPetsByStatus(
-                        @QueryValue(value = "status", defaultValue = "[\\"available\\"]") @Nullable(inherited = true) List<@NotNull String> status
+                        @QueryValue(value = "status", defaultValue = "[\\"available\\"]") @Nullable(inherited = true) @Format(FORMAT_MULTI) List<@NotNull String> status
                     );
                 """);
     }
@@ -851,5 +853,21 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "api/BooksApi.java",
             "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable");
         assertFileNotContains(path + "api/BooksApi.java", "getAuthorBooks");
+    }
+
+    @Test
+    void testParamWithStyle() {
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-style.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.java",
+            "import static io.micronaut.core.convert.converters.MultiValuesConverterFactory.*;",
+            "@QueryValue(\"fields\") @NotNull @Format(FORMAT_MULTI) Map<String, @NotNull String> fields",
+            "@QueryValue(\"fieldsCsv\") @NotNull Map<String, @NotNull String> fieldsCsv",
+            "@QueryValue(\"fieldsSpace\") @NotNull @Format(FORMAT_SSV) Map<String, @NotNull String> fieldsSpace",
+            "@QueryValue(\"fieldsPipes\") @NotNull @Format(FORMAT_PIPES) Map<String, @NotNull String> fieldsPipes",
+            "@QueryValue(\"fieldsDeepObject\") @NotNull @Format(FORMAT_DEEP_OBJECT) Map<String, @NotNull String> fieldsDeepObject"
+        );
     }
 }

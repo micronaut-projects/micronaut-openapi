@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: 'Order API'
+  version: v6
+paths:
+  /api/V3/{id}:
+    get:
+      operationId: checkV3
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: defines the input fields of the service
+          required: true
+          style: form
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+        - name: fieldsCsv
+          in: query
+          description: defines the input fields of the service
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+        - name: fieldsSpace
+          in: query
+          description: defines the input fields of the service
+          required: true
+          style: spaceDelimited
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+        - name: fieldsPipes
+          in: query
+          description: defines the input fields of the service
+          required: true
+          style: pipeDelimited
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+        - name: fieldsDeepObject
+          in: query
+          description: defines the input fields of the service
+          required: true
+          style: deepObject
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
