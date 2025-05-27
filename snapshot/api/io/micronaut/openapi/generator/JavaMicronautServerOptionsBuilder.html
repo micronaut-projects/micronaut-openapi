@@ -125,14 +125,24 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">If set to true, generated code will be with jakarta.annotation.Generated annotation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateImplementationFiles(boolean)" class="member-name-link">withGenerateImplementationFiles</a><wbr>(boolean&nbsp;generateImplementationFiles)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHardNullable(boolean)" class="member-name-link">withGenerateHardNullable</a><wbr>(boolean&nbsp;generateHardNullable)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Whether to generate controller implementations that need to be filled in.</div>
+<div class="block">Whether to generate and use an inherited nullable annotation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateOperationsToReturnNotImplemented(boolean)" class="member-name-link">withGenerateOperationsToReturnNotImplemented</a><wbr>(boolean&nbsp;generateOperationsToReturnNotImplemented)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateImplementationFiles(boolean)" class="member-name-link">withGenerateImplementationFiles</a><wbr>(boolean&nbsp;generateImplementationFiles)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Whether to generate controller implementations that need to be filled in.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateOperationsToReturnNotImplemented(boolean)" class="member-name-link">withGenerateOperationsToReturnNotImplemented</a><wbr>(boolean&nbsp;generateOperationsToReturnNotImplemented)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, controller operations will return not implemented status.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateStreamingFileUpload(boolean)" class="member-name-link">withGenerateStreamingFileUpload</a><wbr>(boolean&nbsp;generateStreamingFileUpload)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Whether to generate StreamingFileUpload type for file request body.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withLombok(boolean)" class="member-name-link">withLombok</a><wbr>(boolean&nbsp;lombok)</code></div>
@@ -288,6 +298,32 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>generatedAnnotation</code> - generate code with jakarta.annotation.Generated annotation or not</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withGenerateHardNullable(boolean)">
+<h3>withGenerateHardNullable</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateHardNullable</span><wbr><span class="parameters">(boolean&nbsp;generateHardNullable)</span></div>
+<div class="block">Whether to generate and use an inherited nullable annotation.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>generateHardNullable</code> - whether to generate and use an inherited nullable annotation</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withGenerateStreamingFileUpload(boolean)">
+<h3>withGenerateStreamingFileUpload</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateStreamingFileUpload</span><wbr><span class="parameters">(boolean&nbsp;generateStreamingFileUpload)</span></div>
+<div class="block">Whether to generate StreamingFileUpload type for file request body.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>generateStreamingFileUpload</code> - whether to generate StreamingFileUpload type for file request body</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

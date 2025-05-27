@@ -100,6 +100,26 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">Sets annotations for client type (class level annotations).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthConfigName(java.lang.String)" class="member-name-link">withAuthConfigName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authConfigName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Authorization config name.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthFilter(boolean)" class="member-name-link">withAuthFilter</a><wbr>(boolean&nbsp;authFilter)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate AuthorizationFilter or not.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthFilterClientIds(java.util.List)" class="member-name-link">withAuthFilterClientIds</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;authFilterClientIds)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sets serviceId annotation property for AuthorizationFilter.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthFilterExcludedClientIds(java.util.List)" class="member-name-link">withAuthFilterExcludedClientIds</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;authFilterExcludedClientIds)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">The list of client IDs, for which this filter will NOT be used.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthorization(boolean)" class="member-name-link">withAuthorization</a><wbr>(boolean&nbsp;useAuth)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true the client will be configured for authorization.</div>
@@ -110,24 +130,34 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">Sets the authorization filter pattern.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withBasePathSeparator(java.lang.String)" class="member-name-link">withBasePathSeparator</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;basePathSeparator)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAuthorizationFilterPatternStyle(java.lang.String)" class="member-name-link">withAuthorizationFilterPatternStyle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authorizationFilterPatternStyle)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sets the authorization filter pattern style.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withBasePathSeparator(java.lang.String)" class="member-name-link">withBasePathSeparator</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;basePathSeparator)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the separator to use between the application name and base path when referencing the property.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withClientId(java.lang.String)" class="member-name-link">withClientId</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientId)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withClientId(java.lang.String)" class="member-name-link">withClientId</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;clientId)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the client id.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withClientPath(boolean)" class="member-name-link">withClientPath</a><wbr>(boolean&nbsp;clientPath)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withClientPath(boolean)" class="member-name-link">withClientPath</a><wbr>(boolean&nbsp;clientPath)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, Api annotation @Client will be with `path` attribute.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withFluxForArrays(boolean)" class="member-name-link">withFluxForArrays</a><wbr>(boolean&nbsp;fluxForArrays)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withFluxForArrays(boolean)" class="member-name-link">withFluxForArrays</a><wbr>(boolean&nbsp;fluxForArrays)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, generated code will be with Flux&lt;?> instead Mono&lt;List&lt;?>>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateAuthClasses(boolean)" class="member-name-link">withGenerateAuthClasses</a><wbr>(boolean&nbsp;generateAuthorizationClasses)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate authorization classes or not.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGeneratedAnnotation(boolean)" class="member-name-link">withGeneratedAnnotation</a><wbr>(boolean&nbsp;generatedAnnotation)</code></div>
@@ -149,6 +179,21 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will pluralize parameters and properties for arrays.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUseApiKeyAuth(boolean)" class="member-name-link">withUseApiKeyAuth</a><wbr>(boolean&nbsp;useApiKeyAuth)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate ApiKeyAuthConfig config or not.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUseBasicAuth(boolean)" class="member-name-link">withUseBasicAuth</a><wbr>(boolean&nbsp;useBasicAuth)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate HttpBasicAuthConfig class or not.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUseOauth(boolean)" class="member-name-link">withUseOauth</a><wbr>(boolean&nbsp;useOauth)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate AuthorizationFilter with support OAuth2.0 or not.</div>
+</div>
 </div>
 </div>
 </div>
@@ -164,19 +209,6 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="withNoArgsConstructor(boolean)">
-<h3>withNoArgsConstructor</h3>
-<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withNoArgsConstructor</span><wbr><span class="parameters">(boolean&nbsp;noArgsConstructor)</span></div>
-<div class="block">Generate or not public no-args constructor always.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>noArgsConstructor</code> - generate or not public no-args constructor always</dd>
-<dt>Returns:</dt>
-<dd>this builder</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="withAuthorization(boolean)">
 <h3>withAuthorization</h3>
 <div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthorization</span><wbr><span class="parameters">(boolean&nbsp;useAuth)</span></div>
@@ -190,13 +222,138 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 </section>
 </li>
 <li>
+<section class="detail" id="withGenerateAuthClasses(boolean)">
+<h3>withGenerateAuthClasses</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateAuthClasses</span><wbr><span class="parameters">(boolean&nbsp;generateAuthorizationClasses)</span></div>
+<div class="block">Generate authorization classes or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>generateAuthorizationClasses</code> - Generate authorization classes or not.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAuthFilter(boolean)">
+<h3>withAuthFilter</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthFilter</span><wbr><span class="parameters">(boolean&nbsp;authFilter)</span></div>
+<div class="block">Generate AuthorizationFilter or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>authFilter</code> - Generate AuthorizationFilter or not.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withUseOauth(boolean)">
+<h3>withUseOauth</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withUseOauth</span><wbr><span class="parameters">(boolean&nbsp;useOauth)</span></div>
+<div class="block">Generate AuthorizationFilter with support OAuth2.0 or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>useOauth</code> - if true, then AuthorizationFilter will be created with support OAuth2.0</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withUseBasicAuth(boolean)">
+<h3>withUseBasicAuth</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withUseBasicAuth</span><wbr><span class="parameters">(boolean&nbsp;useBasicAuth)</span></div>
+<div class="block">Generate HttpBasicAuthConfig class or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>useBasicAuth</code> - if true, then HttpBasicAuthConfig class will be generated</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withUseApiKeyAuth(boolean)">
+<h3>withUseApiKeyAuth</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withUseApiKeyAuth</span><wbr><span class="parameters">(boolean&nbsp;useApiKeyAuth)</span></div>
+<div class="block">Generate ApiKeyAuthConfig config or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>useApiKeyAuth</code> - if true, then ApiKeyAuthConfig class will be generated</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="withAuthorizationFilterPattern(java.lang.String)">
 <h3>withAuthorizationFilterPattern</h3>
 <div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthorizationFilterPattern</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authorizationFilterPattern)</span></div>
-<div class="block">Sets the authorization filter pattern.</div>
+<div class="block">Sets the authorization filter pattern. Can be a list of strings, or single string with `;` separator</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>authorizationFilterPattern</code> - the filter pattern</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAuthorizationFilterPatternStyle(java.lang.String)">
+<h3>withAuthorizationFilterPatternStyle</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthorizationFilterPatternStyle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authorizationFilterPatternStyle)</span></div>
+<div class="block">Sets the authorization filter pattern style. Available values: ANT, REGEX.
+ <p>
+ Default: ANT</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>authorizationFilterPatternStyle</code> - the filter pattern style. Default: ANT</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAuthFilterClientIds(java.util.List)">
+<h3>withAuthFilterClientIds</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthFilterClientIds</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;authFilterClientIds)</span></div>
+<div class="block">Sets serviceId annotation property for AuthorizationFilter. Usefully, when use one filter for several clients.
+ Can be a list of strings, or single string with `;` separator.
+ <p>
+ By default, if you don't set any authFilterClientIds, value will be a list with one element - `clientId` property value.
+ If you don't want to add any serviceId annotation property for AuthorizationFilter, just set empty list (not null!).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>authFilterClientIds</code> - the list of client IDs, for which this filter will be used</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAuthFilterExcludedClientIds(java.util.List)">
+<h3>withAuthFilterExcludedClientIds</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthFilterExcludedClientIds</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;authFilterExcludedClientIds)</span></div>
+<div class="block">The list of client IDs, for which this filter will NOT be used. Can be a list of strings,
+ or single string with `;` separator (if you set this property, by additionalProperties)</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>authFilterExcludedClientIds</code> - the list of client IDs, for which this filter will NOT be used</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAuthConfigName(java.lang.String)">
+<h3>withAuthConfigName</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAuthConfigName</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authConfigName)</span></div>
+<div class="block">Authorization config name. Using in config properties for HttpBasicAuthConfig and ApiKeyAuthConfig.
+ If not set, clientId value will be used.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>authConfigName</code> - the client id</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
@@ -219,7 +376,7 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <section class="detail" id="withAdditionalClientTypeAnnotations(java.util.List)">
 <h3>withAdditionalClientTypeAnnotations</h3>
 <div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withAdditionalClientTypeAnnotations</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalClientTypeAnnotations)</span></div>
-<div class="block">Sets annotations for client type (class level annotations).</div>
+<div class="block">Sets annotations for client type (class level annotations). Can be a list of strings, or single string with `;` separator</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>additionalClientTypeAnnotations</code> - the type annotations</dd>
@@ -236,19 +393,6 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>basePathSeparator</code> - the base path separator</dd>
-<dt>Returns:</dt>
-<dd>this builder</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="withLombok(boolean)">
-<h3>withLombok</h3>
-<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withLombok</span><wbr><span class="parameters">(boolean&nbsp;lombok)</span></div>
-<div class="block">If set to true, generated code will be with lombok annotations.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>lombok</code> - generate code with lombok annotations or not</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
@@ -301,6 +445,32 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>clientPath</code> - do we need add path attribute to @Client annotation</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withNoArgsConstructor(boolean)">
+<h3>withNoArgsConstructor</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withNoArgsConstructor</span><wbr><span class="parameters">(boolean&nbsp;noArgsConstructor)</span></div>
+<div class="block">Generate or not public no-args constructor always.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>noArgsConstructor</code> - generate or not public no-args constructor always</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withLombok(boolean)">
+<h3>withLombok</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withLombok</span><wbr><span class="parameters">(boolean&nbsp;lombok)</span></div>
+<div class="block">If set to true, generated code will be with lombok annotations.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>lombok</code> - generate code with lombok annotations or not</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
