@@ -146,6 +146,18 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         this.useAuth = useAuth;
     }
 
+    public void setAot(boolean aot) {
+        this.aot = aot;
+    }
+
+    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+        this.generateStreamingFileUpload = generateStreamingFileUpload;
+    }
+
+    public void setGenerateHardNullable(boolean generateHardNullable) {
+        this.generateHardNullable = generateHardNullable;
+    }
+
     @Override
     public void processOpts() {
         super.processOpts();
@@ -334,6 +346,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean plural = true;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
+        private boolean generateHardNullable = true;
+        private boolean generateStreamingFileUpload;
         private boolean aot;
         private boolean noArgsConstructor;
 
@@ -398,6 +412,18 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         @Override
+        public JavaMicronautServerOptionsBuilder withGenerateHardNullable(boolean generateHardNullable) {
+            this.generateHardNullable = generateHardNullable;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+            this.generateStreamingFileUpload = generateStreamingFileUpload;
+            return this;
+        }
+
+        @Override
         public JavaMicronautServerOptionsBuilder withAot(boolean aot) {
             this.aot = aot;
             return this;
@@ -414,6 +440,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 plural,
                 fluxForArrays,
                 generatedAnnotation,
+                generateHardNullable,
+                generateStreamingFileUpload,
                 aot,
                 noArgsConstructor
             );
@@ -430,6 +458,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,
+        boolean generateHardNullable,
+        boolean generateStreamingFileUpload,
         boolean aot,
         boolean noArgsConstructor
     ) {

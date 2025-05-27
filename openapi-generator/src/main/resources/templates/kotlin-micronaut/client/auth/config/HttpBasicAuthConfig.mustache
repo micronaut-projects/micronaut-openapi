@@ -1,5 +1,5 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration
+package {{invokerPackage}}.auth.config
 
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.EachProperty
@@ -13,8 +13,8 @@ import {{javaxPackage}}.annotation.Generated
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-@EachProperty("security.basic-auth")
-data class HttpBasicAuthConfiguration(
+@EachProperty("security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.basic-auth")
+class HttpBasicAuthConfig @ConfigurationInject constructor(
     @Parameter
     override val name: String,
     @NonNull

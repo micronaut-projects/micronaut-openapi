@@ -1,40 +1,46 @@
 {{>common/licenseInfo}}
 package {{invokerPackage}}.auth;
 
-import io.micronaut.context.BeanContext;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.core.util.Toggleable;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.ClientFilterChain;
+{{#authorizationFilterPatternStyle}}
+import io.micronaut.http.filter.FilterPatternStyle;
+{{/authorizationFilterPatternStyle}}
 import io.micronaut.http.filter.HttpClientFilter;
+{{#useOauth}}
+import io.micronaut.context.BeanContext;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.util.Toggleable;
 import io.micronaut.inject.qualifiers.Qualifiers;
 import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient;
 import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsConfiguration;
-import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter;
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator;
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;
-import {{invokerPackage}}.auth.configuration.ConfigurableAuthorization;
-import org.reactivestreams.Publisher;
-{{#lombok}}
+import java.util.HashMap;
+    {{#lombok}}
 import lombok.extern.slf4j.Slf4j;
-{{/lombok}}
-{{^lombok}}
+    {{/lombok}}
+    {{^lombok}}
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-{{/lombok}}
+    {{/lombok}}
+{{/useOauth}}
+import {{invokerPackage}}.auth.config.ConfigurableAuthorization;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 {{#generatedAnnotation}}
@@ -44,105 +50,123 @@ import {{javaxPackage}}.annotation.Generated;
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-{{#lombok}}
+{{#useOauth}}
+    {{#lombok}}
 @Slf4j
-{{/lombok}}
-@Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
+    {{/lombok}}
+{{/useOauth}}
+@Filter({{#authFilterClientIds.0}}serviceId = {{#authFilterClientIds.1}}{{openbrace}}{{/authFilterClientIds.1}}{{#authFilterClientIds}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authFilterClientIds}}{{#authFilterClientIds.1}}{{closebrace}}{{/authFilterClientIds.1}}, {{/authFilterClientIds.0}}{{#authFilterExcludedClientIds.0}}excludeServiceId = {{#authFilterExcludedClientIds.1}}{{openbrace}}{{/authFilterExcludedClientIds.1}}{{#authFilterExcludedClientIds}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authFilterExcludedClientIds}}{{#authFilterExcludedClientIds.1}}{{closebrace}}{{/authFilterExcludedClientIds.1}}, {{/authFilterExcludedClientIds.0}}{{#authorizationFilterPatternStyle}}patternStyle = FilterPatternStyle.{{{authorizationFilterPatternStyle}}}, {{/authorizationFilterPatternStyle}}patterns = {{#configureAuthFilterPattern}}{{#authorizationFilterPattern.1}}{{openbrace}}{{/authorizationFilterPattern.1}}{{#authorizationFilterPattern}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authorizationFilterPattern}}{{#authorizationFilterPattern.1}}{{closebrace}}{{/authorizationFilterPattern.1}}{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
 public class AuthorizationFilter implements HttpClientFilter {
-{{^lombok}}
+{{#useOauth}}
+    {{^lombok}}
 
-    private static final Logger log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
-{{/lombok}}
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationFilter.class);
+    {{/lombok}}
+
+    protected ClientCredentialsTokenPropagator defaultTokenPropagator;
 
     private final BeanContext beanContext;
     private final Map<String, OauthClientConfiguration> clientConfigurationByName;
-
-    ClientCredentialsTokenPropagator defaultTokenPropagator;
     private final Map<String, ClientCredentialsTokenPropagator> tokenPropagatorByName;
     private final Map<String, ClientCredentialsClient> clientCredentialsClientByName;
+{{/useOauth}}
 
-    public final Map<String, ConfigurableAuthorization> authorizationsByName;
+    private final Map<String, ConfigurableAuthorization> authorizationsByName;
 
+{{#useOauth}}
     public AuthorizationFilter(
-            BeanContext beanContext,
-            Stream<OauthClientConfiguration> clientConfigurations,
-            ClientCredentialsTokenPropagator defaultTokenPropagator,
-            Stream<ConfigurableAuthorization> configurableAuthorizations
+        BeanContext beanContext,
+        Stream<OauthClientConfiguration> clientConfigurations,
+        ClientCredentialsTokenPropagator defaultTokenPropagator,
+        @Nullable Stream<ConfigurableAuthorization> configurableAuthorizations
     ) {
         this.beanContext = beanContext;
         this.defaultTokenPropagator = defaultTokenPropagator;
         clientConfigurationByName = clientConfigurations
-                .filter(Toggleable::isEnabled)
-                .collect(Collectors.toMap(OauthClientConfiguration::getName, v -> v));
+            .filter(Toggleable::isEnabled)
+            .collect(Collectors.toMap(OauthClientConfiguration::getName, Function.identity()));
         tokenPropagatorByName = new HashMap<>();
         clientCredentialsClientByName = new HashMap<>();
-        authorizationsByName = configurableAuthorizations
-                .collect(Collectors.toMap(ConfigurableAuthorization::getName, v -> v));
+        authorizationsByName = configurableAuthorizations != null
+            ? configurableAuthorizations.collect(Collectors.toMap(ConfigurableAuthorization::getName, Function.identity()))
+            : Collections.emptyMap();
     }
+{{/useOauth}}
+{{^useOauth}}
+    public AuthorizationFilter(@Nullable Stream<ConfigurableAuthorization> configurableAuthorizations) {
+        authorizationsByName = configurableAuthorizations != null
+            ? configurableAuthorizations.collect(Collectors.toMap(ConfigurableAuthorization::getName, Function.identity()))
+            : Collections.emptyMap();
+    }
+{{/useOauth}}
 
     @Override
-    public Publisher<? extends HttpResponse<?>> doFilter(
-            @NonNull MutableHttpRequest<?> request,
-            @NonNull ClientFilterChain chain
-    ) {
+    public Publisher<? extends HttpResponse<?>> doFilter(@NonNull MutableHttpRequest<?> request, @NonNull ClientFilterChain chain) {
         List<?> names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, List.class).orElse(null);
-        if (CollectionUtils.isNotEmpty(names)) {
-            var authorizers = new ArrayList<Publisher<HttpRequest<?>>>(names.size());
-
-            for (Object nameObject : names) {
-                if (!(nameObject instanceof String name)) {
-                    continue;
-                }
-
-                // Check if other authorizations have the key
-                if (authorizationsByName.containsKey(name)) {
-                    ConfigurableAuthorization authorizer = authorizationsByName.get(name);
-                    authorizers.add(Mono.fromCallable(() -> {
-                        authorizer.applyAuthorization(request);
-                        return request;
-                    }));
-                    continue;
-                }
-
-                // Perform OAuth authorization
-                OauthClientConfiguration clientConfiguration = clientConfigurationByName.get(name);
-                if (clientConfiguration == null) {
-                    continue;
-                }
-
-                ClientCredentialsClient clientCredentialsClient = getClientCredentialsClient(name);
-                if (clientCredentialsClient == null) {
-                    log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name);
-                    continue;
-                }
-
-                ClientCredentialsTokenPropagator tokenHandler = getTokenPropagator(name);
-                Flux<HttpRequest<?>> authorizer = Flux.from(clientCredentialsClient
-                        .requestToken(getScope(clientConfiguration)))
-                        .map(tokenResponse -> {
-                            var accessToken = tokenResponse.getAccessToken();
-                            if (StringUtils.isNotEmpty(accessToken)) {
-                                tokenHandler.writeToken(request, accessToken);
-                            }
-                            return request;
-                        });
-                authorizers.add(authorizer);
-            }
-
-            return Flux.concat(authorizers)
-                    .switchMap(v -> chain.proceed(request));
+        if (CollectionUtils.isEmpty(names)) {
+            return chain.proceed(request);
         }
 
-        return chain.proceed(request);
+        var authorizers = new ArrayList<Publisher<HttpRequest<?>>>(names.size());
+
+        for (Object nameObject : names) {
+            if (!(nameObject instanceof String name)) {
+                continue;
+            }
+
+            // Check if other authorizations have the key
+            if (authorizationsByName.containsKey(name)) {
+                ConfigurableAuthorization authorizer = authorizationsByName.get(name);
+                authorizers.add(Mono.fromCallable(() -> {
+                    authorizer.applyAuthorization(request);
+                    return request;
+                }));
+{{#useOauth}}
+                continue;
+{{/useOauth}}
+            }
+{{#useOauth}}
+
+            // Perform OAuth authorization
+            OauthClientConfiguration clientConfiguration = clientConfigurationByName.get(name);
+            if (clientConfiguration == null) {
+                continue;
+            }
+
+            ClientCredentialsClient clientCredentialsClient = getClientCredentialsClient(name);
+            if (clientCredentialsClient == null) {
+                log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name);
+                continue;
+            }
+
+            ClientCredentialsTokenPropagator tokenHandler = getTokenPropagator(name);
+            Flux<HttpRequest<?>> authorizer = Flux.from(clientCredentialsClient
+                    .requestToken(getScope(clientConfiguration)))
+                    .map(tokenResponse -> {
+                        var accessToken = tokenResponse.getAccessToken();
+                        if (StringUtils.isNotEmpty(accessToken)) {
+                            tokenHandler.writeToken(request, accessToken);
+                        }
+                        return request;
+                    });
+            authorizers.add(authorizer);
+{{/useOauth}}
+        }
+
+        return Flux.concat(authorizers)
+                .switchMap(v -> chain.proceed(request));
     }
+{{#useOauth}}
 
     protected ClientCredentialsTokenPropagator getTokenPropagator(String name) {
         ClientCredentialsTokenPropagator tokenPropagator = tokenPropagatorByName.get(name);
         if (tokenPropagator == null) {
-            tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator.class, Qualifiers.byName(name))
-                    .orElse(defaultTokenPropagator);
-            if (tokenPropagator != null) {
-                tokenPropagatorByName.put(name, tokenPropagator);
+            synchronized (tokenPropagatorByName) {
+                tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator.class, Qualifiers.byName(name))
+                        .orElse(defaultTokenPropagator);
+                if (tokenPropagator != null) {
+                    tokenPropagatorByName.put(name, tokenPropagator);
+                }
             }
         }
         return tokenPropagator;
@@ -151,9 +175,11 @@ public class AuthorizationFilter implements HttpClientFilter {
     protected ClientCredentialsClient getClientCredentialsClient(String name) {
         ClientCredentialsClient client = clientCredentialsClientByName.get(name);
         if (client == null) {
-            client = beanContext.findBean(ClientCredentialsClient.class, Qualifiers.byName(name)).orElse(null);
-            if (client != null) {
-                clientCredentialsClientByName.put(name, client);
+            synchronized (clientCredentialsClientByName) {
+                client = beanContext.findBean(ClientCredentialsClient.class, Qualifiers.byName(name)).orElse(null);
+                if (client != null) {
+                    clientCredentialsClientByName.put(name, client);
+                }
             }
         }
         return client;
@@ -165,4 +191,5 @@ public class AuthorizationFilter implements HttpClientFilter {
                 .flatMap(ClientCredentialsConfiguration::getScope)
                 .orElse(null);
     }
+{{/useOauth}}
 }

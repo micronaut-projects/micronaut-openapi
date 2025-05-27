@@ -112,6 +112,24 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);
 
     /**
+     * Whether to generate and use an inherited nullable annotation.
+     *
+     * @param generateHardNullable whether to generate and use an inherited nullable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withGenerateHardNullable(boolean generateHardNullable);
+
+    /**
+     * Whether to generate StreamingFileUpload type for file request body.
+     *
+     * @param generateStreamingFileUpload whether to generate StreamingFileUpload type for file request body
+     *
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withGenerateStreamingFileUpload(boolean generateStreamingFileUpload);
+
+    /**
      * If set to true, generated compatible code with micronaut-aot.
      *
      * @param aot generate compatible code with micronaut-aot or not

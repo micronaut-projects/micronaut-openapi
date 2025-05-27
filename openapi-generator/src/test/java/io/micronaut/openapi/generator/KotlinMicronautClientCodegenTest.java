@@ -231,7 +231,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS);
 
         // Micronaut AuthorizationFilter should default to match all patterns
-        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/auth/AuthorizationFilter.kt", "@Filter(Filter.MATCH_ALL_PATTERN)");
+        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/auth/AuthorizationFilter.kt", "@Filter(patterns = [Filter.MATCH_ALL_PATTERN])");
     }
 
     @Test
@@ -242,7 +242,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS);
 
         // Micronaut AuthorizationFilter should match the provided pattern
-        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/auth/AuthorizationFilter.kt", "@Filter(\"pet/**\")");
+        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/auth/AuthorizationFilter.kt", "@Filter(patterns = [\"pet/**\"])");
     }
 
     @Test
@@ -640,8 +640,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "api/DefaultApi.kt",
             "@QueryValue(\"ids\") @Nullable @Format(FORMAT_MULTI) ids: List<@NotNull Int>? = null,",
             "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
-            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,",
-            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\"",
+            "@PathVariable(\"apiVersion\", defaultValue = \"v5\") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,",
+            "@Header(\"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\"",
             "@QueryValue(\"algorithm\") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null"
         );
     }
@@ -1371,7 +1371,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/pet/findByStatus")
                     @Consumes("application/json", "application/xml")
                     fun findPetsByStatus(
-                        @QueryValue(value = "status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf("available"),
+                        @QueryValue("status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf("available"),
                     ): Mono<List<Pet>>
                 """);
     }
@@ -1788,10 +1788,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                     @Get("/{apiVersion}/orders")
                     suspend fun browseSearchOrders(
-                        @PathVariable(name = "apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
+                        @PathVariable("apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
                         @QueryValue("ids") @Nullable @Format(FORMAT_MULTI) ids: List<@NotNull Int>? = null,
                         @Header("X-Favor-Token") @Nullable xFavorToken: String? = null,
-                        @Header(name = "Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
+                        @Header("Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
                         @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null,
                     ): String
                 """
@@ -1822,10 +1822,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
             "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 
@@ -1850,10 +1850,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
             "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 
@@ -1886,5 +1886,163 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@QueryValue(\"fieldsPipes\") @NotNull @Format(FORMAT_PIPES) fieldsPipes: Map<String, @NotNull String>,",
             "@QueryValue(\"fieldsDeepObject\") @NotNull @Format(FORMAT_DEEP_OBJECT) fieldsDeepObject: Map<String, @NotNull String>,"
         );
+    }
+
+
+    @Test
+    void testUseBasicAuth() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setUseBasicAuth(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.kt");
+        assertFileExists(path + "auth/config/ApiKeyAuthConfig.kt");
+        assertFileDoesntExist(path + "auth/config/HttpBasicAuthConfig.kt");
+        assertFileExists(path + "auth/AuthorizationFilter.kt");
+    }
+
+    @Test
+    void testUseApiKeyAuth() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setUseApiKeyAuth(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.kt");
+        assertFileDoesntExist(path + "auth/config/ApiKeyAuthConfig.kt");
+        assertFileExists(path + "auth/config/HttpBasicAuthConfig.kt");
+        assertFileExists(path + "auth/AuthorizationFilter.kt");
+    }
+
+    @Test
+    void testAuthFilter() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setAuthFilter(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.kt");
+        assertFileExists(path + "auth/config/ApiKeyAuthConfig.kt");
+        assertFileExists(path + "auth/config/HttpBasicAuthConfig.kt");
+        assertFileDoesntExist(path + "auth/AuthorizationFilter.kt");
+    }
+
+    @Test
+    void testGenerateAuthClasses() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setGenerateAuthClasses(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileDoesntExist(path + "auth/config/ConfigurableAuthorization.kt");
+        assertFileDoesntExist(path + "auth/config/ApiKeyAuthConfig.kt");
+        assertFileDoesntExist(path + "auth/config/HttpBasicAuthConfig.kt");
+        assertFileDoesntExist(path + "auth/AuthorizationFilter.kt");
+        assertFileDoesntExist(path + "auth/Authorizations.kt");
+        assertFileDoesntExist(path + "auth/AuthorizationBinder.kt");
+        assertFileDoesntExist(path + "auth/Authorization.kt");
+    }
+
+    @Test
+    void testAuthWithClientIdAndMultiplePatterns() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "@Filter(serviceId = [\"myApiClient\"], patterns = [\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"])");
+        assertFileContains(path + "auth/AuthorizationBinder.kt",
+            "const val AUTHORIZATION_NAMES = \"micronaut.security.myApiClient.AUTHORIZATION_NAMES\"");
+        assertFileContains(path + "auth/config/ApiKeyAuthConfig.kt",
+            "@EachProperty(\"security.myApiClient.api-key-auth\")");
+        assertFileContains(path + "auth/config/HttpBasicAuthConfig.kt",
+            "@EachProperty(\"security.myApiClient.basic-auth\")");
+    }
+
+    @Test
+    void testAuthWithAuthConfigName() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthConfigName("test");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "@Filter(serviceId = [\"myApiClient\"], patterns = [Filter.MATCH_ALL_PATTERN])");
+        assertFileContains(path + "auth/AuthorizationBinder.kt",
+            "const val AUTHORIZATION_NAMES = \"micronaut.security.test.AUTHORIZATION_NAMES\"");
+        assertFileContains(path + "auth/config/ApiKeyAuthConfig.kt",
+            "@EachProperty(\"security.test.api-key-auth\")");
+        assertFileContains(path + "auth/config/HttpBasicAuthConfig.kt",
+            "@EachProperty(\"security.test.basic-auth\")");
+    }
+
+    @Test
+    void testAuthWithAuthFilterClientIds() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "@Filter(serviceId = [\"test1\", \"test2\", \"test3\"], patterns = [\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"])");
+    }
+
+    @Test
+    void testAuthWithAuthFilterExcludedClientIds() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "@Filter(serviceId = [\"myApiClient\"], excludeServiceId = [\"test1\", \"test2\", \"test3\"], patterns = [\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"])");
+    }
+
+    @Test
+    void testAuthWithAuthFilterExcludedClientIdsAndEmptyAuthFilterClientIds() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of());
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "@Filter(excludeServiceId = [\"test1\", \"test2\", \"test3\"], patterns = [\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"])");
+    }
+
+    @Test
+    void testAuthWithAuthorizationFilterPatternStyle() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of());
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        codegen.setAuthorizationFilterPatternStyle("regex");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            "import io.micronaut.http.filter.FilterPatternStyle",
+            "@Filter(excludeServiceId = [\"test1\", \"test2\", \"test3\"], patternStyle = FilterPatternStyle.REGEX, patterns = [\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"])");
     }
 }

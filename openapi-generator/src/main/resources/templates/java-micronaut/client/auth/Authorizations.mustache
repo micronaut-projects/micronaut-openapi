@@ -10,16 +10,17 @@ import java.lang.annotation.Target;
 import {{javaxPackage}}.annotation.Generated;
 {{/generatedAnnotation}}
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
+@Bindable
 @Documented
 @Retention(RUNTIME)
-@Target(METHOD)
-@Bindable
+@Target({METHOD, ANNOTATION_TYPE})
 public @interface Authorizations {
 
     Authorization[] value();
