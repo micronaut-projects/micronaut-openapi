@@ -870,7 +870,11 @@ public final class ConfigUtils {
         if (environment != null) {
             for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_ENDPOINTS_PREFIX, StringConvention.RAW).entrySet()) {
                 String entryKey = entry.getKey();
-                String endpointName = entryKey.substring(0, entryKey.indexOf('.'));
+                var dotIndex = entryKey.indexOf('.');
+                if (dotIndex < 0) {
+                    continue;
+                }
+                String endpointName = entryKey.substring(0, dotIndex);
                 String propName = entryKey.substring(endpointName.length() + 1);
                 setEndpointProperty(endpointName, propName, entry.getValue(), endpointPropertiesMap, context);
             }

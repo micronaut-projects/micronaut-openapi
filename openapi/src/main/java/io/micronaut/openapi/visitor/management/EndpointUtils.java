@@ -27,7 +27,7 @@ import static java.util.Map.entry;
 /**
  * Endpoint utilities.
  *
- * @since 4.16.0
+ * @since 6.16.0
  */
 @Internal
 public final class EndpointUtils {
@@ -66,7 +66,8 @@ public final class EndpointUtils {
         entry("sessions", "org.springframework.boot.actuate.session.SessionsEndpoint"),
         entry("startup", "org.springframework.boot.actuate.startup.StartupEndpoint"),
         entry("httpexchanges", "org.springframework.boot.actuate.web.exchanges.HttpExchangesEndpoint"),
-        entry("mappings", "org.springframework.boot.actuate.web.mappings.MappingsEndpoint")
+        entry("mappings", "org.springframework.boot.actuate.web.mappings.MappingsEndpoint"),
+        entry("prometheus", "org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint")
     );
 
     /**

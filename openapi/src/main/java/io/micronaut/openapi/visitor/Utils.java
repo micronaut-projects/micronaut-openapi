@@ -55,6 +55,7 @@ public final class Utils {
 
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
+    public static final String ATTR_TEST_SPRING_ACTUATOR = "io.micronaut.OPENAPI_TEST_SPRING_ACTUATOR";
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
     public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
@@ -256,6 +257,10 @@ public final class Utils {
 
     public static boolean isTestMode() {
         return Boolean.getBoolean(ATTR_TEST_MODE);
+    }
+
+    public static boolean isTestSpringActuator() {
+        return Boolean.getBoolean(ATTR_TEST_SPRING_ACTUATOR);
     }
 
     public static OpenAPI getTestReference() {

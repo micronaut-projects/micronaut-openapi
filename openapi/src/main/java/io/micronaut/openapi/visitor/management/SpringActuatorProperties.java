@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Spring Boot actuator properties.
  *
- * @since 4.16.0
+ * @since 6.16.0
  */
 @Internal
 public final class SpringActuatorProperties {
