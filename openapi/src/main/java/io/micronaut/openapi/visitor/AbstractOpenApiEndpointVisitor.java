@@ -172,7 +172,6 @@ import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
-import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
 import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
