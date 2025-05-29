@@ -18,7 +18,7 @@ class Owner {
     private Pet cat;
     private Pet dog;
 
-    @Schema(description = "Pet that is a a bird") // <2>
+    @Schema(description = "Pet that is a bird") // <2>
     public Pet getBird() {
         return bird;
     }
@@ -30,7 +30,7 @@ class Owner {
 
     @Schema(name = "Dog", description = "Pet that is a dog") // <4>
     public Pet getDog() {
-        return cat;
+        return dog;
     }
 }
 ----
