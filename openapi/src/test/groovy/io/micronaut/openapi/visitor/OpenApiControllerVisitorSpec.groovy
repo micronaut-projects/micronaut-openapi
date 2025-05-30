@@ -3097,4 +3097,56 @@ class MyBean {}
         openApi.components.schemas.containsKey("Response")
         openApi.components.schemas.containsKey("Response_1")
     }
+
+    void "test interfaces inheritance"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+
+import java.util.List;
+
+@Controller
+interface MyController extends MyInterface<Integer> {
+
+  @Get
+  String get(
+      @QueryValue(defaultValue = "a") List<String> a,
+      @QueryValue(defaultValue = "b") List<String> b
+  );
+}
+
+interface MyInterface<T> {
+  @Post
+  String set(@QueryValue String arg1, @QueryValue T arg2);
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation op1 = Utils.testReference?.paths?."/"?.get
+        Operation op2 = Utils.testReference?.paths?."/"?.post
+
+        then:
+        op1
+        op1.parameters[0].name == 'a'
+        op1.parameters[0].schema.type == 'array'
+        op1.parameters[0].schema.items.type == 'string'
+
+        op1.parameters[1].name == 'b'
+        op1.parameters[1].schema.type == 'array'
+        op1.parameters[1].schema.items.type == 'string'
+
+        op2
+        op2.parameters[0].name == 'arg1'
+        op2.parameters[0].schema.type == 'string'
+
+        op2.parameters[1].name == 'arg2'
+        op2.parameters[1].schema.type == 'integer'
+    }
 }
