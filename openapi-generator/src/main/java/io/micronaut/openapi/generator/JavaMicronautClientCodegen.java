@@ -16,10 +16,12 @@
 package io.micronaut.openapi.generator;
 
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenType;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelMap;
@@ -101,6 +103,8 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newBoolean(OPT_USE_API_KEY_AUTH, "Generate ApiKeyAuthConfig config or not"));
         cliOptions.add(CliOption.newBoolean(OPT_AUTH_FILTER, "Generate AuthorizationFilter or not"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_AUTH_CLASSES, "Generate authorization classes or not"));
+        GlobalSettings.setProperty(CodegenConstants.API_DOCS, "false");
+        GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "false");
 
         final CliOption authorizationFilterPatternStyleOpt = CliOption.newString(AUTHORIZATION_FILTER_PATTERN_STYLE, "Configure the authorization filter pattern style for the client");
         var authorizationFilterPatternStyleOptions = new HashMap<String, String>();
@@ -332,12 +336,6 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         } else if (testTool.equals(OPT_TEST_SPOCK)) {
             apiTestTemplateFiles.put("client/test/api_test.groovy.mustache", ".groovy");
         }
-
-        // Add documentation files
-        supportingFiles.add(new SupportingFile("client/doc/README.mustache", "", "README.md").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("client/doc/auth.mustache", apiDocPath, "auth.md"));
-        apiDocTemplateFiles.clear();
-        apiDocTemplateFiles.put("client/doc/api_doc.mustache", ".md");
     }
 
     @Override

@@ -109,6 +109,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
         typeMapping.put("responseFile", "FileCustomizableResponseType");
         importMapping.put("FileCustomizableResponseType", "io.micronaut.http.server.types.files.FileCustomizableResponseType");
+
+        // Add all the supporting files
+        String resourceFolder = projectFolder + "/resources";
+        supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourceFolder, "application.yml").doNotOverwrite());
+        supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourceFolder, "logback.xml").doNotOverwrite());
     }
 
     @Override

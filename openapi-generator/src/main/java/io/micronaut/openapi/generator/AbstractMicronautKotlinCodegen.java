@@ -134,6 +134,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_TEST = "test";
     public static final String OPT_TEST_JUNIT = "junit";
     public static final String OPT_USE_AUTH = "useAuth";
+    public static final String OPT_GENERATE_ENUM_CONVERTERS = "generateEnumConverters";
     public static final String OPT_USE_PLURAL = "plural";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
     public static final String OPT_GENERATED_ANNOTATION = "generatedAnnotation";
@@ -180,6 +181,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean useBeanValidation;
     protected boolean visitable;
     protected boolean useTags = true;
+    protected boolean generateEnumConverters = true;
     protected boolean plural = true;
     protected boolean fluxForArrays;
     protected boolean generatedAnnotation = true;
@@ -325,6 +327,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newString(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, "Additional annotations for enum type (class level annotations)"));
         cliOptions.add(CliOption.newString(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, "Additional annotations for oneOf interfaces (class level annotations). List separated by semicolon(;) or new line (Linux or Windows)"));
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_ENUM_CONVERTERS, "Generate or not custom enum converters for enum query values and path variables", generateEnumConverters));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
         cliOptions.add(CliOption.newBoolean(OPT_KSP, "Generate code compatible only with KSP", ksp));
@@ -513,6 +516,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         this.generateOperationOnlyForFirstTag = generateOperationOnlyForFirstTag;
     }
 
+    public void setGenerateEnumConverters(boolean generateEnumConverters) {
+        this.generateEnumConverters = generateEnumConverters;
+    }
+
     public void setPlural(boolean plural) {
         this.plural = plural;
     }
@@ -582,6 +589,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_ENUM_CONVERTERS)) {
+            generateEnumConverters = convertPropertyToBoolean(OPT_GENERATE_ENUM_CONVERTERS);
+        }
+        writePropertyBack(OPT_GENERATE_ENUM_CONVERTERS, generateEnumConverters);
 
         if (additionalProperties.containsKey(OPT_USE_PLURAL)) {
             plural = convertPropertyToBoolean(OPT_USE_PLURAL);
@@ -711,10 +723,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
         }
 
-        // Add all the supporting files
-        supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourcesFolder, "application.yml").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourcesFolder, "logback.xml").doNotOverwrite());
-
         // Use the default java time
         switch (dateLibrary) {
             case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
@@ -772,6 +780,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         additionalProperties.put("formatOneEmptyLine", new Formatting.LineFormatter(1));
         additionalProperties.put("formatSingleLine", new Formatting.SingleLineFormatter());
         additionalProperties.put("indent", new Formatting.IndentFormatter(4));
+
+        if (generateEnumConverters) {
+            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", "EnumConverterConfig.kt"));
+        }
     }
 
     public void addParameterMappings(List<ParameterMapping> parameterMappings) {
@@ -1102,6 +1114,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         List<CodegenOperation> operationList = operations.getOperation();
         var needToAddImportFormat = false;
 
+        var converterCounters = new HashMap<String, Integer>();
+        var enumParams = new ArrayList<CodegenParameter>();
+        var enumImports = new ArrayList<String>(enumParams.size());
+
         for (CodegenOperation op : operationList) {
 
             handleImplicitHeaders(op);
@@ -1223,7 +1239,33 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     needToAddImportFormat = true;
                     param.vendorExtensions.put("format", queryValueFormat);
                 }
+
+                if (param.isEnum && !param.isBodyParam) {
+
+                    var converterName = param.dataType;
+                    var alreadyAdded = false;
+                    for (var enumParam : enumParams) {
+                        if (param.dataType.equals(enumParam.dataType)) {
+                            alreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyAdded) {
+                        var counter = converterCounters.get(converterName);
+                        if (counter == null) {
+                            converterCounters.put(converterName, 0);
+                        } else {
+                            converterCounters.put(converterName, counter + 1);
+                        }
+                        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+                        enumParams.add(param);
+                        enumImports.add(modelPackage + "." + param.dataType);
+                    }
+                }
             }
+
+            additionalProperties.put("enumImports", enumImports);
+            additionalProperties.put("enumParams", enumParams);
 
             if (op.returnProperty != null) {
                 processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false, ksp);

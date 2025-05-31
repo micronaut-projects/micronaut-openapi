@@ -106,6 +106,10 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
         typeMapping.put("responseFile", "FileCustomizableResponseType");
         importMapping.put("FileCustomizableResponseType", "io.micronaut.http.server.types.files.FileCustomizableResponseType");
+
+        // Add all the supporting files
+        supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourcesFolder, "application.yml").doNotOverwrite());
+        supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourcesFolder, "logback.xml").doNotOverwrite());
     }
 
     @Override

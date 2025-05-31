@@ -218,6 +218,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setGenerateOperationOnlyForFirstTag(options.generateOperationOnlyForFirstTag);
             javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
+            javaCodeGen.setGenerateEnumConverters(options.generateEnumConverters());
             javaCodeGen.setReactive(options.reactive);
             javaCodeGen.setUseSealed(options.useSealed);
             javaCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
@@ -317,6 +318,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setGenerateOperationOnlyForFirstTag(options.generateOperationOnlyForFirstTag);
             kotlinCodeGen.setUseJakartaEe(options.useJakartaEe);
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
+            kotlinCodeGen.setGenerateEnumConverters(options.generateEnumConverters());
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
@@ -648,6 +650,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean useUrlConnectionCache;
             private boolean optional;
             private boolean reactive = true;
+            private boolean generateEnumConverters = true;
             private boolean useSealed;
             private boolean jsonIncludeAlwaysForRequiredFields;
             private boolean requiredPropertiesInConstructor = true;
@@ -816,6 +819,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive) {
                 this.reactive = reactive;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateEnumConverters(boolean generateEnumConverters) {
+                this.generateEnumConverters = generateEnumConverters;
                 return this;
             }
 
@@ -1035,6 +1044,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     optional,
                     reactive,
                     useSealed,
+                    generateEnumConverters,
                     jsonIncludeAlwaysForRequiredFields,
                     requiredPropertiesInConstructor,
                     useOneOfInterfaces,
@@ -1115,6 +1125,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean optional,
         boolean reactive,
         boolean useSealed,
+        boolean generateEnumConverters,
         boolean jsonIncludeAlwaysForRequiredFields,
         boolean requiredPropertiesInConstructor,
         boolean useOneOfInterfaces,
