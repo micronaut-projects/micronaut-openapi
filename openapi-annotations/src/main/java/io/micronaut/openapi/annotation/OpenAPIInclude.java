@@ -97,14 +97,14 @@ public @interface OpenAPIInclude {
     /**
      * @return Description for auto-generated tags (if class is controller) or for operation if class is Endpoint.
      *
-     * @since 4.16.0
+     * @since 6.16.0
      */
     String description() default "";
 
     /**
      * @return extensions for endpoint operation or controller endpoints.
      *
-     * @since 4.16.0
+     * @since 6.16.0
      */
     Extension[] extensions() default {};
 }

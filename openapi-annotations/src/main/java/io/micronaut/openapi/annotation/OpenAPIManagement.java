@@ -53,14 +53,14 @@ public @interface OpenAPIManagement {
     /**
      * @return Array of groups to which this controller should be included.
      *
-     * @since 4.16.0
+     * @since 6.16.0
      */
     String[] groups() default {};
 
     /**
      * @return Array of groups to which this controller should not be included.
      *
-     * @since 4.16.0
+     * @since 6.16.0
      */
     String[] groupsExcluded() default {};
 }

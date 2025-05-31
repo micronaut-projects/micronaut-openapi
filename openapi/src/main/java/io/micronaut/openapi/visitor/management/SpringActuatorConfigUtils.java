@@ -22,6 +22,7 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.ContextUtils;
+import io.micronaut.openapi.visitor.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SPRING_OPENAPI_ENDPOINTS;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_ENDPOINTS_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_ENDPOINTS_PREFIX;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
@@ -45,7 +47,7 @@ import static java.util.Map.entry;
 /**
  * Spring Boot actuator Configuration utilities methods.
  *
- * @since 4.16.0
+ * @since 6.16.0
  */
 @Internal
 public final class SpringActuatorConfigUtils {
@@ -161,7 +163,7 @@ public final class SpringActuatorConfigUtils {
     public static void mergeWithActuatorProperties(EndpointsConfig endpointsConfig, VisitorContext context) {
 
         // check is spring-boot-actuator in dependencies
-        if (ContextUtils.getClassElement("org.springframework.boot.actuate.endpoint.InvocationContext", context) == null) {
+        if (!Utils.isTestSpringActuator() && ContextUtils.getClassElement("org.springframework.boot.actuate.endpoint.InvocationContext", context) == null) {
             return;
         }
 
@@ -177,6 +179,10 @@ public final class SpringActuatorConfigUtils {
             enabledEndpointIds.addAll(EndpointUtils.ALL_SPRING_ACTUATOR_ENDPOINTS.keySet());
         } else {
             for (var endpointName : springActuatorProperties.getIncludedEndpoints()) {
+                if (!EndpointUtils.ALL_SPRING_ACTUATOR_ENDPOINTS.containsKey(endpointName)) {
+                    warn("Unknown actuator endpoint: " + endpointName + ". Skip it", context);
+                    continue;
+                }
                 enabledEndpoints.add(entry(endpointName, EndpointUtils.ALL_SPRING_ACTUATOR_ENDPOINTS.get(endpointName)));
                 enabledEndpointIds.add(endpointName);
             }
