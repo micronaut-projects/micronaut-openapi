@@ -50,7 +50,9 @@
 
     companion object {
 
+    {{#javaCompatibility}}
         @JvmField
+    {{/javaCompatibility}}
         val VALUE_MAPPING = entries.associateBy { it.value{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}} }
 
         /**
@@ -60,8 +62,10 @@
          *
          * @return The enum
          */
-        @JsonCreator
+    {{#javaCompatibility}}
         @JvmStatic
+    {{/javaCompatibility}}
+        @JsonCreator
         fun fromValue(value: {{{dataType}}}): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {{openbrace}}{{#formatNoEmptyLines}}
             {{#isString}}{{#useEnumCaseInsensitive}}
             val key = value.lowercase()

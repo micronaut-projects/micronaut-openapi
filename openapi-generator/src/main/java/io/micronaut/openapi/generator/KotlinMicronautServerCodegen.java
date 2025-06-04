@@ -330,6 +330,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean ksp;
         private boolean coroutines;
         private boolean generateStreamingFileUpload;
+        private boolean jvmOverloads;
+        private boolean jvmRecord;
+        private boolean javaCompatibility = true;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -403,6 +406,24 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withJvmOverloads(boolean jvmOverloads) {
+            this.jvmOverloads = jvmOverloads;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withJvmRecord(boolean jvmRecord) {
+            this.jvmRecord = jvmRecord;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withJavaCompatibility(boolean javaCompatibility) {
+            this.javaCompatibility = javaCompatibility;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -416,7 +437,10 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 aot,
                 ksp,
                 coroutines,
-                generateStreamingFileUpload
+                generateStreamingFileUpload,
+                jvmOverloads,
+                jvmRecord,
+                javaCompatibility
             );
         }
     }
@@ -433,7 +457,10 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean aot,
         boolean ksp,
         boolean coroutines,
-        boolean generateStreamingFileUpload
+        boolean generateStreamingFileUpload,
+        boolean jvmOverloads,
+        boolean jvmRecord,
+        boolean javaCompatibility
     ) {
     }
 }
