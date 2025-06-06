@@ -271,7 +271,7 @@
         <h1>OpenAPI/Swagger Support</h1>
         <p></p>
         <p>Configuration to integrate Micronaut and OpenAPI/Swagger</p>
-        <p><strong>Version:</strong> 6.16.0 </p>
+        <p><strong>Version:</strong> 6.16.1 </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
@@ -871,7 +871,7 @@ public class Application {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.target.file</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables setting the target file to write to.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/${applicationName}-$6.16.0.yml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/${applicationName}-$6.16.1.yml</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.views.dest.dir</strong></code></p></td>
@@ -1145,7 +1145,7 @@ micronaut:<br>
 &#160;&#160;&#160;&#160;group:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;my-group1:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;title: Title 1<br>
-&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;filename: swagger-${group}-${apiVersion}-$6.16.0.yml<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;filename: swagger-${group}-${apiVersion}-$6.16.1.yml<br>
 &#160;&#160;&#160;&#160;&#160;&#160;my-group2:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;title: Title 2<br></p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -2360,7 +2360,7 @@ class Owner {
     private Pet cat;
     private Pet dog;
 
-    @Schema(description = "Pet that is a a bird") <i class="conum" data-value="2"></i><b>(2)</b>
+    @Schema(description = "Pet that is a bird") <i class="conum" data-value="2"></i><b>(2)</b>
     public Pet getBird() {
         return bird;
     }
@@ -2372,7 +2372,7 @@ class Owner {
 
     @Schema(name = "Dog", description = "Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
     public Pet getDog() {
-        return cat;
+        return dog;
     }
 }</code></pre>
 </div>
