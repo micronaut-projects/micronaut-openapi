@@ -1,0 +1,55 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.config
+
+import io.micronaut.context.annotation.Bean
+import io.micronaut.context.annotation.Factory
+import io.micronaut.core.convert.TypeConverter
+import io.micronaut.serde.ObjectMapper
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+{{#enumImports}}
+import {{{.}}}
+{{/enumImports}}
+
+import java.io.IOException
+
+@Factory
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+class EnumConverterConfig(
+    private val objectMapper: ObjectMapper,
+) {
+{{#enumParams}}
+
+    @Bean
+    fun toEnum{{{vendorExtensions.converterName}}}(): TypeConverter<String, {{{dataType}}}> =
+        commonToEnumConverter({{{dataType}}}::class.java, objectMapper)
+
+    @Bean
+    fun toStr{{{vendorExtensions.converterName}}}(): TypeConverter<{{{dataType}}}, String> =
+        commonToStrConverter({{{dataType}}}::class.java, objectMapper)
+{{/enumParams}}
+
+    companion object {
+
+        fun <T> commonToStrConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<T, String> =
+            TypeConverter.of(clazz, String::class.java) {
+                try {
+                    objectMapper.writeValueAsString(it)
+                } catch (e: IOException) {
+                    throw RuntimeException(e)
+                }
+            }
+
+        fun <T> commonToEnumConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<String, T> =
+            TypeConverter.of(String::class.java, clazz) {
+                try {
+                    objectMapper.readValue(it, clazz)
+                } catch (e: IOException) {
+                    throw RuntimeException(e)
+                }
+            }
+    }
+}

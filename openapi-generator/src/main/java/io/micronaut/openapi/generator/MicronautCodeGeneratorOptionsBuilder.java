@@ -230,6 +230,14 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withUseSealed(boolean useSealed);
 
     /**
+     * Generate or not custom enum converters for enum query values and path variables.
+     *
+     * @param generateEnumConverters Generate or not custom enum converters for enum query values and path variables.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateEnumConverters(boolean generateEnumConverters);
+
+    /**
      * If set to true, {@literal @}JsonInclude annotation will be with value ALWAYS for required properties in POJO's.
      *
      * @param jsonIncludeAlwaysForRequiredFields set value ALWAYS to JsonInclude annotation for required properties or not

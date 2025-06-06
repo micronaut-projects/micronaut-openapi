@@ -70,9 +70,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileExists(modelFolder + "Pet.kt");
         assertFileExists(modelFolder + "User.kt");
         assertFileExists(modelFolder + "Order.kt");
-
-        String resources = outputPath + "src/main/resources/";
-        assertFileExists(resources + "application.yml");
     }
 
     @Test
@@ -188,18 +185,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
         assertFileContains(apiPath + "DefaultApi.kt", "@Consumes(\"application/vnd.oracle.resource+json; type=collection\", \"application/vnd.oracle.resource+json; type=error\")");
         assertFileContains(apiPath + "DefaultApi.kt", "@Produces(\"application/vnd.oracle.resource+json; type=singular\")");
-    }
-
-    @Test
-    void doGenerateOauth2InApplicationConfig() {
-        var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
-
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/oauth2.yml", CodegenConstants.SUPPORTING_FILES);
-
-        // micronaut yaml property names shouldn't contain any dots
-        String resourcesPath = outputPath + "src/main/resources/";
-        assertFileContains(resourcesPath + "application.yml", "OAuth_2_0_Client_Credentials:");
     }
 
     @Test
@@ -2215,5 +2200,101 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
                 """);
+    }
+
+
+    @Test
+    void testEnumConvertersConfig() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileExists(path + "EnumConverterConfig.kt");
+
+        assertFileContains(path + "EnumConverterConfig.kt",
+            "import org.openapitools.model.BytePrimitiveEnum",
+            "import org.openapitools.model.CharPrimitiveEnum",
+            "import org.openapitools.model.DecimalEnum",
+            "import org.openapitools.model.DoubleEnum",
+            "import org.openapitools.model.DoublePrimitiveEnum",
+            "import org.openapitools.model.FloatEnum",
+            "import org.openapitools.model.FloatPrimitiveEnum",
+            "import org.openapitools.model.IntEnum",
+            "import org.openapitools.model.IntPrimitiveEnum",
+            "import org.openapitools.model.LongEnum",
+            "import org.openapitools.model.LongPrimitiveEnum",
+            "import org.openapitools.model.ShortPrimitiveEnum",
+            "import org.openapitools.model.StringEnum",
+            """
+                    @Bean
+                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
+                        commonToEnumConverter(StringEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
+                        commonToStrConverter(StringEnum::class.java, objectMapper)
+                """,
+            """
+                    @Bean
+                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
+                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
+                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                """
+        );
+    }
+
+    @Test
+    void testEnumConvertersConfigWithoutEnumParams() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileExists(path + "EnumConverterConfig.kt");
+
+        assertFileContains(path + "EnumConverterConfig.kt",
+            """
+                class EnumConverterConfig(
+                    private val objectMapper: ObjectMapper,
+                ) {
+                
+                    companion object {
+                
+                        fun <T> commonToStrConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<T, String> =
+                            TypeConverter.of(clazz, String::class.java) {
+                                try {
+                                    objectMapper.writeValueAsString(it)
+                                } catch (e: IOException) {
+                                    throw RuntimeException(e)
+                                }
+                            }
+                
+                        fun <T> commonToEnumConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<String, T> =
+                            TypeConverter.of(String::class.java, clazz) {
+                                try {
+                                    objectMapper.readValue(it, clazz)
+                                } catch (e: IOException) {
+                                    throw RuntimeException(e)
+                                }
+                            }
+                    }
+                }
+                """
+        );
+    }
+
+    @Test
+    void testEnumConvertersConfigDisabled() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setGenerateEnumConverters(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileDoesntExist(path + "EnumConverterConfig.kt");
     }
 }

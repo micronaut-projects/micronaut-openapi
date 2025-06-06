@@ -128,6 +128,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_USE_LOMBOK = "lombok";
+    public static final String OPT_GENERATE_ENUM_CONVERTERS = "generateEnumConverters";
     public static final String OPT_NO_ARGS_CONSTRUCTOR = "noArgsConstructor";
     public static final String OPT_USE_PLURAL = "plural";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
@@ -167,6 +168,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean useOptional;
     protected boolean visitable;
     protected boolean lombok;
+    protected boolean generateEnumConverters = true;
     protected boolean noArgsConstructor;
     protected boolean fluxForArrays;
     protected boolean useTags = true;
@@ -273,6 +275,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
         cliOptions.add(CliOption.newBoolean(OPT_USE_LOMBOK, "Whether or not to use lombok annotations in generated code", lombok));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_ENUM_CONVERTERS, "Generate or not custom enum converters for enum query values and path variables", generateEnumConverters));
         cliOptions.add(CliOption.newBoolean(OPT_NO_ARGS_CONSTRUCTOR, "Generate or not no-args constructor for each POJO", noArgsConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
@@ -432,6 +435,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         this.lombok = lombok;
     }
 
+    public void setGenerateEnumConverters(boolean generateEnumConverters) {
+        this.generateEnumConverters = generateEnumConverters;
+    }
+
     public void setUseTags(boolean useTags) {
         this.useTags = useTags;
     }
@@ -524,6 +531,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             lombok = convertPropertyToBoolean(OPT_USE_LOMBOK);
         }
         writePropertyBack(OPT_USE_LOMBOK, lombok);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_ENUM_CONVERTERS)) {
+            generateEnumConverters = convertPropertyToBoolean(OPT_GENERATE_ENUM_CONVERTERS);
+        }
+        writePropertyBack(OPT_GENERATE_ENUM_CONVERTERS, generateEnumConverters);
 
         if (additionalProperties.containsKey(OPT_NO_ARGS_CONSTRUCTOR)) {
             noArgsConstructor = convertPropertyToBoolean(OPT_NO_ARGS_CONSTRUCTOR);
@@ -639,11 +651,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
         }
 
-        // Add all the supporting files
-        String resourceFolder = projectFolder + "/resources";
-        supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourceFolder, "application.yml").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourceFolder, "logback.xml").doNotOverwrite());
-
         // Use the default java time
         switch (dateLibrary) {
             case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
@@ -691,6 +698,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         // Set properties for documentation
+        String resourceFolder = projectFolder + "/resources";
         final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
         final String apiFolder = (sourceFolder + '/' + apiPackage()).replace('.', '/');
         final String modelFolder = (sourceFolder + '/' + modelPackage()).replace('.', '/');
@@ -703,6 +711,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         additionalProperties.put("formatOneEmptyLine", new Formatting.LineFormatter(1));
         additionalProperties.put("formatSingleLine", new Formatting.SingleLineFormatter());
         additionalProperties.put("indent", new Formatting.IndentFormatter(4));
+
+        if (generateEnumConverters) {
+            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", "EnumConverterConfig.java"));
+        }
     }
 
     public void addParameterMappings(List<ParameterMapping> parameterMappings) {
@@ -1440,6 +1452,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         List<CodegenOperation> operationList = operations.getOperation();
         var needToAddImportFormat = false;
 
+        var converterCounters = new HashMap<String, Integer>();
+        var enumParams = new ArrayList<CodegenParameter>();
+        var enumImports = new ArrayList<String>(enumParams.size());
+
         for (CodegenOperation op : operationList) {
             // Set whether body is supported in request
             op.vendorExtensions.put("methodAllowsBody", op.httpMethod.equals("PUT")
@@ -1541,8 +1557,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     param.vendorExtensions.put("withValid", true);
                 }
 
-                String queryValueFormat = null;
-
                 // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
                 if (isDateType(param.dataType)) {
                     if (StringUtils.isNotEmpty(param.pattern)) {
@@ -1554,10 +1568,33 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     param.minLength = null;
                     param.maxLength = null;
                 }
-                queryValueFormat = calcQueryValueFormat(param);
+                var queryValueFormat = calcQueryValueFormat(param);
                 if (queryValueFormat != null) {
                     needToAddImportFormat = true;
                     param.vendorExtensions.put("format", queryValueFormat);
+                }
+
+                if (param.isEnum && !param.isBodyParam) {
+
+                    var converterName = param.dataType;
+                    var alreadyAdded = false;
+                    for (var enumParam : enumParams) {
+                        if (param.dataType.equals(enumParam.dataType)) {
+                            alreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyAdded) {
+                        var counter = converterCounters.get(converterName);
+                        if (counter == null) {
+                            converterCounters.put(converterName, 0);
+                        } else {
+                            converterCounters.put(converterName, counter + 1);
+                        }
+                        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+                        enumParams.add(param);
+                        enumImports.add(modelPackage + "." + param.dataType);
+                    }
                 }
             }
             if (op.returnProperty != null) {
@@ -1565,6 +1602,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
+
+        additionalProperties.put("enumImports", enumImports);
+        additionalProperties.put("enumParams", enumParams);
 
         if (needToAddImportFormat) {
             objs.getImports().add(Map.of("import", "static io.micronaut.core.convert.converters.MultiValuesConverterFactory.*", "classname", "MultiValuesConverterFactory"));
