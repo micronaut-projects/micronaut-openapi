@@ -17,7 +17,12 @@ import {{javaxPackage}}.annotation.Generated
 @MustBeDocumented
 @Retention(RUNTIME)
 @Target(FUNCTION, ANNOTATION_CLASS)
+{{#javaCompatibility}}
+@JvmRepeatable(Authorizations::class)
+{{/javaCompatibility}}
+{{^javaCompatibility}}
 @Repeatable
+{{/javaCompatibility}}
 annotation class Authorization(
 
     /**

@@ -145,6 +145,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
     public static final String OPT_COROUTINES = "coroutines";
+    public static final String OPT_JVM_OVERLOADS = "jvmOverloads";
+    public static final String OPT_JVM_RECORD = "jvmRecord";
+    public static final String OPT_JAVA_COMPATIBILITY = "javaCompatibility";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
@@ -190,6 +193,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean ksp;
     protected boolean jsonIncludeAlwaysForRequiredFields;
     protected boolean implicitHeaders;
+    protected boolean jvmOverloads;
+    protected boolean jvmRecord;
+    protected boolean javaCompatibility = true;
     protected String implicitHeadersRegex;
     protected String appName;
     protected String dateFormat;
@@ -337,6 +343,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
         cliOptions.add(CliOption.newBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS, "If set to true, @JsonInclude annotation will be with value ALWAYS for required properties in POJO's", jsonIncludeAlwaysForRequiredFields));
+
+        cliOptions.add(CliOption.newBoolean(OPT_JVM_OVERLOADS, "Add or not @JvmOverloads annotation for classes with properties with default values.", jvmOverloads));
+        cliOptions.add(CliOption.newBoolean(OPT_JVM_RECORD, "Add or not @JvmRecord annotation to data classes.", jvmRecord));
+        cliOptions.add(CliOption.newBoolean(OPT_JAVA_COMPATIBILITY, "Add or not @JvmField, @JvmStatic and @JvmRepeatable annotations to improve java compatibility", javaCompatibility));
 
         var testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
         var testToolOptionMap = new HashMap<String, String>();
@@ -587,6 +597,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             useEnumCaseInsensitive = convertPropertyToBoolean(OPT_USE_ENUM_CASE_INSENSITIVE);
         }
         writePropertyBack(OPT_USE_ENUM_CASE_INSENSITIVE, useEnumCaseInsensitive);
+
+        if (additionalProperties.containsKey(OPT_JVM_OVERLOADS)) {
+            jvmOverloads = convertPropertyToBoolean(OPT_JVM_OVERLOADS);
+        }
+        writePropertyBack(OPT_JVM_OVERLOADS, jvmOverloads);
+
+        if (additionalProperties.containsKey(OPT_JVM_RECORD)) {
+            jvmRecord = convertPropertyToBoolean(OPT_JVM_RECORD);
+        }
+        writePropertyBack(OPT_JVM_RECORD, jvmRecord);
+
+        if (additionalProperties.containsKey(OPT_JAVA_COMPATIBILITY)) {
+            javaCompatibility = convertPropertyToBoolean(OPT_JAVA_COMPATIBILITY);
+        }
+        writePropertyBack(OPT_JAVA_COMPATIBILITY, javaCompatibility);
 
         if (additionalProperties.containsKey(OPT_GENERATED_ANNOTATION)) {
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
@@ -1192,7 +1217,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     param.maxLength = null;
                 }
                 var paramDefaultValueInit = (String) param.vendorExtensions.get("defaultValueInit");
-                param.vendorExtensions.put("valueWithDefaultValue", ksp && (paramDefaultValueInit != null  && !paramDefaultValueInit.equals(NULL_STRING)));
+                param.vendorExtensions.put("valueWithDefaultValue", ksp && (paramDefaultValueInit != null && !paramDefaultValueInit.equals(NULL_STRING)));
                 var queryValueFormat = calcQueryValueFormat(param);
                 if (queryValueFormat != null) {
                     needToAddImportFormat = true;
@@ -2150,7 +2175,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 model.vendorExtensions.put("withRequiredVars", false);
                 model.vars = Collections.emptyList();
             }
-            model.vendorExtensions.put("dataClass", !model.hasChildren && model.hasVars && (!withInheritance || model.parentVars.isEmpty()) ? "data " : "");
+            var isDataClass = !model.hasChildren && model.hasVars && (!withInheritance || model.parentVars.isEmpty());
+            model.vendorExtensions.put("dataClass", isDataClass ? "data " : "");
+            model.vendorExtensions.put("isDataClass", isDataClass);
 
             addStrValueToEnum(model);
         }
@@ -2200,6 +2227,22 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     }
                 }
             }
+        }
+
+        for (var models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            var props = (List<CodegenProperty>) model.vendorExtensions.get("requiredVarsWithoutDiscriminator");
+            if (props == null || props.isEmpty()) {
+                continue;
+            }
+            for (var prop : props) {
+                var defaultValueInit = prop.vendorExtensions.get("defaultValueInit");
+                if (defaultValueInit != null && !defaultValueInit.toString().isEmpty()) {
+                    model.vendorExtensions.put("hasDefaultValues", true);
+                }
+                prop.vendorExtensions.put("isDataClass", model.vendorExtensions.get("isDataClass"));
+            }
+
         }
 
         return objs;
@@ -2413,7 +2456,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);
 
         var defaultValueInit = (String) property.vendorExtensions.get("defaultValueInit");
-        property.vendorExtensions.put("valueWithDefaultValue", ksp && defaultValueInit != null && !defaultValueInit.equals(NULL_STRING));
+        var valueWithDefaultValue = ksp && defaultValueInit != null && !defaultValueInit.equals(NULL_STRING);
+        property.vendorExtensions.put("valueWithDefaultValue", valueWithDefaultValue);
+        if (valueWithDefaultValue) {
+            model.vendorExtensions.put("hasDefaultValues", true);
+        }
     }
 
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,
@@ -3016,6 +3063,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setUseEnumCaseInsensitive(boolean useEnumCaseInsensitive) {
         this.useEnumCaseInsensitive = useEnumCaseInsensitive;
+    }
+
+    public void setJvmOverloads(boolean jvmOverloads) {
+        this.jvmOverloads = jvmOverloads;
+    }
+
+    public void setJvmRecord(boolean jvmRecord) {
+        this.jvmRecord = jvmRecord;
+    }
+
+    public void setJavaCompatibility(boolean javaCompatibility) {
+        this.javaCompatibility = javaCompatibility;
     }
 
     public void setAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations) {

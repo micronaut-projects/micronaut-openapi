@@ -128,4 +128,31 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withGenerateStreamingFileUpload(boolean generateStreamingFileUpload);
+
+    /**
+     * Add or not @JvmOverloads annotation for classes with properties with default values. Default: false
+     *
+     * @param jvmOverloads if true, then @JvmOverload annotation will be added to classes with properties with default values
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withJvmOverloads(boolean jvmOverloads);
+
+    /**
+     * Add or not @JvmRecord annotation to data classes. Default: false
+     *
+     * @param jvmRecord if true, then @JvmRecord annotation will be added to data classes
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withJvmRecord(boolean jvmRecord);
+
+    /**
+     * Add or not @JvmField, @JvmStatic and @JvmRepeatable annotations to improve java compatibility. Default: true
+     *
+     * @param javaCompatibility if true, then @JvmField, @JvmStatic and @JvmRepeatable annotations wil be added where it needed to improve java compatibility
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withJavaCompatibility(boolean javaCompatibility);
 }

@@ -44,8 +44,12 @@
 {{{.}}}
 {{/vendorExtensions.x-class-extra-annotation}}
 {{/formatNoEmptyLines}}
-{{!Declare the class with extends and implements}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}({{/hasVars}}
+{{#vendorExtensions.isDataClass}}
+    {{#jvmRecord}}
+@JvmRecord
+    {{/jvmRecord}}
+{{/vendorExtensions.isDataClass}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
     {{#formatNoEmptyLines}}
@@ -66,7 +70,7 @@
         {{/deprecated}}
     {{/description}}
     {{>common/model/field_annotations}}
-    {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
+    {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}{{#jvmRecord}}{{#vendorExtensions.isDataClass}}val{{/vendorExtensions.isDataClass}}{{^vendorExtensions.isDataClass}}var{{/vendorExtensions.isDataClass}}{{/jvmRecord}}{{^jvmRecord}}var{{/jvmRecord}} {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
     {{/formatNoEmptyLines}}
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
 {{#hasVars}}){{/hasVars}}{{#parent}} : {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}){{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}} : {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
@@ -125,8 +129,10 @@
     companion object {
     {{#serializableModel}}
 
-        @Serial
+        {{#javaCompatibility}}
         @JvmStatic
+        {{/javaCompatibility}}
+        @Serial
         private val serialVersionUID = {{{vendorExtensions.serialId}}}L
     {{/serializableModel}}
 
@@ -139,8 +145,10 @@
         {{#serializableModel}}
     companion object {
 
-        @Serial
+        {{#javaCompatibility}}
         @JvmStatic
+        {{/javaCompatibility}}
+        @Serial
         private val serialVersionUID = {{{vendorExtensions.serialId}}}L
     }
         {{/serializableModel}}

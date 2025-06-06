@@ -418,6 +418,9 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
             kotlinServerCodegen.setGenerateStreamingFileUpload(kotlinServerOptions.generateStreamingFileUpload());
             kotlinServerCodegen.setAot(kotlinServerOptions.aot());
+            kotlinServerCodegen.setJvmOverloads(kotlinServerOptions.jvmOverloads());
+            kotlinServerCodegen.setJvmRecord(kotlinServerOptions.jvmRecord());
+            kotlinServerCodegen.setJavaCompatibility(kotlinServerOptions.javaCompatibility());
         }
     }
 
@@ -455,6 +458,9 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
             kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());
             kotlinClientCodegen.setCoroutines(kotlinClientOptions.coroutines());
+            kotlinClientCodegen.setJvmOverloads(kotlinClientOptions.jvmOverloads());
+            kotlinClientCodegen.setJvmRecord(kotlinClientOptions.jvmRecord());
+            kotlinClientCodegen.setJavaCompatibility(kotlinClientOptions.javaCompatibility());
         }
     }
 

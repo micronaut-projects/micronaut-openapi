@@ -442,6 +442,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private boolean generatedAnnotation = true;
         private boolean ksp;
         private boolean coroutines;
+        private boolean jvmOverloads;
+        private boolean jvmRecord;
+        private boolean javaCompatibility = true;
 
         @Override
         public KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -563,6 +566,24 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautClientOptionsBuilder withJvmOverloads(boolean jvmOverloads) {
+            this.jvmOverloads = jvmOverloads;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautClientOptionsBuilder withJvmRecord(boolean jvmRecord) {
+            this.jvmRecord = jvmRecord;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautClientOptionsBuilder withJavaCompatibility(boolean javaCompatibility) {
+            this.javaCompatibility = javaCompatibility;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
@@ -584,7 +605,10 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 fluxForArrays,
                 generatedAnnotation,
                 ksp,
-                coroutines
+                coroutines,
+                jvmOverloads,
+                jvmRecord,
+                javaCompatibility
             );
         }
     }
@@ -609,7 +633,10 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean ksp,
-        boolean coroutines
+        boolean coroutines,
+        boolean jvmOverloads,
+        boolean jvmRecord,
+        boolean javaCompatibility
     ) {
     }
 }

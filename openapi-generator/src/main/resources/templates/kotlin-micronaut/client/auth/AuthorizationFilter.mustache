@@ -131,7 +131,9 @@ open class AuthorizationFilter(
 
     companion object {
 
+    {{#javaCompatibility}}
         @JvmField
+    {{/javaCompatibility}}
         val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 {{/useOauth}}
