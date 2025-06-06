@@ -146,6 +146,8 @@ import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecord;
+import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecordType;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilCollectionType;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
@@ -1768,7 +1770,7 @@ public final class SchemaDefinitionUtils {
             classElement = typedEl.getType();
         }
 
-        if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName()) && !isJavaUtilCollectionType(classElement)) {
+        if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName()) && !isJavaRecordType(classElement) && !isJavaUtilCollectionType(classElement)) {
             var finalClassElement = classElement;
             List<PropertyElement> beanProperties;
             try {
@@ -1806,6 +1808,8 @@ public final class SchemaDefinitionUtils {
             }
 
             var publicFields = new ArrayList<FieldElement>();
+            // fix for processing java records with groovy and kotlin processors
+            var isJavaRecord = isJavaRecord(classElement);
 
             for (FieldElement field : classElement.getFields()) {
                 if (field.isStatic()) {
@@ -1813,7 +1817,9 @@ public final class SchemaDefinitionUtils {
                 }
                 if (visibilityLevel == VisibilityLevel.PUBLIC
                     && !field.isPublic()) {
+                    if (!isJavaRecord) {
                     continue;
+                    }
                 } else if (visibilityLevel == VisibilityLevel.PROTECTED
                     && (!field.isPublic() && !field.isProtected())) {
                     continue;
@@ -1863,6 +1869,7 @@ public final class SchemaDefinitionUtils {
                     componentType = parentInterface.getFirstTypeArgument().orElse(null);
                 }
                 if (ClassUtils.isJavaLangType(parentInterface.getName())
+                    || isJavaRecordType(parentInterface)
                     || isProtobufGenerated(parentInterface)
                     || parentInterface.getBeanProperties().isEmpty()) {
                     continue;
@@ -1876,7 +1883,10 @@ public final class SchemaDefinitionUtils {
                     isJavaCollectionExtendedClass = true;
                     componentType = superType.getFirstTypeArgument().orElse(null);
                     // check protobuf generated classes
-                } else if (!Enum.class.getName().equals(superType.getName()) && !isProtobufMessageClass(superType)) {
+                } else if (!Enum.class.getName().equals(superType.getName())
+                    && !isProtobufMessageClass(superType)
+                    && !isJavaRecordType(superType)
+                ) {
                     superTypes.add(superType);
                 }
             }
@@ -1948,6 +1958,7 @@ public final class SchemaDefinitionUtils {
         if (superType.isInterface()) {
             for (var interfaceEl : superType.getInterfaces()) {
                 if (ClassUtils.isJavaLangType(interfaceEl.getName())
+                    || isJavaRecordType(interfaceEl)
                     || interfaceEl.getBeanProperties().isEmpty()) {
                     continue;
                 }

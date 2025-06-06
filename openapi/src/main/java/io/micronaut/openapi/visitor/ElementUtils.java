@@ -120,6 +120,14 @@ public final class ElementUtils {
     private ElementUtils() {
     }
 
+    public static boolean isJavaRecord(ClassElement classEl) {
+        return classEl.isAssignable(Record.class.getName());
+    }
+
+    public static boolean isJavaRecordType(ClassElement classEl) {
+        return Record.class.getName().equals(classEl.getName());
+    }
+
     public static boolean isJavaUtilType(ClassElement classEl) {
         return classEl.getPackageName().startsWith("java.util");
     }

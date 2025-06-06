@@ -1,6 +1,7 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractKotlinCompilerSpec
+import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
@@ -444,5 +445,43 @@ class MyBean
         openAPI.paths."/test2/{apiVersion}".post.parameters[1].name == "apiVersion"
 
         !schema.extensions
+    }
+
+    void "test java records with kotlin"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.sample.FooRecord
+
+@Controller("/demo3")
+open class Demo3Controller {
+
+    @Get(uri = "/", produces = ["text/plain"])
+    open fun index(): String =
+        "Example Response"
+
+    @Get("/foo")
+    open fun foo(): FooRecord =
+        FooRecord("foo", "bar")
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas.FooRecord.type == 'object'
+        openAPI.components.schemas.FooRecord.properties
+        openAPI.components.schemas.FooRecord.properties.size() == 2
+        openAPI.components.schemas.FooRecord.properties.foo
+        openAPI.components.schemas.FooRecord.properties.foo.type == 'string'
+        openAPI.components.schemas.FooRecord.properties.bar
+        openAPI.components.schemas.FooRecord.properties.bar.type == 'string'
     }
 }

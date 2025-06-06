@@ -4,6 +4,7 @@ import io.micronaut.ast.transform.test.AbstractBeanDefinitionSpec
 import io.micronaut.http.MediaType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
@@ -332,5 +333,54 @@ public class MyBean {}
         openAPI.paths."/file".post.requestBody.content."multipart/form-data"
         openAPI.paths."/file".post.requestBody.content."multipart/form-data".schema
         openAPI.paths."/file".post.requestBody.content."multipart/form-data".encoding.file.contentType == MediaType.APPLICATION_OCTET_STREAM
+    }
+
+    void "test java records with groovy"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.sample.FooRecord
+import io.micronaut.serde.annotation.Serdeable
+
+@Controller("/demo3")
+class Demo3Controller {
+
+    @Get(uri = "/", produces = "text/plain")
+    String index() {
+        "Example Response"
+    }
+
+    @Get("/foo")
+    FooRecord foo() {
+        return new FooRecord("foo", "bar")
+    }
+
+    @Get("/bar")
+    BarRecord bar() {
+        return new BarRecord("foo", "bar")
+    }
+}
+
+@Serdeable
+record BarRecord(String foo, String bar) {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas.FooRecord.type == 'object'
+        openAPI.components.schemas.FooRecord.properties
+        openAPI.components.schemas.FooRecord.properties.size() == 2
+        openAPI.components.schemas.FooRecord.properties.foo
+        openAPI.components.schemas.FooRecord.properties.foo.type == 'string'
+        openAPI.components.schemas.FooRecord.properties.bar
+        openAPI.components.schemas.FooRecord.properties.bar.type == 'string'
     }
 }
