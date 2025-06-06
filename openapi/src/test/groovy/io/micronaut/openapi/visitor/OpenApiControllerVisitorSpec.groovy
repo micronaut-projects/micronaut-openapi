@@ -3149,4 +3149,93 @@ class MyBean {}
         op2.parameters[1].name == 'arg2'
         op2.parameters[1].schema.type == 'integer'
     }
+
+    void "test process byte / char array"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.PathVariable;import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+@Controller
+interface MyController {
+
+    @Post(uri = "/byteArray1", produces = MediaType.APPLICATION_OCTET_STREAM)
+    HttpResponse<byte[]> byteArray1();
+
+    @Post(uri = "/byteArray2", produces = MediaType.APPLICATION_OCTET_STREAM)
+    Mono<byte[]> byteArray2();
+
+    @Post(uri = "/byteArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
+    byte[] byteArrayInParams(@PathVariable byte[] param1, @QueryValue byte[] qv1, @Body byte[] body);
+    
+    @Post(uri = "/charArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
+    char[] charArrayInParams(@PathVariable char[] param1, @QueryValue char[] qv1, @Body char[] body);
+
+    @Post(uri = "/byteArrayWithDto", produces = MediaType.APPLICATION_OCTET_STREAM)
+    MyDto byteArrayWithDto(@Body MyDto body);
+}
+
+@Introspected
+class MyDto {
+    
+    public byte[] payload;
+    public char[] payload2;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        def openApi = Utils.testReference
+        def op1 = openApi.paths."/byteArray1".post
+        def op2 = openApi.paths."/byteArray2".post
+        def op3 = openApi.paths."/byteArrayInParams/{param1}".post
+        def op4 = openApi.paths."/charArrayInParams/{param1}".post
+        def op5 = openApi.paths."/byteArrayWithDto".post
+
+        then:
+        op1
+        op1.responses."200".content."application/octet-stream".schema.type == "string"
+        op1.responses."200".content."application/octet-stream".schema.format == "byte"
+
+        op2
+        op2.responses."200".content."application/octet-stream".schema.type == "string"
+        op2.responses."200".content."application/octet-stream".schema.format == "byte"
+
+        op3
+        op3.parameters[0].schema.type == "string"
+        op3.parameters[0].schema.format == "byte"
+        op3.parameters[1].schema.type == "string"
+        op3.parameters[1].schema.format == "byte"
+        op3.requestBody.content."application/json".schema.type == "string"
+        op3.requestBody.content."application/json".schema.format == "byte"
+
+        op3.responses."200".content."application/octet-stream".schema.type == "string"
+        op3.responses."200".content."application/octet-stream".schema.format == "byte"
+
+        op4
+        op4.parameters[0].schema.type == "string"
+        !op4.parameters[0].schema.format
+        op4.parameters[1].schema.type == "string"
+        !op4.parameters[1].schema.format
+        op4.requestBody.content."application/json".schema.type == "string"
+        !op4.requestBody.content."application/json".schema.format
+
+        op4.responses."200".content."application/octet-stream".schema.type == "string"
+        !op4.responses."200".content."application/octet-stream".schema.format
+
+        op5
+        openApi.components.schemas.MyDto.properties.payload.type == "string"
+        openApi.components.schemas.MyDto.properties.payload.format == "byte"
+        openApi.components.schemas.MyDto.properties.payload2.type == "string"
+        !openApi.components.schemas.MyDto.properties.payload2.format
+    }
 }

@@ -948,6 +948,10 @@ public final class SchemaDefinitionUtils {
                 }
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(type, typeName, context);
+                } else if (isArray && type.isAssignable(byte.class)) {
+                    schema = PrimitiveType.BYTE.createProperty();
+                } else if (isArray && type.isAssignable(char.class)) {
+                    schema = PrimitiveType.STRING.createProperty();
                 } else if (!isArray && primitiveType != null) {
                     schema = primitiveType.createProperty(openapi31);
                 } else if (type.isAssignable(Map.class)) {
@@ -3307,7 +3311,7 @@ public final class SchemaDefinitionUtils {
             return classEl.getPrimaryConstructor()
                 .flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
-                    .map(paramEl ->  isConstructorArgumentsAsRequired(context) ? !ElementUtils.isNullable(paramEl) : ElementUtils.isNotNullable(paramEl))
+                    .map(paramEl -> isConstructorArgumentsAsRequired(context) ? !ElementUtils.isNullable(paramEl) : ElementUtils.isNotNullable(paramEl))
                     .findFirst())
                 .orElse(false);
         }
