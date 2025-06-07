@@ -332,6 +332,15 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
             }
         }
 
+        var enumParams = (List<String>) additionalProperties.get("enumParams");
+        if (generateEnumConverters && !enumParams.isEmpty()) {
+            var enumConfigName = "Server";
+            var enumConfigClassName = "EnumConverter" + enumConfigName + "Config";
+            additionalProperties.put("enumConfigClassName", enumConfigClassName);
+            final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", enumConfigClassName + ".java"));
+        }
+
         return objs;
     }
 

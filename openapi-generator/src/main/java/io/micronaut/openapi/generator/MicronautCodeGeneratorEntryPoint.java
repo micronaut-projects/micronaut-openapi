@@ -939,13 +939,13 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withUseTags(boolean useTags) {
                 this.useTags = useTags;
-                return null;
+                return this;
             }
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withGenerateOperationOnlyForFirstTag(boolean generateOperationOnlyForFirstTag) {
                 this.generateOperationOnlyForFirstTag = generateOperationOnlyForFirstTag;
-                return null;
+                return this;
             }
 
             @Override

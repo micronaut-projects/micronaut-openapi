@@ -2202,7 +2202,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """);
     }
 
-
     @Test
     void testEnumConvertersConfig() {
 
@@ -2210,9 +2209,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
 
         String path = outputPath + "src/main/kotlin/org/openapitools/config/";
-        assertFileExists(path + "EnumConverterConfig.kt");
+        assertFileExists(path + "EnumConverterClientConfig.kt");
 
-        assertFileContains(path + "EnumConverterConfig.kt",
+        assertFileContains(path + "EnumConverterClientConfig.kt",
             "import org.openapitools.model.BytePrimitiveEnum",
             "import org.openapitools.model.CharPrimitiveEnum",
             "import org.openapitools.model.DecimalEnum",
@@ -2226,6 +2225,53 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.LongPrimitiveEnum",
             "import org.openapitools.model.ShortPrimitiveEnum",
             "import org.openapitools.model.StringEnum",
+            "class EnumConverterClientConfig(",
+            """
+                    @Bean
+                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
+                        commonToEnumConverter(StringEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
+                        commonToStrConverter(StringEnum::class.java, objectMapper)
+                """,
+            """
+                    @Bean
+                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
+                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
+                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                """
+        );
+    }
+
+    @Test
+    void testEnumConvertersConfigWithCustomClientId() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setClientId("myApiClient");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileExists(path + "EnumConverterMyApiClientConfig.kt");
+
+        assertFileContains(path + "EnumConverterMyApiClientConfig.kt",
+            "import org.openapitools.model.BytePrimitiveEnum",
+            "import org.openapitools.model.CharPrimitiveEnum",
+            "import org.openapitools.model.DecimalEnum",
+            "import org.openapitools.model.DoubleEnum",
+            "import org.openapitools.model.DoublePrimitiveEnum",
+            "import org.openapitools.model.FloatEnum",
+            "import org.openapitools.model.FloatPrimitiveEnum",
+            "import org.openapitools.model.IntEnum",
+            "import org.openapitools.model.IntPrimitiveEnum",
+            "import org.openapitools.model.LongEnum",
+            "import org.openapitools.model.LongPrimitiveEnum",
+            "import org.openapitools.model.ShortPrimitiveEnum",
+            "import org.openapitools.model.StringEnum",
+            "class EnumConverterMyApiClientConfig(",
             """
                     @Bean
                     fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
@@ -2254,37 +2300,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
 
         String path = outputPath + "src/main/kotlin/org/openapitools/config/";
-        assertFileExists(path + "EnumConverterConfig.kt");
-
-        assertFileContains(path + "EnumConverterConfig.kt",
-            """
-                class EnumConverterConfig(
-                    private val objectMapper: ObjectMapper,
-                ) {
-                
-                    companion object {
-                
-                        fun <T> commonToStrConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<T, String> =
-                            TypeConverter.of(clazz, String::class.java) {
-                                try {
-                                    objectMapper.writeValueAsString(it)
-                                } catch (e: IOException) {
-                                    throw RuntimeException(e)
-                                }
-                            }
-                
-                        fun <T> commonToEnumConverter(clazz: Class<T>, objectMapper: ObjectMapper): TypeConverter<String, T> =
-                            TypeConverter.of(String::class.java, clazz) {
-                                try {
-                                    objectMapper.readValue(it, clazz)
-                                } catch (e: IOException) {
-                                    throw RuntimeException(e)
-                                }
-                            }
-                    }
-                }
-                """
-        );
+        assertFileDoesntExist(path + "EnumConverterClientConfig.kt");
     }
 
     @Test
@@ -2295,6 +2311,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
 
         String path = outputPath + "src/main/kotlin/org/openapitools/config/";
-        assertFileDoesntExist(path + "EnumConverterConfig.kt");
+        assertFileDoesntExist(path + "EnumConverterClientConfig.kt");
     }
 }

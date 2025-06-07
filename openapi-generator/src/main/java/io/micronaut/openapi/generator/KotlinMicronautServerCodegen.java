@@ -312,6 +312,15 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             }
         }
 
+        var enumParams = (List<String>) additionalProperties.get("enumParams");
+        if (generateEnumConverters && !enumParams.isEmpty()) {
+            var enumConfigName = "Server";
+            var enumConfigClassName = "EnumConverter" + enumConfigName + "Config";
+            additionalProperties.put("enumConfigClassName", enumConfigClassName);
+            final String invokerFolder = (sourceFolder + '/' + packageName).replace(".", "/");
+            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", enumConfigClassName + ".kt"));
+        }
+
         return objs;
     }
 
