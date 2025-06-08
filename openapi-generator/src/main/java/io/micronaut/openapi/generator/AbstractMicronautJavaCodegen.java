@@ -44,7 +44,6 @@ import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.CodegenResponse;
 import org.openapitools.codegen.IJsonSchemaValidationProperties;
-import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.VendorExtension;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractJavaCodegen;
@@ -711,10 +710,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         additionalProperties.put("formatOneEmptyLine", new Formatting.LineFormatter(1));
         additionalProperties.put("formatSingleLine", new Formatting.SingleLineFormatter());
         additionalProperties.put("indent", new Formatting.IndentFormatter(4));
-
-        if (generateEnumConverters) {
-            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", "EnumConverterConfig.java"));
-        }
     }
 
     public void addParameterMappings(List<ParameterMapping> parameterMappings) {
@@ -1454,7 +1449,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         var converterCounters = new HashMap<String, Integer>();
         var enumParams = new ArrayList<CodegenParameter>();
-        var enumImports = new ArrayList<String>(enumParams.size());
+        var enumImports = new ArrayList<String>();
 
         for (CodegenOperation op : operationList) {
             // Set whether body is supported in request

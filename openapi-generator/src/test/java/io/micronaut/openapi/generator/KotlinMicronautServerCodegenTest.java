@@ -1100,4 +1100,70 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             "@QueryValue(\"fieldsDeepObject\") @NotNull @Format(FORMAT_DEEP_OBJECT) fieldsDeepObject: Map<String, @NotNull String>,"
         );
     }
+
+    @Test
+    void testEnumConvertersConfig() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileExists(path + "EnumConverterServerConfig.kt");
+
+        assertFileContains(path + "EnumConverterServerConfig.kt",
+            "import org.openapitools.model.BytePrimitiveEnum",
+            "import org.openapitools.model.CharPrimitiveEnum",
+            "import org.openapitools.model.DecimalEnum",
+            "import org.openapitools.model.DoubleEnum",
+            "import org.openapitools.model.DoublePrimitiveEnum",
+            "import org.openapitools.model.FloatEnum",
+            "import org.openapitools.model.FloatPrimitiveEnum",
+            "import org.openapitools.model.IntEnum",
+            "import org.openapitools.model.IntPrimitiveEnum",
+            "import org.openapitools.model.LongEnum",
+            "import org.openapitools.model.LongPrimitiveEnum",
+            "import org.openapitools.model.ShortPrimitiveEnum",
+            "import org.openapitools.model.StringEnum",
+            "class EnumConverterServerConfig(",
+            """
+                    @Bean
+                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
+                        commonToEnumConverter(StringEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
+                        commonToStrConverter(StringEnum::class.java, objectMapper)
+                """,
+            """
+                    @Bean
+                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
+                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
+                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                """
+        );
+    }
+
+    @Test
+    void testEnumConvertersConfigWithoutEnumParams() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileDoesntExist(path + "EnumConverterServerConfig.kt");
+    }
+
+    @Test
+    void testEnumConvertersConfigDisabled() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateEnumConverters(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
+        assertFileDoesntExist(path + "EnumConverterServerConfig.kt");
+    }
 }

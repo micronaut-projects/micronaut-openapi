@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.generator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenOperation;
@@ -178,6 +179,18 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 param.vendorExtensions.put("hasNotBodyParam", hasNotBodyParam);
                 param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
             }
+        }
+
+        var enumParams = (List<String>) additionalProperties.get("enumParams");
+        if (generateEnumConverters && !enumParams.isEmpty()) {
+            var enumConfigName = "Client";
+            if (clientId != null) {
+                enumConfigName = StringUtils.capitalize(clientId.replace("-", ""));
+            }
+            var enumConfigClassName = "EnumConverter" + enumConfigName + "Config";
+            additionalProperties.put("enumConfigClassName", enumConfigClassName);
+            final String invokerFolder = (sourceFolder + '/' + packageName).replace(".", "/");
+            supportingFiles.add(new SupportingFile("common/EnumConverterConfig.mustache", invokerFolder + "/config", enumConfigClassName + ".kt"));
         }
 
         return objs;
