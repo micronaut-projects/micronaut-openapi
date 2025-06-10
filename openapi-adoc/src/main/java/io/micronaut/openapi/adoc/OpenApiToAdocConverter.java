@@ -15,21 +15,6 @@
  */
 package io.micronaut.openapi.adoc;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import io.micronaut.openapi.OpenApiUtils;
-import io.micronaut.openapi.adoc.md.MdToAdocConverter;
-import io.micronaut.openapi.adoc.utils.SwaggerUtils;
-import io.swagger.v3.oas.models.OpenAPI;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -37,6 +22,20 @@ import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.adoc.md.MdToAdocConverter;
+import io.micronaut.openapi.adoc.utils.SwaggerUtils;
+import io.swagger.v3.oas.models.OpenAPI;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.micronaut.openapi.adoc.TemplatePaths.CONTENT;
 import static io.micronaut.openapi.adoc.TemplatePaths.DEFINITIONS;
@@ -84,7 +83,7 @@ public final class OpenApiToAdocConverter {
         }
         var openApi = SwaggerUtils.readOpenApiFromLocation(openApiFile);
 
-        var outputPath = Paths.get(System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, "build/generated"))
+        var outputPath = Path.of(System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, "build/generated"))
             .resolve(System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, "openApiDoc.adoc"));
 
         if (outputPath.getParent() != null) {

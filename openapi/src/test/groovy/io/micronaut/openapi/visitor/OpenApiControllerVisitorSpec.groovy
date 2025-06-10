@@ -3134,20 +3134,27 @@ class MyBean {}
 
         then:
         op1
-        op1.parameters[0].name == 'a'
-        op1.parameters[0].schema.type == 'array'
-        op1.parameters[0].schema.items.type == 'string'
+        var paramA = op1.parameters.find {it.name == 'a' }
+        paramA
+        paramA.name == 'a'
+        paramA.schema.type == 'array'
+        paramA.schema.items.type == 'string'
 
-        op1.parameters[1].name == 'b'
-        op1.parameters[1].schema.type == 'array'
-        op1.parameters[1].schema.items.type == 'string'
+        var paramB = op1.parameters.find {it.name == 'b' }
+        paramB.name == 'b'
+        paramB.schema.type == 'array'
+        paramB.schema.items.type == 'string'
 
         op2
-        op2.parameters[0].name == 'arg1'
-        op2.parameters[0].schema.type == 'string'
+        var paramArg1 = op2.parameters.find {it.name == 'arg1' }
+        paramArg1
+        paramArg1.name == 'arg1'
+        paramArg1.schema.type == 'string'
 
-        op2.parameters[1].name == 'arg2'
-        op2.parameters[1].schema.type == 'integer'
+        var paramArg2 = op2.parameters.find {it.name == 'arg2' }
+        paramArg2
+        paramArg2.name == 'arg2'
+        paramArg2.schema.type == 'integer'
     }
 
     void "test process byte / char array"() {

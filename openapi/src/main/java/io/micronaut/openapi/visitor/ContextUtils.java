@@ -28,11 +28,13 @@ import io.micronaut.openapi.visitor.management.EndpointProperties;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static io.micronaut.inject.visitor.VisitorContext.MICRONAUT_PROCESSING_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CLASSPATH_OUTPUT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATED_FILE;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.PREFIX_DUMMY_FILE;
@@ -46,14 +48,22 @@ import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 @Internal
 public final class ContextUtils {
 
-    public static final Argument<List<Tag>> TAGS_LIST_ARGUMENT = new GenericArgument<>() { };
-    public static final Argument<List<Server>> SERVERS_LIST_ARGUMENT = new GenericArgument<>() { };
-    public static final Argument<Map<String, Object>> EXTENSIONS_MAP_ARGUMENT = new GenericArgument<>() { };
-    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
-    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() { };
-    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() { };
-    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() { };
-    public static final Argument<Map<String, EndpointProperties>> ARGUMENT_ENDPOINT_PROPERTIES_MAP = new GenericArgument<>() { };
+    public static final Argument<List<Tag>> TAGS_LIST_ARGUMENT = new GenericArgument<>() {
+    };
+    public static final Argument<List<Server>> SERVERS_LIST_ARGUMENT = new GenericArgument<>() {
+    };
+    public static final Argument<Map<String, Object>> EXTENSIONS_MAP_ARGUMENT = new GenericArgument<>() {
+    };
+    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() {
+    };
+    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() {
+    };
+    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() {
+    };
+    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() {
+    };
+    public static final Argument<Map<String, EndpointProperties>> ARGUMENT_ENDPOINT_PROPERTIES_MAP = new GenericArgument<>() {
+    };
 
     private ContextUtils() {
     }
@@ -78,49 +88,101 @@ public final class ContextUtils {
         if (outputPath != null) {
             return outputPath;
         }
-        visitMetaInfFile(PREFIX_DUMMY_FILE + System.nanoTime(), context);
-        return get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class, null, context);
+        var generatedFile = visitMetaInfFile(PREFIX_DUMMY_FILE, context);
+        if (generatedFile != null) {
+            return calcClassesOutputPath(generatedFile, context);
+        }
+        return null;
     }
 
-    @Nullable
-    public static GeneratedFile visitMetaInfFile(String path, VisitorContext context) {
+    public static Path calcClassesOutputPath(GeneratedFile generatedFile, VisitorContext context) {
+        // trying to calculate project directory path, if needed, and we can
+        // if it's absolute path, we can't calculate project directory path
+        try {
+            if (!contains(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, context)) {
 
-        if (context == null) {
-            return null;
+                var uri = generatedFile.toURI();
+                // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
+                if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
+                    var filePath = Path.of(uri).normalize();
+                    while (filePath != null) {
+                        Path fileName = filePath.getFileName();
+                        if (fileName != null && "META-INF".equals(fileName.toString())) {
+                            put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, filePath, context);
+                            return filePath;
+                        }
+                        filePath = filePath.getParent();
+                    }
+                    return null;
+                }
+            } else {
+                return get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class, null, context);
+            }
+        } catch (Exception e) {
+            // do nothing
         }
-        var cachedFile = get(MICRONAUT_INTERNAL_GENERATED_FILE + path, GeneratedFile.class, null, context);
-        if (cachedFile != null) {
-            return cachedFile;
-        }
-        var generatedFile = context.visitMetaInfFile(path, Element.EMPTY_ELEMENT_ARRAY).orElse(null);
-        if (generatedFile == null) {
-            warn("Unable to get " + path + " file.", context);
-            return null;
-        }
+        return null;
+    }
 
-        put(MICRONAUT_INTERNAL_GENERATED_FILE + path, generatedFile, context);
-
-        if (!contains(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, context)) {
-
-            var uri = generatedFile.toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                var generatedFilePath = Path.of(uri);
-                var count = 0;
-                for (var i = 0; i < path.length(); i++) {
-                    if (path.charAt(i) == '/') {
-                        generatedFilePath = generatedFilePath.getParent();
-                        count++;
+    public static Path calcProjectPath(GeneratedFile generatedFile, VisitorContext context) {
+        // trying to calculate project directory path, if needed, and we can
+        // if it's absolute path, we can't calculate project directory path
+        try {
+            if (!contains(MICRONAUT_PROCESSING_PROJECT_DIR, context)) {
+                Path projectDir;
+                URI uri = generatedFile.toURI();
+                // happens in tests 'mem:///CLASS_OUTPUT/dummy'
+                if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
+                    // assume files are generated in 'build' or 'target' directories
+                    Path filePath = Path.of(uri).normalize();
+                    while (filePath != null) {
+                        Path dummyFileName = filePath.getFileName();
+                        if (dummyFileName != null && ("build".equals(dummyFileName.toString()) || "target".equals(dummyFileName.toString()))) {
+                            projectDir = filePath.getParent();
+                            put(MICRONAUT_PROCESSING_PROJECT_DIR, projectDir, context);
+                            return projectDir;
+                        }
+                        filePath = filePath.getParent();
                     }
                 }
-                // now this is classesOutputDir, parent of META-INF directory
-                generatedFilePath = generatedFilePath.getParent();
-
-                put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, generatedFilePath, context);
+            } else {
+                return get(MICRONAUT_PROCESSING_PROJECT_DIR, Path.class, null, context);
             }
+        } catch (Exception e) {
+            // do nothing
+        }
+        return null;
+    }
+
+    public static GeneratedFile visitMetaInfFile(String path, VisitorContext context) {
+        var generatedFile = get(MICRONAUT_INTERNAL_GENERATED_FILE + "META-INF/" + path, GeneratedFile.class, null, context);
+        if (generatedFile == null) {
+            generatedFile = context.visitMetaInfFile(path, Element.EMPTY_ELEMENT_ARRAY).orElse(null);
+            if (generatedFile == null || (generatedFile.toURI().getScheme() != null && generatedFile.toURI().getScheme().equals("mem"))) {
+                return null;
+            }
+            put(MICRONAUT_INTERNAL_GENERATED_FILE + "META-INF/" + path, generatedFile, context);
+        }
+        calcProjectPath(generatedFile, context);
+        return generatedFile;
+    }
+
+    public static Path getProjectDir(VisitorContext context) {
+        Path projectDir = get(MICRONAUT_PROCESSING_PROJECT_DIR, Path.class, context);
+        if (projectDir != null) {
+            return projectDir;
         }
 
-        return generatedFile;
+        var dummyFile = get(MICRONAUT_INTERNAL_GENERATED_FILE + PREFIX_DUMMY_FILE, GeneratedFile.class, null, context);
+        if (dummyFile == null) {
+            dummyFile = context.visitGeneratedFile(PREFIX_DUMMY_FILE, Element.EMPTY_ELEMENT_ARRAY).orElse(null);
+            if (dummyFile == null || (dummyFile.toURI().getScheme() != null && dummyFile.toURI().getScheme().equals("mem"))) {
+                return null;
+            }
+            put(MICRONAUT_INTERNAL_GENERATED_FILE + PREFIX_DUMMY_FILE, dummyFile, context);
+        }
+
+        return calcProjectPath(dummyFile, context);
     }
 
     public static void warn(String message, @Nullable VisitorContext context) {

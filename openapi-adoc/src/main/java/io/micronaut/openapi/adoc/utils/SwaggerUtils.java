@@ -15,16 +15,15 @@
  */
 package io.micronaut.openapi.adoc.utils;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.loadFileFromClasspath;
@@ -66,7 +65,7 @@ public final class SwaggerUtils {
                 }
             } else {
                 var path = adjustedLocation.startsWith(FILE_SCHEME) ?
-                    Paths.get(URI.create(adjustedLocation)) : Paths.get(adjustedLocation);
+                    Path.of(URI.create(adjustedLocation)) : Path.of(adjustedLocation);
                 if (Files.exists(path)) {
                     return readOpenApi(Files.readString(path), isJson);
                 } else {

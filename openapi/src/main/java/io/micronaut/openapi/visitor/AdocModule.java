@@ -23,7 +23,6 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
@@ -102,7 +101,7 @@ public final class AdocModule {
         Path outputPath;
         String outputDir = props.get(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH);
         if (StringUtils.isNotEmpty(outputDir)) {
-            outputPath = resolve(context, Paths.get(outputDir));
+            outputPath = resolve(context, Path.of(outputDir));
         } else {
             var defaultFilePath = getDefaultFilePath(fileName, context);
             if (defaultFilePath == null) {
