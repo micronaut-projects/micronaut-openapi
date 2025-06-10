@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -137,7 +136,7 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static void assertFileExists(String file) {
-        Path path = Paths.get(file);
+        Path path = Path.of(file);
         if (!path.toFile().exists()) {
             while (path.getParent() != null && !path.getParent().toFile().exists()) {
                 path = path.getParent();
@@ -161,13 +160,13 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static void assertFileDoesntExist(String path) {
-        assertFalse(Paths.get(path).toFile().exists(), "File \"" + path + "\" should not exist");
+        assertFalse(Path.of(path).toFile().exists(), "File \"" + path + "\" should not exist");
     }
 
     public static String readFile(String path) {
         String file = null;
         try {
-            file = Files.readString(Paths.get(path));
+            file = Files.readString(Path.of(path));
             assertNotNull(file, "File \"" + path + "\" does not exist");
         } catch (IOException e) {
             fail("Unable to evaluate file " + path);

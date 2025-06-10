@@ -111,7 +111,6 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
-import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
 import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
 import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
@@ -303,7 +302,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }
             }
 
-            Path path = resolve(context, java.nio.file.Paths.get(additionalSwaggerFile));
+            Path path = resolve(context, java.nio.file.Path.of(additionalSwaggerFile));
             if (!Files.exists(path)) {
                 warn(path + " does not exist", context);
                 continue;
@@ -890,7 +889,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(PREFIX_DUMMY_FILE + System.nanoTime(), context), context);
+        Path viewsDestDirs = getViewsDestDir(context);
         if (viewsDestDirs == null) {
             return;
         }

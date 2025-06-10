@@ -34,7 +34,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
@@ -273,7 +272,7 @@ public final class OpenApiViewConfig {
         ClassLoader classLoader = getClass().getClassLoader();
         try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName)) {
 
-            Files.copy(is, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(is, Path.of(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
             Path file = resDir.resolve(themeFileName);
             if (context != null) {
                 info("Writing OpenAPI View Resources to destination: " + file, context);
@@ -305,7 +304,7 @@ public final class OpenApiViewConfig {
             for (String resource : resources) {
                 try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource)) {
 
-                    Files.copy(is, Paths.get(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(is, Path.of(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
                     Path file = outputResDir.resolve(resource);
 
                     if (context != null) {
@@ -368,7 +367,7 @@ public final class OpenApiViewConfig {
             }
         }
 
-        Path templatePath = resolve(context, Paths.get(customPathStr));
+        Path templatePath = resolve(context, Path.of(customPathStr));
         if (!Files.isReadable(templatePath)) {
             throw new IOException("Can't read file " + customPathStr);
         }

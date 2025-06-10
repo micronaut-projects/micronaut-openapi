@@ -1,22 +1,20 @@
 package io.micronaut.openapi.adoc;
 
+import freemarker.template.TemplateException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import freemarker.template.TemplateException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpenApiToAdocConverterTest {
 
-    final Path outputDir = Paths.get("build/test/freemarker");
+    final Path outputDir = Path.of("build/test/freemarker");
 
     @BeforeEach
     void setup() throws IOException {
