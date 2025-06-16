@@ -9,9 +9,9 @@ management:
     web:
       path-mapping:
         health: /test
-      base-path: /actuator
+      base-path: /actuator2
       exposure:
-        include: health, beans, metrics
+        include: health,beans, metrics,info,prometheus,loggers
   server:
     base-path: /my
     port: 9090

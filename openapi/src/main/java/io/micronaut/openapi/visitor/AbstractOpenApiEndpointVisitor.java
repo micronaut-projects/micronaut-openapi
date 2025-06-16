@@ -103,7 +103,9 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CH
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX_ADD_ALWAYS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_PATH;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS;
+import static io.micronaut.openapi.visitor.ContextUtils.get;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.MAP_TYPE;
 import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
@@ -922,7 +924,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
-                newParameter.setRequired(true);
+                // exception for spring actuator prometheus endpoint
+                if (!get(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, Boolean.class, false, context)
+                    || !"query".equalsIgnoreCase(newParameter.getIn())) {
+                    newParameter.setRequired(true);
+                }
             }
             if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
                 CharSequence desc = javadocDescription.getParameters().get(parameter.getName());

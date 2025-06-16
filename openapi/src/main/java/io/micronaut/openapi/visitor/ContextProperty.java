@@ -127,4 +127,8 @@ public interface ContextProperty {
     String MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX = "micronaut.internal.opId.suffix";
     String MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX_ADD_ALWAYS = "micronaut.internal.opId.suffixes.add.always";
     String MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS = "micronaut.internal.is.process.parent";
+    /**
+     * Is it spring-actuator prometheus endpoint.
+     */
+    String MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS = "micronaut.internal.endpoint.is-prometheus";
 }

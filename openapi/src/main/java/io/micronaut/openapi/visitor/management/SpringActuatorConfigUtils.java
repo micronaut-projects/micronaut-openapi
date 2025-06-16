@@ -52,6 +52,8 @@ import static java.util.Map.entry;
 @Internal
 public final class SpringActuatorConfigUtils {
 
+    public static final String DEFAULT_ACTUATOR_BASE_PATH = "/actuator";
+
     private SpringActuatorConfigUtils() {
     }
 
@@ -244,6 +246,9 @@ public final class SpringActuatorConfigUtils {
         }
         if (StringUtils.isEmpty(endpointsConfig.getPath())) {
             endpointsConfig.setPath(springActuatorProperties.getBasePath());
+        }
+        if (StringUtils.isEmpty(endpointsConfig.getPath())) {
+            endpointsConfig.setPath(DEFAULT_ACTUATOR_BASE_PATH);
         }
     }
 }

@@ -48,6 +48,15 @@ dependencies {
     testImplementation(libs.spotbugs.annotations)
     testImplementation(libs.guava)
     testImplementation(mn.kotlinx.coroutines.reactor)
+
+// uncomment it, if you want to test micronaut-openapi with spring-boot actuator locally
+//    testAnnotationProcessor(mnSpring.micronaut.spring.annotation)
+//    testAnnotationProcessor(mnSpring.micronaut.spring.web.annotation)
+//    testAnnotationProcessor(mnSpring.micronaut.spring.boot.annotation)
+//    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:${mnSpring.versions.spring.boot.get()}"))
+//    testImplementation(libs.spring.boot.starter.web)
+//    testImplementation(libs.spring.boot.starter.actuator)
+//    testImplementation(libs.micrometer.registry.prometheus)
 }
 
 configurations.configureEach {

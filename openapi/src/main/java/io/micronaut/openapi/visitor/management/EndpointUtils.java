@@ -78,7 +78,8 @@ public final class EndpointUtils {
         "org.springframework.boot.actuate.flyway.FlywayEndpoint", "org.flywaydb.core.Flyway",
         "org.springframework.boot.actuate.session.SessionsEndpoint", "org.springframework.session.Session",
         "org.springframework.boot.actuate.quartz.QuartzEndpoint", "org.quartz.Job",
-        "org.springframework.boot.actuate.liquibase.LiquibaseEndpoint", "liquibase.integration.spring.SpringLiquibase"
+        "org.springframework.boot.actuate.liquibase.LiquibaseEndpoint", "liquibase.integration.spring.SpringLiquibase",
+        "org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint", "io.prometheus.metrics.model.registry.PrometheusRegistry"
     );
 
     public static final List<String> ALL_MANAGEMENT_ENDPOINT_CLASSES;

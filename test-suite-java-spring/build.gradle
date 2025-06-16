@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.data.rest)
     implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.micrometer.registry.prometheus)
 
     testCompileOnly(projects.micronautOpenapiAnnotations)
     testCompileOnly(mn.jackson.annotations)
