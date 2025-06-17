@@ -77,8 +77,8 @@ public final class SecurityUtils {
             return;
         }
 
-        OpenAPI openAPI = Utils.resolveOpenApi(context);
-        Components components = openAPI.getComponents();
+        OpenAPI openApi = Utils.resolveOpenApi(context);
+        Components components = openApi.getComponents();
 
         String securitySchemeName;
         if (components != null && CollectionUtils.isNotEmpty(components.getSecuritySchemes())) {
@@ -86,7 +86,7 @@ public final class SecurityUtils {
         } else {
             if (components == null) {
                 components = new Components();
-                openAPI.setComponents(components);
+                openApi.setComponents(components);
             }
             if (components.getSecuritySchemes() == null) {
                 components.setSecuritySchemes(new HashMap<>());

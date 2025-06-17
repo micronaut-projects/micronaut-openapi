@@ -286,7 +286,7 @@ public final class SchemaDefinitionUtils {
      * Reads schema.
      *
      * @param schemaValue annotation value
-     * @param openAPI The OpenApi
+     * @param openApi The OpenAPI object
      * @param context The VisitorContext
      * @param type type element
      * @param typeArgs type arguments
@@ -295,7 +295,7 @@ public final class SchemaDefinitionUtils {
      * @param jsonViewClass Class from JsonView annotation
      * @return New schema instance
      */
-    public static Schema<?> readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openAPI, VisitorContext context,
+    public static Schema<?> readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openApi, VisitorContext context,
                                        @Nullable Element type, Map<String, ClassElement> typeArgs,
                                        @Nullable Element definingElement, List<MediaType> mediaTypes,
                                        @Nullable ClassElement jsonViewClass) {
@@ -326,14 +326,14 @@ public final class SchemaDefinitionUtils {
             }
         } else {
             JavadocDescription javadoc = type != null ? Utils.getJavadocParser().parse(type.getDocumentation().orElse(null)) : null;
-            populateSchemaProperties(openAPI, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
+            populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
             checkAllOf(schema);
         }
         return schema;
     }
 
     @Nullable
-    public static Schema<?> getSchemaDefinition(OpenAPI openAPI,
+    public static Schema<?> getSchemaDefinition(OpenAPI openApi,
                                                 VisitorContext context,
                                                 ClassElement type,
                                                 Map<String, ClassElement> typeArgs,
@@ -397,7 +397,7 @@ public final class SchemaDefinitionUtils {
         }
 
         Schema schema;
-        Map<String, Schema> schemas = resolveSchemas(openAPI);
+        Map<String, Schema> schemas = resolveSchemas(openApi);
         if (schemaValue == null) {
             final boolean isBasicType = ElementUtils.isJavaBasicType(type.getName());
             final PrimitiveType primitiveType;
@@ -443,7 +443,7 @@ public final class SchemaDefinitionUtils {
                             setEnumValues(enumEl, schema, context);
                         }
                     } else {
-                        Schema<?> schemaWithSuperTypes = processSuperTypes(null, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context, jsonViewClass);
+                        Schema<?> schemaWithSuperTypes = processSuperTypes(null, schemaName, type, definingElement, openApi, mediaTypes, schemas, context, jsonViewClass);
                         if (schemaWithSuperTypes != null) {
                             schema = schemaWithSuperTypes;
                         }
@@ -452,7 +452,7 @@ public final class SchemaDefinitionUtils {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
 
-                        populateSchemaProperties(openAPI, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
+                        populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
                         checkAllOf(schema);
                     }
                     if (isDeprecated(type) && schema != null) {
@@ -479,28 +479,18 @@ public final class SchemaDefinitionUtils {
                 }
                 inProgressSchemas.add(schemaName);
                 try {
-                    schema = readSchema(schemaValue, openAPI, context, type, typeArgs, schemaAnnOnField ? definingElement : type, mediaTypes, jsonViewClass);
+                    schema = readSchema(schemaValue, openApi, context, type, typeArgs, schemaAnnOnField ? definingElement : type, mediaTypes, jsonViewClass);
                     var typeSchema = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                     if (typeSchema != null) {
-                        Schema<?> originalTypeSchema = readSchema(typeSchema, openAPI, context, type, typeArgs, schemaAnnOnField ? definingElement : type, mediaTypes, jsonViewClass);
-                        if (originalTypeSchema != null && schema != null) {
-                            if (StringUtils.isNotEmpty(originalTypeSchema.getDescription())) {
-                                schema.setDescription(originalTypeSchema.getDescription());
-                            }
-                            if ((originalTypeSchema.getNullable() != null && originalTypeSchema.getNullable())
-                                || (isOpenapi31()
-                                && CollectionUtils.isNotEmpty(originalTypeSchema.getTypes())
-                                && originalTypeSchema.getTypes().contains(SchemaUtils.TYPE_NULL))
-                            ) {
-                                SchemaUtils.setNullable(schema);
-                            }
-                            schema.setRequired(originalTypeSchema.getRequired());
+                        Schema<?> originalTypeSchema = readSchema(typeSchema, openApi, context, type, typeArgs, null, mediaTypes, jsonViewClass);
+                        if (schemaAnnOnField) {
+                            schema.setTitle(null);
                         }
+                        appendSchema(originalTypeSchema, schema);
+                        schema = originalTypeSchema;
                     }
 
-                    if (schema != null) {
-                        processSuperTypes(schema, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context, jsonViewClass);
-                    }
+                    processSuperTypes(schema, schemaName, type, definingElement, openApi, mediaTypes, schemas, context, jsonViewClass);
                 } finally {
                     inProgressSchemas.remove(schemaName);
                 }
@@ -1761,7 +1751,7 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
+    private static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
                                                  List<MediaType> mediaTypes, JavadocDescription classJavadoc, @Nullable ClassElement jsonViewClass) {
         ClassElement classElement = null;
         if (type instanceof ClassElement classEl) {
@@ -1795,7 +1785,7 @@ public final class SchemaDefinitionUtils {
                 beanProperties = Collections.emptyList();
             }
             beanProperties = filterProtobufProperties(classElement, beanProperties);
-            processPropertyElements(openAPI, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc, jsonViewClass);
+            processPropertyElements(openApi, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc, jsonViewClass);
 
             String visibilityLevelProp = getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
             var visibilityLevel = VisibilityLevel.PUBLIC;
@@ -1818,7 +1808,7 @@ public final class SchemaDefinitionUtils {
                 if (visibilityLevel == VisibilityLevel.PUBLIC
                     && !field.isPublic()) {
                     if (!isJavaRecord) {
-                    continue;
+                        continue;
                     }
                 } else if (visibilityLevel == VisibilityLevel.PROTECTED
                     && (!field.isPublic() && !field.isProtected())) {
@@ -1840,14 +1830,14 @@ public final class SchemaDefinitionUtils {
                 publicFields.add(field);
             }
 
-            processPropertyElements(openAPI, context, type, typeArgs, schema, publicFields, mediaTypes, classJavadoc, jsonViewClass);
+            processPropertyElements(openApi, context, type, typeArgs, schema, publicFields, mediaTypes, classJavadoc, jsonViewClass);
         }
     }
 
     private static Schema<?> processSuperTypes(Schema<?> schema,
                                                String schemaName,
                                                ClassElement type, @Nullable Element definingElement,
-                                               OpenAPI openAPI,
+                                               OpenAPI openApi,
                                                List<MediaType> mediaTypes,
                                                Map<String, Schema> schemas,
                                                VisitorContext context,
@@ -1916,7 +1906,7 @@ public final class SchemaDefinitionUtils {
                 if (customStype != null) {
                     sType = customStype;
                 }
-                readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas, sTypeArgs, jsonViewClass);
+                readAllInterfaces(openApi, context, definingElement, mediaTypes, schema, sType, schemas, sTypeArgs, jsonViewClass);
             }
         } else {
             if (schema == null) {
@@ -1929,7 +1919,7 @@ public final class SchemaDefinitionUtils {
         if (isJavaCollectionExtendedClass && (type.isIterable() || type.isArray())) {
             schema.type(TYPE_ARRAY);
             if (componentType != null) {
-                var componentSchema = getSchemaDefinition(openAPI, context, componentType, componentType.getTypeArguments(), definingElement, mediaTypes, jsonViewClass);
+                var componentSchema = getSchemaDefinition(openApi, context, componentType, componentType.getTypeArguments(), definingElement, mediaTypes, jsonViewClass);
                 if (componentSchema != null) {
                     schema.items(componentSchema);
                 }
@@ -1941,14 +1931,14 @@ public final class SchemaDefinitionUtils {
     }
 
     @SuppressWarnings("java:S3655") // false positive
-    private static void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
+    private static void readAllInterfaces(OpenAPI openApi, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
                                           Schema<?> schema, ClassElement superType, Map<String, Schema> schemas, Map<String, ClassElement> superTypeArgs,
                                           @Nullable ClassElement jsonViewClass) {
         var schemaNameFromAnn = getNameFromAnn(superType);
         String parentSchemaName = computeDefaultSchemaName(schemaNameFromAnn, definingElement, superType, superTypeArgs, context, jsonViewClass);
 
         if (schemas.get(parentSchemaName) != null
-            || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
+            || getSchemaDefinition(openApi, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
             var parentSchema = createSchema();
             parentSchema.set$ref(SchemaUtils.schemaRef(parentSchemaName));
             if (schema.getAllOf() == null || !schema.getAllOf().contains(parentSchema)) {
@@ -1969,7 +1959,7 @@ public final class SchemaDefinitionUtils {
                     interfaceEl = customInterfaceType;
                 }
 
-                readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, interfaceEl, schemas, interfaceTypeArgs, jsonViewClass);
+                readAllInterfaces(openApi, context, definingElement, mediaTypes, schema, interfaceEl, schemas, interfaceTypeArgs, jsonViewClass);
             }
         } else if (superType.getSuperType().isPresent()) {
             ClassElement superSuperType = superType.getSuperType().get();
@@ -1978,7 +1968,7 @@ public final class SchemaDefinitionUtils {
             if (customSuperSuperType != null) {
                 superSuperType = customSuperSuperType;
             }
-            readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, superSuperType, schemas, superSuperTypeArgs, jsonViewClass);
+            readAllInterfaces(openApi, context, definingElement, mediaTypes, schema, superSuperType, schemas, superSuperTypeArgs, jsonViewClass);
         }
     }
 
@@ -2426,6 +2416,16 @@ public final class SchemaDefinitionUtils {
 
         var oneOf = (AnnotationClassValue<?>[]) annValues.get(propName);
         if (ArrayUtils.isEmpty(oneOf)) {
+            // if set empty array, that means we want to override auto calculated value
+            if (oneOf != null) {
+                if (PROP_ALL_OF.equals(propName)) {
+                    schemaToBind.setAllOf(null);
+                } else if (PROP_ANY_OF.equals(propName)) {
+                    schemaToBind.setAnyOf(null);
+                } else if (PROP_ONE_OF.equals(propName)) {
+                    schemaToBind.setOneOf(null);
+                }
+            }
             return;
         }
 
@@ -2867,7 +2867,7 @@ public final class SchemaDefinitionUtils {
     }
 
     @SuppressWarnings("java:S3776")
-    private static void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
+    private static void processPropertyElements(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
                                                 List<? extends TypedElement> publicFields, List<MediaType> mediaTypes, JavadocDescription classJavadoc,
                                                 @Nullable ClassElement jsonViewClass) {
 
@@ -2921,7 +2921,7 @@ public final class SchemaDefinitionUtils {
                 }
                 ClassElement fieldType = publicField.getGenericType();
 
-                Schema<?> propertySchema = resolveSchema(openAPI, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc, null);
+                Schema<?> propertySchema = resolveSchema(openApi, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc, null);
 
                 processSchemaProperty(
                     context,

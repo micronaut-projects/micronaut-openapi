@@ -138,11 +138,11 @@ abstract class AbstractOpenApiVisitor {
      * @return The {@link PathItem}
      */
     Map<String, List<PathItem>> resolvePathItems(VisitorContext context, List<UriMatchTemplate> matchTemplates) {
-        OpenAPI openAPI = Utils.resolveOpenApi(context);
-        Paths paths = openAPI.getPaths();
+        OpenAPI openApi = Utils.resolveOpenApi(context);
+        Paths paths = openApi.getPaths();
         if (paths == null) {
             paths = new Paths();
-            openAPI.setPaths(paths);
+            openApi.setPaths(paths);
         }
 
         var resultPathItemsMap = new HashMap<String, List<PathItem>>();

@@ -104,7 +104,7 @@ public final class OpenApiToAdocConverter {
     /**
      * Conversion from openAPI format to asciidoc format.
      *
-     * @param openApi openAPI object
+     * @param openApi OpenAPI object
      * @param props converter config properties
      * @param writer writer for rendered template
      *
