@@ -16,6 +16,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yml";
     static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yml";
+    private static final String DUPLICATE_PROPERTY_NAMES_PATH = "src/test/resources/3_0/duplicatePropertyNames.yaml";
 
     @Test
     void clientOptsUniqueness() {
@@ -763,7 +764,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-            
+
                 @Nullable(inherited = true)
                 @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @JsonProperty(JSON_PROPERTY_DATE)
@@ -901,7 +902,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     public TypeConverter<String, StringEnum> toEnumStringEnum() {
                         return commonToEnumConverter(StringEnum.class, objectMapper);
                     }
-                
+
                     @Bean
                     public TypeConverter<StringEnum, String> toStrStringEnum() {
                         return commonToStrConverter(StringEnum.class, objectMapper);
@@ -912,7 +913,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     public TypeConverter<String, ShortPrimitiveEnum> toEnumShortPrimitiveEnum() {
                         return commonToEnumConverter(ShortPrimitiveEnum.class, objectMapper);
                     }
-                
+
                     @Bean
                     public TypeConverter<ShortPrimitiveEnum, String> toStrShortPrimitiveEnum() {
                         return commonToStrConverter(ShortPrimitiveEnum.class, objectMapper);
@@ -941,4 +942,21 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/config/";
         assertFileDoesntExist(path + "EnumConverterServerConfig.java");
     }
+
+    @Test
+    void testAvoidDuplicatePropertyNames() {
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, DUPLICATE_PROPERTY_NAMES_PATH,
+            CodegenConstants.MODELS);
+
+        String modelFolder = outputPath + "src/main/java/org/openapitools/model/";
+        String file = modelFolder + "ModelWithDuplicateProperties.java";
+        assertFileExists(file);
+        assertFileContainsRegex(file, "String name");
+        assertFileContainsRegex(file, "String name2");
+        assertFileContains(file, "public static final String JSON_PROPERTY_NAME_2 = \"_name\";");
+        assertFileContains(file, "public String get_name()");
+        assertFileContains(file, "public void set_name(String name2)");
+    }
+
 }
