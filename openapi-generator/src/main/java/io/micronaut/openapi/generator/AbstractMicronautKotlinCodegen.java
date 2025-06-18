@@ -1506,12 +1506,27 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         model.imports.remove("ApiModel");
         model.imports.remove("ApiModelProperty");
+        processDuplicateVars(model.vars);
         if (importMapping.containsKey(model.dataType)
             && !model.imports.contains(model.dataType)) {
             model.imports.add(model.dataType);
         }
         allModels.put(name, model);
         return model;
+    }
+
+    private void processDuplicateVars(List<CodegenProperty> vars) {
+        Map<String, Integer> names = new HashMap<>();
+        for (CodegenProperty var : vars) {
+            if (names.containsKey(var.getName())) {
+                names.put(var.getName(), names.get(var.getName()) + 1);
+                int index = names.get(var.getName());
+                var.setName(var.getName() + index);
+                var.nameInSnakeCase = var.nameInSnakeCase + "_" + index;
+            } else {
+                names.put(var.getName(), 1);
+            }
+        }
     }
 
     /**
