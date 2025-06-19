@@ -15,7 +15,7 @@ spotbugs-annotations = "4.9.3"
 openapi-generator = "7.13.0"
 swagger-parser = "1.0.75"
 swagger-parser-v3 = "2.1.29"
-javaparser = "3.26.4"
+javaparser = "3.27.0"
 commons-lang3 = "3.17.0"
 commons-codec = "1.18.0"
 commons-io = "2.19.0"
@@ -23,21 +23,21 @@ commons-text = "1.13.1"
 guava = "33.4.8-jre"
 commonmark = "0.24.0"
 
-micronaut = "4.8.18"
+micronaut = "4.9.1"
 micronaut-platform = "4.8.3"
 micronaut-jaxrs = "4.8.0"
 micronaut-security = "4.12.2"
-micronaut-serde = "2.14.1"
+micronaut-serde = "2.15.0"
 micronaut-rxjava2 = "2.7.0"
 micronaut-rxjava3 = "3.7.0"
 micronaut-reactor = "3.7.0"
 micronaut-gradle-plugin = "4.5.3"
-micronaut-groovy = "4.6.0"
+micronaut-groovy = "4.7.0"
 micronaut-validation = "4.10.0"
 micronaut-data = "4.12.2"
 micronaut-test = "4.7.0"
 micronaut-kotlin = "4.6.0"
-micronaut-logging = "1.6.1"
+micronaut-logging = "1.7.0"
 micronaut-session = "4.6.0"
 micronaut-grpc = "4.9.0"
 micronaut-spring = "5.10.1"
@@ -103,6 +103,7 @@ spring-boot-starter-validation = { module = "org.springframework.boot:spring-boo
 spring-boot-starter-data-rest = { module = "org.springframework.boot:spring-boot-starter-data-rest" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }

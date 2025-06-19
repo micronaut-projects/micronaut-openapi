@@ -120,4 +120,19 @@ public final class EndpointsConfig {
     public void setGroupsExcluded(List<String> groupsExcluded) {
         this.groupsExcluded = groupsExcluded;
     }
+
+    @Override
+    public String toString() {
+        return "EndpointsConfig{" +
+            "enabled=" + enabled +
+            ", path='" + path + '\'' +
+            ", tags=" + tags +
+            ", servers=" + servers +
+            ", securityRequirements=" + securityRequirements +
+            ", endpoints=" + endpoints +
+            ", groups=" + groups +
+            ", groupsExcluded=" + groupsExcluded +
+            ", extensions=" + extensions +
+            '}';
+    }
 }

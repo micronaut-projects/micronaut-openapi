@@ -96,6 +96,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isEndpointsEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_EXTENSIONS;
@@ -104,6 +105,8 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
+import static io.micronaut.openapi.visitor.ContextUtils.put;
+import static io.micronaut.openapi.visitor.ContextUtils.remove;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
@@ -1019,14 +1022,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION, endpointProps.getDescription(), context);
             ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS, endpointProps, context);
 
+            if ("prometheus".equals(endpointProps.getId())) {
+                put(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, true, context);
+            }
+
             groupVisitor.visitClass(classEl, context);
 
-            visitor.visitClass(classEl, context);
-            for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
-                .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                .named(name -> !name.contains(StringUtil.DOLLAR)))) {
+            try {
+                visitor.visitClass(classEl, context);
+                for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
+                    .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                    .named(name -> !name.contains(StringUtil.DOLLAR)))) {
 
-                visitor.visitMethod(methodEl, context);
+                    visitor.visitMethod(methodEl, context);
+                }
+            } catch (Exception e) {
+                warn("Can't process endpoint " + endpointProps.getId() + ". Skip it", context);
+            } finally {
+                remove(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, context);
             }
         }
     }

@@ -100,7 +100,8 @@ public final class ElementUtils {
         "io.reactivex.rxjava3.core.Observable",
         "io.reactivex.rxjava3.core.Maybe",
         "kotlinx.coroutines.flow.Flow",
-        "org.springframework.web.context.request.async.DeferredResult"
+        "org.springframework.web.context.request.async.DeferredResult",
+        "org.springframework.boot.actuate.endpoint.web.WebEndpointResponse"
     );
 
     public static final List<String> FILE_TYPES = List.of(
@@ -378,6 +379,7 @@ public final class ElementUtils {
             || parameterType.isAssignable("org.springframework.http.HttpMethod")
             || parameterType.isAssignable("org.springframework.validation.BindingResult")
             || parameterType.isAssignable("org.springframework.validation.Errors")
+            || parameterType.isAssignable("org.springframework.boot.actuate.endpoint.Producible")
             ;
     }
 

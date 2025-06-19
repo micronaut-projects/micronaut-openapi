@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.naming.NameUtils;
-import io.micronaut.core.util.ArrayUtils;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
@@ -30,6 +30,7 @@ import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.management.EndpointProperties;
+import io.micronaut.openapi.visitor.management.SpringActuatorUtils;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -151,6 +152,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
                 }
             }
         }
+        if (ignore(element, context)) {
+            return;
+        }
         if (servers == null) {
             servers = endpointsConfig.getServers();
             if (servers == null) {
@@ -205,26 +209,32 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (enabled != null && !enabled) {
             return true;
         }
+        AnnotationValue<?> ann = null;
         if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-            AnnotationValue<?> ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
-            String idAnn = ann.stringValue(PROP_ID).orElse(ann.stringValue(PROP_VALUE).orElse(null));
-            if (StringUtils.isEmpty(idAnn)) {
-                idAnn = NameUtils.hyphenate(element.getSimpleName());
-            }
-            var endpointProps = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS, EndpointProperties.class, context);
-            var endpointPath = endpointProps != null && StringUtils.isNotEmpty(endpointProps.getPath()) ? endpointProps.getPath() : idAnn;
-            if (path.endsWith(SLASH) && endpointPath.startsWith(SLASH)) {
-                endpointPath = endpointPath.substring(1);
-            } else if (!path.endsWith(SLASH) && !endpointPath.startsWith(SLASH)) {
-                endpointPath = SLASH + endpointPath;
-            }
-            id = path + endpointPath;
-            if (!id.startsWith(SLASH)) {
-                id = SLASH + id;
-            }
-            return false;
+            ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
+            // currently, micronaut-spring can't map spring WebEndpoint annotation to micronaut Endpoint annotation
+        } else if (element.isAnnotationPresent("org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint")) {
+            ann = element.getAnnotation("org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint");
         }
-        return true;
+        if (ann == null) {
+            return true;
+        }
+        var idAnn = ann.stringValue(PROP_ID).orElse(ann.stringValue(PROP_VALUE).orElse(null));
+        if (StringUtils.isEmpty(idAnn)) {
+            idAnn = NameUtils.hyphenate(element.getSimpleName());
+        }
+        var endpointProps = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS, EndpointProperties.class, context);
+        var endpointPath = endpointProps != null && StringUtils.isNotEmpty(endpointProps.getPath()) ? endpointProps.getPath() : idAnn;
+        if (path.endsWith(SLASH) && endpointPath.startsWith(SLASH)) {
+            endpointPath = endpointPath.substring(1);
+        } else if (!path.endsWith(SLASH) && !endpointPath.startsWith(SLASH)) {
+            endpointPath = SLASH + endpointPath;
+        }
+        id = path + endpointPath;
+        if (!id.startsWith(SLASH)) {
+            id = SLASH + id;
+        }
+        return false;
     }
 
     @Override
@@ -242,7 +252,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
             || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true))) {
             return true;
         }
-        methodDescription = httpMethodDescription(element);
+        methodDescription = httpMethodDescription(element, context);
         return methodDescription == null;
     }
 
@@ -322,33 +332,55 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         return 40;
     }
 
-    private static List<MediaType> mediaTypes(String... arr) {
-        if (ArrayUtils.isEmpty(arr)) {
+    private static List<MediaType> mediaTypes(List<String> mediaTypes) {
+        if (CollectionUtils.isEmpty(mediaTypes)) {
             return DEFAULT_MEDIA_TYPES;
         }
-        return Arrays.stream(arr)
+        return mediaTypes.stream()
             .map(Utils::getMediaType)
             .toList();
     }
 
-    private static HttpMethodDescription httpMethodDescription(MethodElement element) {
-        HttpMethodDescription httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Write", HttpMethod.POST);
+    private static HttpMethodDescription httpMethodDescription(MethodElement element, VisitorContext context) {
+        HttpMethodDescription httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Write", HttpMethod.POST, context);
         if (httpMethodDescription != null) {
             return httpMethodDescription;
         }
-        httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Read", HttpMethod.GET);
+        httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Read", HttpMethod.GET, context);
         if (httpMethodDescription != null) {
             return httpMethodDescription;
         }
-        return methodDescription(element, "io.micronaut.management.endpoint.annotation.Delete", HttpMethod.DELETE);
+        httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Delete", HttpMethod.DELETE, context);
+        if (httpMethodDescription != null) {
+            return httpMethodDescription;
+        }
+        // check spring-actuator annotations, if micronaut-spring didn't map them
+        httpMethodDescription = methodDescription(element, "org.springframework.boot.actuate.endpoint.annotation.WriteOperation", HttpMethod.POST, context);
+        if (httpMethodDescription != null) {
+            return httpMethodDescription;
+        }
+        httpMethodDescription = methodDescription(element, "org.springframework.boot.actuate.endpoint.annotation.ReadOperation", HttpMethod.GET, context);
+        if (httpMethodDescription != null) {
+            return httpMethodDescription;
+        }
+        return methodDescription(element, "org.springframework.boot.actuate.endpoint.annotation.DeleteOperation", HttpMethod.DELETE, context);
     }
 
-    private static HttpMethodDescription methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod) {
+    private static HttpMethodDescription methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod, VisitorContext context) {
         if (element.isAnnotationPresent(endpointManagementAnnName)) {
             AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             assert annotation != null;
-            return new HttpMethodDescription(httpMethod, annotation.stringValue(PROP_DESCRIPTION).orElse(null),
-                annotation.stringValues("produces"), annotation.stringValues("consumes"));
+
+            List<String> produces = Arrays.asList(annotation.stringValues("produces"));
+            List<String> consumes = Arrays.asList(annotation.stringValues("consumes"));
+            if (CollectionUtils.isEmpty(produces)) {
+                produces = SpringActuatorUtils.getProducesFrom(context);
+                if (CollectionUtils.isNotEmpty(produces)) {
+                    consumes = produces;
+                }
+            }
+
+            return new HttpMethodDescription(httpMethod, annotation.stringValue(PROP_DESCRIPTION).orElse(null), produces, consumes);
         }
         return null;
     }
@@ -367,8 +399,8 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     private record HttpMethodDescription(
         HttpMethod httpMethod,
         String description,
-        String[] produces,
-        String[] consumes
+        List<String> produces,
+        List<String> consumes
     ) {
     }
 }
