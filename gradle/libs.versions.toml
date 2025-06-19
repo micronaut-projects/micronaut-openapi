@@ -25,7 +25,7 @@ commonmark = "0.24.0"
 
 micronaut = "4.9.1"
 micronaut-platform = "4.8.3"
-micronaut-jaxrs = "4.8.0"
+micronaut-jaxrs = "4.9.0"
 micronaut-security = "4.12.2"
 micronaut-serde = "2.15.0"
 micronaut-rxjava2 = "2.7.0"
