@@ -2,12 +2,6 @@ plugins {
     id 'io.micronaut.build.internal.openapi-simple-module'
 }
 
-micronautBuild {
-    binaryCompatibility {
-        enabled = false
-    }
-}
-
 dependencies {
 
     api(libs.managed.pegdown)
