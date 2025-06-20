@@ -18,7 +18,6 @@ dependencies {
     testImplementation(mn.reactor)
     testImplementation(mnValidation.validation)
 
-    testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
 
@@ -28,7 +27,6 @@ compileTestJava.options.compilerArgs += '-parameters'
 test {
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
-    useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
     }

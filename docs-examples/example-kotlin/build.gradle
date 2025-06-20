@@ -23,7 +23,6 @@ dependencies {
     testImplementation(mn.kotlin.stdlib.asProvider())
     testImplementation(mn.kotlin.reflect)
 
-    testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
 
@@ -34,7 +33,6 @@ ksp {
 test {
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
-    useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
     }

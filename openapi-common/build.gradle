@@ -9,7 +9,3 @@ dependencies {
     api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
 }
-
-test {
-    useJUnitPlatform()
-}

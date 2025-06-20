@@ -15,7 +15,3 @@ dependencies {
 
     testRuntimeOnly(mnTest.junit.jupiter.engine)
 }
-
-test {
-    useJUnitPlatform()
-}
