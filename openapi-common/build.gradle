@@ -3,12 +3,6 @@ plugins {
     id 'io.micronaut.build.internal.openapi-simple-module'
 }
 
-micronautBuild {
-    binaryCompatibility {
-        enabled = false
-    }
-}
-
 dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
