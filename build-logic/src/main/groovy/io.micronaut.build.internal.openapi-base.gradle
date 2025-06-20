@@ -3,7 +3,6 @@ repositories {
 }
 
 tasks.withType(Test).configureEach {
-    useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
     }
