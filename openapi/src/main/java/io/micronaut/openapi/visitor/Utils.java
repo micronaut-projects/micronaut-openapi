@@ -94,6 +94,10 @@ public final class Utils {
     private Utils() {
     }
 
+    public static boolean isKsp(VisitorContext context) {
+        return context.getClass().getName().equals("io.micronaut.kotlin.processing.visitor.KotlinVisitorContext");
+    }
+
     public static void init(VisitorContext context) {
         if (initialized) {
             return;

@@ -76,6 +76,10 @@ tasks.named("generateOpenApi") {
     ]
 }
 
+ksp {
+    arg("micronaut.openapi.project.dir", "$projectDir")
+}
+
 kotlin {
     jvmToolchain(17)
 }

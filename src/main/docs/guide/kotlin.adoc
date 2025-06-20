@@ -1,7 +1,7 @@
 To support incremental annotation processing, you need to explicitly set the path to
 the project directory through the annotation processor setting `micronaut.openapi.project.dir` like this:
 
-.Gradle
+.Gradle with KAPT
 [source,groovy]
 ----
 kapt {
@@ -10,3 +10,18 @@ kapt {
     }
 }
 ----
+
+.Gradle with KSP
+[source,groovy]
+----
+ksp {
+    arg("micronaut.openapi.project.dir", projectDir.toString())
+}
+----
+====
+
+[NOTE]
+====
+If you use KSP we recommend to set **micronaut.openapi.project.dir**, otherwise dummy file will be created.
+That is limitation of KSP, for automatically detect project directory need to create this file, but KSP doesn't delete dummy file automatically:
+====
