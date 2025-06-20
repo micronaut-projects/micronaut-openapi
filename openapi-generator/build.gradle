@@ -28,6 +28,7 @@ dependencies {
     testFixturesImplementation(mnTest.junit.jupiter.params)
 
     testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {
