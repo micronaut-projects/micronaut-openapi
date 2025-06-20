@@ -41,7 +41,7 @@ dependencies {
     testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mnLogging.logback.classic)
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:${mnTest.versions.junit.platform.get()}")
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -112,12 +112,12 @@ public final class TagUtils {
         return tagList;
     }
 
-    public static void readTags(MethodElement element, VisitorContext context, Operation swaggerOperation, List<Tag> classTags, OpenAPI openAPI) {
+    public static void readTags(MethodElement element, VisitorContext context, Operation swaggerOperation, List<Tag> classTags, OpenAPI openApi) {
         element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.tags.Tag.class)
             .forEach(av -> av.stringValue(PROP_NAME)
                 .ifPresent(swaggerOperation::addTagsItem));
 
-        var copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
+        var copyTags = openApi.getTags() != null ? new ArrayList<>(openApi.getTags()) : null;
         var operationTags = processOpenApiAnnotation(element, context, io.swagger.v3.oas.annotations.tags.Tag.class, Tag.class, copyTags);
         // find not simple tags (tags with description or other information), such fields need to be described at the openAPI level.
         List<Tag> complexTags = null;
@@ -132,20 +132,20 @@ public final class TagUtils {
             }
         }
         if (CollectionUtils.isNotEmpty(complexTags)) {
-            if (CollectionUtils.isEmpty(openAPI.getTags())) {
-                openAPI.setTags(complexTags);
+            if (CollectionUtils.isEmpty(openApi.getTags())) {
+                openApi.setTags(complexTags);
             } else {
                 for (Tag complexTag : complexTags) {
                     // skip all existed tags
                     boolean alreadyExists = false;
-                    for (Tag apiTag : openAPI.getTags()) {
+                    for (Tag apiTag : openApi.getTags()) {
                         if (apiTag.getName().equals(complexTag.getName())) {
                             alreadyExists = true;
                             break;
                         }
                     }
                     if (!alreadyExists) {
-                        openAPI.getTags().add(complexTag);
+                        openApi.getTags().add(complexTag);
                     }
                 }
             }

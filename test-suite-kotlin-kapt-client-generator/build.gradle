@@ -33,8 +33,9 @@ dependencies {
     kaptTest(mn.micronaut.inject.kotlin)
 
     testImplementation(mnTest.micronaut.test.junit5)
+
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
-    testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mn.snakeyaml)
 }

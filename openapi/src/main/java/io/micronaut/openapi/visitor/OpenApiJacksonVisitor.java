@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.order.Ordered;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
@@ -30,6 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import javax.annotation.processing.SupportedOptions;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -67,7 +67,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return 200;
     }
 
     @Override
@@ -77,7 +77,6 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
         }
         var jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
         var jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
-        var schemaAnn = element.getDeclaredAnnotation(Schema.class);
 
         /*
         Given the following annotations:
@@ -97,7 +96,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
                 discriminatorProperty = "type"
             )
          */
-        if (jsonTypeInfoDecAnn != null && jsonSubTypesDecAnn != null && schemaAnn == null) {
+        if (jsonTypeInfoDecAnn != null && jsonSubTypesDecAnn != null) {
             JsonTypeInfo.Id use = jsonTypeInfoDecAnn.enumValue("use", JsonTypeInfo.Id.class).orElse(null);
             String discriminatorProp = jsonTypeInfoDecAnn.stringValue("property").orElse(null);
             if (use != JsonTypeInfo.Id.NAME || discriminatorProp == null) {
@@ -119,10 +118,14 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
                 }
             }
 
+            var schemaAnn = element.getDeclaredAnnotation(Schema.class);
+            var schemaAnnValues = schemaAnn != null ? schemaAnn.getValues() : Collections.<CharSequence, Object>emptyMap();
+            element.removeAnnotation(Schema.class);
             element.annotate(Schema.class, builder -> {
-                builder.member(PROP_ONE_OF, discriminatorClasses.toArray(new AnnotationClassValue[0]));
-                builder.member(PROP_DISCRIMINATOR_PROPERTY, discriminatorProp);
-                builder.member(PROP_DISCRIMINATOR_MAPPING, discriminatorMappingAnns.toArray(new AnnotationValue<?>[0]));
+                builder.member(PROP_ONE_OF, discriminatorClasses.toArray(new AnnotationClassValue[0]))
+                    .member(PROP_DISCRIMINATOR_PROPERTY, discriminatorProp)
+                    .member(PROP_DISCRIMINATOR_MAPPING, discriminatorMappingAnns.toArray(new AnnotationValue<?>[0]));
+                builder.members(schemaAnnValues);
             });
         }
     }

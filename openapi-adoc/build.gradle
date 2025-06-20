@@ -14,8 +14,5 @@ dependencies {
     testImplementation(mnTest.micronaut.test.junit5)
 
     testRuntimeOnly(mnTest.junit.jupiter.engine)
-}
-
-test {
-    useJUnitPlatform()
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }

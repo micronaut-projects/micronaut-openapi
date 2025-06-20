@@ -204,8 +204,8 @@ public final class SchemaUtils {
         return prefix + str;
     }
 
-    public static Map<String, Schema> resolveSchemas(OpenAPI openAPI) {
-        Components components = resolveComponents(openAPI);
+    public static Map<String, Schema> resolveSchemas(OpenAPI openApi) {
+        Components components = resolveComponents(openApi);
         Map<String, Schema> schemas = components.getSchemas();
         if (schemas == null) {
             schemas = new LinkedHashMap<>();
