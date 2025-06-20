@@ -941,4 +941,35 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/config/";
         assertFileDoesntExist(path + "EnumConverterServerConfig.java");
     }
+
+    @Test
+    void testResponseFileWithoutReactive() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setReactive(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.java", """
+                @Get("/example-route")
+                @Produces("application/octet-stream")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                FileCustomizableResponseType exampleRouteGet();
+            """);
+    }
+
+    @Test
+    void testResponseFileWithReactive() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.java", """
+                @Get("/example-route")
+                @Produces("application/octet-stream")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                Mono<@NotNull FileCustomizableResponseType> exampleRouteGet();
+            """);
+    }
 }
