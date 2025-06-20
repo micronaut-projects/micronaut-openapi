@@ -1978,13 +1978,35 @@ To enable the addition of extensions to the final OpenAPI specification, you nee
 the project directory through the annotation processor setting <code>micronaut.openapi.project.dir</code> like this:</p>
 </div>
 <div class="listingblock">
-<div class="title">Gradle</div>
+<div class="title">Gradle with KAPT</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
     }
 }</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Gradle with KSP</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">ksp {
+    arg("micronaut.openapi.project.dir", projectDir.toString())
+}</code></pre>
+</div>
+</div>
+<div class="exampleblock">
+<div class="content">
+
+</div>
+</div>
+<div class="paragraph">
+<p>If you use KSP we recommend to set <strong>micronaut.openapi.project.dir</strong>, otherwise dummy file will be created.
+That is limitation of KSP, for automatically detect project directory need to create this file, but KSP doesn&#8217;t delete dummy file automatically:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+
 </div>
 </div>
 
