@@ -864,6 +864,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         return VALUE_MAPPING[key]!!
                     }
                 """);
+
+        assertFileContains(path + "model/DecimalEnum.kt",
+            "val VALUE_MAPPING = entries.associateBy { it.value }",
+            """
+                    fun fromValue(value: BigDecimal): DecimalEnum {
+                        require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+                        return VALUE_MAPPING[value]!!
+                    }
+                """);
     }
 
     @Test
@@ -2314,3 +2323,4 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileDoesntExist(path + "EnumConverterClientConfig.kt");
     }
 }
+
