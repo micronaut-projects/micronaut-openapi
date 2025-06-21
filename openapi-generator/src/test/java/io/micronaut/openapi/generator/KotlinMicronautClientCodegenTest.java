@@ -555,7 +555,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Book.kt",
             """
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 data class Book(
                     @field:NotNull
                     @field:Size(max = 10)
@@ -1317,7 +1317,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @Serdeable
                 @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen")
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 class Book {
                 }
                 """);
