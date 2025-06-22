@@ -10,7 +10,6 @@ import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MutableHttpRequest
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.uri.UriTemplate
 import io.micronaut.http.cookie.Cookie
@@ -20,6 +19,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Assertions
 import {{javaxPackage}}.inject.Inject
+import {{javaxPackage}}.validation.Valid
+import {{javaxPackage}}.validation.constraints.*
 {{#reactive}}
 import reactor.core.publisher.Flux
 {{/reactive}}

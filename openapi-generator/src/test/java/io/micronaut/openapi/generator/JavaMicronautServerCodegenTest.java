@@ -1,6 +1,5 @@
 package io.micronaut.openapi.generator;
 
-import io.micronaut.openapi.generator.assertions.TestUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -8,9 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
+import static io.micronaut.openapi.generator.assertions.TestUtils.assertExtraAnnotationFiles;
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.openapitools.codegen.CodegenConstants.APIS;
+import static org.openapitools.codegen.CodegenConstants.API_TESTS;
+import static org.openapitools.codegen.CodegenConstants.MODELS;
+import static org.openapitools.codegen.CodegenConstants.MODEL_TESTS;
+import static org.openapitools.codegen.CodegenConstants.SUPPORTING_FILES;
 
 class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
@@ -53,10 +58,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(CodegenConstants.INVOKER_PACKAGE, "org.test.test");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "org.test.test.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "org.test.test.api");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.APIS,
-            CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
 
         String invokerFolder = outputPath + "src/main/java/org/test/test/";
         assertFileExists(invokerFolder + "Application.java");
@@ -79,11 +81,11 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doUseValidationParam() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.USE_BEANVALIDATION, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
 
         // Files are not generated
         String apiFolder = outputPath + "/src/main/java/org/openapitools/api/";
+
         assertFileContains(apiFolder + "PetApi.java", "@Valid");
         assertFileContains(apiFolder + "PetApi.java", "@NotNull");
     }
@@ -92,11 +94,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doNotUseValidationParam() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.USE_BEANVALIDATION, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         // Files are not generated
         String apiFolder = outputPath + "/src/main/java/org/openapitools/api/";
+
         assertFileNotContains(apiFolder + "PetApi.java", "@Valid");
         assertFileNotContains(apiFolder + "PetApi.java", "@NotNull");
     }
@@ -104,15 +105,12 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateForTestJUnit() {
         var codegen = new JavaMicronautServerCodegen();
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_TEST,
-            JavaMicronautServerCodegen.OPT_TEST_JUNIT);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_TEST, JavaMicronautServerCodegen.OPT_TEST_JUNIT);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, true, SUPPORTING_FILES, APIS, MODELS, API_TESTS, MODEL_TESTS);
+        String apiTestFolder = outputPath + "src/test/java/org/openapitools/api/";
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/java/");
-        String apiTestFolder = outputPath + "src/test/java/org/openapitools/api/";
         assertFileExists(apiTestFolder + "PetApiTest.java");
         assertFileContains(apiTestFolder + "PetApiTest.java", "PetApiTest", "@MicronautTest");
     }
@@ -120,15 +118,12 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateForTestSpock() {
         var codegen = new JavaMicronautServerCodegen();
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_TEST,
-            JavaMicronautServerCodegen.OPT_TEST_SPOCK);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_TEST, JavaMicronautServerCodegen.OPT_TEST_SPOCK);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, true, SUPPORTING_FILES, APIS, MODELS, API_TESTS, MODEL_TESTS);
+        String apiTestFolder = outputPath + "src/test/groovy/org/openapitools/api/";
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/groovy");
-        String apiTestFolder = outputPath + "src/test/groovy/org/openapitools/api/";
         assertFileExists(apiTestFolder + "PetApiSpec.groovy");
         assertFileContains(apiTestFolder + "PetApiSpec.groovy", "PetApiSpec", "@MicronautTest");
     }
@@ -138,10 +133,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "true");
         codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.JACKSON.name());
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
         assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<@NotNull String> photoUrls)");
         assertFileContains(modelPath + "Pet.java", "private Pet()");
     }
@@ -150,10 +145,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doNotGenerateRequiredPropertiesInConstructor() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
         assertFileNotContainsRegex(modelPath + "Pet.java", "public Pet\\([^)]+\\)");
         assertFileNotContains(modelPath + "Pet.java", "private Pet()");
         assertFileNotContainsRegex(modelPath + "User.java", "public User\\([^)]+\\)");
@@ -165,18 +160,18 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testExtraAnnotations1() {
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_11772.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_11772.yml");
 
-        TestUtils.assertExtraAnnotationFiles(outputPath + "/src/main/java/org/openapitools/model");
+        assertExtraAnnotationFiles(outputPath + "/src/main/java/org/openapitools/model");
     }
 
     @Test
     void doNotGenerateAuthRolesWithExtensionWhenNotUseAuth() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_USE_AUTH, false);
-        String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileNotContains(apiPath + "BooksApi.java", "@Secured");
         assertFileNotContains(apiPath + "UsersApi.java", "@Secured");
         assertFileNotContains(apiPath + "ReviewsApi.java", "@Secured");
@@ -186,9 +181,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void generateAuthRolesWithExtension() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_USE_AUTH, true);
-        String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}bookSearchGet");
         assertFileContainsRegex(apiPath + "BooksApi.java", "@Secured\\(\"admin\"\\)[^;]{0,100}createBook");
         assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}getBook");
@@ -206,9 +201,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<@Valid Pet>>");
     }
 
@@ -218,9 +213,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_FLUX_FOR_ARRAYS, "false");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
@@ -232,9 +227,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_FLUX_FOR_ARRAYS, "true");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
         assertFileContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
@@ -245,9 +240,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "false");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(apiPath + "PetApi.java", "HttpResponse<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "Mono");
     }
@@ -257,9 +252,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "false");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
+        String outputPath = generateFiles(codegen, PETSTORE_PATH);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(apiPath + "PetApi.java", "Pet");
         assertFileNotContains(apiPath + "PetApi.java", "Mono");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
@@ -268,9 +263,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateOperationOnlyForFirstTag() {
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, CodegenConstants.MODELS,
-            CodegenConstants.APIS, CodegenConstants.API_TESTS);
-
+        String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, true, SUPPORTING_FILES, APIS, MODELS, MODEL_TESTS, API_TESTS);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         String apiTestPath = outputPath + "/src/test/java/org/openapitools/api/";
 
@@ -296,9 +289,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doRepeatOperationForAllTags() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "false");
-        String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, CodegenConstants.MODELS,
-            CodegenConstants.APIS, CodegenConstants.API_TESTS);
-
+        String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, true, SUPPORTING_FILES, APIS, MODELS, MODEL_TESTS, API_TESTS);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         String apiTestPath = outputPath + "/src/test/java/org/openapitools/api/";
 
@@ -323,9 +314,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testReadOnlyConstructorBug() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml");
         String apiPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name, String requiredReadOnly)");
@@ -334,9 +324,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorConstructorBug() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml");
         String apiPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
@@ -346,9 +335,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenericAnnotations() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml");
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
@@ -359,9 +347,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testPluralBodyParamName() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/plural.yml", CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/plural.yml");
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
 
         assertFileContains(apiPath + "DefaultApi.java", "@Body @NotNull List<@Valid Book> books");
@@ -369,9 +356,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testControllerEnums() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum.yml");
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileExists(modelPath + "GetTokenRequestGrantType.java");
@@ -382,9 +368,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testFileEndpoint() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml");
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
 
         assertFileContains(apiPath + "RequestBodyApi.java", "@Nullable(inherited = true) CompletedFileUpload file");
@@ -392,15 +377,14 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testReservedWords() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/javaReservedWords.yml",
-            CodegenConstants.APIS,
-            CodegenConstants.MODELS,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.MODEL_TESTS,
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/javaReservedWords.yml", true,
+            SUPPORTING_FILES,
+            APIS,
+            MODELS,
+            MODEL_TESTS,
+            API_TESTS,
             CodegenConstants.MODEL_DOCS,
-            CodegenConstants.API_TESTS,
             CodegenConstants.API_DOCS
         );
         String path = outputPath + "src/main/java/org/openapitools/";
@@ -420,9 +404,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testCommonPathParametersWithRef() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
@@ -439,9 +422,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testResponseRef() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/spec.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/ResponseBodyApi.java", "@ApiResponse(responseCode = \"default\", description = \"An unexpected error has occurred\")");
@@ -449,9 +431,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testExtraAnnotations() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.java",
@@ -486,9 +467,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testOperationDescription() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/operation-with-desc.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/operation-with-desc.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DatasetsApi.java", "description = \"Creates a brand new dataset.\"");
@@ -496,9 +476,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testSecurity() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.java",
@@ -514,9 +493,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testMultipartFormData() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/ResetPasswordApi.java", """
@@ -534,9 +512,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testMultipleContentTypesEndpoints() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.java", """
@@ -568,11 +545,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testPolymorphism() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setUseAuth(false);
         codegen.setReactive(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/1794/openapi.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/1794/openapi.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/CurrencyInvoiceCreateDto.java", """
@@ -599,10 +575,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDeprecated() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/ParametersApi.java",
@@ -646,10 +621,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testCustomValidationMessages() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setUseEnumCaseInsensitive(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.java",
@@ -690,10 +664,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testSwaggerAnnotations() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/PetApi.java",
@@ -723,11 +696,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testBodyEnum() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateSwaggerAnnotations(false);
         codegen.setUseAuth(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/MyCustomApi.java", """
@@ -741,11 +713,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenerateControllerAsAbstract() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateControllerAsAbstract(true);
         codegen.setUseAuth(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileNotContains(path + "api/MyCustomApi.java", "@Controller");
@@ -753,9 +724,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDateWithoutSizeAnnotations() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DocumentResourcesApi.java", """
@@ -774,9 +744,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testImportZonedDateTime() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/library-definition.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/library-definition.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/BookInfo.java",
@@ -787,7 +756,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testReadOnlyRequiredPropertyInConstructor() {
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oas.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oas.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/CategoryObject.java", """
@@ -801,10 +770,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testUseTags() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setUseTags(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileExists(path + "api/UserApi.java");
@@ -814,10 +782,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenerateOperationOnlyForFirstTagFalse() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         // Verify all the tags created
@@ -836,10 +803,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenerateOperationOnlyForFirstTagTrue() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateOperationOnlyForFirstTag(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/multi-tags-test.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         // Verify all the tags created
@@ -858,7 +824,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testParamWithStyle() {
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-style.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-style.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.java",
@@ -873,11 +839,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumConvertersConfig() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
-
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
         String path = outputPath + "src/main/java/org/openapitools/config/";
+
         assertFileExists(path + "EnumConverterServerConfig.java");
 
         assertFileContains(path + "EnumConverterServerConfig.java",
@@ -923,33 +888,30 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumConvertersConfigWithoutEnumParams() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
-
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml");
         String path = outputPath + "src/main/java/org/openapitools/config/";
+
         assertFileDoesntExist(path + "EnumConverterServerConfig.java");
     }
 
     @Test
     void testEnumConvertersConfigDisabled() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setGenerateEnumConverters(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
-
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
         String path = outputPath + "src/main/java/org/openapitools/config/";
+
         assertFileDoesntExist(path + "EnumConverterServerConfig.java");
     }
 
     @Test
     void testResponseFileWithoutReactive() {
-
         var codegen = new JavaMicronautServerCodegen();
         codegen.setReactive(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
-
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml");
         String path = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(path + "DefaultApi.java", """
                 @Get("/example-route")
                 @Produces("application/octet-stream")
@@ -960,11 +922,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testResponseFileWithReactive() {
-
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
-
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml");
         String path = outputPath + "src/main/java/org/openapitools/api/";
+
         assertFileContains(path + "DefaultApi.java", """
                 @Get("/example-route")
                 @Produces("application/octet-stream")
