@@ -20,7 +20,12 @@ dependencies {
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mnTest.junit.jupiter.params)
     testImplementation(libs.kotlin.compile.testing)
-    testImplementation(libs.kotlin.compiler)
+    testImplementation(mn.kotlin.compiler.embeddable)
+
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
+
+    testFixturesApi(mn.micronaut.http.server.netty)
     testFixturesApi(mn.micronaut.http.client.core)
     testFixturesApi(mnValidation.validation)
     testFixturesApi(mnSerde.micronaut.serde.api)
@@ -28,13 +33,10 @@ dependencies {
 
     testFixturesImplementation(mn.micronaut.inject)
     testFixturesImplementation(mnTest.assertj.core)
-    testFixturesImplementation(libs.javaparser)
-    testFixturesImplementation(libs.openapi.generator)
     testFixturesImplementation(mnTest.micronaut.test.junit5)
     testFixturesImplementation(mnTest.junit.jupiter.params)
-
-    testRuntimeOnly(mnTest.junit.jupiter.engine)
-    testRuntimeOnly(mnTest.junit.platform.launcher)
+    testFixturesImplementation(libs.javaparser)
+    testFixturesImplementation(libs.openapi.generator)
 }
 
 configurations.configureEach {

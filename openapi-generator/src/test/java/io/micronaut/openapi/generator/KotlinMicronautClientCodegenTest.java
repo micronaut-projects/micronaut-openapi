@@ -20,6 +20,10 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.openapitools.codegen.CodegenConstants.APIS;
+import static org.openapitools.codegen.CodegenConstants.API_TESTS;
+import static org.openapitools.codegen.CodegenConstants.MODELS;
+import static org.openapitools.codegen.CodegenConstants.SUPPORTING_FILES;
 
 class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
@@ -58,10 +62,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(CodegenConstants.INVOKER_PACKAGE, "org.test.test");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "org.test.test.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "org.test.test.api");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.APIS,
-            CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         String apiFolder = outputPath + "src/main/kotlin/org/test/test/api/";
         assertFileExists(apiFolder + "PetApi.kt");
@@ -78,9 +81,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doConfigureAuthParam() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Files generated
         assertFileExists(outputPath + "/src/main/kotlin/org/openapitools/auth/Authorization.kt");
@@ -92,9 +95,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doNotConfigureAuthParam() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Files are not generated
         assertFileDoesntExist(outputPath + "/src/main/kotlin/org/openapitools/auth/");
@@ -105,8 +108,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doUseValidationParam() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.USE_BEANVALIDATION, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Files are not generated
         assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt", "@Valid");
@@ -117,8 +121,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doNotUseValidationParam() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.USE_BEANVALIDATION, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Files are not generated
         assertFileNotContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt", "@Valid");
@@ -128,11 +133,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateForTestJUnit() {
         var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_TEST,
-            KotlinMicronautClientCodegen.OPT_TEST_JUNIT);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.SUPPORTING_FILES,
-            CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
+        codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_TEST, KotlinMicronautClientCodegen.OPT_TEST_JUNIT);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, API_TESTS, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/kotlin/");
@@ -143,7 +147,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateRequiredPropertiesInConstructor() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath);
 
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
@@ -180,8 +186,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateMultipleContentTypes() {
         var codegen = new KotlinMicronautClientCodegen();
-
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/content-type.yml", CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/micronaut/content-type.yml", SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -195,7 +200,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testAdditionalClientTypeAnnotations() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, "@SuppressWarnings(\"someWarning\");@java.lang.Deprecated(since=\"\\${badVersion}\",forRemoval=true);");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -208,9 +213,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAdditionalClientTypeAnnotationsFromSetter() {
         var codegen = new KotlinMicronautClientCodegen();
-
         codegen.setAdditionalClientTypeAnnotations(List.of("@SuppressWarnings(\"someWarning\")", "@java.lang.Deprecated(since=\"\\${badVersion}\",forRemoval=true)"));
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -223,7 +227,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testDefaultAuthorizationFilterPattern() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -236,7 +240,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.AUTHORIZATION_FILTER_PATTERN, "pet/**");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -247,7 +251,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testNoConfigureClientId() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -259,7 +263,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testConfigureClientId() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.CLIENT_ID, "unit-test");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -272,7 +276,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.CLIENT_ID, "unit-test");
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CLIENT_PATH, true);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -283,7 +287,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testDefaultPathSeparator() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -295,7 +299,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testConfigurePathSeparator() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.BASE_PATH_SEPARATOR, "-");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -305,9 +309,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testReadOnlyConstructorBug() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", SUPPORTING_FILES, APIS, MODELS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -381,10 +384,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testAddValidAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.USE_BEANVALIDATION, "true");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithlist.yml", CodegenConstants.APIS, CodegenConstants.API_TESTS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithlist.yml", SUPPORTING_FILES, APIS, MODELS, API_TESTS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -398,9 +400,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenericAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", SUPPORTING_FILES, APIS, MODELS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
@@ -416,12 +417,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorConstructorBug() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml",
-            CodegenConstants.MODELS
-        );
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml", SUPPORTING_FILES, APIS, MODELS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -485,7 +483,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testDifferentPropertyCase() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", SUPPORTING_FILES, APIS, MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -501,9 +499,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumsWithNonStringTypeValue() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", SUPPORTING_FILES, APIS, MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -523,15 +520,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testReservedWords() {
-
         var codegen = new KotlinMicronautClientCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/kotlinReservedWords.yml",
-            CodegenConstants.APIS,
-            CodegenConstants.MODELS,
-            CodegenConstants.SUPPORTING_FILES,
+            APIS,
+            MODELS,
+            SUPPORTING_FILES,
             CodegenConstants.MODEL_TESTS,
             CodegenConstants.MODEL_DOCS,
-            CodegenConstants.API_TESTS,
+            API_TESTS,
             CodegenConstants.API_DOCS
         );
         String path = outputPath + "src/main/kotlin/org/openapitools/";
@@ -550,9 +546,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testControllerEnums2() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum2.yml", SUPPORTING_FILES, APIS, MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/api/";
 
         assertFilesCompile(outputPath);
@@ -562,9 +557,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testCommonPathParametersWithRef() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -583,9 +577,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testExtraAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -612,10 +605,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testOneOf() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
+
         assertFilesCompile(outputPath);
 
         assertFileContains(path + "model/Subject.kt", "val typeCode: String?");
@@ -624,10 +617,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testOneOfWithoutDiscriminator() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-without-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-without-discriminator.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
+
         assertFilesCompile(outputPath);
 
         assertFileNotContains(path + "model/ShoppingNotesDTO.kt", "@JsonIgnoreProperties(",
@@ -637,12 +630,12 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorCustomType() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator2.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
+
         assertFileContains(path + "model/CancellationReasonTypesV2.kt", """
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_VERSION)
@@ -653,20 +646,20 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testUuidWithModelNameSuffix() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setModelNameSuffix("Dto");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFilesCompile(outputPath);
 
         assertFileContains(path + "model/OrderDTODto.kt", "var id: UUID,");
     }
 
     @Test
     void testParamsWithDefaultValue() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -682,9 +675,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testFileDownloadEndpoint() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file-download.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file-download.yml", SUPPORTING_FILES, APIS, MODELS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
 
         assertFilesCompile(outputPath);
@@ -698,9 +690,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testSingleProduceContentType() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/client-produces-content-type.yml", CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/client-produces-content-type.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -710,10 +701,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testImplicitHeaders() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setImplicitHeaders(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -725,10 +715,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testImplicitHeadersRegex() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setImplicitHeadersRegex(".*");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -740,10 +729,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorWithoutUseOneOfInterfaces() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -791,10 +779,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorWithUseOneOfInterfaces() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -828,9 +815,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testMultipartFormData() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -847,9 +833,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testGenerateByMultipleFiles() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple/swagger.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple/swagger.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -883,9 +868,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testMultipleContentTypesEndpoints() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -916,10 +900,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testUseEnumCaseInsensitive() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseEnumCaseInsensitive(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         // assertFilesCompile(outputPath);  BUG: https://github.com/micronaut-projects/micronaut-openapi/issues/2233
@@ -946,19 +929,18 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testAdditionalAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
         String clientTypeAnnotation = "MyClientTypeAnnotation";
         String modelTypeAnnotation = "MyModelTypeAnnotation";
         String oneOfTypeAnnotation = "MyOneOfTypeAnnotation";
         String enumTypeAnnotation = "MyEnumTypeAnnotation";
 
-        var annotations = new String[]{clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation};
+        var annotations = new String[] {clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation};
         codegen.setAdditionalClientTypeAnnotations(List.of("@org.openapitools." + clientTypeAnnotation));
         codegen.setAdditionalModelTypeAnnotations(List.of("@org.openapitools." + modelTypeAnnotation));
         codegen.setAdditionalOneOfTypeAnnotations(List.of("@org.openapitools." + oneOfTypeAnnotation));
         codegen.setAdditionalEnumTypeAnnotations(List.of("@org.openapitools." + enumTypeAnnotation));
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         var annotationSources = Arrays.stream(annotations).map(annotation ->
@@ -980,7 +962,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testAdditionalAnnotations2() {
-
         var codegen = new KotlinMicronautClientCodegen();
         String clientTypeAnnotation = "MyClientTypeAnnotation";
         String modelTypeAnnotation = "MyModelTypeAnnotation";
@@ -988,7 +969,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String enumTypeAnnotation1 = "MyEnumTypeAnnotation1";
         String enumTypeAnnotation2 = "MyEnumTypeAnnotation2";
         String enumTypeAnnotation3 = "MyEnumTypeAnnotation3";
-        var annotations = new String[]{clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3};
+        var annotations = new String[] {clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3};
         codegen.additionalProperties().putAll(Map.of(
             "additionalClientTypeAnnotations", List.of("@org.openapitools." + clientTypeAnnotation),
             "additionalModelTypeAnnotations", List.of("@org.openapitools." + modelTypeAnnotation),
@@ -996,7 +977,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "additionalEnumTypeAnnotations", "@org.openapitools.%s;@org.openapitools.%s;\n@org.openapitools.%s;".formatted(enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3)
         ));
         codegen.processOpts();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         var annotationSources = Arrays.stream(annotations).map(annotation ->
@@ -1018,9 +999,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumsExtensions() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", SUPPORTING_FILES, APIS, MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFilesCompile(outputPath);
@@ -1113,9 +1093,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testPrimitives() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/model-with-primitives.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/model-with-primitives.yml", SUPPORTING_FILES, APIS, MODELS);
         String basePath = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1191,10 +1170,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDeprecated() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1277,9 +1255,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testCustomValidationMessages() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1427,11 +1404,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testNoVars() {
-
         System.setProperty("micronaut.test.no-vars", "true");
 
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1450,10 +1426,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testSwaggerAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/petstore.json", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1488,10 +1463,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDiscriminatorOverride() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/test-override-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/test-override-discriminator.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1529,10 +1503,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEquals() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateSwaggerAnnotations(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/check-equals.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/check-equals.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1557,10 +1530,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testOptionalQueryValues() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateSwaggerAnnotations(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/optional-controller-values.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/optional-controller-values.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1580,9 +1552,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testBodyEnum() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1598,9 +1569,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testDateWithoutSizeAnnotations() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1620,10 +1590,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testJsonIncludeAlways() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setJsonIncludeAlwaysForRequiredFields(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/json-include-always.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/json-include-always.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1660,11 +1629,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testBuiltInModelNamePrefixAndSuffix() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setModelNamePrefix("Api");
         codegen.setModelNameSuffix("Dto");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openapi-built-in-prefix.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openapi-built-in-prefix.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1889,25 +1857,22 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @MethodSource("sealedScenarios")
     @ParameterizedTest
     public void sealedScenarios(String apiFile, Map<String, String> definitions) {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/" + apiFile, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/" + apiFile, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/model/";
 
 //        assertFilesCompile(outputPath); TODO: fix broken
 
-        definitions.forEach((file, check) ->
-            assertFileContains(path + file, check));
+        definitions.forEach((file, check) -> assertFileContains(path + file, check));
     }
 
     @Test
     void testCoroutines() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setCoroutines(true);
         codegen.setReactive(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1928,9 +1893,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumXimplements() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum-implements.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum-implements.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1948,7 +1912,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testPropsWithDefaultValueAreOptionalKsp() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setKsp(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -1978,7 +1942,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testPropsWithDefaultValueAreOptionalKapt() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-value-optional.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2009,7 +1973,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testParamWithStyle() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-style.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-style.yml", SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2030,7 +1994,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setConfigureAuthorization(true);
         codegen.setUseBasicAuth(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2046,7 +2010,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setConfigureAuthorization(true);
         codegen.setUseApiKeyAuth(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2062,7 +2026,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setConfigureAuthorization(true);
         codegen.setAuthFilter(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2078,7 +2042,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setConfigureAuthorization(true);
         codegen.setGenerateAuthClasses(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileDoesntExist(path + "auth/config/ConfigurableAuthorization.kt");
@@ -2096,7 +2060,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setConfigureAuthorization(true);
         codegen.setClientId("myApiClient");
         codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2117,7 +2081,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setConfigureAuthorization(true);
         codegen.setClientId("myApiClient");
         codegen.setAuthConfigName("test");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2139,7 +2103,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setClientId("myApiClient");
         codegen.setAuthFilterClientIds(List.of("test1", "test2", "test3"));
         codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2155,7 +2119,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setClientId("myApiClient");
         codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
         codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2172,7 +2136,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setAuthFilterClientIds(List.of());
         codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
         codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2190,7 +2154,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
         codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
         codegen.setAuthorizationFilterPatternStyle("regex");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFilesCompile(outputPath);
@@ -2205,7 +2169,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setJvmOverloads(true);
         codegen.setJvmRecord(true);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
@@ -2265,7 +2229,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.setJvmOverloads(true);
         codegen.setJvmRecord(false);
         codegen.setJavaCompatibility(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, SUPPORTING_FILES, APIS, MODELS);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
@@ -2313,7 +2277,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testJvmOverloadsWithoutDefaultValues() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setJvmOverloads(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", SUPPORTING_FILES, APIS, MODELS);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
@@ -2351,7 +2315,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testJvmRecordWithInheritance() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setJvmRecord(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", SUPPORTING_FILES, APIS, MODELS);
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
@@ -2363,7 +2327,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     JsonSubTypes.Type(value = ExtendedBookInfo::class, name = "EXTENDED"),
                 )
                 open class BookInfo(
-
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
@@ -2384,11 +2348,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testEnumConvertersConfig() {
 
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", SUPPORTING_FILES, APIS, MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
 
         assertFilesCompile(outputPath);
 
-        String path = outputPath + "src/main/kotlin/org/openapitools/config/";
         assertFileExists(path + "EnumConverterClientConfig.kt");
 
         assertFileContains(path + "EnumConverterClientConfig.kt",
@@ -2429,10 +2393,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumConvertersConfigWithCustomClientId() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setClientId("myApiClient");
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -2477,9 +2440,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumConvertersConfigWithoutEnumParams() {
-
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -2489,10 +2451,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     void testEnumConvertersConfigDisabled() {
-
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setGenerateEnumConverters(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", SUPPORTING_FILES, APIS, MODELS);
 
         assertFilesCompile(outputPath);
 
@@ -2504,7 +2465,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testHideGenerationTimestamp() {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", SUPPORTING_FILES, APIS, MODELS);
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
 
         assertFilesCompile(outputPath);

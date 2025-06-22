@@ -2,7 +2,6 @@ package io.micronaut.openapi.generator;
 
 import com.tschuchort.compiletesting.KotlinCompilation;
 import com.tschuchort.compiletesting.SourceFile;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,12 +124,15 @@ public abstract class AbstractMicronautCodegenTest {
      * @param extraSourceFiles - extra source files to add to the compilation - useful for adding dummy types
      */
     public static void assertFilesCompile(String directory, String jvmTarget, SourceFile... extraSourceFiles) {
-        String[] compilableFileExtensions = {".java", ".kt"};
-        List<SourceFile> sourceFiles = new ArrayList<>();
-        FileUtils.iterateFiles(new File(directory), compilableFileExtensions, true)
-            .forEachRemaining(
-                file -> sourceFiles.add(SourceFile.Companion.fromPath(file, false))
-            );
+        var sourceFiles = new ArrayList<SourceFile>();
+        try (var files = Files.find(Path.of(directory), 999, (p, bfa) -> {
+            var pathStr = p.toString();
+            return bfa.isRegularFile() && (pathStr.endsWith(".java") || pathStr.endsWith(".kt"));
+        })) {
+            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile(), false)));
+        } catch (IOException e) {
+            fail(e.getMessage(), e);
+        }
         sourceFiles.addAll(List.of(extraSourceFiles));
         var compilation = new KotlinCompilation();
         compilation.setSources(sourceFiles);
