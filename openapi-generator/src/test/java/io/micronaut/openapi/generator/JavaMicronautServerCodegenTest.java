@@ -464,7 +464,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Book.java",
             """
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
                 """,
             """
