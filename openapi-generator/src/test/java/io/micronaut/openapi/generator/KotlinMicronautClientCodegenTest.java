@@ -2330,5 +2330,23 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen", date =
             """);
     }
+
+    @Test
+    void testInheritanceWithInterfaces() {
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/oneOf_discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "model/FruitType.kt");
+        assertFileContains(path + "model/FruitType.kt",
+            """
+                data class FruitType(
+                
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
+                    override var fruitType: String? = null,
+                ) : ComposedDiscRequiredInconsistent, ComposedDiscTypeInconsistent, FruitAnyOfDisc, FruitOneOfDisc {
+                """);
+    }
 }
 

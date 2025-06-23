@@ -558,6 +558,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             CodegenConstants.API_DOCS
         );
         String path = outputPath + "src/main/kotlin/org/openapitools/";
+        String testPath = outputPath + "src/test/kotlin/org/openapitools/";
 
         assertFileContains(path + "controller/ParametersController.kt", """
                 override fun callInterface(
@@ -574,6 +575,21 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             "@field:Schema(name = \"data\", requiredMode = Schema.RequiredMode.REQUIRED)",
             "@field:JsonProperty(JSON_PROPERTY_DATA)",
             "var `data`: String,");
+        assertFileContains(testPath + "api/ParametersApiTest.kt",
+            """
+                    // given
+                    var name = Class(`data` = "example")
+                    var `data` = "example"
+                """,
+            """
+                    var request = HttpRequest.GET<Void>(uri)
+                        .accept("application/json")
+                """,
+            """
+                    request.parameters
+                        .add("name", Class(`data` = "example").toString()) // The query parameter format should be\s
+                        .add("data", "example") // The query parameter format should be\s
+                """);
     }
 
     @Test

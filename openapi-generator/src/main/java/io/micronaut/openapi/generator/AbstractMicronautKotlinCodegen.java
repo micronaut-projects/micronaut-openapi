@@ -2732,7 +2732,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected String getParameterExampleValue(CodegenParameter p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
         var model = allModels.get(p.dataType);
-        if (model == null) {
+        if (model == null && p.dataType != null) {
             model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
         }
 
@@ -2745,7 +2745,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected String getPropertyExampleValue(CodegenProperty p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
         var model = allModels.get(p.getDataType());
-        if (model == null) {
+        if (model == null && p.dataType != null) {
             model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
         }
 
