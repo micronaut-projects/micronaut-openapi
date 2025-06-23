@@ -53,7 +53,7 @@
     {{#javaCompatibility}}
         @JvmField
     {{/javaCompatibility}}
-        val VALUE_MAPPING = entries.associateBy { it.value{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}} }
+        val VALUE_MAPPING = entries.associateBy { it.value{{#isString}}{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}}{{/isString}} }
 
         /**
          * Create this enum from a value.
