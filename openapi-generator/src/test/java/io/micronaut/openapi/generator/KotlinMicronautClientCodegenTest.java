@@ -641,7 +641,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "DefaultApi.kt", """
                 fun fetchData(
                     @PathVariable("id") @NotNull @Min(0L) id: Long,
-                ): Mono<HttpResponse<ByteBuffer<?>>>
+                ): Mono<HttpResponse<ByteBuffer<*>>>
             """);
     }
 
