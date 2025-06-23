@@ -1,13 +1,20 @@
 package io.micronaut.openapi.generator;
 
+import com.tschuchort.compiletesting.KotlinCompilation;
+import com.tschuchort.compiletesting.SourceFile;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -101,6 +108,38 @@ public abstract class AbstractMicronautCodegenTest {
         String outputPath = output.getAbsolutePath().replace('\\', '/');
 
         return outputPath + "/";
+    }
+
+    /**
+     * @see AbstractMicronautCodegenTest#assertFilesCompile(String, String, SourceFile...)
+     */
+    public static void assertFilesCompile(String directory, SourceFile... extraSourceFiles) {
+        assertFilesCompile(directory, null, extraSourceFiles);
+    }
+
+    /**
+     * Compile files using the kotlin compiler and assert the compilation succeeded
+     *
+     * @param directory        - path of a directory of generated files to be compiled
+     * @param jvmTarget        - jvmTarget version to compile to
+     * @param extraSourceFiles - extra source files to add to the compilation - useful for adding dummy types
+     */
+    public static void assertFilesCompile(String directory, String jvmTarget, SourceFile... extraSourceFiles) {
+        String[] compilableFileExtensions = {".java", ".kt"};
+        List<SourceFile> sourceFiles = new ArrayList<>();
+        FileUtils.iterateFiles(new File(directory), compilableFileExtensions, true)
+            .forEachRemaining(
+                file -> sourceFiles.add(SourceFile.Companion.fromPath(file, false))
+            );
+        sourceFiles.addAll(List.of(extraSourceFiles));
+        var compilation = new KotlinCompilation();
+        compilation.setSources(sourceFiles);
+        compilation.setInheritClassPath(true);
+        if (jvmTarget != null) {
+            compilation.setJvmTarget(jvmTarget);
+        }
+        var result = compilation.compile();
+        assertEquals(KotlinCompilation.ExitCode.OK, result.getExitCode());
     }
 
     public static void assertFileContainsRegex(String path, String... regex) {

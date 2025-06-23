@@ -472,7 +472,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Book.java",
             """
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
                 """,
             """
@@ -1315,7 +1315,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @Serdeable
                 @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
                 
                     @Override
