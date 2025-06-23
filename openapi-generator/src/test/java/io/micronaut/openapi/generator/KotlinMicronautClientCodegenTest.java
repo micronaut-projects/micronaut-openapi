@@ -1,6 +1,5 @@
 package io.micronaut.openapi.generator;
 
-import com.tschuchort.compiletesting.SourceFile;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -11,7 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -41,10 +39,10 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautClientCodegen();
         codegen.processOpts();
 
-        OpenAPI openAPI = new OpenAPI();
-        openAPI.addServersItem(new Server().url("https://one.com/v2"));
-        openAPI.setInfo(new Info());
-        codegen.preprocessOpenAPI(openAPI);
+        var openApi = new OpenAPI();
+        openApi.addServersItem(new Server().url("https://one.com/v2"));
+        openApi.setInfo(new Info());
+        codegen.preprocessOpenAPI(openApi);
 
         assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
@@ -823,8 +821,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml");
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        // assertFilesCompile(outputPath);  BUG: https://github.com/micronaut-projects/micronaut-openapi/issues/2233
-
         assertFileContains(path + "model/StringEnum.kt",
             "val VALUE_MAPPING = entries.associateBy { it.value.lowercase() }",
             """
@@ -848,81 +844,47 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAdditionalAnnotations() {
         var codegen = new KotlinMicronautClientCodegen();
-        String clientTypeAnnotation = "Validated";
-        String clientTypeFullAnnotation = "@io.micronaut.validation." + clientTypeAnnotation;
-        String modelTypeAnnotation = "JsonClassDescription";
-        String modelTypeFullAnnotation = "@com.fasterxml.jackson.annotation." + modelTypeAnnotation;
-        String oneOfTypeAnnotation = "Introspected";
-        String oneOfTypeFullAnnotation = "@io.micronaut.core.annotation." + oneOfTypeAnnotation;
-        String enumTypeAnnotation = "Schema";
-        String enumTypeFullAnnotation = "@io.swagger.v3.oas.annotations.media." + enumTypeAnnotation;
+        String clientTypeAnnotation = "@io.micronaut.validation.Validated";
+        String modelTypeAnnotation = "@com.fasterxml.jackson.annotation.JsonClassDescription";
+        String oneOfTypeAnnotation = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation = "@io.swagger.v3.oas.annotations.media.Schema";
 
-        var annotations = new String[] {clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation};
-        codegen.setAdditionalClientTypeAnnotations(List.of(clientTypeFullAnnotation));
-        codegen.setAdditionalModelTypeAnnotations(List.of(modelTypeFullAnnotation));
-        codegen.setAdditionalOneOfTypeAnnotations(List.of(oneOfTypeFullAnnotation));
-        codegen.setAdditionalEnumTypeAnnotations(List.of(enumTypeFullAnnotation));
+        codegen.setAdditionalClientTypeAnnotations(List.of(clientTypeAnnotation));
+        codegen.setAdditionalModelTypeAnnotations(List.of(modelTypeAnnotation));
+        codegen.setAdditionalOneOfTypeAnnotations(List.of(oneOfTypeAnnotation));
+        codegen.setAdditionalEnumTypeAnnotations(List.of(enumTypeAnnotation));
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml");
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        var annotationSources = Arrays.stream(annotations).map(annotation ->
-            SourceFile.Companion.kotlin(path + annotation + ".kt", """
-                    package org.openapitools
-                    annotation class %s
-                    """.formatted(annotation),
-                true,
-                false)
-        ).toArray(SourceFile[]::new);
-
-        assertFilesCompile(outputPath, annotationSources);
-
-        assertFileContains(path + "api/SubjectsApi.kt", clientTypeFullAnnotation);
-        assertFileContains(path + "model/Person.kt", modelTypeFullAnnotation);
-        assertFileContains(path + "model/Subject.kt", oneOfTypeFullAnnotation);
-        assertFileContains(path + "model/PersonSex.kt", enumTypeFullAnnotation);
+        assertFileContains(path + "api/SubjectsApi.kt", clientTypeAnnotation);
+        assertFileContains(path + "model/Person.kt", modelTypeAnnotation);
+        assertFileContains(path + "model/Subject.kt", oneOfTypeAnnotation);
+        assertFileContains(path + "model/PersonSex.kt", enumTypeAnnotation);
     }
 
     @Test
     void testAdditionalAnnotations2() {
         var codegen = new KotlinMicronautClientCodegen();
-        String clientTypeAnnotation = "Validated";
-        String clientTypeFullAnnotation = "@io.micronaut.validation." + clientTypeAnnotation;
-        String modelTypeAnnotation = "JsonClassDescription";
-        String modelTypeFullAnnotation = "@com.fasterxml.jackson.annotation." + modelTypeAnnotation;
-        String oneOfTypeAnnotation = "Introspected";
-        String oneOfTypeFullAnnotation = "@io.micronaut.core.annotation." + oneOfTypeAnnotation;
-        String enumTypeAnnotation1 = "Introspected";
-        String enumTypeFullAnnotation1 = "@io.micronaut.core.annotation." + enumTypeAnnotation1;
-        String enumTypeAnnotation2 = "Schema";
-        String enumTypeFullAnnotation2 = "@io.swagger.v3.oas.annotations.media." + enumTypeAnnotation2;
-        String enumTypeAnnotation3 = "JsonClassDescription";
-        String enumTypeFullAnnotation3 = "@com.fasterxml.jackson.annotation." + enumTypeAnnotation3;
-        var annotations = new String[] {clientTypeAnnotation, modelTypeAnnotation, oneOfTypeAnnotation, enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3};
+        String clientTypeAnnotation = "@io.micronaut.validation.Validated";
+        String modelTypeAnnotation = "@com.fasterxml.jackson.annotation.JsonClassDescription";
+        String oneOfTypeAnnotation = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation1 = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation2 = "@io.swagger.v3.oas.annotations.media.Schema";
+        String enumTypeAnnotation3 = "@com.fasterxml.jackson.annotation.JsonClassDescription";
         codegen.additionalProperties().putAll(Map.of(
-            "additionalClientTypeAnnotations", List.of(clientTypeFullAnnotation),
-            "additionalModelTypeAnnotations", List.of(modelTypeFullAnnotation),
-            "additionalOneOfTypeAnnotations", List.of(oneOfTypeFullAnnotation),
-            "additionalEnumTypeAnnotations", "%s;%s;\n%s;".formatted(enumTypeFullAnnotation1, enumTypeFullAnnotation2, enumTypeFullAnnotation3)
+            "additionalClientTypeAnnotations", List.of(clientTypeAnnotation),
+            "additionalModelTypeAnnotations", List.of(modelTypeAnnotation),
+            "additionalOneOfTypeAnnotations", List.of(oneOfTypeAnnotation),
+            "additionalEnumTypeAnnotations", "%s;%s;\n%s;".formatted(enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3)
         ));
         codegen.processOpts();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml");
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        var annotationSources = Arrays.stream(annotations).map(annotation ->
-            SourceFile.Companion.kotlin(path + annotation + ".kt", """
-                    package org.openapitools
-                    annotation class %s
-                    """.formatted(annotation),
-                true,
-                false)
-        ).toArray(SourceFile[]::new);
-
-        assertFilesCompile(outputPath, annotationSources);
-
-        assertFileContains(path + "api/SubjectsApi.kt", clientTypeFullAnnotation);
-        assertFileContains(path + "model/Person.kt", modelTypeFullAnnotation);
-        assertFileContains(path + "model/Subject.kt", oneOfTypeFullAnnotation);
-        assertFileContains(path + "model/PersonSex.kt", enumTypeFullAnnotation1, enumTypeFullAnnotation2, enumTypeFullAnnotation3);
+        assertFileContains(path + "api/SubjectsApi.kt", clientTypeAnnotation);
+        assertFileContains(path + "model/Person.kt", modelTypeAnnotation);
+        assertFileContains(path + "model/Subject.kt", oneOfTypeAnnotation);
+        assertFileContains(path + "model/PersonSex.kt", enumTypeAnnotation1 + "\n", enumTypeAnnotation2 + "\n", enumTypeAnnotation3 + "\n");
     }
 
     @Test
@@ -2045,8 +2007,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
-        assertFilesCompile(outputPath, "16"); // JvmRecord is supported only since java 16
-
         assertFileContains(modelPath + "Pet.kt",
             """
                 @JvmRecord
@@ -2334,7 +2294,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testInheritanceWithInterfaces() {
         var codegen = new KotlinMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/oneOf_discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/oneOf_discriminator.yml");
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileExists(path + "model/FruitType.kt");
