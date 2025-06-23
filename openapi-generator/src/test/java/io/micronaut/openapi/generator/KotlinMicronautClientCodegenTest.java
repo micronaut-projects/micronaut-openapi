@@ -475,8 +475,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testReservedWords() {
         var codegen = new KotlinMicronautClientCodegen();
-        // TODO: fix /src/test/kotlin/org/openapitools/api/ParametersApiTest.kt:25:25 No value passed for parameter 'data'
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/kotlinReservedWords.yml", false,
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/kotlinReservedWords.yml", true,
             APIS,
             MODELS,
             SUPPORTING_FILES,
