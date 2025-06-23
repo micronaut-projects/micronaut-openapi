@@ -96,6 +96,7 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
+import static io.micronaut.openapi.generator.Utils.NULL_STRING;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
@@ -2341,7 +2342,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("lombok", lombok);
-        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals(NULL_STRING));
         property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if (useBeanValidation && (
             (!property.isContainer && property.isModel)
@@ -2395,6 +2396,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             var parentVars = new ArrayList<CodegenProperty>();
             for (var v : parent.allVars) {
                 if (notContainsProp(v, model.vars)) {
+                    processGenericAnnotations(v, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
                     parentVars.add(v);
                 }
             }
@@ -2480,16 +2482,29 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     protected String getParameterExampleValue(CodegenParameter p, boolean groovy) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
+        var model = allModels.get(p.getDataType());
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
+        if (!p.vendorExtensions.containsKey("baseType")) {
+            p.vendorExtensions.put("baseType", p.isContainer ? p.dataType : p.baseType);
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
             p.items == null ? null : p.items.defaultValue,
-            p.requiredVars, groovy, false);
+            model != null ? model.requiredVars : null, groovy, false);
     }
 
     protected String getPropertyExampleValue(CodegenProperty p, boolean groovy) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
         var model = allModels.get(p.getDataType());
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
+        if (!p.vendorExtensions.containsKey("baseType")) {
+            p.vendorExtensions.put("baseType", p.isContainer ? p.dataType : p.baseType);
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
@@ -2521,7 +2536,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         } else if ("Boolean".equals(dataType)) {
             example = example != null ? example : "false";
         } else if ("File".equals(dataType)) {
-            example = null;
+            example = NULL_STRING;
         } else if ("OffsetDateTime".equals(dataType)) {
             example = "OffsetDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
         } else if ("LocalDate".equals(dataType)) {
@@ -2544,7 +2559,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             example = dataType + ".fromValue(\"" + value + "\")";
         } else if ((isModel != null && isModel) || (isModel == null && !languageSpecificPrimitives.contains(dataType))) {
             if (requiredVars == null) {
-                example = null;
+                example = NULL_STRING;
             } else {
                 if (requiredPropertiesInConstructor) {
                     var builder = new StringBuilder();
@@ -2597,7 +2612,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 example = "new HashMap<>()";
             }
         } else if (example == null) {
-            example = "null";
+            example = NULL_STRING;
         }
 
         return example;

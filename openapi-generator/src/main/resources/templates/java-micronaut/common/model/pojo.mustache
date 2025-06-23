@@ -219,9 +219,9 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{/vendorExtensions.withRequiredVars}}
         {{/formatNoEmptyLines}}
     {{/requiredPropertiesInConstructor}}
-
     {{#vars}}
         {{^vendorExtensions.lombok}}
+
     /**
         {{#description}}
      * {{description}}
@@ -264,9 +264,9 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
     }
         {{/vendorExtensions.lombok}}
-
     {{#useOptional}}
         {{^required}}
+
     /**
         {{#description}}
      * {{description}}
@@ -294,8 +294,8 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     }
         {{/required}}
     {{/useOptional}}
-
     {{^vendorExtensions.lombok}}
+
     /**
      * Set the {{name}} property value
      *
@@ -320,8 +320,8 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
     }
     {{/vendorExtensions.lombok}}
-
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
+
     /**
      * A JsonNullable getter that will be used for JSON serialization.
      *
@@ -337,9 +337,9 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     {{! For getters/setters that have name differing from attribute name, we must include setter (albeit private) for jackson to be able to set the attribute}}       this.{{name}} = {{name}};
     }
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
-
         {{^isReadOnly}}
             {{^vendorExtensions.lombok}}
+
     /**
      * Set {{name}} in a chainable fashion.
      *
@@ -363,6 +363,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     }
             {{/vendorExtensions.lombok}}
             {{#isArray}}
+
     /**
      * Add an item to the {{name}} property in a chainable fashion.
      *
@@ -390,8 +391,8 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         return this;
     }
             {{/isArray}}
-
             {{#isMap}}
+
     /**
      * Set the value for the key for the {{name}} map property in a chainable fashion.
      *
@@ -419,38 +420,38 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         return this;
     }
             {{/isMap}}
-
         {{/isReadOnly}}
     {{/vars}}
 
     {{#parentVars}}
         {{^isReadOnly}}
+
     @Override
     public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
         super.{{{setter}}}({{name}});
         return this;
     }
-
             {{#isArray}}
+
     @Override
     public {{classname}} add{{nameInPascalCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
         super.add{{nameInPascalCase}}Item({{name}}Item);
         return this;
     }
             {{/isArray}}
-
             {{#isMap}}
+
     @Override
     public {{classname}} put{{nameInPascalCase}}Item(String key, {{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
         super.put{{nameInPascalCase}}Item(key, {{name}}Item);
         return this;
     }
             {{/isMap}}
-
         {{/isReadOnly}}
     {{/parentVars}}
 
 {{^lombok}}
+
     @Override
     public boolean equals(Object o) {
     {{#useReflectionEqualsHashCode}}

@@ -36,10 +36,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         final var codegen = new JavaMicronautServerCodegen();
         codegen.processOpts();
 
-        var openAPI = new OpenAPI();
-        openAPI.addServersItem(new Server().url("https://one.com/v2"));
-        openAPI.setInfo(new Info());
-        codegen.preprocessOpenAPI(openAPI);
+        var openApi = new OpenAPI();
+        openApi.addServersItem(new Server().url("https://one.com/v2"));
+        openApi.setInfo(new Info());
+        codegen.preprocessOpenAPI(openApi);
 
         assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
@@ -329,7 +329,23 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
-        assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
+        assertFileContains(apiPath + "BasicBookInfo.java",
+            "public BasicBookInfo(String author, String name)",
+            "super(name)",
+            """
+                    @Override
+                    public BasicBookInfo name(String name) {
+                        super.setName(name);
+                        return this;
+                    }
+                
+                    @Override
+                    public BasicBookInfo type(BookInfoType type) {
+                        super.setType(type);
+                        return this;
+                    }
+                """
+        );
         assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
     }
 

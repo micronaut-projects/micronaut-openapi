@@ -23,7 +23,6 @@ commons-text = "1.13.1"
 guava = "33.4.8-jre"
 commonmark = "0.25.0"
 kotlin-compile-testing = "1.6.0"
-lombok = "1.18.38"
 
 micronaut = "4.9.4"
 micronaut-platform = "4.8.3"
@@ -111,4 +110,3 @@ swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
 sonatype-scan = { module = "org.sonatype.gradle.plugins:scan-gradle-plugin", version.ref = "sonatype-scan" }
 kotlin-compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlin-compile-testing" }
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok"}

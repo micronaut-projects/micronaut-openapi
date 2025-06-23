@@ -144,7 +144,7 @@ class {{classname}}Spec extends Specification {
             .contentType('{{vendorExtensions.x-content-type}}')
         {{/vendorExtensions.x-content-type}}
         {{#vendorExtensions.x-accepts}}
-            .accept('{{vendorExtensions.x-accepts}}')
+            .accept('{{{.}}}')
         {{/vendorExtensions.x-accepts}}
         {{#headerParams}}
             .header('{{{baseName}}}', {{{vendorExtensions.groovyExample}}}{{^isString}}.toString(){{/isString}})

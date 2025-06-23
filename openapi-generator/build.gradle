@@ -33,7 +33,6 @@ dependencies {
     testFixturesApi(mnData.micronaut.data.runtime)
     testFixturesApi(mnData.micronaut.data.spring.jpa)
     testFixturesApi(mnData.micronaut.data.hibernate.jpa)
-    testFixturesApi(libs.lombok)
 
     testFixturesImplementation(mn.micronaut.inject)
     testFixturesImplementation(mnTest.assertj.core)

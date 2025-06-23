@@ -40,10 +40,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.processOpts();
 
-        var openAPI = new OpenAPI();
-        openAPI.addServersItem(new Server().url("https://one.com/v2"));
-        openAPI.setInfo(new Info());
-        codegen.preprocessOpenAPI(openAPI);
+        var openApi = new OpenAPI();
+        openApi.addServersItem(new Server().url("https://one.com/v2"));
+        openApi.setInfo(new Info());
+        codegen.preprocessOpenAPI(openApi);
 
         assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
@@ -549,7 +549,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void testLombok() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.setLombok(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", false);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/V1ForecastIdGet400Response.java",
@@ -1967,7 +1967,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.setLombok(true);
         codegen.setGeneratedAnnotation(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", false);
         String path = outputPath + "src/main/java/org/openapitools/config/";
 
         assertFileExists(path + "EnumConverterClientConfig.java");
