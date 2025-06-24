@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import {{javaxPackage}}.inject.Inject;
+import {{javaxPackage}}.validation.Valid;
+import {{javaxPackage}}.validation.constraints.*;
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse;
 {{/wrapInHttpResponse}}
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * API tests for {{classname}}
@@ -38,16 +42,16 @@ class {{classname}}Test {
     void {{operationId}}Test() {
         // given
         {{#allParams}}
-        {{{vendorExtensions.baseType}}} {{paramName}} = {{{example}}};
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{#isFile}}null{{/isFile}}{{^isFile}}{{{example}}}{{/isFile}};
         {{/allParams}}
 
         // when
         {{#wrapInHttpResponse}}
         HttpResponse<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> response = api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}};{{#returnType}}
-        {{{returnType}}} body = response.body();{{/returnType}}
+        {{{returnType}}} rsBody = response.body();{{/returnType}}
         {{/wrapInHttpResponse}}
         {{^wrapInHttpResponse}}
-        {{#returnType}}var body = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}};
+        {{#returnType}}var rsBody = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}};
         {{/wrapInHttpResponse}}
 
         // then

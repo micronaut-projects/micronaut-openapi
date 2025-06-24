@@ -72,11 +72,11 @@ components:
     EmployeeEntity:
       type: object
       x-class-extra-annotation: |-
-        @javax.persistence.Entity
-        @javax.persistence.Table(
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(
             name = "employees",
             uniqueConstraints = {
-              @javax.persistence.UniqueConstraint(columnNames = {"email"})
+              @jakarta.persistence.UniqueConstraint(columnNames = {"email"})
             }
           )
       allOf:
@@ -88,18 +88,18 @@ components:
             $ref: "#/components/schemas/EmployeeAssignment"
           type: array
           x-field-extra-annotation: |-
-            @javax.persistence.OneToMany(mappedBy = "employee")
+            @jakarta.persistence.OneToMany(mappedBy = "employee")
     Employee:
       type: object
       x-class-extra-annotation: |-
-          @javax.persistence.MappedSuperclass
+          @jakarta.persistence.MappedSuperclass
       properties:
         id:
           description: Employee's ID
           type: string
           example: jsmith@openapi.com
           x-field-extra-annotation: |-
-            @javax.persistence.Id
+            @jakarta.persistence.Id
         name:
           description: Name of the employee.
           type: string
@@ -119,7 +119,7 @@ components:
           type: boolean
           example: false
           x-field-extra-annotation: |-
-            @javax.persistence.Transient
+            @jakarta.persistence.Transient
         dateTermsAccepted:
           description: The date the employee accepted the terms of the usage agreement.
           type: string
@@ -140,21 +140,21 @@ components:
       allOf:
         - $ref: "#/components/schemas/SurveyGroup"
       x-class-extra-annotation: |-
-        @javax.persistence.Entity
-        @javax.persistence.Table(name = "survey_groups")
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(name = "survey_groups")
       properties:
         assignments:
           type: array
           x-field-extra-annotation: |-
-            @javax.persistence.OneToMany
-            @javax.persistence.JoinColumn(name = "survey_group_id")
+            @jakarta.persistence.OneToMany
+            @jakarta.persistence.JoinColumn(name = "survey_group_id")
           items:
             $ref: "#/components/schemas/EmployeeAssignment"
         disabled:
           description: A flag indicating if this Survey Group is disabled
           type: boolean
           x-field-extra-annotation: |-
-            @javax.persistence.Column(nullable = false)
+            @jakarta.persistence.Column(nullable = false)
           default: false
           example: false
     SurveyGroup:
@@ -165,8 +165,8 @@ components:
         - tsmId
       type: object
       x-class-extra-annotation: |-
-        @javax.persistence.MappedSuperclass
-        @javax.persistence.EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
+        @jakarta.persistence.MappedSuperclass
+        @jakarta.persistence.EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
       properties:
         id:
           description: A GUID that uniquely identifies the SurveyGroup.
@@ -174,11 +174,11 @@ components:
           format: uuid
           example: f1ad7649-eb70-4499-9c82-a63fe2c6dc71
           x-field-extra-annotation: |-
-            @javax.persistence.Id
-            @javax.persistence.GeneratedValue(generator = "UUID")
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(generator = "UUID")
             @org.hibernate.annotations.GenericGenerator(name = "UUID", strategy =
               "org.hibernate.id.UUIDGenerator")
-            @javax.persistence.Column(name = "id", updatable = false, nullable =
+            @jakarta.persistence.Column(name = "id", updatable = false, nullable =
               false)
         createdDate:
           description: The date the project was created.
@@ -213,7 +213,7 @@ components:
           type: string
           example: 3456NAS
           x-field-extra-annotation: |-
-            @javax.persistence.Column(unique = true)
+            @jakarta.persistence.Column(unique = true)
         projectName:
           description: The name of the project.
           type: string
@@ -224,7 +224,7 @@ components:
           example: janedoe@openapi.com
         submissionStatus:
           x-field-extra-annotation: |-
-            @javax.persistence.Transient
+            @jakarta.persistence.Transient
           description: Returns a status of "Complete" or "Incomplete"
           type: string
           example: Complete
@@ -234,11 +234,11 @@ components:
     EmployeeAssignment:
       type: object
       x-class-extra-annotation: |-
-        @javax.persistence.Entity
-        @javax.persistence.Table(
+        @jakarta.persistence.Entity
+        @jakarta.persistence.Table(
           name = "employee_assignments",
           uniqueConstraints={
-          @javax.persistence.UniqueConstraint(columnNames={"employee_id", "survey_group_id"})
+          @jakarta.persistence.UniqueConstraint(columnNames={"employee_id", "survey_group_id"})
           })
       properties:
         id:
@@ -247,23 +247,23 @@ components:
           format: uuid
           example: f9238beb-9649-4983-9059-4f0ee372d56e
           x-field-extra-annotation: |-
-            @javax.persistence.Id
-            @javax.persistence.GeneratedValue(generator = "UUID")
+            @jakarta.persistence.Id
+            @jakarta.persistence.GeneratedValue(generator = "UUID")
             @org.hibernate.annotations.GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-            @javax.persistence.Column(name = "id", updatable = false, nullable = false)
+            @jakarta.persistence.Column(name = "id", updatable = false, nullable = false)
         employee:
           allOf:
             - $ref: "#/components/schemas/EmployeeEntity"
           type: object
           x-field-extra-annotation: |-
-            @javax.persistence.ManyToOne(cascade = javax.persistence.CascadeType.REMOVE)
-            @javax.persistence.JoinColumn(name = "employee_id", nullable=false)
+            @jakarta.persistence.ManyToOne(cascade = jakarta.persistence.CascadeType.REMOVE)
+            @jakarta.persistence.JoinColumn(name = "employee_id", nullable=false)
         surveyGroup:
           description: The unique ID of the SurveyGroup associated with the opportunity.
           type: object
           x-field-extra-annotation: |-
-            @javax.persistence.ManyToOne
-            @javax.persistence.JoinColumn(name = "survey_group_id", nullable=false)
+            @jakarta.persistence.ManyToOne
+            @jakarta.persistence.JoinColumn(name = "survey_group_id", nullable=false)
           allOf:
             - $ref: "#/components/schemas/SurveyGroupEntity"
         startDate:
@@ -286,7 +286,7 @@ components:
         priceCategory:
           description: The price category
           nullable: true
-          x-field-extra-annotation: '@IgnoreForRoles("MEDIA_ADMIN")'
+          x-field-extra-annotation: '@Deprecated(since = "1.2.3")'
           allOf:
             - $ref: '#/components/schemas/SamplingPriceCategoryEnum'
 

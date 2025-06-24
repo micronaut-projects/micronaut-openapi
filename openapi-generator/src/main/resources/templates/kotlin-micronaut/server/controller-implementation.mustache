@@ -12,6 +12,8 @@ import reactor.core.publisher.Flux
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse
 {{/wrapInHttpResponse}}
+import {{javaxPackage}}.validation.Valid
+import {{javaxPackage}}.validation.constraints.*
 import {{package}}.{{classname}}
 {{#imports}}
 import {{import}}
@@ -22,7 +24,7 @@ class {{controllerClassname}} : {{classname}} {
 {{#operations}}
     {{#operation}}{{#formatNoEmptyLines}}
     override fun {{nickname}}({{#allParams}}
-        {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}},
+        {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}},
 {{/allParams}}
     ){{#returnType}}: {{{returnType}}}{{/returnType}} {{openbrace}}{{/formatNoEmptyLines}}
 {{>server/controllerOperationBody}}    }

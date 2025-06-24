@@ -2,7 +2,7 @@ package io.micronaut.openapi.generator;
 
 import com.tschuchort.compiletesting.KotlinCompilation;
 import com.tschuchort.compiletesting.SourceFile;
-import org.apache.commons.io.FileUtils;
+import org.jetbrains.kotlin.config.JvmTarget;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.openapitools.codegen.CodegenConstants.APIS;
+import static org.openapitools.codegen.CodegenConstants.MODELS;
+import static org.openapitools.codegen.CodegenConstants.SUPPORTING_FILES;
 
 /**
  * An abstract class with methods useful for testing
@@ -77,13 +80,39 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     /**
+     * Generate standard set of file types: SUPPORTING_FILES, APIS, MODELS with compilation.
+     *
      * @param codegen - the code generator
      * @param configPath - the path to the config starting from src/test/resources
+     *
+     * @return - the path to the generated folder
+     */
+    protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath) {
+        return generateFiles(codegen, configPath, true, SUPPORTING_FILES, APIS, MODELS);
+    }
+
+    /**
+     * Generate standard set of file types: SUPPORTING_FILES, APIS, MODELS.
+     *
+     * @param codegen - the code generator
+     * @param withCompile with compilation of generated files
+     * @param configPath - the path to the config starting from src/test/resources
+     *
+     * @return - the path to the generated folder
+     */
+    protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath, boolean withCompile) {
+        return generateFiles(codegen, configPath, withCompile, SUPPORTING_FILES, APIS, MODELS);
+    }
+
+    /**
+     * @param codegen - the code generator
+     * @param configPath - the path to the config starting from src/test/resources
+     * @param withCompile with compilation of generated files
      * @param filesToGenerate - which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
      *
      * @return - the path to the generated folder
      */
-    protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath, String... filesToGenerate) {
+    protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath, boolean withCompile, String... filesToGenerate) {
         File output = null;
         try {
             output = Files.createTempDirectory("test").toFile().getCanonicalFile();
@@ -107,6 +136,10 @@ public abstract class AbstractMicronautCodegenTest {
         // Create parser
         String outputPath = output.getAbsolutePath().replace('\\', '/');
 
+        if (withCompile) {
+            assertFilesCompile(outputPath);
+        }
+
         return outputPath + "/";
     }
 
@@ -125,14 +158,18 @@ public abstract class AbstractMicronautCodegenTest {
      * @param extraSourceFiles - extra source files to add to the compilation - useful for adding dummy types
      */
     public static void assertFilesCompile(String directory, String jvmTarget, SourceFile... extraSourceFiles) {
-        String[] compilableFileExtensions = {".java", ".kt"};
-        List<SourceFile> sourceFiles = new ArrayList<>();
-        FileUtils.iterateFiles(new File(directory), compilableFileExtensions, true)
-            .forEachRemaining(
-                file -> sourceFiles.add(SourceFile.Companion.fromPath(file, false))
-            );
+        var sourceFiles = new ArrayList<SourceFile>();
+        try (var files = Files.find(Path.of(directory), 999, (p, bfa) -> {
+            var pathStr = p.toString();
+            return bfa.isRegularFile() && (pathStr.endsWith(".java") || pathStr.endsWith(".kt"));
+        })) {
+            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile(), false)));
+        } catch (IOException e) {
+            fail(e.getMessage(), e);
+        }
         sourceFiles.addAll(List.of(extraSourceFiles));
         var compilation = new KotlinCompilation();
+        compilation.setJvmTarget(JvmTarget.JVM_17.getDescription());
         compilation.setSources(sourceFiles);
         compilation.setInheritClassPath(true);
         if (jvmTarget != null) {
