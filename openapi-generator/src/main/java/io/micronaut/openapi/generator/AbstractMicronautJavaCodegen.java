@@ -1795,10 +1795,25 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
         }
 
+        processDuplicateVars(model.getVars());
         model.imports.remove("ApiModel");
         model.imports.remove("ApiModelProperty");
         allModels.put(name, model);
         return model;
+    }
+
+    private void processDuplicateVars(List<CodegenProperty> vars) {
+        Map<String, Integer> names = new HashMap<>();
+        for (CodegenProperty var : vars) {
+            if (names.containsKey(var.getName())) {
+                names.put(var.getName(), names.get(var.getName()) + 1);
+                int index = names.get(var.getName());
+                var.setName(var.getName() + index);
+                var.nameInSnakeCase = var.nameInSnakeCase + "_" + index;
+            } else {
+                names.put(var.getName(), 1);
+            }
+        }
     }
 
     private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
