@@ -87,7 +87,7 @@
         other as {{classname}}
     {{#vendorExtensions.hasOwnVars}}
         return {{#vars}}{{^-first}}
-                && {{/-first}}{{{name}}} == other.{{{name}}}{{/vars}}{{#parent}}
+                && {{/-first}}this.{{{name}}} == other.{{{name}}}{{/vars}}{{#parent}}
                 && super.equals(other){{/parent}}
     {{/vendorExtensions.hasOwnVars}}
     {{^vendorExtensions.hasOwnVars}}
