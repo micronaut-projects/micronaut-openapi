@@ -954,11 +954,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAvoidDuplicatePropertyNames() {
         var codegen = new JavaMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, DUPLICATE_PROPERTY_NAMES_PATH,
-            CodegenConstants.MODELS);
-
+        String outputPath = generateFiles(codegen, DUPLICATE_PROPERTY_NAMES_PATH);
         String modelFolder = outputPath + "src/main/java/org/openapitools/model/";
         String file = modelFolder + "ModelWithDuplicateProperties.java";
+
         assertFileExists(file);
         assertFileContainsRegex(file, "String name");
         assertFileContainsRegex(file, "String name2");
