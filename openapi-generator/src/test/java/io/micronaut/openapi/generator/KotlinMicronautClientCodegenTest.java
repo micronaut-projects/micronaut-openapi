@@ -2513,19 +2513,4 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen", date =
             """);
     }
-
-    @Test
-    void testHideGenerationTimestamp() {
-        var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", CodegenConstants.APIS);
-        String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
-
-        assertFilesCompile(outputPath);
-
-        assertFileContains(apiPath + "RequestBodyApi.kt", """
-            @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen", date =
-            """);
-    }
 }
-
