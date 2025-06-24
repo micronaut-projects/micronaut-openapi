@@ -2126,9 +2126,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             if (!requiredParentVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
             }
+            var requiredVarsWithoutDiscriminatorAndReadOnly = new ArrayList<CodegenProperty>();
             if (!requiredVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
-                var requiredVarsWithoutDiscriminatorAndReadOnly = new ArrayList<CodegenProperty>();
                 for (var prop : requiredVarsWithoutDiscriminator) {
                     if (!isServer && prop.isReadOnly) {
                         continue;
@@ -2144,7 +2144,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             model.vendorExtensions.put("optionalVars", optionalVars);
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
             model.vendorExtensions.put("serialId", random.nextLong());
-            model.vendorExtensions.put("withRequiredVars", !model.requiredVars.isEmpty());
+            model.vendorExtensions.put("withRequiredVars", !requiredVarsWithoutDiscriminator.isEmpty() && !requiredVarsWithoutDiscriminatorAndReadOnly.isEmpty());
             normalizeExtraAnnotations(EXT_ANNOTATIONS_CLASS, false, model.vendorExtensions);
             if (model.discriminator != null) {
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
@@ -2283,25 +2283,24 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (!oneOfInterfaceName.equalsIgnoreCase(implInterface.toString())) {
                     continue;
                 }
-                for (var prop : m.allVars) {
-                    if (prop.name.equals(discriminator.getPropertyName())) {
-                        processDiscriminatorProperty(prop);
-                        break;
-                    }
+                fixDiscriminatorProp(m.allVars, discriminator);
+                fixDiscriminatorProp(m.requiredVars, discriminator);
+                var requiredVarsWithoutDiscriminatorAndReadOnly = (List<CodegenProperty>) m.vendorExtensions.get("requiredVarsWithoutDiscriminatorAndReadOnly");
+                if (fixDiscriminatorProp(requiredVarsWithoutDiscriminatorAndReadOnly, discriminator)) {
+                    removePropIfContains(discriminator.getPropertyName(), requiredVarsWithoutDiscriminatorAndReadOnly);
                 }
-                var discriminatorPropFound = false;
-                for (var prop : m.vars) {
-                    if (prop.name.equals(discriminator.getPropertyName())) {
-                        processDiscriminatorProperty(prop);
-                        discriminatorPropFound = true;
-                        break;
-                    }
+                var requiredVarsWithoutDiscriminator = (List<CodegenProperty>) m.vendorExtensions.get("requiredVarsWithoutDiscriminator");
+                if (fixDiscriminatorProp(requiredVarsWithoutDiscriminator, discriminator)) {
+                    removePropIfContains(discriminator.getPropertyName(), requiredVarsWithoutDiscriminator);
+                    m.vendorExtensions.put("withRequiredVars", !requiredVarsWithoutDiscriminator.isEmpty() && !requiredVarsWithoutDiscriminatorAndReadOnly.isEmpty());
                 }
+                var discriminatorPropFound = fixDiscriminatorProp(m.vars, discriminator);
                 if (!discriminatorPropFound) {
                     var discriminatorProp = new CodegenProperty();
                     discriminatorProp.name = discriminator.getPropertyName();
                     discriminatorProp.baseName = discriminator.getPropertyName();
                     discriminatorProp.dataType = discriminator.getPropertyType();
+                    discriminatorProp.baseType = discriminator.getPropertyType();
                     discriminatorProp.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
                     discriminatorProp.isDiscriminator = true;
                     discriminatorProp.isOverridden = true;
@@ -2319,15 +2318,31 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     discriminatorProp.getter = "get" + getterAndSetterCapitalize(discriminatorProp.name);
                     discriminatorProp.setter = "set" + getterAndSetterCapitalize(discriminatorProp.name);
                     discriminatorProp.vendorExtensions.put("realName", realName);
-                    m.vars.add(discriminatorProp);
-                    m.allVars.add(discriminatorProp);
-                    m.vendorExtensions.put("withMultipleVars", true);
+                    var parentVarDiscriminator = findProp(discriminatorProp, m.parentVars);
+                    if (parentVarDiscriminator == null) {
+                        m.vars.add(discriminatorProp);
+                        m.allVars.add(discriminatorProp);
+                        m.vendorExtensions.put("withMultipleVars", true);
+                    }
                 }
             }
         }
     }
 
-    private void processDiscriminatorProperty(CodegenProperty prop) {
+    private boolean fixDiscriminatorProp(List<CodegenProperty> props, CodegenDiscriminator discriminator) {
+        if (props == null || props.isEmpty()) {
+            return false;
+        }
+        for (var prop : props) {
+            if (prop.name.equals(discriminator.getPropertyName())) {
+                processDiscriminatorProperty(prop, discriminator);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void processDiscriminatorProperty(CodegenProperty prop, CodegenDiscriminator discriminator) {
         prop.isDiscriminator = true;
         prop.isOverridden = true;
         prop.isNullable = false;
@@ -2335,6 +2350,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         prop.required = true;
         prop.isReadOnly = false;
         prop.vendorExtensions.put("overridden", true);
+        prop.openApiType = discriminator.getPropertyType();
+        prop.dataType = discriminator.getPropertyType();
+        prop.datatypeWithEnum = discriminator.getPropertyType();
+        prop.baseType = discriminator.getPropertyType();
+        processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
@@ -2410,6 +2430,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     if (parent.discriminator != null && parent.discriminator.getPropertyName().equals(variable.name)) {
                         variable.isDiscriminator = true;
                         variable.isOverridden = true;
+                        removePropIfContains(variable, requiredVarsWithoutDiscriminator);
+                        removePropIfContains(variable, requiredParentVarsWithoutDiscriminator);
                     }
                     model.vars.add(variable.clone());
                 }
@@ -2441,6 +2463,29 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
             }
         }
+    }
+
+    private void removePropIfContains(CodegenProperty prop, List<CodegenProperty> props) {
+        removePropIfContains(prop.name, props);
+    }
+
+    private void removePropIfContains(String propName, List<CodegenProperty> props) {
+        if (props == null || props.isEmpty()) {
+            return;
+        }
+        props.removeIf(p -> propName.equals(p.name));
+    }
+
+    private CodegenProperty findProp(CodegenProperty prop, List<CodegenProperty> props) {
+        if (props == null || props.isEmpty()) {
+            return null;
+        }
+        for (var p : props) {
+            if (prop.name.equals(p.name)) {
+                return p;
+            }
+        }
+        return null;
     }
 
     private boolean notContainsProp(CodegenProperty prop, List<CodegenProperty> props) {

@@ -186,23 +186,23 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAdditionalClientTypeAnnotations() {
         var codegen = new JavaMicronautClientCodegen();
-        codegen.additionalProperties().put(JavaMicronautClientCodegen.ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, "@MyAdditionalAnnotation1(1,${param1});@MyAdditionalAnnotation2(2,${param2});");
+        codegen.additionalProperties().put(JavaMicronautClientCodegen.ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, "@SuppressWarnings(\"someWarning\");@java.lang.Deprecated(since=\"${badVersion}\",forRemoval=true);");
         String outputPath = generateFiles(codegen, PETSTORE_PATH);
 
         // Micronaut declarative http client should contain custom added annotations
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java",
-            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
+            "@SuppressWarnings(\"someWarning\")", "@java.lang.Deprecated(since=\"${badVersion}\",forRemoval=true)");
     }
 
     @Test
     void testAdditionalClientTypeAnnotationsFromSetter() {
         var codegen = new JavaMicronautClientCodegen();
-        codegen.setAdditionalClientTypeAnnotations(List.of("@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})"));
+        codegen.setAdditionalClientTypeAnnotations(List.of("@SuppressWarnings(\"someWarning\")", "@java.lang.Deprecated(since=\"${badVersion}\",forRemoval=true)"));
         String outputPath = generateFiles(codegen, PETSTORE_PATH);
 
         // Micronaut declarative http client should contain custom added annotations
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java",
-            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
+            "@SuppressWarnings(\"someWarning\")", "@java.lang.Deprecated(since=\"${badVersion}\",forRemoval=true)");
     }
 
     @Test
@@ -648,15 +648,26 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "private String path;",
             "protected String op;",
             """
-                    public OpAdd(String path, String op) {
+                    public OpAdd(String path) {
                         this.path = path;
-                        this.op = op;
                     }
                 """,
             """
+                    /**
+                     * @return the op property value
+                     */
                     @Override
                     public String getOp() {
                         return op;
+                    }
+                
+                    /**
+                     * Set the op property value
+                     *
+                     * @param op property value to set
+                     */
+                    public void setOp(String op) {
+                        this.op = op;
                     }
                 """
         );
@@ -788,36 +799,49 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAdditionalAnnotations() {
         var codegen = new JavaMicronautClientCodegen();
-        codegen.setAdditionalClientTypeAnnotations(List.of("@java.io.MyAnnotation1"));
-        codegen.setAdditionalModelTypeAnnotations(List.of("@java.io.MyAnnotation2"));
-        codegen.setAdditionalOneOfTypeAnnotations(List.of("@java.io.MyAnnotation3"));
-        codegen.setAdditionalEnumTypeAnnotations(List.of("@java.io.MyAnnotation4"));
+        String clientTypeAnnotation = "@io.micronaut.validation.Validated";
+        String modelTypeAnnotation = "@com.fasterxml.jackson.annotation.JsonClassDescription";
+        String oneOfTypeAnnotation = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation = "@io.swagger.v3.oas.annotations.media.Schema";
+
+        codegen.setAdditionalClientTypeAnnotations(List.of(clientTypeAnnotation));
+        codegen.setAdditionalModelTypeAnnotations(List.of(modelTypeAnnotation));
+        codegen.setAdditionalOneOfTypeAnnotations(List.of(oneOfTypeAnnotation));
+        codegen.setAdditionalEnumTypeAnnotations(List.of(enumTypeAnnotation));
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
-        assertFileContains(path + "api/SubjectsApi.java", "@java.io.MyAnnotation1");
-        assertFileContains(path + "model/Person.java", "@java.io.MyAnnotation2");
-        assertFileContains(path + "model/Subject.java", "@java.io.MyAnnotation3");
-        assertFileContains(path + "model/PersonSex.java", "@java.io.MyAnnotation4");
+        assertFileContains(path + "api/SubjectsApi.java", clientTypeAnnotation);
+        assertFileContains(path + "model/Person.java", modelTypeAnnotation);
+        assertFileContains(path + "model/Subject.java", oneOfTypeAnnotation);
+        assertFileContains(path + "model/PersonSex.java", enumTypeAnnotation);
     }
 
     @Test
     void testAdditionalAnnotations2() {
         var codegen = new JavaMicronautClientCodegen();
+
+        String clientTypeAnnotation = "@io.micronaut.validation.Validated";
+        String modelTypeAnnotation = "@com.fasterxml.jackson.annotation.JsonClassDescription";
+        String oneOfTypeAnnotation = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation1 = "@io.micronaut.core.annotation.Introspected";
+        String enumTypeAnnotation2 = "@io.swagger.v3.oas.annotations.media.Schema";
+        String enumTypeAnnotation3 = "@com.fasterxml.jackson.annotation.JsonClassDescription";
+
         codegen.additionalProperties().putAll(Map.of(
-            "additionalClientTypeAnnotations", List.of("@java.io.MyAnnotation1"),
-            "additionalModelTypeAnnotations", List.of("@java.io.MyAnnotation2"),
-            "additionalOneOfTypeAnnotations", List.of("@java.io.MyAnnotation3"),
-            "additionalEnumTypeAnnotations", "@java.io.MyAnnotation41;@java.io.MyAnnotation42;\n@java.io.MyAnnotation43;"
+            "additionalClientTypeAnnotations", List.of(clientTypeAnnotation),
+            "additionalModelTypeAnnotations", List.of(modelTypeAnnotation),
+            "additionalOneOfTypeAnnotations", List.of(oneOfTypeAnnotation),
+            "additionalEnumTypeAnnotations", "%s;%s;\n%s;".formatted(enumTypeAnnotation1, enumTypeAnnotation2, enumTypeAnnotation3)
         ));
         codegen.processOpts();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml");
         String path = outputPath + "src/main/java/org/openapitools/";
 
-        assertFileContains(path + "api/SubjectsApi.java", "@java.io.MyAnnotation1");
-        assertFileContains(path + "model/Person.java", "@java.io.MyAnnotation2");
-        assertFileContains(path + "model/Subject.java", "@java.io.MyAnnotation3");
-        assertFileContains(path + "model/PersonSex.java", "@java.io.MyAnnotation41\n", "@java.io.MyAnnotation42\n", "@java.io.MyAnnotation43\n");
+        assertFileContains(path + "api/SubjectsApi.java", clientTypeAnnotation);
+        assertFileContains(path + "model/Person.java", modelTypeAnnotation);
+        assertFileContains(path + "model/Subject.java", oneOfTypeAnnotation);
+        assertFileContains(path + "model/PersonSex.java", enumTypeAnnotation1 + "\n", enumTypeAnnotation2 + "\n", enumTypeAnnotation3 + "\n");
     }
 
     @Test
@@ -1549,13 +1573,13 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @ParameterizedTest
     public void sealedScenarios(String apiFile, Map<String, String> definitions) {
         var codegen = new JavaMicronautClientCodegen();
+        codegen.setNoArgsConstructor(true);
         codegen.setUseSealed(true);
         codegen.setUseOneOfInterfaces(true);
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/" + apiFile);
         String path = outputPath + "src/main/java/org/openapitools/model/";
 
-        definitions.forEach((file, check) ->
-            assertFileContains(path + file, check));
+        definitions.forEach((file, check) -> assertFileContains(path + file, check));
     }
 
     @Test
@@ -1735,7 +1759,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.setConfigureAuthorization(true);
         codegen.setGenerateAuthClasses(false);
-        String outputPath = generateFiles(codegen, PETSTORE_PATH);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, false);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileDoesntExist(path + "auth/config/ConfigurableAuthorization.java");

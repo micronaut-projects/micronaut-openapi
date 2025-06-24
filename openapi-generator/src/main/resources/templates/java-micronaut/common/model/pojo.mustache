@@ -197,13 +197,6 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}super({{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}});{{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
-            {{#isDiscriminator}}
-                {{#useOneOfInterfaces}}
-                    {{#vendorExtensions.x-implements}}
-        this.{{name}} = {{name}};
-                    {{/vendorExtensions.x-implements}}
-                {{/useOneOfInterfaces}}
-            {{/isDiscriminator}}
             {{^isDiscriminator}}
                 {{#isReadOnly}}
                     {{#vendorExtensions.isServer}}
@@ -466,7 +459,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         }
         {{#vendorExtensions.hasOwnVars}}
         var {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals({{name}}, {{classVarName}}.{{name}}){{^-last}}
+        return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}}
             && {{/-last}}{{/vars}}{{#parent}}
             && super.equals(o){{/parent}};
         {{/vendorExtensions.hasOwnVars}}
