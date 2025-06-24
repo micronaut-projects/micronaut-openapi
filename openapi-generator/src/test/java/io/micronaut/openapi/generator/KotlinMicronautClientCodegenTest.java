@@ -2309,4 +2309,3 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """);
     }
 }
-
