@@ -2746,16 +2746,23 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     protected String getParameterExampleValue(CodegenParameter p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
+        var model = allModels.get(p.dataType);
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
             p.items == null ? null : p.items.defaultValue,
-            p.requiredVars, false);
+            model != null ? model.requiredVars : null, false);
     }
 
     protected String getPropertyExampleValue(CodegenProperty p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
         var model = allModels.get(p.getDataType());
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
@@ -2820,10 +2827,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
                 builder.append(dataType).append("(");
                 for (int i = 0; i < requiredVars.size(); ++i) {
+                    var reqVar = requiredVars.get(i);
                     if (i != 0) {
                         builder.append(", ");
                     }
-                    builder.append(getPropertyExampleValue(requiredVars.get(i)));
+                    builder.append(reqVar.name).append(" = ").append(getPropertyExampleValue(reqVar));
                 }
                 builder.append(")");
                 example = builder.toString();

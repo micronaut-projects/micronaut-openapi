@@ -122,6 +122,10 @@ public final class Utils {
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
             items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+
+        if (parameter.items != null) {
+            processGenericAnnotations(parameter.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+        }
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
@@ -135,6 +139,10 @@ public final class Utils {
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
             items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+
+        if (property.items != null) {
+            processGenericAnnotations(property.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+        }
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
