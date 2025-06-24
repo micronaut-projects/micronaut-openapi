@@ -1865,8 +1865,16 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
 
         if (op.isResponseFile) {
-            op.returnType = typeMapping.get("responseFile");
+            var responseFileType = typeMapping.get("responseFile");
+            op.returnType = responseFileType;
+            op.returnBaseType = responseFileType;
             op.imports.add(op.returnType);
+            if (op.returnProperty != null) {
+                op.returnProperty.complexType = responseFileType;
+                op.returnProperty.dataType = responseFileType;
+                op.returnProperty.datatypeWithEnum = responseFileType;
+                op.returnProperty.baseType = responseFileType;
+            }
         }
 
         var paramsWithoutImplicitHeaders = new ArrayList<CodegenParameter>();

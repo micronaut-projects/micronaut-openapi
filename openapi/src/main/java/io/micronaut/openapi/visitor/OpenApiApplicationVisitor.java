@@ -111,7 +111,6 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
-import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
 import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
 import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
@@ -303,7 +302,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }
             }
 
-            Path path = resolve(context, java.nio.file.Paths.get(additionalSwaggerFile));
+            Path path = resolve(context, java.nio.file.Path.of(additionalSwaggerFile));
             if (!Files.exists(path)) {
                 warn(path + " does not exist", context);
                 continue;
@@ -394,16 +393,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
+    private void applyPropertyNamingStrategy(OpenAPI openApi, VisitorContext context) {
         var propertyNamingStrategy = getPropertyNamingStrategy(context);
         if (propertyNamingStrategy == null) {
             return;
         }
         info("Using " + propertyNamingStrategy.getClass().getSimpleName() + " property naming strategy.", context);
-        if (openAPI.getComponents() == null || CollectionUtils.isEmpty(openAPI.getComponents().getSchemas())) {
+        if (openApi.getComponents() == null || CollectionUtils.isEmpty(openApi.getComponents().getSchemas())) {
             return;
         }
-        for (var schema : openAPI.getComponents().getSchemas().values()) {
+        for (var schema : openApi.getComponents().getSchemas().values()) {
             Map<String, Schema> properties = schema.getProperties();
             if (properties != null) {
                 var newProps = new LinkedHashMap<String, Schema>(properties.size());
@@ -423,13 +422,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void applyPropertyServerContextPath(OpenAPI openAPI, VisitorContext context) {
+    private void applyPropertyServerContextPath(OpenAPI openApi, VisitorContext context) {
         final String serverContextPath = getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
         if (StringUtils.isEmpty(serverContextPath)) {
             return;
         }
         info("Applying server context path: " + serverContextPath + " to Paths.", context);
-        Paths paths = openAPI.getPaths();
+        Paths paths = openApi.getPaths();
         if (CollectionUtils.isEmpty(paths)) {
             return;
         }
@@ -442,7 +441,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             newPaths.addPathItem(newPath, path.getValue());
         }
-        openAPI.setPaths(newPaths);
+        openApi.setPaths(newPaths);
     }
 
     public static JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
@@ -522,12 +521,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return value;
     }
 
-    private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext context) {
+    private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openApi, VisitorContext context) {
         List<Pair<String, String>> expandableProperties = getExpandableProperties(context);
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
             info("Expanding properties: " + expandableProperties, context);
         }
-        JsonNode root = resolvePlaceholders(Utils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
+        JsonNode root = resolvePlaceholders(Utils.getYamlMapper().convertValue(openApi, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
         return Utils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
@@ -890,7 +889,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(PREFIX_DUMMY_FILE + System.nanoTime(), context), context);
+        Path viewsDestDirs = getViewsDestDir(context);
         if (viewsDestDirs == null) {
             return;
         }

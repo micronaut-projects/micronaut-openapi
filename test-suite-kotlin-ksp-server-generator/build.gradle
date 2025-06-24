@@ -44,7 +44,7 @@ dependencies {
 
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
-    testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mn.snakeyaml)
 }
@@ -74,6 +74,10 @@ tasks.named("generateOpenApi") {
             // Ignored header - Does not wrap the response in HttpResponse
             [headerName: "ignored-header"]
     ]
+}
+
+ksp {
+    arg("micronaut.openapi.project.dir", "$projectDir")
 }
 
 kotlin {

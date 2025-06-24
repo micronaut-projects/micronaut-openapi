@@ -34,7 +34,6 @@ import io.micronaut.inject.visitor.VisitorContext;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -165,7 +164,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
                 }
             } else if (configLocation.startsWith(FILE_SCHEME)) {
                 configLocation = configLocation.substring(5);
-                Path configLocationPath = Paths.get(configLocation);
+                Path configLocationPath = Path.of(configLocation);
                 if (Files.exists(configLocationPath) && Files.isDirectory(configLocationPath) && Files.isReadable(configLocationPath)) {
                     resourceLoader = new DefaultFileSystemResourceLoader(configLocationPath);
                 } else {

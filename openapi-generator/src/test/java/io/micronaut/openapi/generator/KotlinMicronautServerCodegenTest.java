@@ -594,7 +594,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Book.kt",
             """
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 data class Book(
                     @field:NotNull
                     @field:Size(max = 10)
@@ -1166,6 +1166,54 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/kotlin/org/openapitools/config/";
         assertFileDoesntExist(path + "EnumConverterServerConfig.kt");
+    }
+
+    @Test
+    void testResponseFileWithoutReactive() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setReactive(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt", """
+                @Get("/example-route")
+                @Produces("application/octet-stream")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                fun exampleRouteGet(): FileCustomizableResponseType
+            """);
+    }
+
+    @Test
+    void testResponseFileWithReactive() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt", """
+                @Get("/example-route")
+                @Produces("application/octet-stream")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                fun exampleRouteGet(): Mono<FileCustomizableResponseType>
+            """);
+    }
+
+    @Test
+    void testResponseFileWithCoroutines() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setReactive(false);
+        codegen.setCoroutines(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/response-file.yml", CodegenConstants.APIS, CodegenConstants.MODELS, CodegenConstants.SUPPORTING_FILES);
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt", """
+                @Get("/example-route")
+                @Produces("application/octet-stream")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                suspend fun exampleRouteGet(): FileCustomizableResponseType
+            """);
     }
 
     @Test

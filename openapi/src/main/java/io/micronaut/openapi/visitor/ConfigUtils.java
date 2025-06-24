@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +62,7 @@ import java.util.Properties;
 
 import static io.micronaut.core.type.Argument.LIST_OF_STRING;
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CLASSPATH_OUTPUT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CUSTOM_SCHEMAS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
@@ -81,6 +81,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_CUSTOM_SCHEMA_M
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIES_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_SCHEMA_DECORATORS_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.EXPANDABLE_PROPERTIES_ARGUMENT;
+import static io.micronaut.openapi.visitor.ContextUtils.getProjectDir;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
@@ -149,6 +150,7 @@ import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 import static io.micronaut.openapi.visitor.UrlUtils.parsePath;
+import static io.micronaut.openapi.visitor.Utils.isKsp;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
@@ -1135,19 +1137,27 @@ public final class ConfigUtils {
 
         String projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
         if (projectDir != null) {
-            projectPath = Paths.get(projectDir);
+            projectPath = Path.of(projectDir);
+            // calculating classes output path for KSP and gradle
+            if (isKsp(context)) {
+                var classesOutputDir = projectPath.toString().replace('\\', '/') + "/build/generated/ksp/main/resources";
+                ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
+            }
         }
         if (projectPath == null) {
             try {
                 if (context != null) {
-                    projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+                    projectPath = getProjectDir(context);
+                }
+                if (projectPath == null) {
+                    projectPath = context.getProjectDir().orElse(null);
                 }
                 if (projectPath == null && Utils.isTestMode()) {
-                    projectPath = Paths.get(System.getProperty("user.dir"));
+                    projectPath = Path.of(System.getProperty("user.dir"));
                 }
             } catch (Exception e) {
                 // Should never happen
-                projectPath = Paths.get(System.getProperty("user.dir"));
+                projectPath = Path.of(System.getProperty("user.dir"));
             }
         }
 
@@ -1254,7 +1264,7 @@ public final class ConfigUtils {
             ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE))
             : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
         if (StringUtils.isNotEmpty(cfgFile)) {
-            Path cfg = resolve(context, Paths.get(cfgFile));
+            Path cfg = resolve(context, Path.of(cfgFile));
             if (Files.isReadable(cfg)) {
                 try (Reader reader = Files.newBufferedReader(cfg)) {
                     openApiProperties.load(reader);

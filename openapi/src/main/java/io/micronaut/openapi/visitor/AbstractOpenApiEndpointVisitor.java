@@ -621,7 +621,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return false;
     }
 
-    private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openAPI,
+    private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openApi,
                                             Operation swaggerOperation,
                                             JavadocDescription javadocDescription,
                                             boolean isRequestBodySchemaSet,
@@ -660,7 +660,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 if (schema.get$ref() != null) {
                     if (isRequestBodySchemaSet) {
-                        schema = getSchemaByRef(schema, openAPI);
+                        schema = getSchemaByRef(schema, openApi);
                     } else {
                         var composedSchema = createComposedSchema();
                         var extraBodyParametersSchema = createSchema();
@@ -673,7 +673,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 for (TypedElement parameter : extraBodyParameters) {
                     if (!isRequestBodySchemaSet) {
-                        processBodyParameter(context, openAPI, javadocDescription, getMediaType(mediaTypeName), schema, parameter);
+                        processBodyParameter(context, openApi, javadocDescription, getMediaType(mediaTypeName), schema, parameter);
                     }
                     if (mediaTypeName.equals(MediaType.MULTIPART_FORM_DATA)) {
                         if (CollectionUtils.isNotEmpty(schema.getProperties())) {
@@ -710,7 +710,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void processParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
+    private void processParameters(MethodElement element, VisitorContext context, OpenAPI openApi,
                                    Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
                                    Map<String, UriMatchVariable> pathVariables,
@@ -730,7 +730,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         for (ParameterElement parameter : element.getParameters()) {
             if (!alreadyProcessedParameter(swaggerParameters, parameter)) {
-                processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
+                processParameter(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                     consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             }
         }
@@ -771,7 +771,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
-                                                    OpenAPI openAPI,
+                                                    OpenAPI openApi,
                                                     UriMatchTemplate matchTemplate,
                                                     HttpMethod httpMethod,
                                                     Operation operation,
@@ -842,13 +842,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             operation.addParametersItem(parameter);
-            PathItem pathItem = openAPI.getPaths().get(matchTemplate.toPathString());
+            PathItem pathItem = openApi.getPaths().get(matchTemplate.toPathString());
 
             setOperationOnPathItem(pathItem, httpMethod, operation);
         }
     }
 
-    private void processParameter(VisitorContext context, OpenAPI openAPI,
+    private void processParameter(VisitorContext context, OpenAPI openApi,
                                   Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody,
                                   Map<String, UriMatchVariable> pathVariables,
@@ -878,12 +878,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
 
         if (parameter.isAnnotationPresent(Body.class) && !hasSwaggerRequestBodyImpl) {
-            processBody(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, consumesMediaTypes, parameter, parameterType);
+            processBody(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, consumesMediaTypes, parameter, parameterType);
             return;
         }
 
         if (parameter.isAnnotationPresent(RequestBean.class)) {
-            processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
+            processRequestBean(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             return;
         }
@@ -899,10 +899,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         if (newParameter.getExplode() != null && newParameter.getExplode() && "query".equals(newParameter.getIn()) && !parameterType.isIterable()) {
-            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
+            Schema<?> explodedSchema = resolveSchema(openApi, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
             if (explodedSchema != null) {
-                if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
-                    explodedSchema = getSchemaByRef(explodedSchema, openAPI);
+                if (openApi.getComponents() != null && openApi.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
+                    explodedSchema = getSchemaByRef(explodedSchema, openApi);
                 }
                 if (CollectionUtils.isNotEmpty(explodedSchema.getProperties())) {
                     Map<String, Schema> props = explodedSchema.getProperties();
@@ -941,7 +941,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             Schema<?> schema = newParameter.getSchema();
             if (schema == null) {
-                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
+                schema = resolveSchema(openApi, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
             }
 
             if (schema != null) {
@@ -964,12 +964,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         swaggerParameters.add(newParameter);
     }
 
-    private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
+    private void processBodyParameter(VisitorContext context, OpenAPI openApi, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
 
         var jsonViewClass = getJsonViewClass(parameter, context);
 
-        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
+        Schema<?> propertySchema = resolveSchema(openApi, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
         if (propertySchema == null) {
             return;
         }
@@ -1243,7 +1243,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return newParameter;
     }
 
-    private void processBody(VisitorContext context, OpenAPI openAPI,
+    private void processBody(VisitorContext context, OpenAPI openApi,
                              Operation swaggerOperation, JavadocDescription javadocDescription,
                              boolean permitsRequestBody, List<MediaType> consumesMediaTypes, TypedElement parameter,
                              ClassElement parameterType) {
@@ -1295,10 +1295,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (isNotNullable(parameter)) {
                     wrapperSchema.addRequiredItem(wrappedSchemaPropertyName);
                 }
-                processBodyParameter(context, openAPI, javadocDescription, mediaType, wrapperSchema, parameter);
+                processBodyParameter(context, openApi, javadocDescription, mediaType, wrapperSchema, parameter);
             } else {
                 var needSetSchema = true;
-                var paramSchema = resolveSchema(openAPI, parameter, parameterType, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
+                var paramSchema = resolveSchema(openApi, parameter, parameterType, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
                 if (mt.getSchema() != null) {
                     if (mt.getSchema().get$ref() != null
                         || CollectionUtils.isNotEmpty(mt.getSchema().getAnyOf())
@@ -1341,7 +1341,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void processRequestBean(VisitorContext context, OpenAPI openAPI,
+    private void processRequestBean(VisitorContext context, OpenAPI openApi,
                                     Operation swaggerOperation, JavadocDescription javadocDescription,
                                     boolean permitsRequestBody,
                                     Map<String, UriMatchVariable> pathVariables,
@@ -1356,12 +1356,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (field.isStatic()) {
                 continue;
             }
-            processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
+            processParameter(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, field, extraBodyParameters, httpMethod, matchTemplates, pathItems);
         }
     }
 
-    private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI, Operation swaggerOperation,
+    private void readResponse(MethodElement element, VisitorContext context, OpenAPI openApi, Operation swaggerOperation,
                               Operation existedOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
 
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponses.class)
@@ -1414,22 +1414,22 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             } else {
                 response.setDescription(javadocDescription.getReturnDescription());
             }
-            addResponseContent(element, context, openAPI, response, jsonViewClass);
+            addResponseContent(element, context, openApi, response, jsonViewClass);
             responses.put(responseCode, response);
         } else if (response != null && response.getContent() == null) {
-            addResponseContent(element, context, openAPI, response, jsonViewClass);
+            addResponseContent(element, context, openApi, response, jsonViewClass);
         }
     }
 
-    private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response, @Nullable ClassElement jsonViewClass) {
+    private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openApi, ApiResponse response, @Nullable ClassElement jsonViewClass) {
         ClassElement returnType = returnType(element, context);
         if (returnType != null && !returnType.getCanonicalName().equals(Void.class.getName())) {
             List<MediaType> producesMediaTypes = producesMediaTypes(element);
             Content content;
             if (producesMediaTypes.isEmpty()) {
-                content = buildContent(element, returnType, DEFAULT_MEDIA_TYPES, openAPI, context, jsonViewClass);
+                content = buildContent(element, returnType, DEFAULT_MEDIA_TYPES, openApi, context, jsonViewClass);
             } else {
-                content = buildContent(element, returnType, producesMediaTypes, openAPI, context, jsonViewClass);
+                content = buildContent(element, returnType, producesMediaTypes, openApi, context, jsonViewClass);
             }
             response.setContent(content);
         }
@@ -1861,11 +1861,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return callbacks;
     }
 
-    private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context, @Nullable ClassElement jsonViewClass) {
+    private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openApi, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var content = new Content();
         for (var mediaType : mediaTypes) {
             var mt = new io.swagger.v3.oas.models.media.MediaType();
-            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null));
+            mt.setSchema(resolveSchema(openApi, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null));
             content.addMediaType(mediaType.toString(), mt);
         }
         return content;

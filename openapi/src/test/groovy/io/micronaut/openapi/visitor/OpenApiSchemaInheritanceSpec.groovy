@@ -252,21 +252,22 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI.paths?.get("/")?.post
+        OpenAPI openApi = Utils.testReference
+        Operation operation = openApi.paths?.get("/")?.post
         RequestBody requestBody = operation.requestBody
         requestBody.required
-        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        Map<String, Schema> schemas = openApi.getComponents().getSchemas()
 
         expect:
         Schema owner = schemas.Owner
         Schema vehicleRef = owner.properties.vehicle
         vehicleRef.description == "Vehicle of the owner. Here a car or bike with a name"
         vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
-        vehicleRef.oneOf[0].$ref == '#/components/schemas/Car'
-        vehicleRef.oneOf[1].$ref == '#/components/schemas/Bike'
+        !vehicleRef.oneOf
         Schema vehicle = schemas["Vehicle"]
         vehicle.type == 'object'
+        vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI that on nested inheritance property annotation is preferred over type annotation"() {
@@ -510,8 +511,8 @@ class EmailController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReference
-        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openApi = Utils.testReference
+        Map<String, Schema> schemas = openApi.getComponents().getSchemas()
 
         expect:
         Schema EmailSendProtocolDtoSchema = schemas["EmailSendProtocolDto"]

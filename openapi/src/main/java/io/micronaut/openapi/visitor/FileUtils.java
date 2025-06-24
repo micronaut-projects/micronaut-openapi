@@ -19,19 +19,20 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.info.Info;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ContextUtils.calcClassesOutputPath;
+import static io.micronaut.openapi.visitor.ContextUtils.calcProjectPath;
+import static io.micronaut.openapi.visitor.ContextUtils.getClassesOutputPath;
+import static io.micronaut.openapi.visitor.ContextUtils.visitMetaInfFile;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlaceholders;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
@@ -39,6 +40,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
 import static io.micronaut.openapi.visitor.StringUtil.MINUS;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
+import static io.micronaut.openapi.visitor.Utils.isKsp;
 
 /**
  * File utilities methods.
@@ -48,6 +50,8 @@ import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 @Internal
 public final class FileUtils {
 
+    public static final String DEFAULT_VIEWS_PATH = "swagger/views";
+    public static final String DEFAULT_SPEC_PATH = "swagger/";
     public static final String EXT_ADOC = ".adoc";
     public static final String EXT_YML = ".yml";
     public static final String EXT_YAML = ".yaml";
@@ -84,27 +88,32 @@ public final class FileUtils {
         return path.endsWith(EXT_JSON);
     }
 
-    public static Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
+    public static Path getViewsDestDir(VisitorContext context) {
         String destDir = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
         if (StringUtils.isNotEmpty(destDir)) {
-            Path destPath = resolve(context, Paths.get(destDir));
+            Path destPath = resolve(context, Path.of(destDir));
             createDirectories(destPath, context);
             return destPath;
         }
-        return defaultSwaggerFilePath != null ? defaultSwaggerFilePath.getParent().resolve("views") : null;
+        var classesOutputPath = getClassesOutputPath(context);
+        if (classesOutputPath != null) {
+            if (isKsp(context)) {
+                classesOutputPath = classesOutputPath.resolve("META-INF");
+            }
+            classesOutputPath = classesOutputPath.resolve(DEFAULT_VIEWS_PATH);
+        }
+        return classesOutputPath;
     }
 
     public static Path getDefaultFilePath(String fileName, VisitorContext context) {
-        // default location
-        GeneratedFile generatedFile = ContextUtils.visitMetaInfFile("swagger/" + fileName, context);
+        var generatedFile = visitMetaInfFile(DEFAULT_SPEC_PATH + fileName, context);
         if (generatedFile != null) {
-            URI uri = generatedFile.toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                Path specPath = Paths.get(uri);
-                createDirectories(specPath, context);
-                return specPath;
-            }
+            var specPath = Path.of(generatedFile.toURI());
+            createDirectories(specPath, context);
+            // also trying to calculate classpath output directory and project directory if needed
+            calcProjectPath(generatedFile, context);
+            calcClassesOutputPath(generatedFile, context);
+            return specPath;
         }
         warn("Unable to get swagger/" + fileName + " file.", context);
         return null;
@@ -123,7 +132,7 @@ public final class FileUtils {
         if (StringUtils.isEmpty(targetFile)) {
             return null;
         }
-        Path specFile = resolve(context, Paths.get(targetFile));
+        Path specFile = resolve(context, Path.of(targetFile));
         createDirectories(specFile, context);
         return specFile;
     }

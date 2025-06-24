@@ -19,6 +19,12 @@ dependencies {
 
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mnTest.junit.jupiter.params)
+    testImplementation(libs.kotlin.compile.testing)
+    testImplementation(libs.kotlin.compiler)
+    testFixturesApi(mn.micronaut.http.client.core)
+    testFixturesApi(mnValidation.validation)
+    testFixturesApi(mnSerde.micronaut.serde.api)
+    testFixturesApi(mnSecurity.micronaut.security.oauth2)
 
     testFixturesImplementation(mn.micronaut.inject)
     testFixturesImplementation(mnTest.assertj.core)
@@ -28,6 +34,7 @@ dependencies {
     testFixturesImplementation(mnTest.junit.jupiter.params)
 
     testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {

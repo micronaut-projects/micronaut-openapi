@@ -47,10 +47,12 @@ import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_ARBITRARY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.isEquals;
 
 /**
- * Normalization methods for openAPI objects.
+ * Normalization methods for OpenAPI objects.
  *
  * @since 6.6.0
  */
@@ -60,14 +62,14 @@ public final class OpenApiNormalizeUtils {
     private OpenApiNormalizeUtils() {
     }
 
-    public static void normalizeOpenApi(OpenAPI openAPI, VisitorContext context) {
+    public static void normalizeOpenApi(OpenAPI openApi, VisitorContext context) {
 
-        if (CollectionUtils.isEmpty(openAPI.getExtensions())) {
-            openAPI.setExtensions(null);
+        if (CollectionUtils.isEmpty(openApi.getExtensions())) {
+            openApi.setExtensions(null);
         }
 
-        if (CollectionUtils.isNotEmpty(openAPI.getServers())) {
-            for (var server : openAPI.getServers()) {
+        if (CollectionUtils.isNotEmpty(openApi.getServers())) {
+            for (var server : openApi.getServers()) {
                 if (CollectionUtils.isEmpty(server.getExtensions())) {
                     server.setExtensions(null);
                 }
@@ -75,13 +77,13 @@ public final class OpenApiNormalizeUtils {
         }
 
         // Sort paths
-        if (openAPI.getPaths() != null) {
+        if (openApi.getPaths() != null) {
             var sortedPaths = new Paths();
-            new TreeMap<>(openAPI.getPaths()).forEach(sortedPaths::addPathItem);
-            if (openAPI.getPaths().getExtensions() != null) {
-                sortedPaths.setExtensions(new TreeMap<>(openAPI.getPaths().getExtensions()));
+            new TreeMap<>(openApi.getPaths()).forEach(sortedPaths::addPathItem);
+            if (openApi.getPaths().getExtensions() != null) {
+                sortedPaths.setExtensions(new TreeMap<>(openApi.getPaths().getExtensions()));
             }
-            openAPI.setPaths(sortedPaths);
+            openApi.setPaths(sortedPaths);
             for (PathItem pathItem : sortedPaths.values()) {
                 if (CollectionUtils.isNotEmpty(pathItem.getExtensions())) {
                     pathItem.getExtensions().remove(MICRONAUT_OP_POSTFIX);
@@ -89,24 +91,24 @@ public final class OpenApiNormalizeUtils {
                 if (CollectionUtils.isEmpty(pathItem.getExtensions())) {
                     pathItem.setExtensions(null);
                 }
-                normalizeOperation(pathItem.getGet(), context);
-                normalizeOperation(pathItem.getPut(), context);
-                normalizeOperation(pathItem.getPost(), context);
-                normalizeOperation(pathItem.getDelete(), context);
-                normalizeOperation(pathItem.getOptions(), context);
-                normalizeOperation(pathItem.getHead(), context);
-                normalizeOperation(pathItem.getPatch(), context);
-                normalizeOperation(pathItem.getTrace(), context);
+                normalizeOperation(pathItem.getGet(), openApi, context);
+                normalizeOperation(pathItem.getPut(), openApi, context);
+                normalizeOperation(pathItem.getPost(), openApi, context);
+                normalizeOperation(pathItem.getDelete(), openApi, context);
+                normalizeOperation(pathItem.getOptions(), openApi, context);
+                normalizeOperation(pathItem.getHead(), openApi, context);
+                normalizeOperation(pathItem.getPatch(), openApi, context);
+                normalizeOperation(pathItem.getTrace(), openApi, context);
             }
         }
 
         // Sort all reusable Components
-        Components components = openAPI.getComponents();
+        Components components = openApi.getComponents();
         if (components == null) {
             return;
         }
 
-        normalizeSchemas(components.getSchemas(), context);
+        normalizeSchemas(components.getSchemas(), openApi, context);
 
         sortComponent(components, Components::getSchemas, Components::setSchemas);
         sortComponent(components, Components::getResponses, Components::setResponses);
@@ -119,13 +121,13 @@ public final class OpenApiNormalizeUtils {
         sortComponent(components, Components::getCallbacks, Components::setCallbacks);
         if (Utils.isOpenapi31()) {
             sortComponent(components, Components::getPathItems, Components::setPathItems);
-            if (CollectionUtils.isNotEmpty(openAPI.getWebhooks())) {
-                openAPI.setWebhooks(new TreeMap<>(openAPI.getWebhooks()));
+            if (CollectionUtils.isNotEmpty(openApi.getWebhooks())) {
+                openApi.setWebhooks(new TreeMap<>(openApi.getWebhooks()));
             }
         }
     }
 
-    public static void normalizeOperation(Operation operation, VisitorContext context) {
+    public static void normalizeOperation(Operation operation, OpenAPI openApi, VisitorContext context) {
         if (operation == null) {
             return;
         }
@@ -141,7 +143,7 @@ public final class OpenApiNormalizeUtils {
                 if (paramSchema == null) {
                     continue;
                 }
-                Schema<?> normalizedSchema = normalizeSchema(paramSchema, context);
+                Schema<?> normalizedSchema = normalizeSchema(paramSchema, openApi, context);
                 if (normalizedSchema != null) {
                     parameter.setSchema(normalizedSchema);
                 } else if (paramSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
@@ -160,7 +162,7 @@ public final class OpenApiNormalizeUtils {
         }
 
         if (operation.getRequestBody() != null) {
-            normalizeContent(operation.getRequestBody().getContent(), context);
+            normalizeContent(operation.getRequestBody().getContent(), openApi, context);
         }
         var responses = operation.getResponses();
         if (CollectionUtils.isNotEmpty(responses)) {
@@ -178,8 +180,8 @@ public final class OpenApiNormalizeUtils {
                     iter.remove();
                     continue;
                 }
-                normalizeContent(response.getContent(), context);
-                normalizeHeaders(response.getHeaders(), context);
+                normalizeContent(response.getContent(), openApi, context);
+                normalizeHeaders(response.getHeaders(), openApi, context);
                 if (CollectionUtils.isEmpty(response.getExtensions())) {
                     response.setExtensions(null);
                 }
@@ -187,7 +189,7 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static void normalizeHeaders(Map<String, Header> headers, VisitorContext context) {
+    public static void normalizeHeaders(Map<String, Header> headers, OpenAPI openApi, VisitorContext context) {
         if (CollectionUtils.isEmpty(headers)) {
             return;
         }
@@ -201,7 +203,7 @@ public final class OpenApiNormalizeUtils {
                 headerSchema = PrimitiveType.STRING.createProperty(Utils.isOpenapi31());
                 header.setSchema(headerSchema);
             }
-            Schema<?> normalizedSchema = normalizeSchema(headerSchema, context);
+            Schema<?> normalizedSchema = normalizeSchema(headerSchema, openApi, context);
             if (normalizedSchema != null) {
                 header.setSchema(normalizedSchema);
             } else if (headerSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
@@ -212,11 +214,11 @@ public final class OpenApiNormalizeUtils {
                 header.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, header.getSchema().getType(), header.getSchema().getFormat(), context, false));
             }
             normalizeExamples(header.getExamples());
-            normalizeContent(header.getContent(), context);
+            normalizeContent(header.getContent(), openApi, context);
         }
     }
 
-    public static void normalizeContent(Content content, VisitorContext context) {
+    public static void normalizeContent(Content content, OpenAPI openApi, VisitorContext context) {
         if (CollectionUtils.isEmpty(content)) {
             return;
         }
@@ -228,7 +230,7 @@ public final class OpenApiNormalizeUtils {
             if (mediaTypeSchema == null) {
                 continue;
             }
-            Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema, context);
+            Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema, openApi, context);
             if (normalizedSchema != null) {
                 mediaType.setSchema(normalizedSchema);
             } else if (mediaTypeSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
@@ -240,7 +242,7 @@ public final class OpenApiNormalizeUtils {
                 var paramNormalizedSchemas = new HashMap<String, Schema>();
                 for (var paramEntry : paramSchemas.entrySet()) {
                     Schema<?> paramSchema = paramEntry.getValue();
-                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, openApi, context);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -277,7 +279,7 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static Schema<?> normalizeSchema(Schema<?> schema, VisitorContext context) {
+    public static Schema<?> normalizeSchema(Schema<?> schema, OpenAPI openApi, VisitorContext context) {
         if (schema == null) {
             return null;
         }
@@ -289,6 +291,11 @@ public final class OpenApiNormalizeUtils {
         if (CollectionUtils.isEmpty(schema.getTypes())
             || (schema.getTypes().size() == 1 && schema.getTypes().iterator().next() == null)) {
             schema.setTypes(null);
+        }
+
+        removeDuplicateSchemasInOneOf(schema.getOneOf(), schema.getAllOf(), openApi);
+        if (schema.getOneOf() != null && schema.getOneOf().isEmpty()) {
+            schema.setOneOf(null);
         }
 
         List<Schema> allOf = schema.getAllOf();
@@ -337,9 +344,9 @@ public final class OpenApiNormalizeUtils {
                 normalizeSchemaProperties(schema, context);
                 normalizeSchemaProperties(normalizedSchema, context);
                 unwrapAllOff(normalizedSchema);
-                normalizeSchema(schema.getItems(), context);
+                normalizeSchema(schema.getItems(), openApi, context);
                 if (normalizedSchema != null) {
-                    normalizeSchema(normalizedSchema.getItems(), context);
+                    normalizeSchema(normalizedSchema.getItems(), openApi, context);
                 }
                 return normalizedSchema;
             }
@@ -347,7 +354,7 @@ public final class OpenApiNormalizeUtils {
             var finalList = new ArrayList<Schema>(allOf.size());
             var schemasWithoutRef = new ArrayList<Schema>(allOf.size() - 1);
             for (Schema<?> schemaAllOf : allOf) {
-                Schema<?> normalizedSchema = normalizeSchema(schemaAllOf, context);
+                Schema<?> normalizedSchema = normalizeSchema(schemaAllOf, openApi, context);
                 if (normalizedSchema != null) {
                     schemaAllOf = normalizedSchema;
                 }
@@ -356,7 +363,7 @@ public final class OpenApiNormalizeUtils {
                     var paramNormalizedSchemas = new HashMap<String, Schema>();
                     for (var paramEntry : paramSchemas.entrySet()) {
                         Schema<?> paramSchema = paramEntry.getValue();
-                        Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
+                        Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, openApi, context);
                         if (paramNormalizedSchema != null) {
                             paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                         }
@@ -387,8 +394,38 @@ public final class OpenApiNormalizeUtils {
         }
         normalizeSchemaProperties(schema, context);
         unwrapAllOff(schema);
-        normalizeSchema(schema.getItems(), context);
+        normalizeSchema(schema.getItems(), openApi, context);
         return null;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void removeDuplicateSchemasInOneOf(List<Schema> oneOf, List<Schema> allOf, OpenAPI openApi) {
+        if (CollectionUtils.isEmpty(oneOf) || CollectionUtils.isEmpty(allOf)) {
+            return;
+        }
+        var iter = oneOf.iterator();
+
+        while (iter.hasNext()) {
+            var oneOfSchema = iter.next();
+            for (var allOfSchema : allOf) {
+                if (allOfSchema.get$ref() != null) {
+                    allOfSchema = getSchemaByRef(allOfSchema.get$ref(), openApi);
+                }
+                if (allOfSchema == null) {
+                    continue;
+                }
+                removeDuplicateSchemasInOneOf(oneOf, allOfSchema.getAllOf(), openApi);
+                if (CollectionUtils.isEmpty(allOfSchema.getOneOf())) {
+                    continue;
+                }
+                for (var allOfOneOfSchema : (List<Schema>) allOfSchema.getOneOf()) {
+                    if (isEquals(oneOfSchema, allOfOneOfSchema)) {
+                        iter.remove();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private static void normalizeSchemaProperties(Schema<?> schema, VisitorContext context) {
@@ -408,9 +445,10 @@ public final class OpenApiNormalizeUtils {
      * Sort schemas list in allOf block: schemas with ref must be first, next other schemas.
      *
      * @param schemas all schema components
+     * @param openApi OpenAPI object
      * @param context Visitor context
      */
-    public static void normalizeSchemas(Map<String, Schema> schemas, VisitorContext context) {
+    public static void normalizeSchemas(Map<String, Schema> schemas, OpenAPI openApi, VisitorContext context) {
 
         if (CollectionUtils.isEmpty(schemas)) {
             return;
@@ -420,7 +458,7 @@ public final class OpenApiNormalizeUtils {
 
         for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
             Schema<?> schema = entry.getValue();
-            Schema<?> normalizedSchema = normalizeSchema(schema, context);
+            Schema<?> normalizedSchema = normalizeSchema(schema, openApi, context);
             if (normalizedSchema != null) {
                 normalizedSchemas.put(entry.getKey(), normalizedSchema);
             } else if (schema.equals(EMPTY_ARBITRARY_SCHEMA)) {
@@ -432,7 +470,7 @@ public final class OpenApiNormalizeUtils {
                 var paramNormalizedSchemas = new HashMap<String, Schema>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
                     Schema<?> paramSchema = paramEntry.getValue();
-                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, openApi, context);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     } else if (paramSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
@@ -450,13 +488,13 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static void removeEmptyComponents(OpenAPI openAPI) {
+    public static void removeEmptyComponents(OpenAPI openApi) {
 
-        if (CollectionUtils.isEmpty(openAPI.getWebhooks())) {
-            openAPI.setWebhooks(null);
+        if (CollectionUtils.isEmpty(openApi.getWebhooks())) {
+            openApi.setWebhooks(null);
         }
 
-        Components components = openAPI.getComponents();
+        Components components = openApi.getComponents();
         if (components == null) {
             return;
         }
@@ -506,14 +544,14 @@ public final class OpenApiNormalizeUtils {
             && CollectionUtils.isEmpty(components.getExtensions())
             && CollectionUtils.isEmpty(components.getPathItems())
         ) {
-            openAPI.setComponents(null);
+            openApi.setComponents(null);
         }
     }
 
     /**
      * Find and remove duplicates in openApi object.
      *
-     * @param openApi openAPI object
+     * @param openApi OpenAPI object
      */
     public static void findAndRemoveDuplicates(OpenAPI openApi) {
         openApi.setTags(Utils.findAndRemoveDuplicates(openApi.getTags(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())));
@@ -532,13 +570,6 @@ public final class OpenApiNormalizeUtils {
                 findAndRemoveDuplicates(path.getHead());
                 findAndRemoveDuplicates(path.getPatch());
                 findAndRemoveDuplicates(path.getTrace());
-            }
-        }
-        if (openApi.getComponents() != null) {
-            if (CollectionUtils.isNotEmpty(openApi.getComponents().getSchemas())) {
-                for (var schema : openApi.getComponents().getSchemas().values()) {
-                    findAndRemoveDuplicates(schema);
-                }
             }
         }
         if (openApi.getComponents() != null) {
@@ -591,9 +622,9 @@ public final class OpenApiNormalizeUtils {
         }
         schema.setRequired(Utils.findAndRemoveDuplicates(schema.getRequired(), (el1, el2) -> el1 != null && el1.equals(el2)));
         schema.setPrefixItems(Utils.findAndRemoveDuplicates(schema.getPrefixItems(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setAllOf(Utils.findAndRemoveDuplicates(schema.getAllOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setAnyOf(Utils.findAndRemoveDuplicates(schema.getAnyOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setOneOf(Utils.findAndRemoveDuplicates(schema.getOneOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setAllOf(Utils.findAndRemoveDuplicates(schema.getAllOf(), SchemaUtils::isEquals));
+        schema.setAnyOf(Utils.findAndRemoveDuplicates(schema.getAnyOf(), SchemaUtils::isEquals));
+        schema.setOneOf(Utils.findAndRemoveDuplicates(schema.getOneOf(), SchemaUtils::isEquals));
     }
 
     private static void unwrapAllOff(Schema<?> schema) {

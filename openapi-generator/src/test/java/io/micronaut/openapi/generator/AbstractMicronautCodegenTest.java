@@ -1,14 +1,20 @@
 package io.micronaut.openapi.generator;
 
+import com.tschuchort.compiletesting.KotlinCompilation;
+import com.tschuchort.compiletesting.SourceFile;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -104,6 +110,38 @@ public abstract class AbstractMicronautCodegenTest {
         return outputPath + "/";
     }
 
+    /**
+     * @see AbstractMicronautCodegenTest#assertFilesCompile(String, String, SourceFile...)
+     */
+    public static void assertFilesCompile(String directory, SourceFile... extraSourceFiles) {
+        assertFilesCompile(directory, null, extraSourceFiles);
+    }
+
+    /**
+     * Compile files using the kotlin compiler and assert the compilation succeeded
+     *
+     * @param directory        - path of a directory of generated files to be compiled
+     * @param jvmTarget        - jvmTarget version to compile to
+     * @param extraSourceFiles - extra source files to add to the compilation - useful for adding dummy types
+     */
+    public static void assertFilesCompile(String directory, String jvmTarget, SourceFile... extraSourceFiles) {
+        String[] compilableFileExtensions = {".java", ".kt"};
+        List<SourceFile> sourceFiles = new ArrayList<>();
+        FileUtils.iterateFiles(new File(directory), compilableFileExtensions, true)
+            .forEachRemaining(
+                file -> sourceFiles.add(SourceFile.Companion.fromPath(file, false))
+            );
+        sourceFiles.addAll(List.of(extraSourceFiles));
+        var compilation = new KotlinCompilation();
+        compilation.setSources(sourceFiles);
+        compilation.setInheritClassPath(true);
+        if (jvmTarget != null) {
+            compilation.setJvmTarget(jvmTarget);
+        }
+        var result = compilation.compile();
+        assertEquals(KotlinCompilation.ExitCode.OK, result.getExitCode());
+    }
+
     public static void assertFileContainsRegex(String path, String... regex) {
         assertFileExists(path);
         String file = readFile(path);
@@ -137,7 +175,7 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static void assertFileExists(String file) {
-        Path path = Paths.get(file);
+        Path path = Path.of(file);
         if (!path.toFile().exists()) {
             while (path.getParent() != null && !path.getParent().toFile().exists()) {
                 path = path.getParent();
@@ -161,13 +199,13 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static void assertFileDoesntExist(String path) {
-        assertFalse(Paths.get(path).toFile().exists(), "File \"" + path + "\" should not exist");
+        assertFalse(Path.of(path).toFile().exists(), "File \"" + path + "\" should not exist");
     }
 
     public static String readFile(String path) {
         String file = null;
         try {
-            file = Files.readString(Paths.get(path));
+            file = Files.readString(Path.of(path));
             assertNotNull(file, "File \"" + path + "\" does not exist");
         } catch (IOException e) {
             fail("Unable to evaluate file " + path);

@@ -115,9 +115,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(authorizationFilterPatternStyleOpt);
 
         typeMapping.put("file", "ByteArray");
-        typeMapping.put("responseFile", "ByteBuffer<?>");
+        typeMapping.put("responseFile", "ByteBuffer<*>");
 
-        importMapping.put("ByteBuffer<?>", "io.micronaut.core.io.buffer.ByteBuffer");
+        importMapping.put("ByteBuffer<*>", "io.micronaut.core.io.buffer.ByteBuffer");
         importMapping.put("MultipartBody", "io.micronaut.http.client.multipart.MultipartBody");
     }
 
