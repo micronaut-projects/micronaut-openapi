@@ -472,7 +472,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Book.java",
             """
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
                 """,
             """
@@ -797,7 +797,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/StringEnum.java",
             """
                     public static final Map<String, StringEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
-                            .collect(Collectors.toMap(v -> v.value.toLowerCase(), Function.identity())));
+                        .collect(Collectors.toMap(v -> v.value.toLowerCase(), Function.identity())));
                 """,
             """
                     public static StringEnum fromValue(String value) {
@@ -806,6 +806,20 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                             throw new IllegalArgumentException("Unexpected value '" + key + "'");
                         }
                         return VALUE_MAPPING.get(key);
+                    }
+                """);
+
+        assertFileContains(path + "model/DecimalEnum.java",
+            """
+                    public static final Map<BigDecimal, DecimalEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
+                        .collect(Collectors.toMap(v -> v.value, Function.identity())));
+                """,
+            """
+                    public static DecimalEnum fromValue(BigDecimal value) {
+                        if (!VALUE_MAPPING.containsKey(value)) {
+                            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+                        }
+                        return VALUE_MAPPING.get(value);
                     }
                 """);
     }
@@ -1315,7 +1329,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @Serdeable
                 @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
-                @Serializable
+                @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
                 
                     @Override
