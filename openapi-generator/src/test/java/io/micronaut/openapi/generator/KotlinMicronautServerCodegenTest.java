@@ -1196,11 +1196,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAvoidDuplicatePropertyNames() {
         var codegen = new KotlinMicronautServerCodegen();
-        String outputPath = generateFiles(codegen, DUPLICATE_PROPERTY_NAMES_PATH,
-            CodegenConstants.MODELS);
-
+        String outputPath = generateFiles(codegen, DUPLICATE_PROPERTY_NAMES_PATH);
         String modelFolder = outputPath + "src/main/kotlin/org/openapitools/model/";
         String file = modelFolder + "ModelWithDuplicateProperties.kt";
+
         assertFileExists(file);
         assertFileContains(file, "var name: String? = null");
         assertFileContains(file, "var name2: String? = null");
