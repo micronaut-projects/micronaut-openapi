@@ -52,7 +52,7 @@
         {{!generate only when at least 2 tags}}
         tags = {{openbrace}} {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} {{closebrace}},
         {{/tags.1}}
-        responses = {{#responses.1}}{{openbrace}}
+        responses = {{#responses.0}}{{#responses.1}}{{openbrace}}
     {{/responses.1}}{{#responses}}{{#responses.1}}
             {{/responses.1}}@ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = {{#produces.1}}{{openbrace}}
                 {{#produces}}
@@ -60,7 +60,7 @@
                 {{/produces}}
             {{closebrace}}{{/produces.1}}{{^produces.1}}{{#produces}}@Content(mediaType = "{{{mediaType}}}", {{#isArray}}array = @ArraySchema({{/isArray}}schema = @Schema(implementation = {{{baseType}}}.class)){{#isArray}}){{/isArray}}{{/produces}}{{/produces.1}}{{/baseType}}){{^-last}},{{/-last}}{{#responses.1}}
             {{/responses.1}}{{/responses}}{{#responses.1}}
-        {{closebrace}}{{/responses.1}}{{#vendorExtensions.hasNotBodyParam}},
+        {{closebrace}}{{/responses.1}}{{/responses.0}}{{^responses.0}}{}{{/responses.0}}{{#vendorExtensions.hasNotBodyParam}},
         parameters = {{#vendorExtensions.swaggerParams.1}}{{openbrace}}
             {{/vendorExtensions.swaggerParams.1}}{{#vendorExtensions.swaggerParams}}{{#vendorExtensions.swaggerParams.1}}
             {{/vendorExtensions.swaggerParams.1}}@Parameter(name = "{{baseName}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, in = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}{{#vendorExtensions.hasMultipleParams}}

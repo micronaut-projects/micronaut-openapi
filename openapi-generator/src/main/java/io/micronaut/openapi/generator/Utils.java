@@ -615,4 +615,32 @@ public final class Utils {
             }
         }
     }
+
+    public static void addEnumParamsForConverters(
+        String modelPackage,
+        CodegenParameter param,
+        Map<String, Integer> converterCounters,
+        List<CodegenParameter> enumParams,
+        List<String> enumImports
+    ) {
+        var converterName = param.dataType;
+        var alreadyAdded = false;
+        for (var enumParam : enumParams) {
+            if (param.dataType.equals(enumParam.dataType)) {
+                alreadyAdded = true;
+                break;
+            }
+        }
+        if (!alreadyAdded) {
+            var counter = converterCounters.get(converterName);
+            if (counter == null) {
+                converterCounters.put(converterName, 0);
+            } else {
+                converterCounters.put(converterName, counter + 1);
+            }
+            param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+            enumParams.add(param);
+            enumImports.add(modelPackage + "." + param.dataType);
+        }
+    }
 }

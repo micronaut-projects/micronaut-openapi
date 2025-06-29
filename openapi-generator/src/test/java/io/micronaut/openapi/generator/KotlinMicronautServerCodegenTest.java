@@ -325,31 +325,31 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-
+                
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-
+                
                     @field:Nullable
                     @field:Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String? = null,
-
+                
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
-
+                
                     @field:Nullable
                     @field:Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
-
+                
                     @field:Nullable
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -360,37 +360,37 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
                 class ExtendedBookInfo(
-
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-
+                
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-
+                
                     @Nullable
                     @Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     requiredReadOnly: String? = null,
-
+                
                     @Nullable
                     @Size(min = 3)
                     @Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     author: String? = null,
-
+                
                     @Nullable
                     @Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     optionalReadOnly: String? = null,
-
+                
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -409,12 +409,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-
+                
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-
+                
                     @field:NotNull
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -426,18 +426,18 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
-
+                
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-
+                
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-
+                
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -447,24 +447,24 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
                 class DetailedBookInfo(
-
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-
+                
                     @NotNull
                     @Size(min = 3)
                     @Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     author: String,
-
+                
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-
+                
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -889,7 +889,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.kt", """
                 var id: String? = null,
-
+            
                 @field:Nullable
                 @field:Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @field:JsonProperty(JSON_PROPERTY_DATE)
@@ -1029,7 +1029,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-
+                
                     @field:Schema(name = "currency", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1059,7 +1059,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-
+                
                     @field:Nullable
                     @field:Schema(name = "currency", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
@@ -1112,7 +1112,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Bean
                     fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
                         commonToEnumConverter(StringEnum::class.java, objectMapper)
-
+                
                     @Bean
                     fun toStrStringEnum(): TypeConverter<StringEnum, String> =
                         commonToStrConverter(StringEnum::class.java, objectMapper)
@@ -1121,7 +1121,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Bean
                     fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
                         commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
-
+                
                     @Bean
                     fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
                         commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
@@ -1204,5 +1204,69 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(file, "var name: String? = null");
         assertFileContains(file, "var name2: String? = null");
         assertFileContains(file, "const val JSON_PROPERTY_NAME_2 = \"_name\"");
+    }
+
+    @Test
+    void testMultipartOperationWithoutResponse() {
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipart-without-response.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "api/DefaultApi.kt");
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Operation(
+                        operationId = "testPut",
+                        responses = [
+                        ],
+                    )
+                    @Put("/test")
+                    @Consumes("multipart/form-data")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun testPut(
+                        @Part("file") @NotNull file: CompletedFileUpload,
+                    ): Mono<Void>
+                """
+        );
+    }
+
+    @Test
+    void testEnumInMultipart() {
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum-in-multipart.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "config/EnumConverterServerConfig.kt");
+        assertFileContains(path + "config/EnumConverterServerConfig.kt",
+            """
+                    @Bean
+                    fun toEnumDataDirection(): TypeConverter<String, DataDirection> =
+                        commonToEnumConverter(DataDirection::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrDataDirection(): TypeConverter<DataDirection, String> =
+                        commonToStrConverter(DataDirection::class.java, objectMapper)
+                
+                    @Bean
+                    fun toEnumDataChannel(): TypeConverter<String, DataChannel> =
+                        commonToEnumConverter(DataChannel::class.java, objectMapper)
+                
+                    @Bean
+                    fun toStrDataChannel(): TypeConverter<DataChannel, String> =
+                        commonToStrConverter(DataChannel::class.java, objectMapper)
+                """
+        );
+
+        assertFileExists(path + "api/BasApi.kt");
+        assertFileContains(path + "api/BasApi.kt",
+            """
+                    fun createMessage(
+                        @Part("fileContent") @NotNull fileContent: CompletedFileUpload,
+                        @Part("idempotencyKey") @NotNull idempotencyKey: String,
+                        @Part("dataDirection") @NotNull dataDirection: DataDirection,
+                        @Part("dataChannel") @NotNull dataChannel: DataChannel,
+                    ): Mono<HttpResponse<InlineObject>>
+                """
+        );
     }
 }
