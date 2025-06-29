@@ -101,6 +101,7 @@ import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
+import static io.micronaut.openapi.generator.Utils.processDuplicateVars;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.BYTE_FORMAT;
@@ -1801,20 +1802,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         model.imports.remove("ApiModelProperty");
         allModels.put(name, model);
         return model;
-    }
-
-    private void processDuplicateVars(List<CodegenProperty> vars) {
-        Map<String, Integer> names = new HashMap<>();
-        for (CodegenProperty var : vars) {
-            if (names.containsKey(var.getName())) {
-                names.put(var.getName(), names.get(var.getName()) + 1);
-                int index = names.get(var.getName());
-                var.setName(var.getName() + index);
-                var.nameInSnakeCase = var.nameInSnakeCase + "_" + index;
-            } else {
-                names.put(var.getName(), 1);
-            }
-        }
     }
 
     private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
