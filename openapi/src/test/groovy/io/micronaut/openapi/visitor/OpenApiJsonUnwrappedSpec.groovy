@@ -222,4 +222,56 @@ class MyBean {}
         schema.properties.size() == 1
         schema.properties.name
     }
+
+    void "test JsonUnwrapped with schema with custom name"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class DemoController {
+
+    @Get("/")
+    MyDto index() {
+        return null;
+    }
+}
+
+@Schema(name = "My")
+class MyDto {
+    @JsonUnwrapped
+    public FieldsDto fields;
+}
+
+@Schema(name = "Fields") // does not work
+//@Schema // works
+class FieldsDto {
+    public String field1;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        Schema schema = openApi.components.schemas.My
+
+        then: "the components are valid"
+        schema
+        schema.type == 'object'
+        schema.properties
+        schema.properties.size() == 1
+        schema.properties.field1
+        schema.properties.field1.type == "string"
+    }
 }
