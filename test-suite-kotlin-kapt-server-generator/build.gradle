@@ -33,6 +33,7 @@ dependencies {
 
     runtimeOnly(mnLogging.logback.classic)
     runtimeOnly(mnSerde.micronaut.serde.jackson)
+    runtimeOnly(mn.snakeyaml)
 
     kaptTest(mnValidation.micronaut.validation.processor)
     kaptTest(mnSerde.micronaut.serde.processor)
@@ -76,6 +77,14 @@ tasks.named("generateOpenApi") {
             // Ignored header - Does not wrap the response in HttpResponse
             [headerName: "ignored-header"]
     ]
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.openapi.environments", "local")
+        arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
+    }
 }
 
 kotlin {

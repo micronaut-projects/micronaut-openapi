@@ -50,6 +50,7 @@ import static io.micronaut.openapi.visitor.Utils.isKsp;
 @Internal
 public final class FileUtils {
 
+    public static final String META_INFO_DIR = "META-INF";
     public static final String DEFAULT_VIEWS_PATH = "swagger/views";
     public static final String DEFAULT_SPEC_PATH = "swagger/";
     public static final String EXT_ADOC = ".adoc";
@@ -97,8 +98,8 @@ public final class FileUtils {
         }
         var classesOutputPath = getClassesOutputPath(context);
         if (classesOutputPath != null) {
-            if (isKsp(context)) {
-                classesOutputPath = classesOutputPath.resolve("META-INF");
+            if (isKsp(context) && !classesOutputPath.endsWith(META_INFO_DIR)) {
+                classesOutputPath = classesOutputPath.resolve(META_INFO_DIR);
             }
             classesOutputPath = classesOutputPath.resolve(DEFAULT_VIEWS_PATH);
         }
