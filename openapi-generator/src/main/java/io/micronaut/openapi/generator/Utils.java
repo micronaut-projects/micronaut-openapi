@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -598,5 +599,48 @@ public final class Utils {
             return "FORMAT_DEEP_OBJECT";
         }
         return null;
+    }
+
+    public static void processDuplicateVars(List<CodegenProperty> vars) {
+        var names = new HashMap<String, Integer>();
+        for (CodegenProperty var : vars) {
+            var varName = var.getName();
+            if (names.containsKey(varName)) {
+                names.put(varName, names.get(varName) + 1);
+                int index = names.get(varName);
+                var.setName(varName + index);
+                var.nameInSnakeCase = var.nameInSnakeCase + "_" + index;
+            } else {
+                names.put(varName, 1);
+            }
+        }
+    }
+
+    public static void addEnumParamsForConverters(
+        String modelPackage,
+        CodegenParameter param,
+        Map<String, Integer> converterCounters,
+        List<CodegenParameter> enumParams,
+        List<String> enumImports
+    ) {
+        var converterName = param.dataType;
+        var alreadyAdded = false;
+        for (var enumParam : enumParams) {
+            if (param.dataType.equals(enumParam.dataType)) {
+                alreadyAdded = true;
+                break;
+            }
+        }
+        if (!alreadyAdded) {
+            var counter = converterCounters.get(converterName);
+            if (counter == null) {
+                converterCounters.put(converterName, 0);
+            } else {
+                converterCounters.put(converterName, counter + 1);
+            }
+            param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+            enumParams.add(param);
+            enumImports.add(modelPackage + "." + param.dataType);
+        }
     }
 }
