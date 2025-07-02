@@ -4,7 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 
-class OpenApiJsonUnwrappedsSpec extends AbstractOpenApiTypeElementSpec {
+class OpenApiJsonUnwrappedSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test JsonUnwrapped annotation"() {
 
