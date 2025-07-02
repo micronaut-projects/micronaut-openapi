@@ -103,10 +103,12 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.NULL_STRING;
+import static io.micronaut.openapi.generator.Utils.addEnumParamsForConverters;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
+import static io.micronaut.openapi.generator.Utils.processDuplicateVars;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.BYTE_FORMAT;
@@ -1193,12 +1195,24 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         param.isBodyParam = true;
                         param.isFormParam = false;
                         param.vendorExtensions.put("isPart", true);
+                        if (param.isEnumRef) {
+                            param.isEnum = true;
+                        }
+                        if (param.isEnum) {
+                            addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                        }
                     }
                 }
                 op.formParams.forEach(p -> {
                     p.isBodyParam = true;
                     p.isFormParam = false;
                     p.vendorExtensions.put("isPart", true);
+                    if (p.isEnumRef) {
+                        p.isEnum = true;
+                    }
+                    if (p.isEnum) {
+                        addEnumParamsForConverters(modelPackage, p, converterCounters, enumParams, enumImports);
+                    }
                 });
                 op.formParams.clear();
             }
@@ -1236,26 +1250,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
 
                 if (param.isEnum && !param.isBodyParam) {
-
-                    var converterName = param.dataType;
-                    var alreadyAdded = false;
-                    for (var enumParam : enumParams) {
-                        if (param.dataType.equals(enumParam.dataType)) {
-                            alreadyAdded = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyAdded) {
-                        var counter = converterCounters.get(converterName);
-                        if (counter == null) {
-                            converterCounters.put(converterName, 0);
-                        } else {
-                            converterCounters.put(converterName, counter + 1);
-                        }
-                        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
-                        enumParams.add(param);
-                        enumImports.add(modelPackage + "." + param.dataType);
-                    }
+                    addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
                 }
             }
 
@@ -1513,20 +1508,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         allModels.put(name, model);
         return model;
-    }
-
-    private void processDuplicateVars(List<CodegenProperty> vars) {
-        Map<String, Integer> names = new HashMap<>();
-        for (CodegenProperty var : vars) {
-            if (names.containsKey(var.getName())) {
-                names.put(var.getName(), names.get(var.getName()) + 1);
-                int index = names.get(var.getName());
-                var.setName(var.getName() + index);
-                var.nameInSnakeCase = var.nameInSnakeCase + "_" + index;
-            } else {
-                names.put(var.getName(), 1);
-            }
-        }
     }
 
     /**

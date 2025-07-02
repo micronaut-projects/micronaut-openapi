@@ -966,4 +966,70 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(file, "public void set_name(String name2)");
     }
 
+    @Test
+    void testMultipartOperationWithoutResponse() {
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipart-without-response.yml");
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "api/DefaultApi.java");
+        assertFileContains(path + "api/DefaultApi.java",
+            """
+                    @Operation(
+                        operationId = "testPut",
+                        responses = {}
+                    )
+                    @Put("/test")
+                    @Consumes("multipart/form-data")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<Void> testPut(
+                        @Part("file") @NotNull CompletedFileUpload file
+                    );
+                """
+        );
+    }
+
+    @Test
+    void testEnumInMultipart() {
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum-in-multipart.yml");
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "config/EnumConverterServerConfig.java");
+        assertFileContains(path + "config/EnumConverterServerConfig.java",
+            """
+                    @Bean
+                    public TypeConverter<String, DataDirection> toEnumDataDirection() {
+                        return commonToEnumConverter(DataDirection.class, objectMapper);
+                    }
+                
+                    @Bean
+                    public TypeConverter<DataDirection, String> toStrDataDirection() {
+                        return commonToStrConverter(DataDirection.class, objectMapper);
+                    }
+                
+                    @Bean
+                    public TypeConverter<String, DataChannel> toEnumDataChannel() {
+                        return commonToEnumConverter(DataChannel.class, objectMapper);
+                    }
+                
+                    @Bean
+                    public TypeConverter<DataChannel, String> toStrDataChannel() {
+                        return commonToStrConverter(DataChannel.class, objectMapper);
+                    }
+                """
+        );
+
+        assertFileExists(path + "api/BasApi.java");
+        assertFileContains(path + "api/BasApi.java",
+            """
+                    Mono<HttpResponse<@Valid InlineObject>> createMessage(
+                        @Part("fileContent") @NotNull CompletedFileUpload fileContent,
+                        @Part("idempotencyKey") @NotNull String idempotencyKey,
+                        @Part("dataDirection") @NotNull DataDirection dataDirection,
+                        @Part("dataChannel") @NotNull DataChannel dataChannel
+                    );
+                """
+        );
+    }
 }
