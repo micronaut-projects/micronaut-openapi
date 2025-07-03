@@ -3269,7 +3269,7 @@ public final class SchemaDefinitionUtils {
         return name;
     }
 
-    private static void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
+    private static void handleUnwrapped(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         var elType = customElementType != null ? customElementType : elementType;
@@ -3283,9 +3283,14 @@ public final class SchemaDefinitionUtils {
             }
         }
 
+        // check property
         var schemaNameFromAnn = getNameFromAnn(element);
+        if (schemaNameFromAnn == null) {
+            // check class
+            schemaNameFromAnn = getNameFromAnn(elType);
+        }
 
-        String schemaName = computeDefaultSchemaName(schemaNameFromAnn, null, elType, elementType.getTypeArguments(), context, null);
+        String schemaName = computeDefaultSchemaName(schemaNameFromAnn, null, elType, elType.getTypeArguments(), context, null);
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
         if (wrappedPropertySchema == null) {
             getSchemaDefinition(resolveOpenApi(context), context, elType, elType.getTypeArguments(), element, Collections.emptyList(), null);
