@@ -69,9 +69,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -2776,12 +2780,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             example = withExample(example) ? example : "false";
         } else if ("File".equals(dataType) || "java.io.File".equals(dataType)) {
             example = null;
-        } else if ("OffsetDateTime".equals(dataType)) {
-            example = "OffsetDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
         } else if ("LocalDate".equals(dataType)) {
             example = "LocalDate.of(2001, 2, 3)";
         } else if ("LocalDateTime".equals(dataType)) {
             example = "LocalDateTime.of(2001, 2, 3, 4, 5)";
+        } else if ("OffsetDateTime".equals(dataType)) {
+            example = "OffsetDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
+        } else if ("ZonedDateTime".equals(dataType)) {
+            example = "ZonedDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
         } else if ("ByteArray".equals(dataType)) {
             example = "ByteArray(10)";
         } else if ("BigDecimal".equals(dataType)) {
@@ -2863,13 +2869,34 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 defaultValueStr = schema.getDefault().toString();
             }
         } else if (ModelUtils.isDateSchema(schema)) {
-            // TODO
-            defaultValueInit = null;
-            defaultValueStr = null;
+            if (schema.getDefault() != null) {
+                var date = (Date) schema.getDefault();
+                LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                defaultValueInit = "LocalDate.parse(\"%s\")".formatted(localDate.toString());
+                defaultValueStr = localDate.toString();
+            }
         } else if (ModelUtils.isDateTimeSchema(schema)) {
-            // TODO
-            defaultValueInit = null;
-            defaultValueStr = null;
+            if (schema.getDefault() != null) {
+                var offsetDateTime = (OffsetDateTime) schema.getDefault();
+                switch (dateLibrary) {
+                    case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
+                        defaultValueInit = "OffsetDateTime.parse(\"%s\")".formatted(offsetDateTime);
+                        defaultValueStr = offsetDateTime.toString();
+                    }
+                    case OPT_DATE_LIBRARY_ZONED_DATETIME -> {
+                        var zonedDateTime = offsetDateTime.toZonedDateTime();
+                        defaultValueInit = "ZonedDateTime.parse(\"%s\")".formatted(zonedDateTime);
+                        defaultValueStr = zonedDateTime.toString();
+                    }
+                    case OPT_DATE_LIBRARY_LOCAL_DATETIME -> {
+                        var localDateTime = offsetDateTime.toLocalDateTime();
+                        defaultValueInit = "LocalDateTime.parse(\"%s\")".formatted(localDateTime);
+                        defaultValueStr = localDateTime.toString();
+                    }
+                    default -> {
+                    }
+                }
+            }
         } else if (ModelUtils.isNumberSchema(schema)) {
             if (schema.getDefault() != null) {
                 defaultValueInit = fixNumberValue(schema.getDefault().toString(), schema);
@@ -2883,6 +2910,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         } else if (ModelUtils.isURISchema(schema)) {
             if (schema.getDefault() != null) {
                 defaultValueInit = importMapping.get("URI") + ".create(\"" + schema.getDefault() + "\")";
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isUUIDSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = "UUID.fromString(\"" + schema.getDefault() + "\")";
                 defaultValueStr = schema.getDefault().toString();
             }
         } else if (ModelUtils.isArraySchema(schema) && itemsDatatypeWithEnum != null) {

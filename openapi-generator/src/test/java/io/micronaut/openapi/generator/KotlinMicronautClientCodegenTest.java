@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -2307,5 +2308,80 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     override var fruitType: String? = null,
                 ) : ComposedDiscRequiredInconsistent, ComposedDiscTypeInconsistent, FruitAnyOfDisc, FruitOneOfDisc {
                 """);
+    }
+
+    @Test
+    void testLocalDateTimeDefaultValue() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setDateTimeLibrary("LOCAL_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-local-date-time.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithLocalDateTimeDto.kt");
+        assertFileContains(path + "model/ObjectWithLocalDateTimeDto.kt",
+            "import java.time.LocalDateTime",
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var timestamp: LocalDateTime? = LocalDateTime.parse("2025-05-26T14:00"),
+                """
+        );
+    }
+
+    @Test
+    void testZonedDateTimeDefaultValue() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setDateTimeLibrary("ZONED_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-zoned-date-time.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithZonedDateTimeDto.kt");
+        assertFileContains(path + "model/ObjectWithZonedDateTimeDto.kt",
+            "import java.time.ZonedDateTime",
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var timestamp: ZonedDateTime? = ZonedDateTime.parse("2007-12-03T10:15:30+01:00"),
+                """
+        );
+    }
+
+    @Test
+    void testOffsetDateTimeDefaultValue() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setDateTimeLibrary("OFFSET_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-offset-date-time.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithOffsetDateTimeDto.kt");
+        assertFileContains(path + "model/ObjectWithOffsetDateTimeDto.kt",
+            "import java.time.OffsetDateTime",
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var timestamp: OffsetDateTime? = OffsetDateTime.parse("2007-12-03T10:15:30+01:00"),
+                """
+        );
     }
 }

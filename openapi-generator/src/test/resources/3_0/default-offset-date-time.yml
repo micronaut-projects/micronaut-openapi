@@ -1,0 +1,25 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: date-time problem API
+paths:
+  /example:
+    get:
+      summary: Get example object
+      responses:
+        '200':
+          description: resppnseWithObjectWithOffsetDateTime
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectWithOffsetDateTime'
+components:
+  schemas:
+    ObjectWithOffsetDateTime:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2007-12-03T10:15:30+01:00'
+          default: '2007-12-03T10:15:30+01:00'

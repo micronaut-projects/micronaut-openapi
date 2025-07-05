@@ -2004,4 +2004,79 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testLocalDateTimeDefaultValue() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setDateTimeLibrary("LOCAL_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-local-date-time.yml");
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithLocalDateTimeDto.java");
+        assertFileContains(path + "model/ObjectWithLocalDateTimeDto.java",
+            "import java.time.LocalDateTime;",
+            """
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    private LocalDateTime timestamp = LocalDateTime.parse("2025-05-26T14:00");
+                """
+        );
+    }
+
+    @Test
+    void testZonedDateTimeDefaultValue() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setDateTimeLibrary("ZONED_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-zoned-date-time.yml");
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithZonedDateTimeDto.java");
+        assertFileContains(path + "model/ObjectWithZonedDateTimeDto.java",
+            "import java.time.ZonedDateTime;",
+            """
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    private ZonedDateTime timestamp = ZonedDateTime.parse("2007-12-03T10:15:30+01:00");
+                """
+        );
+    }
+
+    @Test
+    void testOffsetDateTimeDefaultValue() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setDateTimeLibrary("OFFSET_DATETIME");
+        codegen.setModelNameSuffix("Dto");
+        codegen.setReactive(false);
+        codegen.setConfigureAuthorization(false);
+        codegen.setGenerateHttpResponseAlways(false);
+        codegen.setGenerateHttpResponseWhereRequired(true);
+        codegen.setUseBeanValidation(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/default-offset-date-time.yml");
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "model/ObjectWithOffsetDateTimeDto.java");
+        assertFileContains(path + "model/ObjectWithOffsetDateTimeDto.java",
+            "import java.time.OffsetDateTime;",
+            """
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    private OffsetDateTime timestamp = OffsetDateTime.parse("2007-12-03T10:15:30+01:00");
+                """
+        );
+    }
 }
