@@ -4,9 +4,11 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.multipart.CompletedFileUpload
 import io.micronaut.openapi.test.model.*
+import io.swagger.v3.oas.annotations.Hidden
 import reactor.core.publisher.Mono
 import java.io.ByteArrayOutputStream
 
+@Hidden
 @Controller
 open class RequestBodyController : RequestBodyApi {
 

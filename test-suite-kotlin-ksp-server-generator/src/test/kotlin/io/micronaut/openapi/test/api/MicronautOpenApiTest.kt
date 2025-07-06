@@ -3,10 +3,11 @@ package io.micronaut.openapi.test.api
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.openapi.OpenApiUtils
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import io.swagger.v3.oas.models.OpenAPI
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.String
@@ -44,5 +45,15 @@ class MicronautOpenApiTest(
                 """.trimIndent()
             )
         )
+
+        val openApi = OpenApiUtils.getYamlMapper().readValue(openApiSpec, OpenAPI::class.java)
+
+        assertNotNull(openApi)
+        val schema = openApi.components?.schemas?.get("TypeDto") ?: throw IllegalStateException("Schema TypeDto not found")
+        assertEquals("string", schema.type)
+        assertFalse(schema.enum.isNullOrEmpty())
+        assertEquals(2, schema.enum.size)
+        assertTrue(schema.enum.contains("EPISODE"))
+        assertTrue(schema.enum.contains("SCHEDULED_LIVESTREAM"))
     }
 }

@@ -1,13 +1,19 @@
 package io.micronaut.openapi.test.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,7 +35,7 @@ public class MicronautOpenApiTest {
     }
 
     @Test
-    void testOpenApiView() {
+    void testOpenApiView() throws JsonProcessingException {
         var swaggerUi = client.retrieve("/swagger-ui", String.class);
 
         assertNotNull(swaggerUi);
@@ -47,5 +53,18 @@ public class MicronautOpenApiTest {
                     """
             )
         );
+
+        var openApi = OpenApiUtils.getYamlMapper().readValue(openApiSpec, OpenAPI.class);
+
+        assertNotNull(openApi);
+        assertNotNull(openApi.getComponents());
+        assertNotNull(openApi.getComponents().getSchemas());
+        var schema = openApi.getComponents().getSchemas().get("TypeDto");
+        assertNotNull(schema);
+        assertEquals("string", schema.getType());
+        assertFalse(CollectionUtils.isEmpty(schema.getEnum()));
+        assertEquals(2, schema.getEnum().size());
+        assertTrue(schema.getEnum().contains("EPISODE"));
+        assertTrue(schema.getEnum().contains("SCHEDULED_LIVESTREAM"));
     }
 }

@@ -44,6 +44,7 @@ dependencies {
     testImplementation(mn.micronaut.http.client)
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mnTest.junit.jupiter.params)
+    testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
@@ -85,6 +86,7 @@ kapt {
         arg("micronaut.openapi.environments", "local")
         arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
     }
+    useBuildCache = false
 }
 
 kotlin {
