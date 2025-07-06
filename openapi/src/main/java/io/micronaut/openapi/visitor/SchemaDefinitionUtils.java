@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -1719,6 +1720,11 @@ public final class SchemaDefinitionUtils {
             boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
 
             if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
+                required = true;
+            }
+
+            // If inclusion is ALWAYS, then all properties are required
+            if (!required && ConfigUtils.getInclude(context) == JsonInclude.Include.ALWAYS) {
                 required = true;
             }
 

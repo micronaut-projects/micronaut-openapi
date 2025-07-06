@@ -135,6 +135,10 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY = "micronaut.openapi.property.naming.strategy";
     /**
+     * System property for property inclusion. One jackson Include.
+     */
+    String MICRONAUT_OPENAPI_PROPERTY_INCLUDE = "micronaut.openapi.property.include";
+    /**
      * System property for views specification.
      */
     String MICRONAUT_OPENAPI_VIEWS_SPEC = "micronaut.openapi.views.spec";
@@ -468,6 +472,7 @@ public interface OpenApiConfigProperty {
         MICRONAUT_OPENAPI_ENABLED,
         MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
         MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
+        MICRONAUT_OPENAPI_PROPERTY_INCLUDE,
         MICRONAUT_OPENAPI_VIEWS_SPEC,
         MICRONAUT_OPENAPI_FILENAME,
         MICRONAUT_OPENAPI_JSON_FORMAT,

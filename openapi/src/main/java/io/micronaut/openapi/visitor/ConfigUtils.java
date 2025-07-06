@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -116,6 +117,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_INCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
@@ -1188,6 +1190,33 @@ public final class ConfigUtils {
             case "LOWER_DOT_CASE" -> PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> {
                 warn("Unknown naming strategy value: " + namingStrategy, context);
+                yield null;
+            }
+        };
+    }
+
+    public static JsonInclude.Include getInclude(VisitorContext context) {
+        var value = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_INCLUDE, context);
+        if (value == null) {
+            return null;
+        }
+        return toJacksonInclude(value.toUpperCase(Locale.ENGLISH), context);
+    }
+
+    private static JsonInclude.Include toJacksonInclude(String include, VisitorContext context) {
+        if (include == null) {
+            return null;
+        }
+        return switch (include.toUpperCase(Locale.ENGLISH)) {
+            case "ALWAYS" -> JsonInclude.Include.ALWAYS;
+            case "NON_NULL" -> JsonInclude.Include.NON_NULL;
+            case "NON_ABSENT" -> JsonInclude.Include.NON_ABSENT;
+            case "NON_EMPTY" -> JsonInclude.Include.NON_EMPTY;
+            case "NON_DEFAULT" -> JsonInclude.Include.NON_DEFAULT;
+            case "CUSTOM" -> JsonInclude.Include.CUSTOM;
+            case "USE_DEFAULTS" -> JsonInclude.Include.USE_DEFAULTS;
+            default -> {
+                warn("Unknown include value: " + include, context);
                 yield null;
             }
         };

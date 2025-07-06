@@ -1817,4 +1817,101 @@ public class MyBean {}
         itemSchema.properties.name.minProperties == 1
         ((Schema) itemSchema.properties.name.additionalProperties).type == "string"
     }
+
+    @RestoreSystemProperties
+    void "test custom JSON inclusion - issue #2261"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_INCLUDE, "ALWAYS")
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;import jakarta.validation.constraints.PositiveOrZero;
+
+@Controller
+class PersonController {
+
+    @Operation(
+            summary = "Fetch the person information",
+            description = "Fetch the person name, debt and goals information",
+            parameters = { @Parameter(name = "name", required = true, description = "The person name", in = ParameterIn.PATH) },
+            responses = {
+                    @ApiResponse(description = "The person information",
+                        content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                        schema = @Schema( implementation = Person.class )
+                    ))
+            }
+    )
+    @Get("/person/{name}")
+    HttpResponse<Person> get(@NotBlank String name) {
+        return HttpResponse.ok();
+    }
+}
+
+/**
+ * The person information.
+ */
+@Introspected
+class Person {
+
+    public String fieldProp;
+
+    public Integer getReadOnlyProp() {
+        return null;
+    }
+
+    public int getAccessorProp() {
+        return 0;
+    }
+
+    public void setAccessorProp(int value) {
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        OpenAPI openAPI = Utils.testReference
+        openAPI?.paths?.get("/person/{name}")?.get
+        Schema personSchema = openAPI.components.schemas.Person
+
+        personSchema
+        personSchema.type == "object"
+
+        personSchema.properties
+        personSchema.properties.size() == 3
+
+        personSchema.properties["fieldProp"]
+        personSchema.properties["readOnlyProp"]
+        personSchema.properties["accessorProp"]
+
+        personSchema.properties["fieldProp"].type == "string"
+        personSchema.properties["readOnlyProp"].type == "integer"
+        personSchema.properties["accessorProp"].type == "integer"
+
+
+        personSchema.required.size() == 3
+        personSchema.required.contains("fieldProp")
+        personSchema.required.contains("readOnlyProp")
+        personSchema.required.contains("accessorProp")
+    }
 }
