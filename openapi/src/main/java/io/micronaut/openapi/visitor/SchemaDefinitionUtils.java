@@ -234,6 +234,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
+import static io.micronaut.openapi.visitor.SchemaUtils.isArraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
@@ -975,7 +976,7 @@ public final class SchemaDefinitionUtils {
                             var componentSchema = getSchemaDefinition(openApi, context, realClassEl, componentType.getTypeArguments(), type, mediaTypes, null);
                             processSchemaAnn(componentSchema, context, definingElement, type, componentSchemaAnn);
                             schema = resolveSchema(openApi, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
-                            if (componentSchema != null && TYPE_ARRAY.equals(schema.getType()) && !TYPE_ARRAY.equals(componentSchema.getType())) {
+                            if (componentSchema != null && isArraySchema(schema, openApi) && !isArraySchema(componentSchema, openApi)) {
                                 schema.items(componentSchema);
                             }
                         } else {
