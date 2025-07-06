@@ -8,6 +8,7 @@
 |`*micronaut.openapi.exclude.classes*` | System property to specify list of classes which must be excluded from the final OpenAPI specification. |
 |`*micronaut.openapi.exclude.packages*` | System property to specify list of packages, containing controllers / endpoints, which must be excluded from the final OpenAPI specification. |
 |`*micronaut.openapi.property.naming.strategy*` | System property for naming strategy. One jackson PropertyNamingStrategy. | Default: `LOWER_CAMEL_CASE`
+|`*micronaut.openapi.property.property.include*` | System property for default property inclusion - default Jackson include mode. Available values: "USE_DEFAULTS" and "ALWAYS". | Default: `USE_DEFAULTS`
 |`*micronaut.openapi.response.read-successful-from-code*` | If this property true, then successful response will be created from code, if successful code didn't set in swagger annotations. Otherwise, if swagger annotations are specified, the code will be ignored and responses will be read only from swagger annotations. | Default: `true`
 |`*micronaut.openapi.views.spec*` | System property for views specification. |
 |`*micronaut.openapi.target.file*` | System property that enables setting the target file to write to. | Default: `META-INF/swagger/${applicationName}-${version}.yml`

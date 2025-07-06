@@ -1,15 +1,15 @@
 package io.micronaut.openapi.visitor
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
+import java.time.OffsetDateTime
 import spock.lang.Issue
 import spock.util.environment.RestoreSystemProperties
-
-import java.time.OffsetDateTime
 
 class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1816,5 +1816,238 @@ public class MyBean {}
         itemSchema.properties.name.additionalProperties instanceof Schema
         itemSchema.properties.name.minProperties == 1
         ((Schema) itemSchema.properties.name.additionalProperties).type == "string"
+    }
+
+    @RestoreSystemProperties
+    void "test JsonInclude ALWAYS"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_INCLUDE, JsonInclude.Include.ALWAYS.name())
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+
+@Controller
+class PersonController {
+
+    @Get("/person/{name}")
+    Person get(@NotBlank String name) {
+        return null;
+    }
+}
+
+/**
+ * The person information.
+ */
+@Introspected
+class Person {
+
+    public String reqProp;
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    public String notReqPropJsonInclude;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public String reqPropJsonInclude;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    public String notReqPropSwagger;
+
+    public Integer getReadOnlyProp() {
+        return null;
+    }
+
+    public int getAccessorProp() {
+        return 0;
+    }
+
+    public void setAccessorProp(int value) {
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        var openApi = Utils.testReference
+        openApi.paths."/person/{name}".get
+        var personSchema = openApi.components.schemas.Person
+
+        personSchema
+        personSchema.type == "object"
+
+        personSchema.properties
+        personSchema.properties.size() == 6
+
+        personSchema.properties.reqProp
+        personSchema.properties.readOnlyProp
+        personSchema.properties.accessorProp
+        personSchema.properties.notReqPropSwagger
+        personSchema.properties.notReqPropJsonInclude
+        personSchema.properties.reqPropJsonInclude
+
+        personSchema.required.size() == 4
+        personSchema.required.containsAll(List.of("reqProp", "readOnlyProp", "accessorProp", "reqPropJsonInclude"))
+    }
+
+    void "test JsonInclude ALWAYS on class level"() {
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+
+@Controller
+class PersonController {
+
+    @Get("/person/{name}")
+    Person get(@NotBlank String name) {
+        return null;
+    }
+}
+
+/**
+ * The person information.
+ */
+@JsonInclude(JsonInclude.Include.ALWAYS)
+@Introspected
+class Person {
+
+    public String reqProp;
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    public String notReqPropJsonInclude;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public String reqPropJsonInclude;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    public String notReqPropSwagger;
+
+    public Integer getReadOnlyProp() {
+        return null;
+    }
+
+    public int getAccessorProp() {
+        return 0;
+    }
+
+    public void setAccessorProp(int value) {
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        var openApi = Utils.testReference
+        openApi.paths."/person/{name}".get
+        var personSchema = openApi.components.schemas.Person
+
+        personSchema
+        personSchema.type == "object"
+
+        personSchema.properties
+        personSchema.properties.size() == 6
+
+        personSchema.properties.reqProp
+        personSchema.properties.readOnlyProp
+        personSchema.properties.accessorProp
+        personSchema.properties.notReqPropSwagger
+        personSchema.properties.notReqPropJsonInclude
+        personSchema.properties.reqPropJsonInclude
+
+        personSchema.required.size() == 4
+        personSchema.required.containsAll(List.of("reqProp", "readOnlyProp", "accessorProp", "reqPropJsonInclude"))
+    }
+
+    void "test JsonInclude ALWAYS on property level"() {
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+
+@Controller
+class PersonController {
+
+    @Get("/person/{name}")
+    Person get(@NotBlank String name) {
+        return null;
+    }
+}
+
+/**
+ * The person information.
+ */
+@Introspected
+class Person {
+
+    public String reqProp;
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    public String notReqPropJsonInclude;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public String reqPropJsonInclude;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    public String notReqPropSwagger;
+
+    public Integer getReadOnlyProp() {
+        return null;
+    }
+
+    public int getAccessorProp() {
+        return 0;
+    }
+
+    public void setAccessorProp(int value) {
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        var openApi = Utils.testReference
+        openApi.paths."/person/{name}".get
+        var personSchema = openApi.components.schemas.Person
+
+        personSchema
+        personSchema.type == "object"
+
+        personSchema.properties
+        personSchema.properties.size() == 6
+
+        personSchema.properties.reqProp
+        personSchema.properties.readOnlyProp
+        personSchema.properties.accessorProp
+        personSchema.properties.notReqPropSwagger
+        personSchema.properties.notReqPropJsonInclude
+        personSchema.properties.reqPropJsonInclude
+
+        personSchema.required.size() == 1
+        personSchema.required.containsAll(List.of("reqPropJsonInclude"))
     }
 }

@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -1693,11 +1694,11 @@ public final class SchemaDefinitionUtils {
      * @param context The visitor context
      * @param element The element
      * @param elementType The element type
-     * @param classElement The class element
+     * @param classEl The class element
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
-    public static void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable ClassElement classElement,
+    public static void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable ClassElement classEl,
                                              Schema<?> parentSchema, Schema<?> propertySchema) {
         if (propertySchema == null) {
             return;
@@ -1728,16 +1729,36 @@ public final class SchemaDefinitionUtils {
             // check field annotations (@NonNull, @Nullable, etc.)
             boolean isNotNullable = isNotNullable(element);
             // check as mandatory in constructor
-            boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement, context);
+            boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classEl, context);
             boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
 
             if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
                 required = true;
             }
 
+            // check JsonInclude mode, if swagger schema required mode not set
+            if (elementSchemaRequired == null) {
+                var classJsonIncludeAnn = classEl != null ? getAnnotation(classEl, JsonInclude.class) : null;
+                JsonInclude.Include classIncludeMode = null;
+                if (classJsonIncludeAnn != null) {
+                    classIncludeMode = classJsonIncludeAnn.enumValue("value", JsonInclude.Include.class).orElse(null);
+                }
+                var propIncludeAnn = getAnnotation(element, JsonInclude.class);
+                JsonInclude.Include propIncludeMode = null;
+                if (propIncludeAnn != null) {
+                    propIncludeMode = propIncludeAnn.enumValue("value", JsonInclude.Include.class).orElse(null);
+                }
+
+                var finalIncludeMode = propIncludeMode != null ? propIncludeMode :
+                    classIncludeMode != null ? classIncludeMode : ConfigUtils.getJacksonIncludeMode(context);
+                if (finalIncludeMode == JsonInclude.Include.ALWAYS) {
+                    required = true;
+                }
+            }
+
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true);
-            String propertyName = resolvePropertyName(element, classElement, propertySchema);
-            propertyName = normalizePropertyName(propertyName, classElement, elementType);
+            String propertyName = resolvePropertyName(element, classEl, propertySchema);
+            propertyName = normalizePropertyName(propertyName, classEl, elementType);
             propertySchema.setRequired(null);
             Schema<?> propertySchemaFinal = propertySchema;
             addProperty(parentSchema, propertyName, propertySchema, required);
