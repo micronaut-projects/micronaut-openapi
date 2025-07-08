@@ -93,6 +93,7 @@ public class GeneratorMain {
                     .withUseEnumCaseInsensitive(true)
                     .withOptional(true)
                     .withReactive(true)
+                    .withGenerateControllerAsAbstract(true)
                     .withApiNamePrefix(apiPrefix)
                     .withApiNameSuffix(apiSuffix)
                     .withModelNamePrefix(modelPrefix)

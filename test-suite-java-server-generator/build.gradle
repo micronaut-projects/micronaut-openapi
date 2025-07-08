@@ -25,12 +25,14 @@ dependencies {
     implementation(mnReactor.micronaut.reactor)
 
     runtimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mn.snakeyaml)
 
     testCompileOnly(mn.micronaut.inject.groovy.test)
     testCompileOnly(mn.micronaut.inject.java.test)
 
     testImplementation(mnTest.micronaut.test.spock)
     testImplementation(mn.micronaut.http.client)
+    testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
@@ -70,4 +72,16 @@ tasks.named("generateOpenApi") {
             [headerName: "ignored-header"]
     ]
     nameMapping = [test: "changedTest"]
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs = [
+            '-parameters',
+            '-Xlint:unchecked',
+            '-Xlint:deprecation'
+    ]
+    options.fork = true
+    options.forkOptions.jvmArgs += "-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true"
+    options.forkOptions.jvmArgs += "-Dmicronaut.openapi.environments=local"
 }

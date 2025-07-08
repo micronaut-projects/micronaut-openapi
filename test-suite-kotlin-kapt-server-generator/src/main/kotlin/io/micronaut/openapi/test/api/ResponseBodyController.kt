@@ -14,6 +14,7 @@ import io.micronaut.openapi.test.model.DateModel
 import io.micronaut.openapi.test.model.ModelWithValidatedListProperty
 import io.micronaut.openapi.test.model.SimpleModel
 import io.micronaut.openapi.test.model.StateEnum
+import io.swagger.v3.oas.annotations.Hidden
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.time.LocalDate
@@ -21,6 +22,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+@Hidden
 @Controller
 open class ResponseBodyController : ResponseBodyApi {
 

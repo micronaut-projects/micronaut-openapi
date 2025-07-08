@@ -7,11 +7,13 @@ import io.micronaut.openapi.test.filter.MyFilter
 import io.micronaut.openapi.test.model.ColorEnum
 import io.micronaut.openapi.test.model.SendDatesResponse
 import io.micronaut.openapi.test.model.SendPrimitivesResponse
+import io.swagger.v3.oas.annotations.Hidden
 import reactor.core.publisher.Mono
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
+@Hidden
 @Controller
 open class ParametersController : ParametersApi {
 

@@ -13,8 +13,10 @@ import io.micronaut.openapi.test.model.ColorEnum;
 import io.micronaut.openapi.test.model.SendDatesResponse;
 import io.micronaut.openapi.test.model.SendPrimitivesResponse;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import reactor.core.publisher.Mono;
 
+@Hidden
 @Controller
 public class ParametersController implements ParametersApi {
 

@@ -13,6 +13,7 @@ import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
 import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.NestedModel;
 import io.micronaut.openapi.test.model.SimpleModel;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
+@Hidden
 @Controller
 public class RequestBodyController implements RequestBodyApi {
 
