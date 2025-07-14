@@ -1195,31 +1195,16 @@ public final class ConfigUtils {
         };
     }
 
-    public static JsonInclude.Include getInclude(VisitorContext context) {
+    public static boolean isIncludeAll(VisitorContext context) {
         var value = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_INCLUDE, context);
         if (value == null) {
-            return null;
+            return false;
         }
-        return toJacksonInclude(value.toUpperCase(Locale.ENGLISH), context);
-    }
-
-    private static JsonInclude.Include toJacksonInclude(String include, VisitorContext context) {
-        if (include == null) {
-            return null;
+        // ALWAYS is the only value that has any impact on API spec generation.
+        if (value.toUpperCase(Locale.ENGLISH).equals("ALWAYS")) {
+            return true;
         }
-        return switch (include.toUpperCase(Locale.ENGLISH)) {
-            case "ALWAYS" -> JsonInclude.Include.ALWAYS;
-            case "NON_NULL" -> JsonInclude.Include.NON_NULL;
-            case "NON_ABSENT" -> JsonInclude.Include.NON_ABSENT;
-            case "NON_EMPTY" -> JsonInclude.Include.NON_EMPTY;
-            case "NON_DEFAULT" -> JsonInclude.Include.NON_DEFAULT;
-            case "CUSTOM" -> JsonInclude.Include.CUSTOM;
-            case "USE_DEFAULTS" -> JsonInclude.Include.USE_DEFAULTS;
-            default -> {
-                warn("Unknown include value: " + include, context);
-                yield null;
-            }
-        };
+        return false;
     }
 
     public static String getConfigProperty(String key, VisitorContext context) {

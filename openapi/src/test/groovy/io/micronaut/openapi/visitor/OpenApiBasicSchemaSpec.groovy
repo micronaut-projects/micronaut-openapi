@@ -1882,6 +1882,10 @@ class Person {
     public void setAccessorProp(int value) {
     }
 
+    // Ensure that NOT_REQUIRED takes precedence over JsonInclude.Include.ALWAYS
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    public String notRequiredProp;
+
 }
 
 @jakarta.inject.Singleton
@@ -1898,16 +1902,17 @@ public class MyBean {}
         personSchema.type == "object"
 
         personSchema.properties
-        personSchema.properties.size() == 3
+        personSchema.properties.size() == 4
 
         personSchema.properties["fieldProp"]
         personSchema.properties["readOnlyProp"]
         personSchema.properties["accessorProp"]
+        personSchema.properties["notRequiredProp"]
 
         personSchema.properties["fieldProp"].type == "string"
         personSchema.properties["readOnlyProp"].type == "integer"
         personSchema.properties["accessorProp"].type == "integer"
-
+        personSchema.properties["notRequiredProp"].type == "string"
 
         personSchema.required.size() == 3
         personSchema.required.contains("fieldProp")

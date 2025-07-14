@@ -1699,6 +1699,7 @@ public final class SchemaDefinitionUtils {
             Boolean elementSchemaRequired = null;
             boolean isAutoRequiredMode = true;
             boolean isRequiredDefaultValueSet = false;
+            boolean isExplicitlyNotRequired = false;
             if (schemaAnn != null) {
                 elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
                 isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
@@ -1710,6 +1711,7 @@ public final class SchemaDefinitionUtils {
                 } else if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED) {
                     elementSchemaRequired = false;
                     isAutoRequiredMode = false;
+                    isExplicitlyNotRequired = true;
                 }
             }
 
@@ -1723,8 +1725,9 @@ public final class SchemaDefinitionUtils {
                 required = true;
             }
 
-            // If inclusion is ALWAYS, then all properties are required
-            if (!required && ConfigUtils.getInclude(context) == JsonInclude.Include.ALWAYS) {
+            // If inclusion is ALWAYS, then all properties are required, except if overridden
+            // via a NOT_REQUIRED annotation.
+            if (!required && !isExplicitlyNotRequired && ConfigUtils.isIncludeAll(context)) {
                 required = true;
             }
 
