@@ -29,8 +29,11 @@ import org.openapitools.codegen.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static io.micronaut.openapi.generator.Utils.addUserParameter;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
@@ -45,6 +48,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
     public static final String OPT_AOT = "aot";
+    public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -69,6 +73,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     protected boolean useAuth = true;
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
+    protected UserParameterMode userParameterMode = UserParameterMode.NONE;
 
     KotlinMicronautServerCodegen() {
 
@@ -95,6 +100,14 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
+        var userModeOption = new CliOption(OPT_USER_PARAMETER_MODE, "Add or not principal / authentication parameter to controller methods").defaultValue(userParameterMode.name());
+        var userModeOptionsMap = new HashMap<String, String>();
+        userModeOptionsMap.put(UserParameterMode.NONE.name(), "Don't add principal / authentication parameter to controller methods");
+        userModeOptionsMap.put(UserParameterMode.PRINCIPAL.name(), "Add java.security.Principal principal parameter to each controller method");
+        userModeOptionsMap.put(UserParameterMode.AUTHENTICATION.name(), "Add io.micronaut.security.authentication.Authentication authentication parameter to each controller method");
+        userModeOption.setEnum(userModeOptionsMap);
+        cliOptions.add(userModeOption);
+
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
 
@@ -106,6 +119,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
         typeMapping.put("responseFile", "FileCustomizableResponseType");
         importMapping.put("FileCustomizableResponseType", "io.micronaut.http.server.types.files.FileCustomizableResponseType");
+
+        importMapping.put(UserParameterMode.PRINCIPAL.getClassName(), UserParameterMode.PRINCIPAL.getClassFullName());
+        importMapping.put(UserParameterMode.AUTHENTICATION.getClassName(), UserParameterMode.AUTHENTICATION.getClassFullName());
 
         // Add all the supporting files
         supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourcesFolder, "application.yml").doNotOverwrite());
@@ -125,34 +141,6 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     @Override
     public String getHelp() {
         return "Generates a Kotlin Micronaut Server.";
-    }
-
-    public void setControllerPackage(String controllerPackage) {
-        this.controllerPackage = controllerPackage;
-    }
-
-    public void setGenerateImplementationFiles(boolean generateImplementationFiles) {
-        this.generateImplementationFiles = generateImplementationFiles;
-    }
-
-    public void setGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
-        this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
-    }
-
-    public void setGenerateControllerFromExamples(boolean generateControllerFromExamples) {
-        this.generateControllerFromExamples = generateControllerFromExamples;
-    }
-
-    public void setUseAuth(boolean useAuth) {
-        this.useAuth = useAuth;
-    }
-
-    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
-        this.generateStreamingFileUpload = generateStreamingFileUpload;
-    }
-
-    public void setAot(boolean aot) {
-        this.aot = aot;
     }
 
     @Override
@@ -200,6 +188,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             generateStreamingFileUpload = convertPropertyToBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD);
         }
         writePropertyBack(OPT_GENERATE_STREAMING_FILE_UPLOAD, generateStreamingFileUpload);
+
+        if (additionalProperties.containsKey(OPT_USER_PARAMETER_MODE)) {
+            var userModeOpt = (String) additionalProperties.get(OPT_USER_PARAMETER_MODE);
+            setUserParameterMode(userModeOpt);
+        }
+        writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
 
         // Api file
         apiTemplateFiles.clear();
@@ -271,7 +265,6 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
     @Override
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
-        objs = super.postProcessOperationsWithModels(objs, allModels);
 
         // Add the controller classname to operations
         OperationMap operations = objs.getOperations();
@@ -279,11 +272,18 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         objs.put("controllerClassname", controllerClassname);
 
         var allOperations = (List<CodegenOperation>) operations.get("operation");
-        if (useAuth) {
-            for (CodegenOperation operation : allOperations) {
-                if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
 
-                    var roles = new ArrayList<String>();
+        if (useAuth) {
+
+            var alreadyAddedPrincipalImport = false;
+            String importClassFullName = userParameterMode.getClassFullName();
+            String importClassName = userParameterMode.getClassName();
+
+            for (CodegenOperation operation : allOperations) {
+
+                List<String> roles = new ArrayList<>();
+
+                if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
                     var authMethods = operation.authMethods;
                     if (authMethods != null && !authMethods.isEmpty()) {
                         var scopes = authMethods.get(0).scopes;
@@ -297,20 +297,33 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                     } else {
                         roles.add(ANONYMOUS_ROLE);
                     }
-
-                    operation.vendorExtensions.put(EXTENSION_ROLES, roles);
                 } else {
-                    var roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
-                    roles = roles.stream().map(role -> switch (role) {
-                        case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
-                        case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
-                        case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
-                        default -> "\"" + escapeText(role) + "\"";
-                    }).toList();
-                    operation.vendorExtensions.put(EXTENSION_ROLES, roles);
+                    roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
+                    roles = roles.stream()
+                        .map(role -> switch (role) {
+                            case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
+                            case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
+                            case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
+                            default -> "\"" + escapeText(role) + "\"";
+                        }).toList();
+                }
+
+                operation.vendorExtensions.put(EXTENSION_ROLES, roles);
+
+                if (userParameterMode != UserParameterMode.NONE) {
+                    var isAnonymous = roles.contains(ANONYMOUS_ROLE);
+                    var isDenyAll = roles.contains(DENY_ALL_ROLE);
+                    addUserParameter(operation, userParameterMode, isAnonymous, isDenyAll);
+
+                    if (importClassFullName != null && !alreadyAddedPrincipalImport) {
+                        objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
+                        alreadyAddedPrincipalImport = true;
+                    }
                 }
             }
         }
+
+        objs = super.postProcessOperationsWithModels(objs, allModels);
 
         var enumParams = (List<String>) additionalProperties.get("enumParams");
         if (generateEnumConverters && !enumParams.isEmpty()) {
@@ -329,6 +342,50 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         return new DefaultServerOptionsBuilder();
     }
 
+    public void setControllerPackage(String controllerPackage) {
+        this.controllerPackage = controllerPackage;
+    }
+
+    public void setGenerateImplementationFiles(boolean generateImplementationFiles) {
+        this.generateImplementationFiles = generateImplementationFiles;
+    }
+
+    public void setGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
+        this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
+    }
+
+    public void setGenerateControllerFromExamples(boolean generateControllerFromExamples) {
+        this.generateControllerFromExamples = generateControllerFromExamples;
+    }
+
+    public void setUseAuth(boolean useAuth) {
+        this.useAuth = useAuth;
+    }
+
+    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+        this.generateStreamingFileUpload = generateStreamingFileUpload;
+    }
+
+    public void setAot(boolean aot) {
+        this.aot = aot;
+    }
+
+    public void setUserParameterMode(String userParameterMode) {
+        if (userParameterMode == null) {
+            this.userParameterMode = null;
+            return;
+        }
+        try {
+            this.userParameterMode = UserParameterMode.valueOf(userParameterMode.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            var sb = new StringBuilder(userParameterMode + " is an invalid enum property naming option. Please choose from:");
+            for (var availableOpt : UserParameterMode.values()) {
+                sb.append("\n  ").append(availableOpt.name());
+            }
+            throw new RuntimeException(sb.toString());
+        }
+    }
+
     static class DefaultServerOptionsBuilder implements KotlinMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -337,6 +394,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean plural = true;
         private boolean useAuth = true;
+        private String userParameterMode = UserParameterMode.NONE.name();
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
@@ -374,6 +432,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         @Override
         public KotlinMicronautServerOptionsBuilder withAuthentication(boolean useAuth) {
             this.useAuth = useAuth;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode) {
+            this.userParameterMode = userParameterMode;
             return this;
         }
 
@@ -444,6 +508,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generateOperationsToReturnNotImplemented,
                 generateControllerFromExamples,
                 useAuth,
+                userParameterMode,
                 plural,
                 fluxForArrays,
                 generatedAnnotation,
@@ -464,6 +529,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth,
+        String userParameterMode,
         boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,

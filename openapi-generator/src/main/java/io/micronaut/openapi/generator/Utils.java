@@ -643,4 +643,28 @@ public final class Utils {
             enumImports.add(modelPackage + "." + param.dataType);
         }
     }
+
+    public static boolean addUserParameter(CodegenOperation op, UserParameterMode userParameterMode, boolean isAnonymous, boolean isDenyAll) {
+
+        if (userParameterMode == UserParameterMode.NONE || isDenyAll) {
+            return false;
+        }
+
+        CodegenParameter userParam = CodegenModelFactory.newInstance(CodegenModelType.PARAMETER);
+        userParam.paramName = userParameterMode.getParamName();
+        userParam.description = userParameterMode.getParamDescription();
+        userParam.dataType = userParameterMode.getClassName();
+        userParam.unescapedDescription = userParam.description;
+        userParam.required = true;
+        if (!isAnonymous) {
+            userParam.vendorExtensions.put("withoutNullable", true);
+        } else {
+            userParam.isNullable = true;
+            userParam.vendorExtensions.put("defaultValueInit", NULL_STRING);
+        }
+
+        op.allParams.add(userParam);
+
+        return true;
+    }
 }

@@ -1269,4 +1269,118 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testUserParameterModeNone() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+
+        assertFileNotContains(path + "DefaultApi.kt",
+            "import java.security.Principal",
+            "import io.micronaut.security.authentication.Authentication"
+        );
+
+        assertFileContains(path + "DefaultApi.kt", """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    fun denyAllOp(): Mono<Void>
+                """,
+            """
+                    @Get("/pet")
+                    @Secured("read", "admin")
+                    fun get(): Mono<Void>
+                """,
+            """
+                    @Post("/pet")
+                    @Secured("write", "admin")
+                    fun save(): Mono<Void>
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun savePublic(): Mono<Void>
+                """
+        );
+    }
+
+    @Test
+    void testUserParameterModePrincipal() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.PRINCIPAL.name());
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            "import java.security.Principal",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    fun denyAllOp(): Mono<Void>
+                """,
+            """
+                    @Get("/pet")
+                    @Secured("read", "admin")
+                    fun get(
+                        principal: Principal,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet")
+                    @Secured("write", "admin")
+                    fun save(
+                        principal: Principal,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun savePublic(
+                        @Nullable principal: Principal? = null,
+                    ): Mono<Void>
+                """
+        );
+    }
+
+    @Test
+    void testUserParameterModeAuthentication() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.AUTHENTICATION.name());
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            "import io.micronaut.security.authentication.Authentication",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    fun denyAllOp(): Mono<Void>
+                """,
+            """
+                    @Get("/pet")
+                    @Secured("read", "admin")
+                    fun get(
+                        authentication: Authentication,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet")
+                    @Secured("write", "admin")
+                    fun save(
+                        authentication: Authentication,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun savePublic(
+                        @Nullable authentication: Authentication? = null,
+                    ): Mono<Void>
+                """
+        );
+    }
 }

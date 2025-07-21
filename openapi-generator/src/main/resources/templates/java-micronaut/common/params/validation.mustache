@@ -1,11 +1,12 @@
 {{^vendorExtensions.isPrimitiveArray}}
+{{^vendorExtensions.withoutNullable}}
 {{#isNullable}}
-    {{#generateHardNullable}}
+        {{#generateHardNullable}}
     @Nullable(inherited = true)
-    {{/generateHardNullable}}
-    {{^generateHardNullable}}
+        {{/generateHardNullable}}
+        {{^generateHardNullable}}
     @Nullable
-    {{/generateHardNullable}}
+        {{/generateHardNullable}}
 {{/isNullable}}
 {{^isNullable}}
     {{#required}}
@@ -32,6 +33,7 @@
         {{/generateHardNullable}}
     {{/required}}
 {{/isNullable}}
+{{/vendorExtensions.withoutNullable}}
 {{/vendorExtensions.isPrimitiveArray}}
 {{!All the validation}}
 {{#useBeanValidation}}
@@ -39,7 +41,9 @@
     {{^isNullable}}
         {{#required}}
             {{^isReadOnly}}
+                {{^vendorExtensions.withoutNullable}}
     @NotNull{{#vendorExtensions.x-not-null-message}}(message = "{{{.}}}"){{/vendorExtensions.x-not-null-message}}
+                {{/vendorExtensions.withoutNullable}}
             {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}

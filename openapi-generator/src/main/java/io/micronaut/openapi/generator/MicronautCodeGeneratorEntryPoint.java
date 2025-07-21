@@ -356,6 +356,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaServerCodegen.setGenerateOperationsToReturnNotImplemented(javaServerOptions.generateOperationsToReturnNotImplemented());
             javaServerCodegen.setGenerateControllerFromExamples(javaServerOptions.generateControllerFromExamples());
             javaServerCodegen.setUseAuth(javaServerOptions.useAuth());
+            javaServerCodegen.setUserParameterMode(javaServerOptions.userParameterMode());
             javaServerCodegen.setLombok(javaServerOptions.lombok());
             javaServerCodegen.setPlural(javaServerOptions.plural());
             javaServerCodegen.setFluxForArrays(javaServerOptions.fluxForArrays());
@@ -416,6 +417,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setKsp(kotlinServerOptions.ksp());
             kotlinServerCodegen.setCoroutines(kotlinServerOptions.coroutines());
             kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
+            kotlinServerCodegen.setUserParameterMode(kotlinServerOptions.userParameterMode());
             kotlinServerCodegen.setPlural(kotlinServerOptions.plural());
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
             kotlinServerCodegen.setGenerateStreamingFileUpload(kotlinServerOptions.generateStreamingFileUpload());

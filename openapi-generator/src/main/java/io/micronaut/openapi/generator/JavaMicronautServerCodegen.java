@@ -29,8 +29,11 @@ import org.openapitools.codegen.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static io.micronaut.openapi.generator.Utils.addUserParameter;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
@@ -46,6 +49,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_GENERATE_HARD_NULLABLE = "generateHardNullable";
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
     public static final String OPT_AOT = "aot";
+    public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -71,6 +75,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean generateHardNullable = true;
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
+    protected UserParameterMode userParameterMode = UserParameterMode.NONE;
 
     JavaMicronautServerCodegen() {
 
@@ -98,6 +103,14 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
+        var userModeOption = new CliOption(OPT_USER_PARAMETER_MODE, "Add or not principal / authentication parameter to controller methods").defaultValue(userParameterMode.name());
+        var userModeOptionsMap = new HashMap<String, String>();
+        userModeOptionsMap.put(UserParameterMode.NONE.name(), "Don't add principal / authentication parameter to controller methods");
+        userModeOptionsMap.put(UserParameterMode.PRINCIPAL.name(), "Add java.security.Principal principal parameter to each controller method");
+        userModeOptionsMap.put(UserParameterMode.AUTHENTICATION.name(), "Add io.micronaut.security.authentication.Authentication authentication parameter to each controller method");
+        userModeOption.setEnum(userModeOptionsMap);
+        cliOptions.add(userModeOption);
+
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
 
@@ -110,6 +123,9 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         typeMapping.put("responseFile", "FileCustomizableResponseType");
         importMapping.put("FileCustomizableResponseType", "io.micronaut.http.server.types.files.FileCustomizableResponseType");
 
+        importMapping.put(UserParameterMode.PRINCIPAL.getClassName(), UserParameterMode.PRINCIPAL.getClassFullName());
+        importMapping.put(UserParameterMode.AUTHENTICATION.getClassName(), UserParameterMode.AUTHENTICATION.getClassFullName());
+
         // Add all the supporting files
         String resourceFolder = projectFolder + "/resources";
         supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourceFolder, "application.yml").doNotOverwrite());
@@ -119,48 +135,6 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     @Override
     public CodegenType getTag() {
         return CodegenType.SERVER;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public String getHelp() {
-        return "Generates a Java Micronaut Server.";
-    }
-
-    public void setControllerPackage(String controllerPackage) {
-        this.controllerPackage = controllerPackage;
-    }
-
-    public void setGenerateImplementationFiles(boolean generateImplementationFiles) {
-        this.generateImplementationFiles = generateImplementationFiles;
-    }
-
-    public void setGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
-        this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
-    }
-
-    public void setGenerateControllerFromExamples(boolean generateControllerFromExamples) {
-        this.generateControllerFromExamples = generateControllerFromExamples;
-    }
-
-    public void setUseAuth(boolean useAuth) {
-        this.useAuth = useAuth;
-    }
-
-    public void setAot(boolean aot) {
-        this.aot = aot;
-    }
-
-    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
-        this.generateStreamingFileUpload = generateStreamingFileUpload;
-    }
-
-    public void setGenerateHardNullable(boolean generateHardNullable) {
-        this.generateHardNullable = generateHardNullable;
     }
 
     @Override
@@ -213,6 +187,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
             generateStreamingFileUpload = convertPropertyToBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD);
         }
         writePropertyBack(OPT_GENERATE_STREAMING_FILE_UPLOAD, generateStreamingFileUpload);
+
+        if (additionalProperties.containsKey(OPT_USER_PARAMETER_MODE)) {
+            var userModeOpt = (String) additionalProperties.get(OPT_USER_PARAMETER_MODE);
+            setUserParameterMode(userModeOpt);
+        }
+        writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
 
         // Api file
         apiTemplateFiles.clear();
@@ -291,19 +271,24 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
     @Override
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
-        objs = super.postProcessOperationsWithModels(objs, allModels);
 
         // Add the controller classname to operations
         OperationMap operations = objs.getOperations();
         String controllerClassname = StringUtils.camelize(CONTROLLER_PREFIX + "_" + operations.getPathPrefix() + "_" + CONTROLLER_SUFFIX);
         objs.put("controllerClassname", controllerClassname);
-
         var allOperations = (List<CodegenOperation>) operations.get("operation");
-        if (useAuth) {
-            for (CodegenOperation operation : allOperations) {
-                if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
 
-                    var roles = new ArrayList<String>();
+        if (useAuth) {
+
+            var alreadyAddedPrincipalImport = false;
+            String importClassFullName = userParameterMode.getClassFullName();
+            String importClassName = userParameterMode.getClassName();
+
+            for (CodegenOperation operation : allOperations) {
+
+                List<String> roles = new ArrayList<>();
+
+                if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
                     var authMethods = operation.authMethods;
                     if (authMethods != null && !authMethods.isEmpty()) {
                         var scopes = authMethods.get(0).scopes;
@@ -317,20 +302,33 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                     } else {
                         roles.add(ANONYMOUS_ROLE);
                     }
-
-                    operation.vendorExtensions.put(EXTENSION_ROLES, roles);
                 } else {
-                    var roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
-                    roles = roles.stream().map(role -> switch (role) {
-                        case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
-                        case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
-                        case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
-                        default -> "\"" + escapeText(role) + "\"";
-                    }).toList();
-                    operation.vendorExtensions.put(EXTENSION_ROLES, roles);
+                    roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
+                    roles = roles.stream()
+                        .map(role -> switch (role) {
+                            case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
+                            case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
+                            case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
+                            default -> "\"" + escapeText(role) + "\"";
+                        }).toList();
+                }
+
+                operation.vendorExtensions.put(EXTENSION_ROLES, roles);
+
+                if (userParameterMode != UserParameterMode.NONE) {
+                    var isAnonymous = roles.contains(ANONYMOUS_ROLE);
+                    var isDenyAll = roles.contains(DENY_ALL_ROLE);
+                    addUserParameter(operation, userParameterMode, isAnonymous, isDenyAll);
+
+                    if (importClassFullName != null && !alreadyAddedPrincipalImport) {
+                        objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
+                        alreadyAddedPrincipalImport = true;
+                    }
                 }
             }
         }
+
+        objs = super.postProcessOperationsWithModels(objs, allModels);
 
         var enumParams = (List<String>) additionalProperties.get("enumParams");
         if (generateEnumConverters && !enumParams.isEmpty()) {
@@ -349,6 +347,64 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         return new DefaultServerOptionsBuilder();
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getHelp() {
+        return "Generates a Java Micronaut Server.";
+    }
+
+    public void setControllerPackage(String controllerPackage) {
+        this.controllerPackage = controllerPackage;
+    }
+
+    public void setGenerateImplementationFiles(boolean generateImplementationFiles) {
+        this.generateImplementationFiles = generateImplementationFiles;
+    }
+
+    public void setGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
+        this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
+    }
+
+    public void setGenerateControllerFromExamples(boolean generateControllerFromExamples) {
+        this.generateControllerFromExamples = generateControllerFromExamples;
+    }
+
+    public void setUseAuth(boolean useAuth) {
+        this.useAuth = useAuth;
+    }
+
+    public void setAot(boolean aot) {
+        this.aot = aot;
+    }
+
+    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+        this.generateStreamingFileUpload = generateStreamingFileUpload;
+    }
+
+    public void setGenerateHardNullable(boolean generateHardNullable) {
+        this.generateHardNullable = generateHardNullable;
+    }
+
+    public void setUserParameterMode(String userParameterMode) {
+        if (userParameterMode == null) {
+            this.userParameterMode = UserParameterMode.NONE;
+            return;
+        }
+        try {
+            this.userParameterMode = UserParameterMode.valueOf(userParameterMode.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            var sb = new StringBuilder(userParameterMode + " is an invalid enum property naming option. Please choose from:");
+            for (var availableOpt : UserParameterMode.values()) {
+                sb.append("\n  ").append(availableOpt.name());
+            }
+            throw new RuntimeException(sb.toString());
+        }
+    }
+
     static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -356,6 +412,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean generateControllerFromExamples;
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
+        private String userParameterMode = UserParameterMode.NONE.name();
         private boolean lombok;
         private boolean plural = true;
         private boolean fluxForArrays;
@@ -398,6 +455,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         @Override
         public JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth) {
             this.useAuth = useAuth;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode) {
+            this.userParameterMode = userParameterMode;
             return this;
         }
 
@@ -450,6 +513,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 generateOperationsToReturnNotImplemented,
                 generateControllerFromExamples,
                 useAuth,
+                userParameterMode,
                 lombok,
                 plural,
                 fluxForArrays,
@@ -468,6 +532,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth,
+        String userParameterMode,
         boolean lombok,
         boolean plural,
         boolean fluxForArrays,

@@ -19,6 +19,22 @@ paths:
       responses:
         200:
           description: Successfully retrieved information
+  /pet-public:
+    post:
+      operationId: save-public
+      security: []
+      responses:
+        200:
+          description: Successfully saved
+  /deny-all-endpoint:
+    post:
+      operationId: denyAllOp
+      x-roles:
+        - denyAll()
+      security: []
+      responses:
+        200:
+          description: Successfully saved
 components:
   securitySchemes:
     OAuth2:

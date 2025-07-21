@@ -1032,4 +1032,118 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testUserParameterModeNone() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileNotContains(path + "DefaultApi.java",
+            "import java.security.Principal;",
+            "import io.micronaut.security.authentication.Authentication;"
+        );
+
+        assertFileContains(path + "DefaultApi.java", """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    Mono<Void> denyAllOp();
+                """,
+            """
+                    @Get("/pet")
+                    @Secured({"read", "admin"})
+                    Mono<Void> get();
+                """,
+            """
+                    @Post("/pet")
+                    @Secured({"write", "admin"})
+                    Mono<Void> save();
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<Void> savePublic();
+                """
+        );
+    }
+
+    @Test
+    void testUserParameterModePrincipal() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.PRINCIPAL.name());
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.java",
+            "import java.security.Principal;",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    Mono<Void> denyAllOp();
+                """,
+            """
+                    @Get("/pet")
+                    @Secured({"read", "admin"})
+                    Mono<Void> get(
+                        Principal principal
+                    );
+                """,
+            """
+                    @Post("/pet")
+                    @Secured({"write", "admin"})
+                    Mono<Void> save(
+                        Principal principal
+                    );
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<Void> savePublic(
+                        @Nullable(inherited = true) Principal principal
+                    );
+                """
+        );
+    }
+
+    @Test
+    void testUserParameterModeAuthentication() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.AUTHENTICATION.name());
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml");
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.java",
+            "import io.micronaut.security.authentication.Authentication;",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    Mono<Void> denyAllOp();
+                """,
+            """
+                    @Get("/pet")
+                    @Secured({"read", "admin"})
+                    Mono<Void> get(
+                        Authentication authentication
+                    );
+                """,
+            """
+                    @Post("/pet")
+                    @Secured({"write", "admin"})
+                    Mono<Void> save(
+                        Authentication authentication
+                    );
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<Void> savePublic(
+                        @Nullable(inherited = true) Authentication authentication
+                    );
+                """
+        );
+    }
 }
