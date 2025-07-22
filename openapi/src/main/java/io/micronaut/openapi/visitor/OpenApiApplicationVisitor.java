@@ -853,13 +853,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         var removed = false;
 
         try {
-            String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
             // Create a copy of the keySet so that we can modify the map while in a foreach
             var keySet = new HashSet<>(schemas.keySet());
             for (String schemaName : keySet) {
-                if (!openApiJson.contains(QUOTE + COMPONENTS_SCHEMAS_REF + schemaName + QUOTE)
-                    && !extraSchemas.containsKey(schemaName)
-                ) {
+                if (extraSchemas.containsKey(schemaName)) {
+                    continue;
+                }
+                // Create a copy of schemas map without processing schema
+                var schemasCopy = new HashMap<>(schemas);
+                schemasCopy.remove(schemaName);
+                // replace original schemas map to schemas map without processing schema
+                openApi.getComponents().setSchemas(schemasCopy);
+                String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
+                if (!openApiJson.contains(QUOTE + COMPONENTS_SCHEMAS_REF + schemaName + QUOTE)) {
                     schemas.remove(schemaName);
                     removed = true;
                 }
@@ -868,6 +874,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             for (String schemaName : OpenApiExtraSchemaVisitor.getExcludedExtraSchemas()) {
                 schemas.remove(schemaName);
             }
+            openApi.getComponents().setSchemas(schemas);
         } catch (JsonProcessingException e) {
             // do nothing
         }
