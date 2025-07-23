@@ -26,9 +26,8 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * With this annotation, you can specify one or more groups that this endpoint will be included in,
- * as well as specify groups from which this endpoint should be excluded. Also, you can set
- * specific endpoint extensions for each group
+ * With this annotation, you can specify extra schemas (unused in endpoints or other schemas) to final specification file.
+ * By default, all unused schemas will be removed from the final OpenAPI specification file.
  *
  * @since 6.12.0
  */
