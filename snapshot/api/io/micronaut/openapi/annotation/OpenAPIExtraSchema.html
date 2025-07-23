@@ -72,9 +72,8 @@ loadScripts(document, 'script');</script>
 <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/annotation/Documented.html" title="class or interface in java.lang.annotation" class="external-link">@Documented</a>
 <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/annotation/Target.html" title="class or interface in java.lang.annotation" class="external-link">@Target</a>({<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/annotation/ElementType.html#PACKAGE" title="class or interface in java.lang.annotation" class="external-link">PACKAGE</a>,<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/annotation/ElementType.html#TYPE" title="class or interface in java.lang.annotation" class="external-link">TYPE</a>})
 </span><span class="modifiers">public @interface </span><span class="element-name type-name-label">OpenAPIExtraSchema</span></div>
-<div class="block">With this annotation, you can specify one or more groups that this endpoint will be included in,
- as well as specify groups from which this endpoint should be excluded. Also, you can set
- specific endpoint extensions for each group</div>
+<div class="block">With this annotation, you can specify extra schemas (unused in endpoints or other schemas) to final specification file.
+ By default, all unused schemas will be removed from the final OpenAPI specification file.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>6.12.0</dd>
