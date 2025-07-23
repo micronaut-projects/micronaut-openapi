@@ -517,4 +517,88 @@ components:
         openApi.components.schemas.size() == 1
         openApi.components.schemas.VisibleResponse
     }
+
+    void "test group schemas with unused schema with recursion"() {
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIExtraSchema;import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Collections;
+import java.util.List;
+
+@Schema(name = "SomeDto")
+class SomeDto {
+
+    public List<SomeDto> children = Collections.emptyList();
+    
+    public SomeDto() {
+    }
+
+    public SomeDto(List<SomeDto> children) {
+        this.children = children;
+    }
+}
+
+@Schema(name = "StringDto")
+class StringDto {
+
+    public String value;
+    
+    public StringDto(String value) {
+        this.value = value;
+    }
+}
+
+@Controller
+@OpenAPIGroup("demogroup")
+class DemoController {
+
+    @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    StringDto index() {
+        return new StringDto("Hello World");
+    }
+}
+
+@Controller
+@OpenAPIGroup("somegroup")
+class SomeController {
+
+    @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    SomeDto index() {
+        return new SomeDto(List.of(new SomeDto(), new SomeDto()));
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        then:
+        def openApis = Utils.testReferences
+        openApis
+        openApis.size() == 2
+
+        def demoGroup = openApis.get(Pair.of("demogroup", null)).getOpenApi()
+        def someGroup = openApis.get(Pair.of("somegroup", null)).getOpenApi()
+
+        demoGroup.paths.'/'.get.responses.'200'.content.'text/plain'.schema.$ref == '#/components/schemas/StringDto'
+        demoGroup.components.schemas.StringDto
+        demoGroup.components.schemas.StringDto.type == "object"
+        !demoGroup.components.schemas.SomeDto
+
+        someGroup.paths.'/'.get.responses.'200'.content.'text/plain'.schema.$ref == '#/components/schemas/SomeDto'
+        someGroup.components.schemas.SomeDto
+        someGroup.components.schemas.SomeDto.type == "object"
+        !someGroup.components.schemas.StringDto
+    }
 }
