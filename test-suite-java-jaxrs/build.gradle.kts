@@ -14,4 +14,6 @@ dependencies {
     testImplementation(mnSerde.micronaut.serde.jackson)
     testImplementation(mn.micronaut.http.client)
     testImplementation(mn.snakeyaml)
+
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }

@@ -12,7 +12,7 @@ jspecify = "1.0.0"
 jdt-annotation = "2.3.100"
 android-annotation = "1.9.1"
 spotbugs-annotations = "4.9.3"
-openapi-generator = "7.13.0"
+openapi-generator = "7.14.0"
 swagger-parser = "1.0.75"
 swagger-parser-v3 = "2.1.31"
 javaparser = "3.27.0"
@@ -23,10 +23,9 @@ commons-text = "1.13.1"
 guava = "33.4.8-jre"
 commonmark = "0.25.0"
 kotlin-compile-testing = "1.6.0"
-kotlin-compiler = "1.9.25"
 
 micronaut = "4.9.8"
-micronaut-platform = "4.8.3"
+micronaut-platform = "4.9.1"
 micronaut-jaxrs = "4.9.2"
 micronaut-security = "4.13.0"
 micronaut-serde = "2.15.0"
@@ -111,4 +110,3 @@ swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
 sonatype-scan = { module = "org.sonatype.gradle.plugins:scan-gradle-plugin", version.ref = "sonatype-scan" }
 kotlin-compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlin-compile-testing" }
-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin-compiler" }

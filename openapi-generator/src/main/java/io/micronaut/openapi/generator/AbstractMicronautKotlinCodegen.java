@@ -1291,7 +1291,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 operation.allParams.add(p);
             }
         }
-        operation.hasParams = !operation.allParams.isEmpty();
     }
 
     private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
