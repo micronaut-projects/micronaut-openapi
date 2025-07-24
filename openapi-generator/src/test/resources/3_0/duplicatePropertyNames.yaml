@@ -1,0 +1,12 @@
+openapi: 3.1.1
+components:
+  schemas:
+    ModelWithDuplicateProperties:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name
+        _name:
+          type: string
+          description: A very similar but name from older version

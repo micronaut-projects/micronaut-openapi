@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import {{javaxPackage}}.inject.Inject;
+import {{javaxPackage}}.validation.Valid;
+import {{javaxPackage}}.validation.constraints.*;
 {{#reactive}}
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
@@ -33,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * API tests for {{classname}}
@@ -70,7 +74,7 @@ class {{classname}}Test {
     void {{operationId}}MethodTest() {
         // given
         {{#allParams}}
-        {{{vendorExtensions.baseType}}} {{paramName}} = {{{example}}};
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{#isFile}}null{{/isFile}}{{^isFile}}{{{example}}}{{/isFile}};
         {{/allParams}}
 
         // when
@@ -78,12 +82,12 @@ class {{classname}}Test {
 
         // then
         {{^generateControllerFromExamples}}
-        Assertions.assertTrue(true);
+        assertTrue(true);
         {{/generateControllerFromExamples}}
         {{#generateControllerFromExamples}}
             {{#returnType}}
                 {{#vendorExtensions.example}}
-        Assertions.assertEquals(result, {{{vendorExtensions.example}}});
+        assertEquals(result, {{{vendorExtensions.example}}});
                 {{/vendorExtensions.example}}
             {{/returnType}}
         {{/generateControllerFromExamples}}
@@ -103,7 +107,7 @@ class {{classname}}Test {
         // given
         {{!Create the body}}
         {{#bodyParam}}
-        {{{vendorExtensions.baseType}}} body = {{{example}}};
+        var body = {{{example}}};
         {{/bodyParam}}
         {{#formParams.0}}
         var form = new HashMap<String, Object>();
@@ -119,7 +123,7 @@ class {{classname}}Test {
         {{/formParams.0}}
         {{#isMultipart}}
             {{^formParams}}
-        MultipartBody body = MultipartBody.builder() // Create multipart body
+        var body = MultipartBody.builder() // Create multipart body
                 {{#bodyParams}}
                     {{^isFile}}
             .addPart("{{{baseName}}}", {{^isString}}String.valueOf({{/isString}}{{{example}}}{{^isString}}){{/isString}})
@@ -144,9 +148,9 @@ class {{classname}}Test {
         {{/pathParams}}
         {{closebrace}}{{closebrace}}{{/pathParams.0}});
         {{!Create the request with body and uri}}
-        MutableHttpRequest<?> request = HttpRequest.{{httpMethod}}{{#vendorExtensions.methodAllowsBody}}{{#bodyParam}}(uri, body){{/bodyParam}}{{#isMultipart}}{{^formParams}}(uri, body){{/formParams}}{{/isMultipart}}{{#formParams.0}}(uri, form){{/formParams.0}}{{^bodyParam}}{{^isMultipart}}{{^formParams}}(uri, null){{/formParams}}{{/isMultipart}}{{/bodyParam}}{{/vendorExtensions.methodAllowsBody}}{{^vendorExtensions.methodAllowsBody}}(uri){{/vendorExtensions.methodAllowsBody}}{{!Fill in all the request parameters}}{{#vendorExtensions.x-contentType}}
+        var request = HttpRequest.{{httpMethod}}{{#vendorExtensions.methodAllowsBody}}{{#bodyParam}}(uri, body){{/bodyParam}}{{#isMultipart}}{{^formParams}}(uri, body){{/formParams}}{{/isMultipart}}{{#formParams.0}}(uri, form){{/formParams.0}}{{^bodyParam}}{{^isMultipart}}{{^formParams}}(uri, null){{/formParams}}{{/isMultipart}}{{/bodyParam}}{{/vendorExtensions.methodAllowsBody}}{{^vendorExtensions.methodAllowsBody}}(uri){{/vendorExtensions.methodAllowsBody}}{{!Fill in all the request parameters}}{{#vendorExtensions.x-contentType}}
             .contentType("{{vendorExtensions.x-contentType}}"){{/vendorExtensions.x-contentType}}{{#vendorExtensions.x-accepts}}
-            .accept("{{vendorExtensions.x-accepts}}"){{/vendorExtensions.x-accepts}}{{#headerParams}}
+            .accept("{{{.}}}"){{/vendorExtensions.x-accepts}}{{#headerParams}}
             .header("{{{baseName}}}", {{^isString}}String.valueOf({{/isString}}{{{example}}}{{^isString}}){{/isString}}){{/headerParams}}{{#cookieParams}}
             .cookie(Cookie.of("{{{baseName}}}", {{{example}}})){{/cookieParams}};
         {{!Fill in the query parameters}}
@@ -171,10 +175,10 @@ class {{classname}}Test {
         HttpResponse<?> response = client.toBlocking().exchange(request{{#returnType}}, {{#returnContainer}}new GenericArgument<{{#isArray}}List{{/isArray}}{{#isMap}}Map<String, {{/isMap}}{{{returnType}}}{{#isMap}}>{{/isMap}}>() { }{{/returnContainer}}{{^returnContainer}}{{{returnType}}}.class{{/returnContainer}}{{/returnType}});{{^returnType}} // To retrieve body you must specify required type (e.g. Map.class) as second argument {{/returnType}}
 
         // then
-        Assertions.assertEquals(HttpStatus.OK, response.status());
+        assertEquals(HttpStatus.OK, response.status());
         {{#generateControllerFromExamples}}
             {{#returnType}}
-        Assertions.assertEquals(response.body(), {{{vendorExtensions.example}}});
+        assertEquals(response.body(), {{{vendorExtensions.example}}});
             {{/returnType}}
         {{/generateControllerFromExamples}}
     }

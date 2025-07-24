@@ -234,6 +234,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
+import static io.micronaut.openapi.visitor.SchemaUtils.isArraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
@@ -975,7 +976,7 @@ public final class SchemaDefinitionUtils {
                             var componentSchema = getSchemaDefinition(openApi, context, realClassEl, componentType.getTypeArguments(), type, mediaTypes, null);
                             processSchemaAnn(componentSchema, context, definingElement, type, componentSchemaAnn);
                             schema = resolveSchema(openApi, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
-                            if (componentSchema != null && TYPE_ARRAY.equals(schema.getType()) && !TYPE_ARRAY.equals(componentSchema.getType())) {
+                            if (componentSchema != null && isArraySchema(schema, openApi) && !isArraySchema(componentSchema, openApi)) {
                                 schema.items(componentSchema);
                             }
                         } else {
@@ -3269,7 +3270,7 @@ public final class SchemaDefinitionUtils {
         return name;
     }
 
-    private static void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
+    private static void handleUnwrapped(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         var elType = customElementType != null ? customElementType : elementType;
@@ -3283,9 +3284,14 @@ public final class SchemaDefinitionUtils {
             }
         }
 
+        // check property
         var schemaNameFromAnn = getNameFromAnn(element);
+        if (schemaNameFromAnn == null) {
+            // check class
+            schemaNameFromAnn = getNameFromAnn(elType);
+        }
 
-        String schemaName = computeDefaultSchemaName(schemaNameFromAnn, null, elType, elementType.getTypeArguments(), context, null);
+        String schemaName = computeDefaultSchemaName(schemaNameFromAnn, null, elType, elType.getTypeArguments(), context, null);
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
         if (wrappedPropertySchema == null) {
             getSchemaDefinition(resolveOpenApi(context), context, elType, elType.getTypeArguments(), element, Collections.emptyList(), null);

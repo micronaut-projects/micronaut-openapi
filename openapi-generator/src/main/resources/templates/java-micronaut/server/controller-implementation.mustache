@@ -13,6 +13,8 @@ import reactor.core.publisher.Flux;
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse;
 {{/wrapInHttpResponse}}
+import {{javaxPackage}}.validation.Valid;
+import {{javaxPackage}}.validation.constraints.*;
 import {{package}}.{{classname}};
 {{#imports}}
 import {{import}};

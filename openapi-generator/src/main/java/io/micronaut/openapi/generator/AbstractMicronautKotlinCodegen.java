@@ -103,10 +103,12 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.NULL_STRING;
+import static io.micronaut.openapi.generator.Utils.addEnumParamsForConverters;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
+import static io.micronaut.openapi.generator.Utils.processDuplicateVars;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.BYTE_FORMAT;
@@ -1193,12 +1195,24 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         param.isBodyParam = true;
                         param.isFormParam = false;
                         param.vendorExtensions.put("isPart", true);
+                        if (param.isEnumRef) {
+                            param.isEnum = true;
+                        }
+                        if (param.isEnum) {
+                            addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                        }
                     }
                 }
                 op.formParams.forEach(p -> {
                     p.isBodyParam = true;
                     p.isFormParam = false;
                     p.vendorExtensions.put("isPart", true);
+                    if (p.isEnumRef) {
+                        p.isEnum = true;
+                    }
+                    if (p.isEnum) {
+                        addEnumParamsForConverters(modelPackage, p, converterCounters, enumParams, enumImports);
+                    }
                 });
                 op.formParams.clear();
             }
@@ -1236,26 +1250,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
 
                 if (param.isEnum && !param.isBodyParam) {
-
-                    var converterName = param.dataType;
-                    var alreadyAdded = false;
-                    for (var enumParam : enumParams) {
-                        if (param.dataType.equals(enumParam.dataType)) {
-                            alreadyAdded = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyAdded) {
-                        var counter = converterCounters.get(converterName);
-                        if (counter == null) {
-                            converterCounters.put(converterName, 0);
-                        } else {
-                            converterCounters.put(converterName, counter + 1);
-                        }
-                        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
-                        enumParams.add(param);
-                        enumImports.add(modelPackage + "." + param.dataType);
-                    }
+                    addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
                 }
             }
 
@@ -1506,6 +1501,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         model.imports.remove("ApiModel");
         model.imports.remove("ApiModelProperty");
+        processDuplicateVars(model.vars);
         if (importMapping.containsKey(model.dataType)
             && !model.imports.contains(model.dataType)) {
             model.imports.add(model.dataType);
@@ -2731,16 +2727,23 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     protected String getParameterExampleValue(CodegenParameter p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
+        var model = allModels.get(p.dataType);
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
             p.items == null ? null : p.items.defaultValue,
-            p.requiredVars, false);
+            model != null ? model.requiredVars : null, false);
     }
 
     protected String getPropertyExampleValue(CodegenProperty p) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
         var model = allModels.get(p.getDataType());
+        if (model == null && p.dataType != null) {
+            model = allModels.get(p.dataType.toLowerCase(Locale.ENGLISH));
+        }
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
             p.items == null ? null : p.items.dataType,
@@ -2805,10 +2808,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
                 builder.append(dataType).append("(");
                 for (int i = 0; i < requiredVars.size(); ++i) {
+                    var reqVar = requiredVars.get(i);
                     if (i != 0) {
                         builder.append(", ");
                     }
-                    builder.append(getPropertyExampleValue(requiredVars.get(i)));
+                    builder.append(reqVar.name).append(" = ").append(getPropertyExampleValue(reqVar));
                 }
                 builder.append(")");
                 example = builder.toString();

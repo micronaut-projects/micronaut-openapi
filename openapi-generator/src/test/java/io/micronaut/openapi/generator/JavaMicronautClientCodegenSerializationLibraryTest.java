@@ -12,6 +12,7 @@ import org.openapitools.codegen.CodegenConstants;
 import static io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.JAVA;
 import static io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.KOTLIN;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.openapitools.codegen.CodegenConstants.MODELS;
 
 class JavaMicronautClientCodegenSerializationLibraryTest extends AbstractMicronautCodegenTest {
 
@@ -27,7 +28,7 @@ class JavaMicronautClientCodegenSerializationLibraryTest extends AbstractMicrona
     void testSerializationLibraryJackson(GeneratorLanguage lang) {
         var codegen = lang == JAVA ? new JavaMicronautClientCodegen() : new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.JACKSON.name());
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, false, MODELS);
 
         var ext = lang == JAVA ? "java" : "kt";
 
@@ -51,7 +52,7 @@ class JavaMicronautClientCodegenSerializationLibraryTest extends AbstractMicrona
     void testSerializationLibraryMicronautSerdeJackson(GeneratorLanguage lang) {
         var codegen = lang == JAVA ? new JavaMicronautClientCodegen() : new KotlinMicronautClientCodegen();
         codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name());
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, false, MODELS);
 
         var ext = lang == JAVA ? "java" : "kt";
 

@@ -70,9 +70,9 @@ class Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI.paths?.get("/")?.get
-        def petSchema = openAPI.components.schemas['Pets'];
+        OpenAPI openApi = Utils.testReference
+        Operation operation = openApi.paths?.get("/")?.get
+        def petSchema = openApi.components.schemas['Pets'];
 
         expect:
         operation
@@ -296,7 +296,7 @@ class Teste {
     @NotNull
     public List<String> array2 = new ArrayList<>();
 
-    @ArraySchema(arraySchema = @Schema(name = "array3", implementation = LastRetryRecurringPaymentIds.class, requiredMode = Schema.RequiredMode.NOT_REQUIRED))
+    @ArraySchema(schema = @Schema(name = "array3", implementation = LastRetryRecurringPaymentIds.class, requiredMode = Schema.RequiredMode.NOT_REQUIRED))
     public List<LastRetryRecurringPaymentIds> array3 = new ArrayList<>();
 }
 
@@ -332,9 +332,59 @@ class MyBean {}
         ((List) schemas.Teste.properties.array2.example)[1] == "Other Example"
 
         schemas.Teste.properties.array3.type == "array"
-        schemas.Teste.properties.array3.items.type == "string"
-        schemas.Teste.properties.array3.example instanceof List
-        ((List<String>) schemas.Teste.properties.array3.example)[0] == "any example"
+        schemas.Teste.properties.array3.items.type == "array"
+        schemas.Teste.properties.array3.items.example instanceof List
+        ((List<String>) schemas.Teste.properties.array3.items.example)[0] == "any example"
+        schemas.Teste.properties.array3.items.items.type == "string"
+    }
+
+    void "test schema extended ArrayList"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
+interface DefaultApi {
+
+    @Get("/hello")
+    Teste hello();
+}
+
+class Teste {
+
+    @Nullable(inherited = true)
+    public List<LastRetryRecurringPaymentIds> array3;
+}
+
+class LastRetryRecurringPaymentIds extends ArrayList<String> {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        def openApi = Utils.testReference
+        def teste = openApi.components.schemas.Teste
+
+        then:
+        teste
+        teste.properties.size() == 1
+        teste.properties.array3
+        teste.properties.array3.type == "array"
+        teste.properties.array3.items.type == "array"
+        teste.properties.array3.items.items.type == "string"
     }
 
     void "test ArraySchema type override"() {

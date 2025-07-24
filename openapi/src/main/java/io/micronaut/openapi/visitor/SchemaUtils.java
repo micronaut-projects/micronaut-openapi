@@ -147,6 +147,20 @@ public final class SchemaUtils {
     private SchemaUtils() {
     }
 
+    public static boolean isArraySchema(Schema<?> schema, OpenAPI openApi) {
+        if (schema == null) {
+            return false;
+        }
+        if (schema instanceof ArraySchema || TYPE_ARRAY.equals(schema.getType())) {
+            return true;
+        }
+        if (schema.get$ref() == null) {
+            return false;
+        }
+        var refSchema = getSchemaByRef(schema, openApi);
+        return isArraySchema(refSchema, openApi);
+    }
+
     public static boolean isEmptySchema(Schema<?> schema) {
         return ALL_EMPTY_SCHEMAS.contains(schema);
     }
