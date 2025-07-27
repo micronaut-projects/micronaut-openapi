@@ -410,5 +410,6 @@ public final class Utils {
         System.clearProperty(BIND_TYPE_AND_TYPES);
         SchemaDefinitionUtils.clean();
         OpenApiExtraSchemaVisitor.clean();
+        OpenApiExcludeVisitor.clean();
     }
 }

@@ -59,6 +59,14 @@ public @interface OpenAPIInclude {
     String[] classNames() default {};
 
     /**
+     * @return packages with classes should be included for process.
+     * NOTE: Currently you can't use wildcard to include subpackages. Need to set every package in list
+     *
+     * @since 6.18.0
+     */
+    String[] packages() default {};
+
+    /**
      * @return Array of groups to which this controller should be included.
      *
      * @since 4.10.0

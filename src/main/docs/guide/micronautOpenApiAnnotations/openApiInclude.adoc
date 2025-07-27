@@ -1,4 +1,4 @@
-You can use api:openapi.annotation.OpenAPIInclude[] you can include additional api:http.annotation.Controller[] or
+You can use api:openapi.annotation.OpenAPIInclude[] to add additional api:http.annotation.Controller[] or
 api:management.endpoint.annotation.Endpoint[] already compiled
 classes in the OpenAPI processing.
 
@@ -14,9 +14,15 @@ classes in the OpenAPI processing.
         )
 )
 @OpenAPIInclude(
+        // you can specify classes to include
         classes = {
                 io.micronaut.security.endpoints.LoginController.class,
                 io.micronaut.security.endpoints.LogoutController.class
+        },
+        // or / and you can specify packages to include
+        packages = {
+            "io.different.package.with.controllers",
+            "io.different.package.with.controllers2",
         },
         tags = @Tag(name = "Security")
 )

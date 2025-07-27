@@ -26,6 +26,7 @@ import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.reflect.ClassUtils;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -68,6 +69,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getIncludeExcludeProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
@@ -670,4 +672,23 @@ public final class ElementUtils {
         return valueType.getType().isAssignable(CharSequence.class);
     }
 
+    public static boolean isIgnored(ClassElement element, VisitorContext context) {
+        var isExcluded = false;
+        var includeExcludeProperties = getIncludeExcludeProperties(context);
+        var excludedClasses = includeExcludeProperties.getExcludedClasses();
+        if (excludedClasses == null) {
+            excludedClasses = OpenApiExcludeVisitor.getExcludedClasses();
+        }
+        if (CollectionUtils.isNotEmpty(excludedClasses) && excludedClasses.contains(element.getName())) {
+            isExcluded = true;
+        }
+        var excludedPackages = includeExcludeProperties.getExcludedPackages();
+        if (excludedPackages == null) {
+            excludedPackages = OpenApiExcludeVisitor.getExcludedPackages();
+        }
+        if (CollectionUtils.isNotEmpty(excludedPackages) && excludedPackages.contains(element.getPackageName())) {
+            isExcluded = true;
+        }
+        return isExcluded;
+    }
 }

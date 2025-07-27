@@ -46,6 +46,10 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_CUSTOM_SCHEMAS = "micronaut.internal.custom.schemas";
     /**
+     * Loaded openapi include-exclude properties from file.
+     */
+    String MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES = "micronaut.internal.openapi.include-exclude.properties";
+    /**
      * Loaded openapi properties from file.
      */
     String MICRONAUT_INTERNAL_OPENAPI_PROPERTIES = "micronaut.internal.openapi.properties";

@@ -359,6 +359,15 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
 
     /**
+     * List of classes which must be excluded from the final OpenAPI specification.
+     */
+    String MICRONAUT_OPENAPI_EXCLUDE_CLASSES = "micronaut.openapi.exclude.classes";
+    /**
+     * List of packages, containing controllers / endpoints, which must be excluded from the final OpenAPI specification.
+     */
+    String MICRONAUT_OPENAPI_EXCLUDE_PACKAGES = "micronaut.openapi.exclude.packages";
+
+    /**
      * System property that enables interpret primary constructor arguments as required properties.
      * <p>
      * Default: true

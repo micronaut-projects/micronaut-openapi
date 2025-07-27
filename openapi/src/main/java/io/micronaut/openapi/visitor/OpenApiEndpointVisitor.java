@@ -59,6 +59,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextUtils.EXTENSIONS_MAP_ARGUMENT;
 import static io.micronaut.openapi.visitor.ContextUtils.SERVERS_LIST_ARGUMENT;
 import static io.micronaut.openapi.visitor.ContextUtils.TAGS_LIST_ARGUMENT;
+import static io.micronaut.openapi.visitor.ElementUtils.isIgnored;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
@@ -209,6 +210,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (enabled != null && !enabled) {
             return true;
         }
+        if (isIgnored(element, context)) {
+            return true;
+        }
         AnnotationValue<?> ann = null;
         if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
             ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
@@ -240,6 +244,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
         if (enabled != null && !enabled) {
+            return true;
+        }
+        if (isIgnored(element.getOwningType(), context)) {
             return true;
         }
 
