@@ -1,0 +1,56 @@
+﻿openapi: 3.1.0
+info:
+  version: '1.0.0'
+  title: 'OpenAPI BUG REST API'
+servers:
+  - url: 'localhost:3000'
+
+paths:
+  /api/v2/help_center/{locale}/articles/{article_id}:
+    post:
+      parameters:
+        - name: locale
+          in: path
+          description: Param locale description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}
+          required: true
+          schema:
+            type: string
+        - name: article_id
+          in: path
+          description: Param article_id description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}
+          required: true
+          schema:
+            type: string
+      tags: [ my-custom ]
+      operationId: "selectColor"
+      summary: Summary {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}
+      description: |
+        Archives the article. You can restore the article using the Help Center user interface. {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}.
+        Allowed for Agents
+      requestBody:
+        required: true
+        description: Request body {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Color"
+      responses:
+        "200":
+          description: Response description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}
+          content:
+            application/json:
+              schema:
+                type: string
+
+components:
+  schemas:
+
+    Color:
+      type: string
+      enum:
+        - GREEN
+        - RED
+        - WHITE
+        - BLACK
+        - YELLOW
+        - BLUE
