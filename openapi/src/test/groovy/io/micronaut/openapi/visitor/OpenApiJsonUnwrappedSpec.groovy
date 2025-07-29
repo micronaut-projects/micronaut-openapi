@@ -6,6 +6,119 @@ import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiJsonUnwrappedSpec extends AbstractOpenApiTypeElementSpec {
 
+    void "test JsonUnwrapped annotation and schema allOf annotation"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.Single;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.*;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+@Controller("/test")
+interface TestOperations {
+
+    @Post("/")
+    Single<Test> save(String name, int age);
+}
+
+@Schema(description = "Represents a pet")
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+class Pet {
+    @Schema(name="pet-name", description = "The pet name")
+    private String name;
+
+    @Schema(name="pet-name", description = "The pet name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+@Schema(description = "Represents a cat", name="TheCat")
+class Cat extends Pet {
+    private boolean grinning;
+
+    public boolean isGrinning() {
+	    return grinning;
+    }
+    public void setGrinning(boolean grinning) {
+        this.grinning = grinning;
+    }
+}
+
+@Schema(description = "Represents a dog")
+class Dog extends Pet {
+    @Schema(name = "dog-herding")
+    private boolean herding;
+
+    public boolean isHerding() {
+	    return herding;
+    }
+    public void setHerding(boolean herding) {
+        this.herding = herding;
+    }
+}
+
+@Schema
+class Test {
+    @Schema(allOf = {Cat.class, Dog.class})
+    public Pet petAsSuperTypeWithoutUnwrapped;
+
+    @JsonUnwrapped
+    @Schema(allOf = {Cat.class, Dog.class})
+    public Pet petAsSuperType;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        assert openAPI.components.schemas.size() == 4
+        Schema schema = openAPI.components.schemas['Test']
+        Schema petSchema = openAPI.components.schemas['Pet']
+        Schema catSchema = openAPI.components.schemas['TheCat']
+        Schema dogSchema = openAPI.components.schemas['Dog']
+        assert schema != null
+        assert petSchema != null
+        assert catSchema != null
+        assert dogSchema != null
+
+        then: "the components are valid"
+        schema.type == 'object'
+        schema.properties.size() == 4
+        schema.properties['petAsSuperTypeWithoutUnwrapped'].type == null
+        schema.properties['petAsSuperTypeWithoutUnwrapped'].allOf.size() == 2
+        schema.properties['pet-name'].type == 'string'
+        schema.properties['grinning'].type == 'boolean'
+        schema.properties['dog-herding'].type == 'boolean'
+        schema.required == null
+        petSchema.properties.size() == 3
+        petSchema.properties['pet-name'].type == 'string'
+        petSchema.properties['grinning'].type == 'boolean'
+        petSchema.properties['dog-herding'].type == 'boolean'
+        petSchema.required == null
+        catSchema.properties.size() == 1
+        catSchema.properties['grinning'].type == 'boolean'
+        catSchema.required == null
+        dogSchema.properties.size() == 1
+        dogSchema.properties['dog-herding'].type == 'boolean'
+        dogSchema.required == null
+    }
+
     void "test JsonUnwrapped annotation"() {
 
         given: "An API definition"
@@ -197,7 +310,7 @@ interface TestOperations {
 }
 
 class Base {
-    
+
     public String name;
 }
 
