@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @Controller("/test")
 interface TestOperations {
 
-    @Post("/")
+    @Post
     Single<Test> save(String name, int age);
 }
 
@@ -45,7 +45,8 @@ class Pet {
 
 @Schema(description = "Represents a cat", name="TheCat")
 class Cat extends Pet {
-    private boolean grinning;
+    private boolean grinning; // duplicated in Dog with different type
+    private String description; // duplicated in Dog with the same type
 
     public boolean isGrinning() {
 	    return grinning;
@@ -53,18 +54,38 @@ class Cat extends Pet {
     public void setGrinning(boolean grinning) {
         this.grinning = grinning;
     }
+    public String getDescription() {
+	    return description;
+    }
+    public void setDescription(String description) {
+	    this.description = description;
+    }
 }
 
 @Schema(description = "Represents a dog")
 class Dog extends Pet {
     @Schema(name = "dog-herding")
     private boolean herding;
+    private String grinning;
+    private String description;
 
     public boolean isHerding() {
 	    return herding;
     }
     public void setHerding(boolean herding) {
         this.herding = herding;
+    }
+    public String getGrinning() {
+	    return grinning;
+    }
+    public void setGrinning(String grinning) {
+        this.grinning = grinning;
+    }
+    public String getDescription() {
+	    return description;
+    }
+    public void setDescription(String description) {
+	    this.description = description;
     }
 }
 
@@ -77,45 +98,38 @@ class Test {
     @Schema(allOf = {Cat.class, Dog.class})
     public Pet petAsSuperType;
 }
-
-@jakarta.inject.Singleton
-class MyBean {}
-
 ''')
         then: "the state is correct"
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
-        assert openAPI.components.schemas.size() == 4
         Schema schema = openAPI.components.schemas['Test']
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['TheCat']
         Schema dogSchema = openAPI.components.schemas['Dog']
-        assert schema != null
-        assert petSchema != null
-        assert catSchema != null
-        assert dogSchema != null
 
         then: "the components are valid"
+        openAPI.components.schemas.size() == 4
         schema.type == 'object'
-        schema.properties.size() == 4
+        schema.properties.size() == 5
         schema.properties['petAsSuperTypeWithoutUnwrapped'].type == null
         schema.properties['petAsSuperTypeWithoutUnwrapped'].allOf.size() == 2
         schema.properties['pet-name'].type == 'string'
         schema.properties['grinning'].type == 'boolean'
         schema.properties['dog-herding'].type == 'boolean'
         schema.required == null
-        petSchema.properties.size() == 3
+        petSchema.properties.size() == 1
         petSchema.properties['pet-name'].type == 'string'
-        petSchema.properties['grinning'].type == 'boolean'
-        petSchema.properties['dog-herding'].type == 'boolean'
         petSchema.required == null
-        catSchema.properties.size() == 1
+        catSchema.properties.size() == 2
         catSchema.properties['grinning'].type == 'boolean'
+        catSchema.properties['description'].type == 'string'
         catSchema.required == null
-        dogSchema.properties.size() == 1
+        dogSchema.properties.size() == 3
         dogSchema.properties['dog-herding'].type == 'boolean'
+        dogSchema.properties['grinning'].type == 'string'
+        dogSchema.properties['description'].type == 'string'
         dogSchema.required == null
     }
 

@@ -3311,15 +3311,27 @@ public final class SchemaDefinitionUtils {
                 .map(schemas::get)
                 .filter(Objects::nonNull)
                 .map(Schema::getProperties);
-            Map<String, Schema> propertiesOfAll = mapStream
+            Map<String, List<Schema>> propertiesOfAllWithPotentialDuplicates = mapStream
                 .map(Map::entrySet)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-            if (properties != null) {
-                properties.putAll(propertiesOfAll);
-            } else {
-                properties = propertiesOfAll;
+                .collect(Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
+            Map<String, Schema> propertiesOfAll = new LinkedHashMap<>();
+            for (Entry<String, List<Schema>> entry : propertiesOfAllWithPotentialDuplicates.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    Set<String> types = entry.getValue().stream()
+                        .map(Schema::getType)
+                        .collect(Collectors.toSet());
+                    if (types.size() > 1) {
+                        warn("Duplicate property definition for property " + entry.getKey()
+                            + " with different types " + types + ". Falling back to first entry " + entry.getValue().get(0), context);
+                    }
+                }
+                propertiesOfAll.put(entry.getKey(), entry.getValue().get(0));
             }
+            if (properties != null) {
+                propertiesOfAll.putAll(properties);
+            }
+            properties = propertiesOfAll;
         }
         if (CollectionUtils.isEmpty(properties)) {
             return;
