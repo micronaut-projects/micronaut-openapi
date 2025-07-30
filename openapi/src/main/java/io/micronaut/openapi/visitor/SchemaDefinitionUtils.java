@@ -111,6 +111,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -121,6 +122,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
@@ -3298,6 +3301,38 @@ public final class SchemaDefinitionUtils {
             wrappedPropertySchema = schemas.get(schemaName);
         }
         Map<String, Schema> properties = wrappedPropertySchema != null ? wrappedPropertySchema.getProperties() : null;
+        AnnotationClassValue<?>[] allOfClassValues = schemaAnn != null ? schemaAnn.annotationClassValues(PROP_ALL_OF) : null;
+        if (ArrayUtils.isNotEmpty(allOfClassValues)) {
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Stream<Map<String, Schema>> mapStream = Arrays.stream(allOfClassValues)
+                .map(classValue -> context.getClassElement(classValue.getName()).orElse(null))
+                .filter(Objects::nonNull)
+                .map(SchemaDefinitionUtils::getNameFromAnnOrFromElement)
+                .map(schemas::get)
+                .filter(Objects::nonNull)
+                .map(Schema::getProperties);
+            Map<String, List<Schema>> propertiesOfAllWithPotentialDuplicates = mapStream
+                .map(Map::entrySet)
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(Entry::getKey, Collectors.mapping(Entry::getValue, Collectors.toList())));
+            Map<String, Schema> propertiesOfAll = new LinkedHashMap<>();
+            for (Entry<String, List<Schema>> entry : propertiesOfAllWithPotentialDuplicates.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    Set<String> types = entry.getValue().stream()
+                        .map(Schema::getType)
+                        .collect(Collectors.toSet());
+                    if (types.size() > 1) {
+                        warn("Duplicate property definition for property " + entry.getKey()
+                            + " with different types " + types + ". Falling back to first entry " + entry.getValue().get(0), context);
+                    }
+                }
+                propertiesOfAll.put(entry.getKey(), entry.getValue().get(0));
+            }
+            if (properties != null) {
+                propertiesOfAll.putAll(properties);
+            }
+            properties = propertiesOfAll;
+        }
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
@@ -3396,5 +3431,10 @@ public final class SchemaDefinitionUtils {
             }
         }
         return nameFromAnn;
+    }
+
+    public static String getNameFromAnnOrFromElement(Element el) {
+        String nameFromAnn = getNameFromAnn(el);
+        return nameFromAnn != null ? nameFromAnn : el.getSimpleName();
     }
 }
