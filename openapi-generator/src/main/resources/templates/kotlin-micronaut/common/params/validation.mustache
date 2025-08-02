@@ -1,5 +1,6 @@
 
 {{^vendorExtensions.isPrimitiveArray}}
+{{^vendorExtensions.withoutNullable}}
     {{^vendorExtensions.valueWithDefaultValue}}
 {{#isNullable}}
     @Nullable
@@ -15,6 +16,7 @@
     {{/required}}
 {{/isNullable}}
     {{/vendorExtensions.valueWithDefaultValue}}
+{{/vendorExtensions.withoutNullable}}
 {{/vendorExtensions.isPrimitiveArray}}
 {{!All the validation}}
 {{#useBeanValidation}}
@@ -22,7 +24,9 @@
     {{^isNullable}}
         {{#required}}
             {{^isReadOnly}}
+                {{^vendorExtensions.withoutNullable}}
     @NotNull{{#vendorExtensions.x-not-null-message}}(message = "{{{.}}}"){{/vendorExtensions.x-not-null-message}}
+                {{/vendorExtensions.withoutNullable}}
             {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}

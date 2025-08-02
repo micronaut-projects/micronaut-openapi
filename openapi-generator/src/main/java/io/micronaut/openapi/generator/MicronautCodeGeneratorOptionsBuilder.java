@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.generator;
 
+import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.TestFramework;
+
 import java.util.List;
 import java.util.Map;
 
@@ -316,7 +318,7 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * @param testFramework the test framework
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework testFramework);
+    MicronautCodeGeneratorOptionsBuilder withTestFramework(TestFramework testFramework);
 
     /**
      * Configure the serialization library.

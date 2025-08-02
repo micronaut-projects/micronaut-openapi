@@ -76,6 +76,19 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth);
 
     /**
+     * Add or not principal / authentication parameter to controller methods.
+     * Available modes:
+     * NONE
+     * PRINCIPAL
+     * AUTHENTICATION
+     *
+     * @param userParameterMode user parameter mode
+     *
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode);
+
+    /**
      * If set to true, generated code will be with lombok annotations.
      *
      * @param lombok generate code with lombok annotations or not

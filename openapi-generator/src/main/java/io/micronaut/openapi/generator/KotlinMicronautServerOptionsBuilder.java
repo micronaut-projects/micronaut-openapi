@@ -67,6 +67,19 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
     KotlinMicronautServerOptionsBuilder withAuthentication(boolean useAuth);
 
     /**
+     * Add or not principal / authentication parameter to controller methods.
+     * Available modes:
+     * NONE
+     * PRINCIPAL
+     * AUTHENTICATION
+     *
+     * @param userParameterMode user parameter mode
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode);
+
+    /**
      * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
      *
      * @param fluxForArrays generate code with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>> or not
