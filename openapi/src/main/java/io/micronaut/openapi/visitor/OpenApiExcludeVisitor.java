@@ -31,6 +31,9 @@ import java.util.List;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASSES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASS_NAMES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PACKAGES;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIExclude}
@@ -65,15 +68,15 @@ public class OpenApiExcludeVisitor implements TypeElementVisitor<OpenAPIExcludes
         for (var excludeAnn : element.getAnnotationValuesByType(OpenAPIExclude.class)) {
             String[] classesValue = excludeAnn.stringValues();
             if (ArrayUtils.isEmpty(classesValue)) {
-                classesValue = excludeAnn.stringValues( "classes");
+                classesValue = excludeAnn.stringValues(PROP_CLASSES);
                 if (ArrayUtils.isEmpty(classesValue)) {
-                    classesValue = excludeAnn.stringValues("classNames");
+                    classesValue = excludeAnn.stringValues(PROP_CLASS_NAMES);
                 }
             }
             if (ArrayUtils.isNotEmpty(classesValue)) {
                 excludedClasses.addAll(Arrays.asList(classesValue));
             }
-            String[] packages = excludeAnn.stringValues("packages");
+            String[] packages = excludeAnn.stringValues(PROP_PACKAGES);
             if (ArrayUtils.isNotEmpty(packages)) {
                 Collections.addAll(excludedPackages, packages);
             }

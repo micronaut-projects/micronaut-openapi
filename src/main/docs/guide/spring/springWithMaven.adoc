@@ -6,7 +6,7 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
     <dependencies>
         <dependency>
             <groupId>io.micronaut</groupId>
-            <artifactId>micronaut-inject-java</artifactId>
+            <artifactId>micronaut-http</artifactId>
             <version>${micronaut.core.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -14,12 +14,6 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
             <groupId>io.micronaut.openapi</groupId>
             <artifactId>micronaut-openapi-annotations</artifactId>
             <version>${micronaut.openapi.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.micronaut.serde</groupId>
-            <artifactId>micronaut-serde-api</artifactId>
-            <version>${micronaut.serde.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -35,11 +29,6 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
                             <groupId>io.micronaut</groupId>
                             <artifactId>micronaut-inject-java</artifactId>
                             <version>${micronaut.core.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.micronaut.spring</groupId>
-                            <artifactId>micronaut-spring-annotation</artifactId>
-                            <version>${micronaut.spring.version}</version>
                         </path>
                         <path>
                             <groupId>io.micronaut.spring</groupId>
@@ -70,7 +59,7 @@ For kotlin
     <dependencies>
         <dependency>
             <groupId>io.micronaut</groupId>
-            <artifactId>micronaut-inject-java</artifactId>
+            <artifactId>micronaut-inject</artifactId>
             <version>${micronaut.core.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -103,11 +92,6 @@ For kotlin
                         <groupId>io.micronaut</groupId>
                         <artifactId>micronaut-inject-java</artifactId>
                         <version>${micronaut.core.version}</version>
-                    </annotationProcessorPath>
-                    <annotationProcessorPath>
-                        <groupId>io.micronaut.spring</groupId>
-                        <artifactId>micronaut-spring-annotation</artifactId>
-                        <version>${micronaut.spring.version}</version>
                     </annotationProcessorPath>
                     <annotationProcessorPath>
                         <groupId>io.micronaut.spring</groupId>

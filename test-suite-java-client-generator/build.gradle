@@ -23,5 +23,6 @@ dependencies {
     testImplementation(mnTest.micronaut.test.spock)
 
     testRuntimeOnly(mn.snakeyaml)
+    testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }

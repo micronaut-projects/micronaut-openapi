@@ -9,14 +9,12 @@ dependencies {
 
     annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
     annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
-    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
 
-    compileOnly("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    compileOnly("io.micronaut:micronaut-http:$micronautCoreVersion")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
-    compileOnly("io.micronaut.serde:micronaut-serde-api:$micronautSerdeVersion")
 
 }
 ----

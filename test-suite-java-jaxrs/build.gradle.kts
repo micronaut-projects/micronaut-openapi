@@ -15,5 +15,6 @@ dependencies {
     testImplementation(mn.micronaut.http.client)
     testImplementation(mn.snakeyaml)
 
+    testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }

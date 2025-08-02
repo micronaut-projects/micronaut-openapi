@@ -12,16 +12,13 @@ sourceSets {
 
 dependencies {
 
-    annotationProcessor(mnSpring.micronaut.spring.annotation)
     annotationProcessor(mnSpring.micronaut.spring.web.annotation)
     annotationProcessor(mnSpring.micronaut.spring.boot.annotation)
     annotationProcessor(mn.micronaut.inject.java)
     annotationProcessor(projects.micronautOpenapi)
 
     compileOnly(projects.micronautOpenapiAnnotations)
-    compileOnly(mn.jackson.annotations)
-    compileOnly(mn.micronaut.inject.java)
-    compileOnly(mnSerde.micronaut.serde.api)
+    compileOnly(mn.micronaut.http)
 
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${mnSpring.versions.spring.boot.get()}"))
     implementation(libs.spring.boot.starter.web)
@@ -31,9 +28,7 @@ dependencies {
     implementation(libs.micrometer.registry.prometheus)
 
     testCompileOnly(projects.micronautOpenapiAnnotations)
-    testCompileOnly(mn.jackson.annotations)
-    testCompileOnly(mn.micronaut.inject.java)
-    testCompileOnly(mnSerde.micronaut.serde.api)
+    testCompileOnly(mn.micronaut.http)
 
     testImplementation("org.springframework.boot:spring-boot-dependencies:${mnSpring.versions.spring.boot.get()}" )
     testImplementation(libs.spring.boot.starter.test)
@@ -41,6 +36,7 @@ dependencies {
     testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 

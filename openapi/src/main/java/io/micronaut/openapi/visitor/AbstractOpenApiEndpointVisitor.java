@@ -146,6 +146,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_METHOD;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPERATION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OP_ID_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OP_ID_SUFFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAMETERS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
@@ -228,6 +229,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             var apiDecoratorAnn = element.getDeclaredAnnotation(OpenAPIDecorator.class);
             if (apiDecoratorAnn != null) {
                 prefix = apiDecoratorAnn.stringValue().orElse(StringUtils.EMPTY_STRING);
+                if (prefix.isEmpty()) {
+                    prefix = apiDecoratorAnn.stringValue(PROP_OP_ID_PREFIX).orElse(StringUtils.EMPTY_STRING);
+                }
                 suffix = apiDecoratorAnn.stringValue(PROP_OP_ID_SUFFIX).orElse(StringUtils.EMPTY_STRING);
                 addAlways = apiDecoratorAnn.booleanValue(PROP_ADD_ALWAYS).orElse(true);
             }
@@ -1611,6 +1615,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             var apiDecoratorAnn = element.getDeclaredAnnotation(OpenAPIDecorator.class);
             if (apiDecoratorAnn != null) {
                 prefix = apiDecoratorAnn.stringValue().orElse(StringUtils.EMPTY_STRING);
+                if (prefix.isEmpty()) {
+                    prefix = apiDecoratorAnn.stringValue(PROP_OP_ID_PREFIX).orElse(StringUtils.EMPTY_STRING);
+                }
                 suffix = apiDecoratorAnn.stringValue(PROP_OP_ID_SUFFIX).orElse(StringUtils.EMPTY_STRING);
                 addAlways = apiDecoratorAnn.booleanValue(PROP_ADD_ALWAYS).orElse(true);
             } else {

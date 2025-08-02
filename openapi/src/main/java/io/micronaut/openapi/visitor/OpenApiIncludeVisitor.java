@@ -35,10 +35,13 @@ import java.util.List;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASSES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASS_NAMES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS_EXCLUDED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PACKAGES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_URI;
@@ -91,9 +94,9 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             var classesValue = List.<String>of();
             var classesValueArr = includeAnn.stringValues();
             if (ArrayUtils.isEmpty(classesValueArr)) {
-                classesValueArr = includeAnn.stringValues("classes");
+                classesValueArr = includeAnn.stringValues(PROP_CLASSES);
                 if (ArrayUtils.isEmpty(classesValueArr)) {
-                    classesValueArr = includeAnn.stringValues("classNames");
+                    classesValueArr = includeAnn.stringValues(PROP_CLASS_NAMES);
                 }
             }
             if (ArrayUtils.isNotEmpty(classesValueArr)) {
@@ -106,7 +109,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 }
             }
             var packages = List.<String>of();
-            var packagesArr = includeAnn.stringValues("packages");
+            var packagesArr = includeAnn.stringValues(PROP_PACKAGES);
             if (ArrayUtils.isNotEmpty(packagesArr)) {
                 packages = List.of(packagesArr);
             }

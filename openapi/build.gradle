@@ -7,6 +7,8 @@ dependencies {
     compileOnly(mn.micronaut.core.processor)
     compileOnly(projects.micronautOpenapiAdoc)
 
+    implementation(mn.micronaut.core)
+    implementation(mn.micronaut.inject)
     implementation(mn.micronaut.http) {
         exclude group: "io.micronaut", module: "micronaut-core-reactive"
         exclude group: "io.micronaut", module: "micronaut-context"
@@ -59,8 +61,19 @@ dependencies {
 //    testImplementation(libs.micrometer.registry.prometheus)
 }
 
-configurations.configureEach {
-    exclude group: "ch.qos.logback"
+configurations {
+
+    compileClasspath {
+        exclude group: "io.micronaut", module: "micronaut-core-bom"
+    }
+
+    runtimeClasspath {
+        exclude group: "io.micronaut", module: "micronaut-core-bom"
+    }
+
+    configureEach {
+        exclude group: "ch.qos.logback"
+    }
 }
 
 test {

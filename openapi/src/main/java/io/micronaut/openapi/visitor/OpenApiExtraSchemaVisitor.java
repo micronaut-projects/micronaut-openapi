@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.order.Ordered;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
@@ -41,6 +42,9 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.getClassElements;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASSES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CLASS_NAMES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PACKAGES;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.computeDefaultSchemaName;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.getNameFromAnn;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.getSchemaDefinition;
@@ -131,9 +135,15 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
 
         for (var extraSchemaAnn : element.getAnnotationValuesByType(OpenAPIExtraSchema.class)) {
             String[] classes = extraSchemaAnn.stringValues();
+            if (ArrayUtils.isEmpty(classes)) {
+                classes = extraSchemaAnn.stringValues(PROP_CLASSES);
+                if (ArrayUtils.isEmpty(classes)) {
+                    classes = extraSchemaAnn.stringValues(PROP_CLASS_NAMES);
+                }
+            }
             String[] excludeClasses = extraSchemaAnn.stringValues("excludeClasses");
             String[] excludeClassNames = extraSchemaAnn.stringValues("excludeClassNames");
-            String[] packages = extraSchemaAnn.stringValues("packages");
+            String[] packages = extraSchemaAnn.stringValues(PROP_PACKAGES);
             String[] excludePackages = extraSchemaAnn.stringValues("excludePackages");
 
             // Classes with annotation without these members we process as extra schema

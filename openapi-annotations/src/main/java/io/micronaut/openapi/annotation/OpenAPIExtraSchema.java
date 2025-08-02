@@ -15,8 +15,6 @@
  */
 package io.micronaut.openapi.annotation;
 
-import io.micronaut.context.annotation.AliasFor;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -43,15 +41,17 @@ public @interface OpenAPIExtraSchema {
     Class<?>[] value() default {};
 
     /**
+     * Alias for 'value' member.
+     *
      * @return Schema classes to include in generated Open API.
      */
-    @AliasFor(member = "value")
     Class<?>[] classes() default {};
 
     /**
+     * Alias for 'value' member.
+     *
      * @return Schema classes to include in generated Open API.
      */
-    @AliasFor(member = "value")
     String[] classNames() default {};
 
     /**
