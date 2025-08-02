@@ -194,8 +194,14 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#OPT_GENERATE_STREAMING_FILE_UPLOAD" class="member-name-link">OPT_GENERATE_STREAMING_FILE_UPLOAD</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#useAuth" class="member-name-link">useAuth</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_USER_PARAMETER_MODE" class="member-name-link">OPT_USER_PARAMETER_MODE</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#useAuth" class="member-name-link">useAuth</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected <a href="UserParameterMode.html" title="enum class in io.micronaut.openapi.generator">UserParameterMode</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#userParameterMode" class="member-name-link">userParameterMode</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
@@ -292,6 +298,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseAuth(boolean)" class="member-name-link">setUseAuth</a><wbr>(boolean&nbsp;useAuth)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUserParameterMode(java.lang.String)" class="member-name-link">setUserParameterMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterMode)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -417,6 +426,20 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.JavaMicronautServerCodegen.OPT_AOT">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="OPT_USER_PARAMETER_MODE">
+<h3>OPT_USER_PARAMETER_MODE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_USER_PARAMETER_MODE</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.JavaMicronautServerCodegen.OPT_USER_PARAMETER_MODE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -644,6 +667,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">aot</span></div>
 </section>
 </li>
+<li>
+<section class="detail" id="userParameterMode">
+<h3>userParameterMode</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="UserParameterMode.html" title="enum class in io.micronaut.openapi.generator">UserParameterMode</a></span>&nbsp;<span class="element-name">userParameterMode</span></div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -662,78 +691,6 @@ loadScripts(document, 'script');</script>
 <dt>Overrides:</dt>
 <dd><code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html#getTag()">getTag</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></code></dd>
 </dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getName()">
-<h3>getName</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getName</span>()</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code>getName</code>&nbsp;in interface&nbsp;<code>org.openapitools.codegen.CodegenConfig</code></dd>
-<dt>Overrides:</dt>
-<dd><code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html#getName()">getName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></code></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getHelp()">
-<h3>getHelp</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHelp</span>()</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code>getHelp</code>&nbsp;in interface&nbsp;<code>org.openapitools.codegen.CodegenConfig</code></dd>
-<dt>Overrides:</dt>
-<dd><code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html#getHelp()">getHelp</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></code></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setControllerPackage(java.lang.String)">
-<h3>setControllerPackage</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setControllerPackage</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;controllerPackage)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setGenerateImplementationFiles(boolean)">
-<h3>setGenerateImplementationFiles</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateImplementationFiles</span><wbr><span class="parameters">(boolean&nbsp;generateImplementationFiles)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setGenerateOperationsToReturnNotImplemented(boolean)">
-<h3>setGenerateOperationsToReturnNotImplemented</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateOperationsToReturnNotImplemented</span><wbr><span class="parameters">(boolean&nbsp;generateOperationsToReturnNotImplemented)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setGenerateControllerFromExamples(boolean)">
-<h3>setGenerateControllerFromExamples</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateControllerFromExamples</span><wbr><span class="parameters">(boolean&nbsp;generateControllerFromExamples)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setUseAuth(boolean)">
-<h3>setUseAuth</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setUseAuth</span><wbr><span class="parameters">(boolean&nbsp;useAuth)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setAot(boolean)">
-<h3>setAot</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAot</span><wbr><span class="parameters">(boolean&nbsp;aot)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setGenerateStreamingFileUpload(boolean)">
-<h3>setGenerateStreamingFileUpload</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateStreamingFileUpload</span><wbr><span class="parameters">(boolean&nbsp;generateStreamingFileUpload)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setGenerateHardNullable(boolean)">
-<h3>setGenerateHardNullable</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateHardNullable</span><wbr><span class="parameters">(boolean&nbsp;generateHardNullable)</span></div>
 </section>
 </li>
 <li>
@@ -831,6 +788,84 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="optionsBuilder()">
 <h3>optionsBuilder</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">optionsBuilder</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getName()">
+<h3>getName</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getName</span>()</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code>getName</code>&nbsp;in interface&nbsp;<code>org.openapitools.codegen.CodegenConfig</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html#getName()">getName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getHelp()">
+<h3>getHelp</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHelp</span>()</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code>getHelp</code>&nbsp;in interface&nbsp;<code>org.openapitools.codegen.CodegenConfig</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html#getHelp()">getHelp</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setControllerPackage(java.lang.String)">
+<h3>setControllerPackage</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setControllerPackage</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;controllerPackage)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setGenerateImplementationFiles(boolean)">
+<h3>setGenerateImplementationFiles</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateImplementationFiles</span><wbr><span class="parameters">(boolean&nbsp;generateImplementationFiles)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setGenerateOperationsToReturnNotImplemented(boolean)">
+<h3>setGenerateOperationsToReturnNotImplemented</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateOperationsToReturnNotImplemented</span><wbr><span class="parameters">(boolean&nbsp;generateOperationsToReturnNotImplemented)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setGenerateControllerFromExamples(boolean)">
+<h3>setGenerateControllerFromExamples</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateControllerFromExamples</span><wbr><span class="parameters">(boolean&nbsp;generateControllerFromExamples)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setUseAuth(boolean)">
+<h3>setUseAuth</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setUseAuth</span><wbr><span class="parameters">(boolean&nbsp;useAuth)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setAot(boolean)">
+<h3>setAot</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAot</span><wbr><span class="parameters">(boolean&nbsp;aot)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setGenerateStreamingFileUpload(boolean)">
+<h3>setGenerateStreamingFileUpload</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateStreamingFileUpload</span><wbr><span class="parameters">(boolean&nbsp;generateStreamingFileUpload)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setGenerateHardNullable(boolean)">
+<h3>setGenerateHardNullable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGenerateHardNullable</span><wbr><span class="parameters">(boolean&nbsp;generateHardNullable)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setUserParameterMode(java.lang.String)">
+<h3>setUserParameterMode</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setUserParameterMode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterMode)</span></div>
 </section>
 </li>
 </ul>
