@@ -972,6 +972,15 @@ public final class SchemaDefinitionUtils {
                         if (componentType != null) {
                             // this fix for enum and KotlinTypeArgumentElement
                             ClassElement realClassEl = componentType;
+                            if (realClassEl instanceof WildcardElement wildcardEl) {
+                                realClassEl = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().get(0) : null;
+                            } else if (realClassEl instanceof GenericPlaceholderElement placeholderEl) {
+                                if (!realClassEl.isArray()) {
+                                    realClassEl = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
+                                }
+                            } else if (realClassEl instanceof GenericElement genericEl) {
+                                realClassEl = genericEl.getResolved().orElse(null);
+                            }
                             if (componentType.isEnum()) {
                                 realClassEl = context.getClassElement(componentType.getName()).orElse(componentType);
                             }

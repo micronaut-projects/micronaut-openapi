@@ -282,6 +282,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 } catch (IOException e) {
                     warn("Fail to load " + additionalSwaggerFile + "\n" + Utils.printStackTrace(e), context);
                 }
+                continue;
             } else if (additionalSwaggerFile.startsWith(PROJECT_SCHEME)) {
                 additionalSwaggerFile = additionalSwaggerFile.substring(PROJECT_SCHEME.length());
                 String projectDir = StringUtils.EMPTY_STRING;

@@ -269,8 +269,7 @@ public final class OpenApiViewConfig {
             Files.createDirectories(resDir);
         }
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName)) {
+        try (var is = getClass().getClassLoader().getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName)) {
 
             Files.copy(is, Path.of(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
             Path file = resDir.resolve(themeFileName);
@@ -293,8 +292,6 @@ public final class OpenApiViewConfig {
             return;
         }
 
-        ClassLoader classLoader = getClass().getClassLoader();
-
         Path outputResDir = outputDir.resolve(RESOURCE_DIR);
         if (!Files.exists(outputResDir)) {
             Files.createDirectories(outputResDir);
@@ -302,7 +299,7 @@ public final class OpenApiViewConfig {
 
         if (CollectionUtils.isNotEmpty(resources)) {
             for (String resource : resources) {
-                try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource)) {
+                try (var is = getClass().getClassLoader().getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource)) {
 
                     Files.copy(is, Path.of(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
                     Path file = outputResDir.resolve(resource);
@@ -324,8 +321,7 @@ public final class OpenApiViewConfig {
     }
 
     private String readTemplateFromClasspath(String templateName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (var in = classLoader.getResourceAsStream(templateName);
+        try (var in = getClass().getClassLoader().getResourceAsStream(templateName);
              var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
         ) {
             return readFile(reader);

@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,7 +77,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT16;
@@ -1114,35 +1114,55 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 defaultValueInit = schema.getDefault().toString();
                 defaultValueStr = schema.getDefault().toString();
             }
+        } else if (ModelUtils.isDateSchema(schema)) {
+            if (schema.getDefault() != null) {
+                var date = (Date) schema.getDefault();
+                LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                defaultValueInit = "LocalDate.parse(\"%s\")".formatted(localDate.toString());
+                defaultValueStr = localDate.toString();
+            }
+        } else if (ModelUtils.isDateTimeSchema(schema)) {
+            if (schema.getDefault() != null) {
+                var offsetDateTime = (OffsetDateTime) schema.getDefault();
+                switch (dateLibrary) {
+                    case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
+                        defaultValueInit = "OffsetDateTime.parse(\"%s\")".formatted(offsetDateTime);
+                        defaultValueStr = offsetDateTime.toString();
+                    }
+                    case OPT_DATE_LIBRARY_ZONED_DATETIME -> {
+                        var zonedDateTime = offsetDateTime.toZonedDateTime();
+                        defaultValueInit = "ZonedDateTime.parse(\"%s\")".formatted(zonedDateTime);
+                        defaultValueStr = zonedDateTime.toString();
+                    }
+                    case OPT_DATE_LIBRARY_LOCAL_DATETIME -> {
+                        var localDateTime = offsetDateTime.toLocalDateTime();
+                        defaultValueInit = "LocalDateTime.parse(\"%s\")".formatted(localDateTime);
+                        defaultValueStr = localDateTime.toString();
+                    }
+                    default -> {
+                    }
+                }
+            }
         } else if (ModelUtils.isURISchema(schema)) {
             if (schema.getDefault() != null) {
                 defaultValueInit = "URI.create(\"" + escapeText(String.valueOf(schema.getDefault())) + "\")";
                 defaultValueStr = schema.getDefault().toString();
             }
+        } else if (ModelUtils.isUUIDSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = "UUID.fromString(\"" + schema.getDefault() + "\")";
+                defaultValueStr = schema.getDefault().toString();
+            }
         } else if (ModelUtils.isStringSchema(schema)) {
             if (schema.getDefault() != null) {
-                if (schema.getDefault() instanceof Date date) {
-                    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    defaultValueInit = String.format(Locale.ROOT, "LocalDate.parse(\"%s\")", localDate.toString());
-                    defaultValueStr = localDate.toString();
-                } else if (schema.getDefault() instanceof java.time.OffsetDateTime offsetDateTime) {
-                    defaultValueInit = String.format(Locale.ROOT, "OffsetDateTime.parse(\"%s\", %s)",
-                        offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()),
-                        "java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault())");
-                    defaultValueStr = offsetDateTime.toString();
-                } else if (schema.getDefault() instanceof UUID) {
-                    defaultValueInit = "UUID.fromString(\"" + schema.getDefault() + "\")";
-                    defaultValueStr = schema.getDefault().toString();
+                String def = schema.getDefault().toString();
+                if (schema.getEnum() == null) {
+                    defaultValueInit = "\"" + escapeText(def) + "\"";
+                    defaultValueStr = escapeText(def);
                 } else {
-                    String def = schema.getDefault().toString();
-                    if (schema.getEnum() == null) {
-                        defaultValueInit = "\"" + escapeText(def) + "\"";
-                        defaultValueStr = escapeText(def);
-                    } else {
-                        // convert to enum var name later in postProcessModels
-                        defaultValueInit = "\"" + def + "\"";
-                        defaultValueStr = def;
-                    }
+                    // convert to enum var name later in postProcessModels
+                    defaultValueInit = "\"" + def + "\"";
+                    defaultValueStr = def;
                 }
             }
         } else if (ModelUtils.isObjectSchema(schema)) {
@@ -2584,6 +2604,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             example = "LocalDate.of(2001, 2, 3)";
         } else if ("LocalDateTime".equals(dataType)) {
             example = "LocalDateTime.of(2001, 2, 3, 4, 5)";
+        } else if ("OffsetDateTime".equals(dataType)) {
+            example = "OffsetDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
+        } else if ("ZonedDateTime".equals(dataType)) {
+            example = "ZonedDateTime.of(2001, 2, 3, 12, 0, 0, 0, java.time.ZoneOffset.of(\"+02:00\"))";
         } else if ("MultipartBody".equals(dataType)) {
             example = "MultipartBody.builder().build()";
         } else if ("BigDecimal".equals(dataType)) {
