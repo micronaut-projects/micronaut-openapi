@@ -189,21 +189,23 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-micronautOpenApiAnnotations"><a href="#micronautOpenApiAnnotations"><strong>16</strong><span>Micronaut OpenAPI annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapidecorator"><a href="#openapidecorator"><strong>16.1</strong><span>@OpenAPIDecorator</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiDecorator"><a href="#openApiDecorator"><strong>16.1</strong><span>@OpenAPIDecorator</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiextraschema"><a href="#openapiextraschema"><strong>16.2</strong><span>@OpenAPIExtraSchema</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiExtraSchema"><a href="#openApiExtraSchema"><strong>16.2</strong><span>@OpenAPIExtraSchema</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroup"><a href="#openapigroup"><strong>16.3</strong><span>@OpenAPIGroup</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiGroup"><a href="#openApiGroup"><strong>16.3</strong><span>@OpenAPIGroup</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroupinfo"><a href="#openapigroupinfo"><strong>16.4</strong><span>@OpenAPIGroupInfo</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiGroupInfo"><a href="#openApiGroupInfo"><strong>16.4</strong><span>@OpenAPIGroupInfo</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>16.5</strong><span>@OpenAPIInclude</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiInclude"><a href="#openApiInclude"><strong>16.5</strong><span>@OpenAPIInclude</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>16.6</strong><span>@OpenAPIManagement</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiExclude"><a href="#openApiExclude"><strong>16.6</strong><span>@OpenAPIExclude</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>16.7</strong><span>@OpenAPISecurity</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiManagement"><a href="#openApiManagement"><strong>16.7</strong><span>@OpenAPIManagement</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>16.8</strong><span>@AccessorsStyle</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiSecurity"><a href="#openApiSecurity"><strong>16.8</strong><span>@OpenAPISecurity</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>16.9</strong><span>@AccessorsStyle</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>17</strong><span>Merging Schemas</span></a></div>
         
@@ -851,6 +853,16 @@ public class Application {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.server.context.path</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">System property for server context path.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.exclude.classes</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property to specify list of classes which must be excluded from the final OpenAPI specification.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.exclude.packages</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property to specify list of packages, containing controllers / endpoints, which must be excluded from the final OpenAPI specification.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -2733,10 +2745,10 @@ are available to enhance the generated OpenAPI.</p>
 </div></p>
 </div>
 
-<h2 id="openapidecorator"><a class="anchor" href="#openapidecorator"></a>16.1 @OpenAPIDecorator</h2>
+<h2 id="openApiDecorator"><a class="anchor" href="#openApiDecorator"></a>16.1 @OpenAPIDecorator</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapidecorator.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiDecorator.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2763,10 +2775,10 @@ interface MyDogsOperations extends Api&lt;MyRequest, MyResponse&gt; {
 </div>
 </div>
 
-<h2 id="openapiextraschema"><a class="anchor" href="#openapiextraschema"></a>16.2 @OpenAPIExtraSchema</h2>
+<h2 id="openApiExtraSchema"><a class="anchor" href="#openApiExtraSchema"></a>16.2 @OpenAPIExtraSchema</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapiextraschema.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiExtraSchema.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2808,10 +2820,10 @@ class Application {
 </div>
 </div>
 
-<h2 id="openapigroup"><a class="anchor" href="#openapigroup"></a>16.3 @OpenAPIGroup</h2>
+<h2 id="openApiGroup"><a class="anchor" href="#openApiGroup"></a>16.3 @OpenAPIGroup</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapigroup.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiGroup.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2859,10 +2871,10 @@ the description of the endpoints <code>/save</code> and <code>/save/{id}</code>.
 <p>You can read more about groups here: <a href="../versionsAndGroups.html">Versions and groups</a></p>
 </div>
 
-<h2 id="openapigroupinfo"><a class="anchor" href="#openapigroupinfo"></a>16.4 @OpenAPIGroupInfo</h2>
+<h2 id="openApiGroupInfo"><a class="anchor" href="#openApiGroupInfo"></a>16.4 @OpenAPIGroupInfo</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapigroupinfo.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiGroupInfo.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2921,17 +2933,17 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>16.5 @OpenAPIInclude</h2>
+<h2 id="openApiInclude"><a class="anchor" href="#openApiInclude"></a>16.5 @OpenAPIInclude</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapiinclude.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiInclude.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> you can include additional <a href="../api/io/micronaut/http/annotation/Controller.html">Controller</a> or
+<p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> to add additional <a href="../api/io/micronaut/http/annotation/Controller.html">Controller</a> or
 <a href="../api/io/micronaut/management/endpoint/annotation/Endpoint.html">Endpoint</a> already compiled
 classes in the OpenAPI processing.</p>
 </div>
@@ -2947,9 +2959,15 @@ classes in the OpenAPI processing.</p>
         )
 )
 @OpenAPIInclude(
+        // you can specify classes to include
         classes = {
                 io.micronaut.security.endpoints.LoginController.class,
                 io.micronaut.security.endpoints.LogoutController.class
+        },
+        // or / and you can specify packages to include
+        packages = {
+            "io.different.package.with.controllers",
+            "io.different.package.with.controllers2",
         },
         tags = @Tag(name = "Security")
 )
@@ -2967,10 +2985,57 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>16.6 @OpenAPIManagement</h2>
+<h2 id="openApiExclude"><a class="anchor" href="#openApiExclude"></a>16.6 @OpenAPIExclude</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapimanagement.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiExclude.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIExclude.html">OpenAPIExclude</a> to exclude selected controllers / endpoints from the OpenAPI processing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${service.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIExclude(
+        // you can specify classes to exclude
+        classes = {
+                OldApi.class,
+                InternalApi.class,
+        },
+        // or / and you can specify packages to exclude
+        packages = {
+            "io.exclude.package.with.controllers",
+            "io.exclude.package.with.controllers2",
+        }
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As alternative, you can use properties <code>micronaut.openapi.exclude.classes</code> and <code>micronaut.openapi.exclude.packages</code>.</p>
+</div>
+
+<h2 id="openApiManagement"><a class="anchor" href="#openApiManagement"></a>16.7 @OpenAPIManagement</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiManagement.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2998,10 +3063,10 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>16.7 @OpenAPISecurity</h2>
+<h2 id="openApiSecurity"><a class="anchor" href="#openApiSecurity"></a>16.8 @OpenAPISecurity</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openapisecurity.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiSecurity.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3022,7 +3087,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>16.8 @AccessorsStyle</h2>
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>16.9 @AccessorsStyle</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/accessorsStyle.adoc"'>
