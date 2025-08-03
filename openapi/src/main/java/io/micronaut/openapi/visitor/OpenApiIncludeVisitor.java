@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.util.ArrayUtils;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ElementModifier;
@@ -62,15 +63,12 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             return;
         }
         for (var includeAnn : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
-            String[] classes = includeAnn.stringValues();
-            if (ArrayUtils.isEmpty(classes)) {
-                continue;
-            }
             var description = includeAnn.stringValue(PROP_DESCRIPTION).orElse(null);
             var extensionAnns = includeAnn.getAnnotations(PROP_EXTENSIONS, Extension.class);
             var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);
             var securityAnns = includeAnn.getAnnotations(PROP_SECURITY, SecurityRequirement.class);
             String customUri = includeAnn.stringValue(PROP_URI).orElse(null);
+
             List<String> groups = List.of(includeAnn.stringValues(PROP_GROUPS));
             List<String> groupsExcluded = List.of(includeAnn.stringValues(PROP_GROUPS_EXCLUDED));
 
@@ -89,19 +87,53 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 tagAnns.isEmpty() ? null : tagAnns,
                 securityAnns.isEmpty() ? null : securityAnns
             );
-            for (String className : classes) {
-                var classEl = ContextUtils.getClassElement(className, context);
-                if (classEl == null) {
-                    continue;
-                }
-                groupVisitor.visitClass(classEl, context);
 
-                if (classEl.isAnnotationPresent(Controller.class)) {
-                    visit(controllerVisitor, context, classEl);
-                } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-                    visit(endpointVisitor, context, classEl);
+            var classesValue = List.<String>of();
+            var classesValueArr = includeAnn.stringValues();
+            if (ArrayUtils.isEmpty(classesValueArr)) {
+                classesValueArr = includeAnn.stringValues("classes");
+                if (ArrayUtils.isEmpty(classesValueArr)) {
+                    classesValueArr = includeAnn.stringValues("classNames");
                 }
             }
+            if (ArrayUtils.isNotEmpty(classesValueArr)) {
+                classesValue = List.of(classesValueArr);
+            }
+            if (CollectionUtils.isNotEmpty(classesValue)) {
+                for (String className : classesValue) {
+                    var classEl = ContextUtils.getClassElement(className, context);
+                    processClassEl(classEl, groupVisitor, controllerVisitor, endpointVisitor, context);
+                }
+            }
+            var packages = List.<String>of();
+            var packagesArr = includeAnn.stringValues("packages");
+            if (ArrayUtils.isNotEmpty(packagesArr)) {
+                packages = List.of(packagesArr);
+            }
+            if (CollectionUtils.isNotEmpty(packages)) {
+                for (String includePackage : packages) {
+                    var classEls = ContextUtils.getClassElements(includePackage, context);
+                    if (ArrayUtils.isEmpty(classEls)) {
+                        continue;
+                    }
+                    for (var classEl : classEls) {
+                        processClassEl(classEl, groupVisitor, controllerVisitor, endpointVisitor, context);
+                    }
+                }
+            }
+        }
+    }
+
+    private void processClassEl(ClassElement classEl, OpenApiGroupInfoVisitor groupVisitor, OpenApiControllerVisitor controllerVisitor, OpenApiEndpointVisitor endpointVisitor, VisitorContext context) {
+        if (classEl == null) {
+            return;
+        }
+        groupVisitor.visitClass(classEl, context);
+
+        if (classEl.isAnnotationPresent(Controller.class)) {
+            visit(controllerVisitor, context, classEl);
+        } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
+            visit(endpointVisitor, context, classEl);
         }
     }
 
@@ -112,5 +144,10 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 .named(name -> !name.contains(StringUtil.DOLLAR))
             )
             .forEach(method -> visitor.visitMethod(method, context));
+    }
+
+    @Override
+    public int getOrder() {
+        return 70;
     }
 }

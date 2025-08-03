@@ -70,6 +70,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EX
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES;
@@ -111,6 +112,8 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXCLUDE_CLASSES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXCLUDE_PACKAGES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
@@ -1374,6 +1377,21 @@ public final class ConfigUtils {
         }
         ContextUtils.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled, context);
         return isEnabled;
+    }
+
+    public static IncludeExcludeProperties getIncludeExcludeProperties(VisitorContext context) {
+
+        var includeExcludeProperties = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES, IncludeExcludeProperties.class, context);
+        if (includeExcludeProperties != null) {
+            return includeExcludeProperties;
+        }
+        includeExcludeProperties = new IncludeExcludeProperties(
+            getListStringsProperty(MICRONAUT_OPENAPI_EXCLUDE_CLASSES, null, context),
+            getListStringsProperty(MICRONAUT_OPENAPI_EXCLUDE_PACKAGES, null, context)
+        );
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES, includeExcludeProperties, context);
+
+        return includeExcludeProperties;
     }
 
     /**

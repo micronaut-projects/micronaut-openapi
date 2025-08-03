@@ -59,6 +59,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getActiveEnvs;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_PATH;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS;
+import static io.micronaut.openapi.visitor.ElementUtils.isIgnored;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
@@ -144,6 +145,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
+        if (isIgnored(element, context)) {
+            return true;
+        }
         boolean isParentClass = ContextUtils.get(MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS, Boolean.class, false, context);
 
         return (!isParentClass && !element.isAnnotationPresent(Controller.class))
@@ -153,6 +157,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
+        if (isIgnored(element.getOwningType(), context)) {
+            return true;
+        }
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
         boolean isHidden = operationAnn != null && operationAnn.booleanValue(PROP_HIDDEN).orElse(false);

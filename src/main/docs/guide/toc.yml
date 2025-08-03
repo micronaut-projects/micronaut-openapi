@@ -35,13 +35,14 @@ endpoints:
   endpointspath: Endpoints Path
 micronautOpenApiAnnotations:
   title: Micronaut OpenAPI annotations
-  openapidecorator: '@OpenAPIDecorator'
-  openapiextraschema: '@OpenAPIExtraSchema'
-  openapigroup: '@OpenAPIGroup'
-  openapigroupinfo: '@OpenAPIGroupInfo'
-  openapiinclude: '@OpenAPIInclude'
-  openapimanagement: '@OpenAPIManagement'
-  openapisecurity: '@OpenAPISecurity'
+  openApiDecorator: '@OpenAPIDecorator'
+  openApiExtraSchema: '@OpenAPIExtraSchema'
+  openApiGroup: '@OpenAPIGroup'
+  openApiGroupInfo: '@OpenAPIGroupInfo'
+  openApiInclude: '@OpenAPIInclude'
+  openApiExclude: '@OpenAPIExclude'
+  openApiManagement: '@OpenAPIManagement'
+  openApiSecurity: '@OpenAPISecurity'
   accessorsStyle: '@AccessorsStyle'
 mergingSchemas: Merging Schemas
 tagsGeneration: Tags generation
