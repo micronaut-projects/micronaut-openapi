@@ -48,6 +48,7 @@ import io.micronaut.inject.ast.MemberElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.annotation.OpenAPIRequest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -263,6 +264,7 @@ public final class ElementUtils {
             && !parameter.isAnnotationPresent(CookieValue.class)
             && !parameter.isAnnotationPresent(Header.class)
             && !parameter.isAnnotationPresent(RequestBean.class)
+            && !parameter.isAnnotationPresent(OpenAPIRequest.class)
             && !isResponseType(parameter.getType());
     }
 
