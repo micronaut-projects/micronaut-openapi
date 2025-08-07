@@ -25,48 +25,58 @@
         {{rapipdf.script}}
         window.onload = function() {
             const swaggerUiBundle = script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-bundle.js", head)
-            script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-standalone-preset.js", head)
+            const swaggerUiStandalonePreset = script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-standalone-preset.js", head)
 
-            swaggerUiBundle.onload = function() {
-                const f = contextPath === '' ? undefined : () => {
-                    return {
-                        statePlugins: {
-                            spec: {
-                                wrapActions: {
-                                    updateJsonSpec: (oriAction) => (...args) => {
-                                        let [spec] = args;
-                                        if (spec && spec.paths) {
-                                            const newPaths = {};
-                                            Object.entries(spec.paths).forEach(([path, value]) => newPaths[contextPath + path] = value);
-                                            spec.paths = newPaths;
-                                        }
-                                        oriAction(...args);
+            swaggerUiBundle.onload = function () {
+                if (typeof (SwaggerUIStandalonePreset) == "undefined") {
+                    swaggerUiStandalonePreset.onload = function () {
+                        initializeSwaggerUI();
+                    };
+                } else {
+                    initializeSwaggerUI()
+                }
+            };
+        };
+
+        function initializeSwaggerUI() {
+            const f = contextPath === '' ? undefined : () => {
+                return {
+                    statePlugins: {
+                        spec: {
+                            wrapActions: {
+                                updateJsonSpec: (oriAction) => (...args) => {
+                                    let [spec] = args;
+                                    if (spec && spec.paths) {
+                                        const newPaths = {};
+                                        Object.entries(spec.paths).forEach(([path, value]) => newPaths[contextPath + path] = value);
+                                        spec.paths = newPaths;
                                     }
+                                    oriAction(...args);
                                 }
                             }
                         }
-                    };
+                    }
                 };
-                const ui = SwaggerUIBundle({
-                    url: contextPath + '{{specURL}}',
-                    dom_id: '#swagger-ui',
-                    presets: [
-                        SwaggerUIBundle.presets.apis,
-                        SwaggerUIStandalonePreset
-                    ],
-                    plugins: [
-                        SwaggerUIBundle.plugins.DownloadUrl,
-                        f
-                    ],
-                    {{swagger-ui.primaryName}}
-                    {{swagger-ui.urls}}
-                    {{swagger-ui.attributes}}
-                });
-                {{swagger-ui.oauth2}}
-                window.ui = ui;
-                {{rapipdf.specurl}}
             };
-        };
+            const ui = SwaggerUIBundle({
+                url: contextPath + '{{specURL}}',
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl,
+                    f
+                ],
+                {{swagger-ui.primaryName}}
+                {{swagger-ui.urls}}
+                {{swagger-ui.attributes}}
+            });
+            {{swagger-ui.oauth2}}
+            window.ui = ui;
+            {{rapipdf.specurl}}
+        }
 
         function link(href, head, type, rel, sizes) {
             const el = document.createElement('link');
