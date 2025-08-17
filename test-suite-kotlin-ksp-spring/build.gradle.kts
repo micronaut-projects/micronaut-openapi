@@ -1,3 +1,5 @@
+import com.google.devtools.ksp.gradle.KspTask
+
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
     alias(mn.plugins.kotlin.jvm)
@@ -30,6 +32,8 @@ dependencies {
     implementation(libs.micrometer.registry.prometheus)
     implementation(mn.kotlin.stdlib.asProvider())
     implementation(mn.kotlin.reflect)
+
+    testCompileOnly(projects.micronautOpenapiAnnotations)
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(mnTest.junit.jupiter.api)
@@ -70,4 +74,29 @@ tasks.register("removeMnFiles") {
 }
 tasks.compileKotlin {
     dependsOn(tasks.named("removeMnFiles"))
+}
+
+tasks.register("removeMnTestFiles") {
+    doLast {
+        delete(layout.buildDirectory.dir("/generated/ksp/test/resources/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/generated/ksp/test/classes").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("kspTestKotlin"))
+}
+tasks.compileTestKotlin {
+    dependsOn(tasks.named("removeMnTestFiles"))
+}
+
+tasks.withType(KspTask::class) {
+    if (name == "kspTestKotlin") {
+        enabled = false
+    }
 }

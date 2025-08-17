@@ -1,0 +1,28 @@
+plugins {
+    id("io.micronaut.build.internal.openapi-java-generator-test-suite")
+    groovy
+}
+
+description = """
+This project tests that the generated client sources can be compiled and
+that tests can be ran with Micronaut 4
+"""
+
+dependencies {
+
+    annotationProcessor(mnValidation.micronaut.validation.processor)
+
+    implementation(mn.micronaut.http.client)
+    implementation(mnSerde.micronaut.serde.jackson)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
+    implementation(mnReactor.micronaut.reactor)
+
+    runtimeOnly(mnLogging.logback.classic)
+
+    testImplementation(mnTest.micronaut.test.spock)
+
+    testRuntimeOnly(mn.snakeyaml)
+    testRuntimeOnly(mnTest.junit.platform.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
+}

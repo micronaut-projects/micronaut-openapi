@@ -1,20 +1,50 @@
+import io.micronaut.gradle.MicronautRuntime
+import io.micronaut.gradle.MicronautTestRuntime
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+
 plugins {
-    id("io.micronaut.build.internal.openapi-test-java")
+    id("io.micronaut.minimal.application") version libs.versions.micronaut.gradle.plugin.get()
+    java
+}
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    version = libs.versions.micronaut.platform.get()
+    runtime = MicronautRuntime.NETTY
+    testRuntime = MicronautTestRuntime.JUNIT_5
 }
 
 dependencies {
-    testAnnotationProcessor(mnJaxrs.micronaut.jaxrs.processor)
-    testAnnotationProcessor(mnSerde.micronaut.serde.processor)
-    testAnnotationProcessor(projects.micronautOpenapi)
+    annotationProcessor(mnJaxrs.micronaut.jaxrs.processor)
+    annotationProcessor(mnSerde.micronaut.serde.processor)
+    annotationProcessor(mn.micronaut.inject.java)
+    annotationProcessor(projects.micronautOpenapi)
 
-    testCompileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(projects.micronautOpenapiAnnotations)
 
-    testImplementation(mnJaxrs.micronaut.jaxrs.server)
-    testImplementation(mn.micronaut.http.server.netty)
-    testImplementation(mnSerde.micronaut.serde.jackson)
+    implementation(mnJaxrs.micronaut.jaxrs.server)
+    implementation(mn.micronaut.http.server.netty)
+    implementation(mnSerde.micronaut.serde.jackson)
+    implementation(mn.snakeyaml)
+
+    testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mn.micronaut.http.client)
-    testImplementation(mn.snakeyaml)
 
+    testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
+}
+
+tasks.withType(JavaCompile::class) {
+    options.compilerArgs.add("-parameters")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = FULL
+    }
 }

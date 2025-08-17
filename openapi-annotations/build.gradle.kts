@@ -1,0 +1,26 @@
+plugins {
+    id("io.micronaut.build.internal.openapi-simple-module")
+}
+
+dependencies {
+    api(libs.managed.swagger.annotations)
+    api(mn.micronaut.core) {
+        exclude(group = "io.micronaut")
+        exclude(group = "org.slf4j")
+    }
+    api(mn.micronaut.inject) {
+        exclude(group = "io.micronaut")
+        exclude(group = "org.slf4j")
+        exclude(group = "jakarta.inject")
+        exclude(group = "jakarta.annotation")
+    }
+    api(mn.micronaut.http) {
+        exclude(group = "io.micronaut")
+        exclude(group = "org.slf4j")
+    }
+}
+
+configurations.configureEach {
+    exclude(group = "io.micronaut", module = "micronaut-inject-java")
+    exclude(group = "io.micronaut", module = "micronaut-core-bom")
+}
