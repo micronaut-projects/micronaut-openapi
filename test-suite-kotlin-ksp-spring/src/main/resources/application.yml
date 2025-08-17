@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: test-suite-kotlin-ksp-spring
+  main:
+    banner-mode: off
+
+management:
+  endpoints:
+    web:
+      path-mapping:
+        health: /test
+      base-path: /actuator2
+      exposure:
+        include: health,beans, metrics,info,prometheus,loggers
+  server:
+    base-path: /my
+    port: 9090
+
+logging:
+  pattern:
+    console: '%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n'
+  level:
+    root: info

@@ -13,24 +13,28 @@ enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
 rootProject.name = "openapi-parent"
 
-include "openapi"
-include "openapi-annotations"
-include "openapi-bom"
-include "openapi-common"
-include "openapi-adoc"
-include "openapi-generator"
-include 'docs-examples:example-groovy'
-include 'docs-examples:example-java'
-include 'docs-examples:example-kotlin'
-include 'test-suite-java-client-generator'
-include 'test-suite-java-jaxrs'
-include 'test-suite-java-spring'
-include 'test-suite-java-server-generator'
-include 'test-suite-kotlin-kapt-client-generator'
-include 'test-suite-kotlin-kapt-server-generator'
-include 'test-suite-kotlin-ksp-client-generator'
-include 'test-suite-kotlin-ksp-server-generator'
-include 'test-suite-generator-util'
+include(
+        "openapi",
+        "openapi-annotations",
+        "openapi-bom",
+        "openapi-common",
+        "openapi-adoc",
+        "openapi-generator",
+        "docs-examples:example-groovy",
+        "docs-examples:example-java",
+        "docs-examples:example-kotlin",
+        "test-suite-java-client-generator",
+        "test-suite-java-jaxrs",
+        "test-suite-java-spring",
+        "test-suite-java-server-generator",
+        "test-suite-kotlin-kapt-client-generator",
+        "test-suite-kotlin-kapt-server-generator",
+        "test-suite-kotlin-kapt-spring",
+        "test-suite-kotlin-ksp-client-generator",
+        "test-suite-kotlin-ksp-server-generator",
+        "test-suite-kotlin-ksp-spring",
+        "test-suite-generator-util",
+)
 
 dependencyResolutionManagement {
     repositories {

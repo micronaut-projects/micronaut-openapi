@@ -5,12 +5,6 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
 ----
     <dependencies>
         <dependency>
-            <groupId>io.micronaut</groupId>
-            <artifactId>micronaut-http</artifactId>
-            <version>${micronaut.core.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>io.micronaut.openapi</groupId>
             <artifactId>micronaut-openapi-annotations</artifactId>
             <version>${micronaut.openapi.version}</version>
@@ -26,11 +20,6 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
                 <configuration>
                     <annotationProcessorPaths combine.children="append">
                         <path>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-inject-java</artifactId>
-                            <version>${micronaut.core.version}</version>
-                        </path>
-                        <path>
                             <groupId>io.micronaut.spring</groupId>
                             <artifactId>micronaut-spring-web-annotation</artifactId>
                             <version>${micronaut.spring.version}</version>
@@ -39,6 +28,11 @@ To use micronaut-openapi with spring in maven add this code to your `pom.xml`
                             <groupId>io.micronaut.spring</groupId>
                             <artifactId>micronaut-spring-boot-annotation</artifactId>
                             <version>${micronaut.spring.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-inject-java</artifactId>
+                            <version>${micronaut.core.version}</version>
                         </path>
                         <path>
                             <groupId>io.micronaut.openapi</groupId>
@@ -57,12 +51,6 @@ For kotlin
 [source,xml]
 ----
     <dependencies>
-        <dependency>
-            <groupId>io.micronaut</groupId>
-            <artifactId>micronaut-inject</artifactId>
-            <version>${micronaut.core.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>io.micronaut.openapi</groupId>
             <artifactId>micronaut-openapi-annotations</artifactId>
@@ -89,11 +77,6 @@ For kotlin
                 </sourceDirs>
                 <annotationProcessorPaths combine.self="override">
                     <annotationProcessorPath>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-inject-java</artifactId>
-                        <version>${micronaut.core.version}</version>
-                    </annotationProcessorPath>
-                    <annotationProcessorPath>
                         <groupId>io.micronaut.spring</groupId>
                         <artifactId>micronaut-spring-web-annotation</artifactId>
                         <version>${micronaut.spring.version}</version>
@@ -102,6 +85,11 @@ For kotlin
                         <groupId>io.micronaut.spring</groupId>
                         <artifactId>micronaut-spring-boot-annotation</artifactId>
                         <version>${micronaut.spring.version}</version>
+                    </annotationProcessorPath>
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut</groupId>
+                        <artifactId>micronaut-inject-java</artifactId>
+                        <version>${micronaut.core.version}</version>
                     </annotationProcessorPath>
                     <annotationProcessorPath>
                         <groupId>io.micronaut.openapi</groupId>
