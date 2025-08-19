@@ -53,6 +53,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
+import io.micronaut.openapi.annotation.OpenAPIRequest;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.Webhook;
@@ -886,7 +887,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
-        if (parameter.isAnnotationPresent(RequestBean.class)) {
+        if (parameter.isAnnotationPresent(RequestBean.class)
+            || parameter.isAnnotationPresent(OpenAPIRequest.class)) {
             processRequestBean(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             return;

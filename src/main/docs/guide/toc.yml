@@ -43,6 +43,7 @@ micronautOpenApiAnnotations:
   openApiExclude: '@OpenAPIExclude'
   openApiManagement: '@OpenAPIManagement'
   openApiSecurity: '@OpenAPISecurity'
+  openApiRequest: '@OpenAPIRequest'
   accessorsStyle: '@AccessorsStyle'
 mergingSchemas: Merging Schemas
 tagsGeneration: Tags generation
