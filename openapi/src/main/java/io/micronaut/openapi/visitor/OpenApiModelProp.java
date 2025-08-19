@@ -95,7 +95,12 @@ public interface OpenApiModelProp {
     String PROP_TITLE = "title";
     String PROP_CALLBACK_URL_EXPRESSION = "callbackUrlExpression";
     String PROP_EXCLUDE = "exclude";
+    String PROP_OP_ID_PREFIX = "opIdPrefix";
     String PROP_OP_ID_SUFFIX = "opIdSuffix";
+    String PROP_NAMES = "names";
+    String PROP_CLASSES = "classes";
+    String PROP_CLASS_NAMES = "classNames";
+    String PROP_PACKAGES = "packages";
     String PROP_ADD_ALWAYS = "addAlways";
     String PROP_PROPERTIES = "properties";
     String PROP_PARSE_VALUE = "parseValue";

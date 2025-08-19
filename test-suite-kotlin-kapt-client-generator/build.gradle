@@ -34,11 +34,11 @@ dependencies {
 
     testImplementation(mnTest.micronaut.test.junit5)
 
-    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
-    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mn.snakeyaml)
+    testRuntimeOnly(mnTest.junit.platform.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 kotlin {

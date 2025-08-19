@@ -44,12 +44,12 @@ dependencies {
     testImplementation(mnTest.junit.jupiter.params)
     testImplementation(projects.micronautOpenapiCommon)
 
-    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
-    testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mn.snakeyaml)
+    testRuntimeOnly(mnTest.junit.platform.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 tasks.named("generateOpenApi") {

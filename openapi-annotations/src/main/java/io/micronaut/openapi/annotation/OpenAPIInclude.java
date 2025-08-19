@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.annotation;
 
-import io.micronaut.context.annotation.AliasFor;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,15 +46,17 @@ public @interface OpenAPIInclude {
     Class<?>[] value() default {};
 
     /**
+     * Alias for 'value' member.
+     *
      * @return The classes to generate Open API for.
      */
-    @AliasFor(member = "value")
     Class<?>[] classes() default {};
 
     /**
+     * Alias for 'value' member.
+     *
      * @return The classes to generate Open API for.
      */
-    @AliasFor(member = "value")
     String[] classNames() default {};
 
     /**

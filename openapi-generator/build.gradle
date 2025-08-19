@@ -42,6 +42,21 @@ dependencies {
     testFixturesImplementation(libs.openapi.generator)
 }
 
+configurations {
+
+    compileClasspath {
+        exclude group: "io.micronaut", module: "micronaut-inject-java"
+        exclude group: "io.micronaut", module: "micronaut-inject"
+        exclude group: "io.micronaut", module: "micronaut-core-bom"
+    }
+
+    runtimeClasspath {
+        exclude group: "io.micronaut", module: "micronaut-inject-java"
+        exclude group: "io.micronaut", module: "micronaut-inject"
+        exclude group: "io.micronaut", module: "micronaut-core-bom"
+    }
+}
+
 configurations.configureEach {
     exclude group: "com.google.code.findbugs", module: "jsr305"
     exclude group: "javax.validation", module: "validation-api"

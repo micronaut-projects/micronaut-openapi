@@ -16,3 +16,10 @@ dependencies {
     testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
+
+configurations.configureEach {
+
+    exclude group: "io.micronaut", module: "micronaut-inject-java"
+    exclude group: "io.micronaut", module: "micronaut-inject"
+    exclude group: "io.micronaut", module: "micronaut-core-bom"
+}

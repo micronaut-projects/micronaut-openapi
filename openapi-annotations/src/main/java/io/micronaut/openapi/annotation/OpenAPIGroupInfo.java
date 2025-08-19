@@ -15,15 +15,14 @@
  */
 package io.micronaut.openapi.annotation;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import io.micronaut.context.annotation.AliasFor;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -43,13 +42,13 @@ public @interface OpenAPIGroupInfo {
     /**
      * @return The names of the OpenAPI groups.
      */
-    @AliasFor(member = "names")
     String[] value() default {};
 
     /**
+     * Alias for 'value' member.
+     *
      * @return The names of the OpenAPI groups.
      */
-    @AliasFor(member = "value")
     String[] names() default {};
 
     /**

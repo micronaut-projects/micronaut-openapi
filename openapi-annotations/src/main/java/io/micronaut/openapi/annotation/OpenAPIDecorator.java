@@ -20,8 +20,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.micronaut.context.annotation.AliasFor;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
@@ -52,9 +50,10 @@ public @interface OpenAPIDecorator {
     String value() default "";
 
     /**
+     * Alias for 'value' member.
+     *
      * @return Prefix for operation ids.
      */
-    @AliasFor(member = "value")
     String opIdPrefix() default "";
 
     /**

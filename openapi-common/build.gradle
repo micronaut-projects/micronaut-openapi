@@ -9,3 +9,10 @@ dependencies {
     api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
 }
+
+configurations.configureEach {
+
+    exclude group: "io.micronaut", module: "micronaut-inject-java"
+    exclude group: "io.micronaut", module: "micronaut-inject"
+    exclude group: "io.micronaut", module: "micronaut-core-bom"
+}

@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.order.Ordered;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.PackageElement;
@@ -39,6 +40,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConvertUtils.toValue;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAMES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 
 /**
@@ -138,7 +140,12 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
                 ConvertUtils.addSecuritySchemes(openApi, securitySchemeAnns, context);
             }
 
-            for (var groupName : groupInfoAnn.stringValues("names")) {
+            var groupNames = groupInfoAnn.stringValues();
+            if (ArrayUtils.isEmpty(groupNames)) {
+                groupNames = groupInfoAnn.stringValues(PROP_NAMES);
+            }
+
+            for (var groupName : groupNames) {
                 openApis.put(groupName, openApi);
             }
         }

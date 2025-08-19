@@ -55,3 +55,10 @@ dependencies {
         implementation("io.micronaut:micronaut-http-client:${libs.versions.micronaut.asProvider().get()}")
     }
 }
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}

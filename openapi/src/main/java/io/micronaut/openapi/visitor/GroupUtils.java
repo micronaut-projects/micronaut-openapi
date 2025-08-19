@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.version.annotation.Version;
 import io.micronaut.http.HttpMethod;
@@ -44,7 +45,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAMES;
 import static io.micronaut.openapi.visitor.ParamUtils.addVersionParameters;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
@@ -61,10 +62,10 @@ public final class GroupUtils {
     }
 
     public static void processMicronautVersionAndGroup(Operation swaggerOperation, String url,
-                                                 HttpMethod httpMethod,
-                                                 List<MediaType> consumesMediaTypes,
-                                                 List<MediaType> producesMediaTypes,
-                                                 MethodElement methodEl, VisitorContext context) {
+                                                       HttpMethod httpMethod,
+                                                       List<MediaType> consumesMediaTypes,
+                                                       List<MediaType> producesMediaTypes,
+                                                       MethodElement methodEl, VisitorContext context) {
 
         String methodKey = httpMethod.name()
             + '#' + url
@@ -145,9 +146,9 @@ public final class GroupUtils {
     }
 
     public static void processGroups(Map<String, EndpointGroupInfo> groups,
-                               List<String> excludedGroups,
-                               List<AnnotationValue<OpenAPIGroup>> annotationValues,
-                               Map<String, GroupProperties> groupPropertiesMap) {
+                                     List<String> excludedGroups,
+                                     List<AnnotationValue<OpenAPIGroup>> annotationValues,
+                                     Map<String, GroupProperties> groupPropertiesMap) {
         if (CollectionUtils.isEmpty(annotationValues)) {
             return;
         }
@@ -155,7 +156,11 @@ public final class GroupUtils {
             excludedGroups.addAll(List.of(groupAnn.stringValues(PROP_EXCLUDE)));
 
             var extensionAnns = groupAnn.getAnnotations(PROP_EXTENSIONS);
-            for (var groupName : groupAnn.stringValues(PROP_VALUE)) {
+            var groupNames = groupAnn.stringValues();
+            if (ArrayUtils.isEmpty(groupNames)) {
+                groupNames = groupAnn.stringValues(PROP_NAMES);
+            }
+            for (var groupName : groupNames) {
                 var extensions = new HashMap<String, Object>();
                 if (CollectionUtils.isNotEmpty(extensionAnns)) {
                     for (Object extensionAnn : extensionAnns) {
