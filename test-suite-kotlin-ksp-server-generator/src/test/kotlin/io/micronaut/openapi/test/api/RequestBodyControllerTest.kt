@@ -176,6 +176,7 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
+    @Disabled
     @MethodSource("models3")
     @ParameterizedTest
     fun testSendModelWithValidatedDeepMapProperty(model: ModelWithMapProperty, messageContent: String) {

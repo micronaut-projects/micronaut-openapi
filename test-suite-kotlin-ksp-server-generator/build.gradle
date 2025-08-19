@@ -31,6 +31,7 @@ dependencies {
 
     runtimeOnly(mnLogging.logback.classic)
     runtimeOnly(mnSerde.micronaut.serde.jackson)
+    runtimeOnly(mn.snakeyaml)
 
     kspTest(mnValidation.micronaut.validation.processor)
     kspTest(mnSerde.micronaut.serde.processor)
@@ -41,6 +42,7 @@ dependencies {
     testImplementation(mn.micronaut.http.client)
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mnTest.junit.jupiter.params)
+    testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mnTest.junit.platform.launcher)
     testRuntimeOnly(mn.micronaut.json.core)
@@ -79,6 +81,8 @@ tasks.named("generateOpenApi") {
 
 ksp {
     arg("micronaut.openapi.project.dir", "$projectDir")
+    arg("micronaut.openapi.environments", "local")
+    arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
 }
 
 kotlin {

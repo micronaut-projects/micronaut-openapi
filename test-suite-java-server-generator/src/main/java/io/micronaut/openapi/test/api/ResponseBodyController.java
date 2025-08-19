@@ -22,8 +22,10 @@ import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.SimpleModel;
 import io.micronaut.openapi.test.model.StateEnum;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import reactor.core.publisher.Mono;
 
+@Hidden
 @Controller
 public class ResponseBodyController implements ResponseBodyApi {
 
