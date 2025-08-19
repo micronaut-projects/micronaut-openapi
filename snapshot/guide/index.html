@@ -205,7 +205,9 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-openApiSecurity"><a href="#openApiSecurity"><strong>16.8</strong><span>@OpenAPISecurity</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>16.9</strong><span>@AccessorsStyle</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiRequest"><a href="#openApiRequest"><strong>16.9</strong><span>@OpenAPIRequest</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>16.10</strong><span>@AccessorsStyle</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>17</strong><span>Merging Schemas</span></a></div>
         
@@ -3087,7 +3089,92 @@ public class Application {
 </div>
 </div>
 
-<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>16.9 @AccessorsStyle</h2>
+<h2 id="openApiRequest"><a class="anchor" href="#openApiRequest"></a>16.9 @OpenAPIRequest</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/openApiRequest.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Annotation <a href="../api/io/micronaut/openapi/annotation/OpenAPIRequest.html">OpenAPIRequest</a> can be used as alternative to <strong>io.micronaut.http.annotation.RequestBean</strong> to mark parameter as wrapped request details. It useful, when you haven&#8217;t micronaut-http in dependencies. For example, when you use micronaut-openapi with spring-boot application.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example of using <code>@OpenAPIRequest</code> annotation with a Spring Boot application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RestController
+@RequestMapping("/my-api")
+public class MyController {
+
+    @PostMapping(value = "/testMultipart/{pathVar}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void testMultipart(@OpenAPIRequest WrappedRq rq) {
+        System.out.println(rq);
+    }
+
+    /**
+     * Wrapped request data
+     */
+    public static class WrappedRq {
+
+        /**
+         * This is path variable
+         */
+        private String pathVar;
+        /**
+         * This is request param
+         */
+        @Parameter(in = QUERY) // you need to set, that this is @RequestParam by swagger annotation!
+        private String queryVar;
+        /**
+         * This is fileName request body part
+         */
+        // Part from multipart body
+        private String fileName;
+        /**
+         * This is file request body part
+         */
+        // Part from multipart body
+        private MultipartFile file;
+
+        public String getPathVar() {
+            return pathVar;
+        }
+
+        public void setPathVar(String pathVar) {
+            this.pathVar = pathVar;
+        }
+
+        public String getQueryVar() {
+            return queryVar;
+        }
+
+        public void setQueryVar(String queryVar) {
+            this.queryVar = queryVar;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public MultipartFile getFile() {
+            return file;
+        }
+
+        public void setFile(MultipartFile file) {
+            this.file = file;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>16.10 @AccessorsStyle</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.18.x/src/main/docs/guide/micronautOpenApiAnnotations/accessorsStyle.adoc"'>
@@ -6247,14 +6334,12 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 
     annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
     annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
-    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
 
-    compileOnly("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    compileOnly("io.micronaut:micronaut-http:$micronautCoreVersion")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
-    compileOnly("io.micronaut.serde:micronaut-serde-api:$micronautSerdeVersion")
 
 }</code></pre>
 </div>
@@ -6281,7 +6366,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+            &lt;artifactId&gt;micronaut-http&lt;/artifactId&gt;
             &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
             &lt;scope&gt;provided&lt;/scope&gt;
         &lt;/dependency&gt;
@@ -6289,12 +6374,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
             &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
             &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
             &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;io.micronaut.serde&lt;/groupId&gt;
-            &lt;artifactId&gt;micronaut-serde-api&lt;/artifactId&gt;
-            &lt;version&gt;${micronaut.serde.version}&lt;/version&gt;
             &lt;scope&gt;provided&lt;/scope&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
@@ -6310,11 +6389,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                             &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
                             &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
                             &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-                        &lt;/path&gt;
-                        &lt;path&gt;
-                            &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
-                            &lt;artifactId&gt;micronaut-spring-annotation&lt;/artifactId&gt;
-                            &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
                         &lt;/path&gt;
                         &lt;path&gt;
                             &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
@@ -6347,7 +6421,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+            &lt;artifactId&gt;micronaut-inject&lt;/artifactId&gt;
             &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
             &lt;scope&gt;provided&lt;/scope&gt;
         &lt;/dependency&gt;
@@ -6380,11 +6454,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                         &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
                         &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
                         &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-                    &lt;/annotationProcessorPath&gt;
-                    &lt;annotationProcessorPath&gt;
-                        &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
-                        &lt;artifactId&gt;micronaut-spring-annotation&lt;/artifactId&gt;
-                        &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
                     &lt;/annotationProcessorPath&gt;
                     &lt;annotationProcessorPath&gt;
                         &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
