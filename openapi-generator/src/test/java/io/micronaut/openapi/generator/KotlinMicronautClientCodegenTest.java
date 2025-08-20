@@ -1072,7 +1072,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      * @param age (required)
                      * @param height (required)
                      *        Deprecated: Deprecated message4
-                     * @return Mono&lt;SendPrimitivesResponse&gt;
+                     *
+                     * @return Success (status code 200)
+                     *         or An unexpected error has occurred (status code default)
                      *
                      * @deprecated Deprecated message1
                      */
@@ -2381,6 +2383,28 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_TIMESTAMP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var timestamp: OffsetDateTime? = OffsetDateTime.parse("2007-12-03T10:15:30+01:00"),
+                """
+        );
+    }
+
+    @Test
+    void testHtmlDescription() {
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/html-description.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/MyCustomApi.kt",
+            """
+                    /**
+                     * {@summary Summary {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}}
+                     * Archives the article. You can restore the article using the Help Center user interface. {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>}. Allowed for Agents
+                     *
+                     * @param locale Param locale description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>} (required)
+                     * @param articleId Param article_id description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>} (required)
+                     * @param body Request body {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>} (required)
+                     *
+                     * @return Response description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>} (status code 200)
+                     */
                 """
         );
     }

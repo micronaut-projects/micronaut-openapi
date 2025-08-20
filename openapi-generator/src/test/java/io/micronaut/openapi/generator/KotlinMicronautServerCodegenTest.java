@@ -721,7 +721,9 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                      * @param age (required)
                      * @param height (required)
                      *        Deprecated: Deprecated message4
-                     * @return Mono&lt;SendPrimitivesResponse&gt;
+                     *
+                     * @return Success (status code 200)
+                     *         or An unexpected error has occurred (status code default)
                      *
                      * @deprecated Deprecated message1
                      */

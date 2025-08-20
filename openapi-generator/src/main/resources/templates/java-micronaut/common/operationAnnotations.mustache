@@ -1,9 +1,9 @@
     /**
     {{#summary}}
-     * {{openbrace}}@summary {{summary}}{{closebrace}}
+     * {{openbrace}}@summary {{{summary}}}{{closebrace}}
     {{/summary}}
     {{#notes}}
-     * {{.}}
+     * {{{.}}}
     {{/notes}}
     {{^summary}}
         {{^notes}}
@@ -14,23 +14,22 @@
         {{#-first}}
      *
         {{/-first}}
-     * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#vendorExtensions.x-deprecated-message}}
+     * @param {{paramName}}{{#description}} {{{description}}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#vendorExtensions.x-deprecated-message}}
      *        Deprecated: {{{.}}}{{/vendorExtensions.x-deprecated-message}}
     {{/vendorExtensions.originalParams}}
     {{#returnType}}
-        {{^vendorExtensions.originalParams.0}}
      *
-        {{/vendorExtensions.originalParams.0}}
-     * @return {{#responses}}{{message}} (status code {{code}}){{^-last}}
+     * @return {{#responses}}{{{message}}} (status code {{code}}){{^-last}}
      *         or {{/-last}}{{/responses}}
     {{/returnType}}
     {{#isDeprecated}}
+     *
      * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
     {{/isDeprecated}}
     {{#externalDocs}}
-     * {{description}}
+     * {{{description}}}
      *
-     * @see <a href="{{url}}">{{summary}} Documentation</a>
+     * @see <a href="{{url}}">{{{summary}}} Documentation</a>
     {{/externalDocs}}
      */
     {{#generateSwagger2Annotations}}

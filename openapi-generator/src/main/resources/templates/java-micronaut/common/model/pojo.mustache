@@ -1,6 +1,6 @@
 {{#formatNoEmptyLines}}
 /**
- * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
+ * {{#description}}{{{.}}}{{/description}}{{^description}}{{classname}}{{/description}}
 {{#isDeprecated}}
  *
  * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
@@ -92,7 +92,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{#formatNoEmptyLines}}
         {{#description}}
     /**
-     * {{description}}
+     * {{{description}}}
         {{#deprecated}}
      *
      * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
@@ -217,7 +217,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
 
     /**
         {{#description}}
-     * {{description}}
+     * {{{description}}}
      *
         {{/description}}
      * @return the {{name}} property value
@@ -262,7 +262,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
 
     /**
         {{#description}}
-     * {{description}}
+     * {{{description}}}
      *
         {{/description}}
      * @return the {{name}} property value wrapped in an optional
