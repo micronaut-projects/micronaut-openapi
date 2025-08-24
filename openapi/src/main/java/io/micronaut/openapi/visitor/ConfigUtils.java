@@ -34,6 +34,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.javadoc.DocsFormat;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
@@ -110,6 +111,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_DOCS_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXCLUDE_CLASSES;
@@ -158,6 +160,7 @@ import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFA
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
 import static io.micronaut.openapi.visitor.management.SpringActuatorConfigUtils.mergeWithActuatorProperties;
+import static org.jsoup.helper.Validate.fail;
 
 /**
  * Configuration utilities methods.
@@ -1392,6 +1395,22 @@ public final class ConfigUtils {
         ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES, includeExcludeProperties, context);
 
         return includeExcludeProperties;
+    }
+
+    public static DocsFormat getDocsFormat(@Nullable VisitorContext context) {
+        if (context == null) {
+            return DocsFormat.HTML_TO_MD;
+        }
+        var value = getConfigProperty(MICRONAUT_OPENAPI_DOCS_FORMAT, context);
+        if (value == null) {
+            return DocsFormat.HTML_TO_MD;
+        }
+        try {
+            return DocsFormat.valueOf(value.toUpperCase(Locale.ENGLISH));
+        } catch (Exception e) {
+            fail("Unknown docs format value: " + value + ". Available values: " + String.join(", ", DocsFormat.NAMES), context);
+            throw e;
+        }
     }
 
     /**

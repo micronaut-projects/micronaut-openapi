@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getDocsFormat;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED;
 import static io.swagger.v3.oas.models.media.Schema.BIND_TYPE_AND_TYPES;
 
@@ -89,7 +90,7 @@ public final class Utils {
     private static String testYamlReference;
     private static String testJsonReference;
 
-    private static JavadocParser javadocParser = new JavadocParser();
+    private static JavadocParser javadocParser;
 
     private Utils() {
     }
@@ -103,6 +104,7 @@ public final class Utils {
             return;
         }
         setOpenapi31(ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context));
+        javadocParser = new JavadocParser(getDocsFormat(context), context);
         initialized = true;
     }
 

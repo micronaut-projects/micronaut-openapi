@@ -25,9 +25,11 @@ dependencies {
     api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
-    api(libs.managed.html2md.converter) {
+    api(libs.managed.flexmark.html2md.converter) {
         exclude(group = "org.jetbrains", module = "annotations")
     }
+    api(libs.managed.flexmark.profile.pegdown)
+
     // this dependency needs to be updated manually. It's used by html2md
     api(libs.managed.jsoup)
 
