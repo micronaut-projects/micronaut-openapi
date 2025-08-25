@@ -3101,78 +3101,7 @@ public class Application {
 <div class="paragraph">
 <p>Annotation <a href="../api/io/micronaut/openapi/annotation/OpenAPIRequest.html">OpenAPIRequest</a> can be used as alternative to <strong>io.micronaut.http.annotation.RequestBean</strong> to mark parameter as wrapped request details. It useful, when you haven&#8217;t micronaut-http in dependencies. For example, when you use micronaut-openapi with spring-boot application.</p>
 </div>
-<div class="listingblock">
-<div class="title">Example of using <code>@OpenAPIRequest</code> annotation with a Spring Boot application</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RestController
-@RequestMapping("/my-api")
-public class MyController {
 
-    @PostMapping(value = "/testMultipart/{pathVar}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void testMultipart(@OpenAPIRequest WrappedRq rq) {
-        System.out.println(rq);
-    }
-
-    /**
-     * Wrapped request data
-     */
-    public static class WrappedRq {
-
-        /**
-         * This is path variable
-         */
-        private String pathVar;
-        /**
-         * This is request param
-         */
-        @Parameter(in = QUERY) // you need to set, that this is @RequestParam by swagger annotation!
-        private String queryVar;
-        /**
-         * This is fileName request body part
-         */
-        // Part from multipart body
-        private String fileName;
-        /**
-         * This is file request body part
-         */
-        // Part from multipart body
-        private MultipartFile file;
-
-        public String getPathVar() {
-            return pathVar;
-        }
-
-        public void setPathVar(String pathVar) {
-            this.pathVar = pathVar;
-        }
-
-        public String getQueryVar() {
-            return queryVar;
-        }
-
-        public void setQueryVar(String queryVar) {
-            this.queryVar = queryVar;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public MultipartFile getFile() {
-            return file;
-        }
-
-        public void setFile(MultipartFile file) {
-            this.file = file;
-        }
-    }
-}</code></pre>
-</div>
-</div>
 
 <h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>16.10 @AccessorsStyle</h2>
 
@@ -6326,26 +6255,94 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>To use micronaut-openapi with spring in gradle add this code to you <code>build.gradle</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">build.gradle</div>
+<div class="title">build.gradle.kts</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">dependencies {
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">dependencies {
 
     // add to annotationProcessor and compileOnly blocks next libraries:
-
+    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotationm:$micronautSpringVersion")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotationm:$micronautSpringVersion")
     annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
-    annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
-    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
-    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
 
-    compileOnly("io.micronaut:micronaut-http:$micronautCoreVersion")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
-
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>For kotlin just change block <code>annotationProcessor</code> to <code>kapt</code> or <code>ksp</code>.</p>
+</div>
+<div class="paragraph">
+<p>Also, if you want to do your final jar is more clear, need to remove some micronaut generated files. For it just add this task to your <code>build.gradle</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="title">Sample gradle task to remove micronaut generated files (java annotation processor)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.file("/classes/java/main/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/classes/java/main").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("classes"))
+}
+tasks.jar {
+    dependsOn(tasks.named("removeMnFiles"))
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample gradle task to remove micronaut generated files (KAPT)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.dir("/tmp/kapt3/classes/main/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/tmp/kapt3/classes/main").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("kaptKotlin"))
+}
+tasks.compileKotlin {
+    dependsOn(tasks.named("removeMnFiles"))
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample gradle task to remove micronaut generated files (KSP)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.dir("/generated/ksp/main/resources/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/generated/ksp/main/classes").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("kspKotlin"))
+}
+tasks.compileKotlin {
+    dependsOn(tasks.named("removeMnFiles"))
+}</code></pre>
+</div>
 </div>
 
 <h2 id="springWithMaven"><a class="anchor" href="#springWithMaven"></a>23.2 Spring with Maven</h2>
@@ -6365,12 +6362,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
         &lt;dependency&gt;
-            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-            &lt;artifactId&gt;micronaut-http&lt;/artifactId&gt;
-            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
             &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
             &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
             &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
@@ -6386,11 +6377,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                 &lt;configuration&gt;
                     &lt;annotationProcessorPaths combine.children="append"&gt;
                         &lt;path&gt;
-                            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-                            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
-                            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-                        &lt;/path&gt;
-                        &lt;path&gt;
                             &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
                             &lt;artifactId&gt;micronaut-spring-web-annotation&lt;/artifactId&gt;
                             &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
@@ -6399,6 +6385,11 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                             &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
                             &lt;artifactId&gt;micronaut-spring-boot-annotation&lt;/artifactId&gt;
                             &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
                         &lt;/path&gt;
                         &lt;path&gt;
                             &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
@@ -6419,12 +6410,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-            &lt;artifactId&gt;micronaut-inject&lt;/artifactId&gt;
-            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
             &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
@@ -6451,11 +6436,6 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                 &lt;/sourceDirs&gt;
                 &lt;annotationProcessorPaths combine.self="override"&gt;
                     &lt;annotationProcessorPath&gt;
-                        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-                        &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
-                        &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
-                    &lt;/annotationProcessorPath&gt;
-                    &lt;annotationProcessorPath&gt;
                         &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
                         &lt;artifactId&gt;micronaut-spring-web-annotation&lt;/artifactId&gt;
                         &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
@@ -6464,6 +6444,11 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
                         &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
                         &lt;artifactId&gt;micronaut-spring-boot-annotation&lt;/artifactId&gt;
                         &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
                     &lt;/annotationProcessorPath&gt;
                     &lt;annotationProcessorPath&gt;
                         &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
