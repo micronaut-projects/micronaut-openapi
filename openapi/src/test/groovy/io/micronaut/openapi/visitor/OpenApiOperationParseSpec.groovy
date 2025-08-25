@@ -1,9 +1,8 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import io.swagger.v3.oas.models.media.ArraySchema
-import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiOperationParseSpec extends AbstractOpenApiTypeElementSpec {
@@ -444,5 +443,144 @@ class MyBean {}
         operation.responses.'200'.extensions.'x-custom'.prop1 == "prop1Val"
         operation.responses.'400'.description == 'Invalid ID supplied'
 
+    }
+
+    void "test parse the OpenAPI api responses inside operations"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
+
+@Controller
+@Tag(name = "Accounts", description = "The Accounts API")
+interface AccountsApi {
+
+    /**
+     * {@summary Deposit amount to account}
+     * Initiates a deposit operation of a desired amount to the account specified
+     *
+     * @param depositRequest Account number and desired amount to deposit (required)
+     * @return Success (status code 204)
+     *         or Request missing required params (status code 400)
+     *         or Internal Server Error (status code 500)
+     */
+    @Operation(
+        operationId = "depositToAccount",
+        summary = "Deposit amount to account",
+        description = "Initiates a deposit operation of a desired amount to the account specified",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Request missing required params", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAccount400Response.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAccount400Response.class)))
+        }
+    )
+    @Post("/account/deposit")
+    Mono<HttpResponse<Void>> depositToAccount(
+        @Body DepositRequest depositRequest
+    );
+}
+
+@JsonPropertyOrder({
+    DepositRequest.JSON_PROPERTY_ACCOUNT_NUMBER,
+    DepositRequest.JSON_PROPERTY_DEPOSIT_AMOUNT,
+})
+class DepositRequest {
+
+    public static final String JSON_PROPERTY_ACCOUNT_NUMBER = "accountNumber";
+    public static final String JSON_PROPERTY_DEPOSIT_AMOUNT = "depositAmount";
+
+    @Nullable(inherited = true)
+    @Schema(name = "accountNumber", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty(JSON_PROPERTY_ACCOUNT_NUMBER)
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    private String accountNumber;
+
+    @Nullable(inherited = true)
+    @Schema(name = "depositAmount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty(JSON_PROPERTY_DEPOSIT_AMOUNT)
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    private BigDecimal depositAmount;
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public DepositRequest accountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+        return this;
+    }
+
+    public BigDecimal getDepositAmount() {
+        return depositAmount;
+    }
+
+    public void setDepositAmount(BigDecimal depositAmount) {
+        this.depositAmount = depositAmount;
+    }
+}
+    
+@JsonPropertyOrder(GetAccount400Response.JSON_PROPERTY_ERROR)
+class GetAccount400Response {
+
+    public static final String JSON_PROPERTY_ERROR = "error";
+
+    @Nullable(inherited = true)
+    @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty(JSON_PROPERTY_ERROR)
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    private String error;
+
+    /**
+     * @return the error property value
+     */
+    public String getError() {
+        return error;
+    }
+
+    /**
+     * Set the error property value
+     *
+     * @param error property value to set
+     */
+    public void setError(String error) {
+        this.error = error;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Operation operation = openApi.paths?.get("/account/deposit")?.post
+
+        expect:
+        operation
+        operation.responses.size() == 3
+        !operation.responses.'200'
+        operation.responses.'204'
+        operation.responses.'400'
+        operation.responses.'500'
     }
 }

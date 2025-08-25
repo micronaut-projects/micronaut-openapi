@@ -102,6 +102,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPEN_ID_CONNECT
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAM_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
@@ -387,8 +388,8 @@ public final class ConvertUtils {
             var requestBody = fixContentForGroovy(requestBodyNode, RequestBody.class);
             ((Operation) value).setRequestBody(requestBody);
 
-            var responsesNode = jn.get("responses");
-            ((ObjectNode) jn).remove("responses");
+            var responsesNode = jn.get(PROP_RESPONSES);
+            ((ObjectNode) jn).remove(PROP_RESPONSES);
             ApiResponses responses = null;
             if (responsesNode != null && !responsesNode.isEmpty()) {
                 responses = new ApiResponses();
