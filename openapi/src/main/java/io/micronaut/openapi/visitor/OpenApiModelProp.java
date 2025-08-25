@@ -75,6 +75,7 @@ public interface OpenApiModelProp {
     String PROP_MEDIA_TYPE = "mediaType";
     String PROP_CONTENT = "content";
     String PROP_RESPONSE_CODE = "responseCode";
+    String PROP_RESPONSES = "responses";
     String PROP_METHOD = "method";
     String PROP_EXPLODE = "explode";
     String PROP_ACCESS_MODE = "accessMode";

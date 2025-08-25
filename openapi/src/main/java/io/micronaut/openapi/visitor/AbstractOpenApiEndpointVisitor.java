@@ -153,6 +153,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAMETERS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
@@ -1372,6 +1373,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponses.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
+        if (!withMethodResponses) {
+            var operationAnn = element.findAnnotation(io.swagger.v3.oas.annotations.Operation.class).orElse(null);
+            if (operationAnn != null) {
+                var responses = operationAnn.getAnnotations(PROP_RESPONSES);
+                withMethodResponses = CollectionUtils.isNotEmpty(responses);
+            }
+        }
 
         boolean isSuccessfulFromCode = isResponseReadSuccessfulFromCode(context);
 
