@@ -1,22 +1,89 @@
 To use micronaut-openapi with spring in gradle add this code to you `build.gradle`:
 
-.build.gradle
-[source,groovy]
+.build.gradle.kts
+[source,kotlin]
 ----
 dependencies {
 
     // add to annotationProcessor and compileOnly blocks next libraries:
-
+    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotationm:$micronautSpringVersion")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotationm:$micronautSpringVersion")
     annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
-    annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
-    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
-    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
 
-    compileOnly("io.micronaut:micronaut-http:$micronautCoreVersion")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
-
 }
 ----
 
 For kotlin just change block `annotationProcessor` to `kapt` or `ksp`.
+
+Also, if you want to do your final jar is more clear, need to remove some micronaut generated files. For it just add this task to your `build.gradle` file:
+
+.Sample gradle task to remove micronaut generated files (java annotation processor)
+[source,kotlin]
+----
+tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.file("/classes/java/main/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/classes/java/main").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("classes"))
+}
+tasks.jar {
+    dependsOn(tasks.named("removeMnFiles"))
+}
+----
+
+.Sample gradle task to remove micronaut generated files (KAPT)
+[source,kotlin]
+----
+tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.dir("/tmp/kapt3/classes/main/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/tmp/kapt3/classes/main").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("kaptKotlin"))
+}
+tasks.compileKotlin {
+    dependsOn(tasks.named("removeMnFiles"))
+}
+----
+
+.Sample gradle task to remove micronaut generated files (KSP)
+[source,kotlin]
+----
+tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.dir("/generated/ksp/main/resources/META-INF/micronaut"))
+        delete(
+            layout.buildDirectory.dir("/generated/ksp/main/classes").get().asFileTree.matching {
+                include(
+                    "**/*\$Definition*.class",
+                    "**/*\$Intercepted*.class",
+                    "**/*\$Introspection*.class",
+                )
+            }.files
+        )
+    }
+    dependsOn(tasks.named("kspKotlin"))
+}
+tasks.compileKotlin {
+    dependsOn(tasks.named("removeMnFiles"))
+}
+----

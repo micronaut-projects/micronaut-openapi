@@ -18,7 +18,6 @@ dependencies {
     annotationProcessor(projects.micronautOpenapi)
 
     compileOnly(projects.micronautOpenapiAnnotations)
-    compileOnly(mn.micronaut.http)
 
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${mnSpring.versions.spring.boot.get()}"))
     implementation(libs.spring.boot.starter.web)
@@ -27,10 +26,6 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.micrometer.registry.prometheus)
 
-    testCompileOnly(projects.micronautOpenapiAnnotations)
-    testCompileOnly(mn.micronaut.http)
-
-    testImplementation("org.springframework.boot:spring-boot-dependencies:${mnSpring.versions.spring.boot.get()}" )
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(mnTest.junit.jupiter.api)
     testImplementation(projects.micronautOpenapiCommon)
@@ -45,9 +40,28 @@ tasks.withType(JavaCompile).configureEach {
     options.incremental = true
     options.fork = true
     options.compilerArgs = [
-        '-parameters',
-        '-Xlint:unchecked',
-        '-Xlint:deprecation'
+            '-parameters',
+            '-Xlint:unchecked',
+            '-Xlint:deprecation'
     ]
     options.forkOptions.jvmArgs += "-Dapp.version=myVersion"
+}
+
+tasks.register("removeMnFiles") {
+    doLast {
+        delete(layout.buildDirectory.file("/classes/java/main/META-INF/micronaut"))
+        delete(
+                layout.buildDirectory.dir("/classes/java/main").get().asFileTree.matching {
+                    include(
+                            "**/*\$Definition*.class",
+                            "**/*\$Intercepted*.class",
+                            "**/*\$Introspection*.class",
+                    )
+                }.files
+        )
+    }
+    dependsOn(tasks.named("classes"))
+}
+tasks.jar {
+    dependsOn(tasks.named("removeMnFiles"))
 }
