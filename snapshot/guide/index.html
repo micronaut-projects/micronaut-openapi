@@ -517,34 +517,6 @@ class Application {
 }</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="title">Example @OpenAPIDefinition usage</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
-import io.swagger.v3.oas.annotations.OpenAPIDefinition
-import io.swagger.v3.oas.annotations.info.Contact
-import io.swagger.v3.oas.annotations.info.Info
-import io.swagger.v3.oas.annotations.info.License
-
-
-@OpenAPIDefinition(
-        info = Info(
-                title = "Hello World",
-                version = "0.0",
-                description = "My API",
-                license = License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-object Application {
-
-    @JvmStatic
-    fun main(args: Array&lt;String&gt;) {
-        Micronaut.run(Application.javaClass)
-    }
-}</code></pre>
-</div>
-</div>
 <div class="paragraph">
 <p>With that in place, you compile your project and a OpenAPI YAML file will be generated to the <code>META-INF/swagger</code> directory of your project&#8217;s class output. For example, the above configuration generates:</p>
 </div>
@@ -1359,29 +1331,6 @@ class HelloController {
 }</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="title">Hello World Example</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Mono
-
-
-@Controller("/")
-open class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting
-     */
-    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
-    open fun index(name: String): Mono&lt;String&gt; {
-        return Mono.just("Hello $name!")
-    }
-}</code></pre>
-</div>
-</div>
 <div class="paragraph">
 <p>The resulting output will be:</p>
 </div>
@@ -2123,39 +2072,6 @@ class HelloController {
     @Tag(name = "greeting")
     Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
         return Mono.just("Hello $name, How are you doing?")
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title">Using Swagger Annotations</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Mono
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.Tag
-
-
-@Controller("/")
-open class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting message
-     */
-    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
-    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
-    @ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))])
-    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
-    @ApiResponse(responseCode = "404", description = "Person not found")
-    @Tag(name = "greeting")
-    open fun greetings(name: String): Mono&lt;String&gt; {
-        return Mono.just("Hello $name, how are you doing?")
     }
 }</code></pre>
 </div>
