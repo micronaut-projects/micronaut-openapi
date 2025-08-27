@@ -4,6 +4,9 @@ spring:
   main:
     banner-mode: off
 
+server:
+  port: 8092
+
 management:
   endpoints:
     web:

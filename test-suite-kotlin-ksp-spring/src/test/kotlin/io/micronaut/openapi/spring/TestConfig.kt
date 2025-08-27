@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient
 open class TestConfig {
 
     @Bean
-    open fun restClient(@Value("\${server.port:8080}") port: Int): RestClient {
+    open fun restClient(@Value("\${server.port}") port: Int): RestClient {
         return RestClient.builder()
             .baseUrl("http://localhost:$port")
             .build()

@@ -12,7 +12,7 @@ public class TestConfig {
     public static final String APP_VERSION = "myVersion";
 
     @Bean
-    RestClient restClient(@Value("${server.port:8080}") int port) {
+    RestClient restClient(@Value("${server.port}") int port) {
         return RestClient.builder()
             .baseUrl("http://localhost:" + port)
             .build();

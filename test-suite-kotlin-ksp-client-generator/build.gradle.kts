@@ -1,0 +1,46 @@
+plugins {
+    id("io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite")
+    alias(mn.plugins.kotlin.jvm)
+    alias(mn.plugins.ksp)
+}
+
+description = """
+This project tests that the generated client sources can be compiled and
+that tests can be ran with Micronaut 4
+"""
+
+dependencies {
+
+    ksp(mnSerde.micronaut.serde.processor)
+    ksp(mnValidation.micronaut.validation.processor)
+    ksp(mn.micronaut.inject.kotlin)
+
+    implementation(mn.micronaut.http.client)
+    implementation(mn.micronaut.inject.kotlin)
+    implementation(mnSerde.micronaut.serde.jackson)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
+    implementation(mnReactor.micronaut.reactor)
+    implementation(mn.kotlin.stdlib.asProvider())
+    implementation(mn.kotlin.reflect)
+    // Required when using useAuth=true
+    implementation(mnSecurity.micronaut.security.oauth2)
+
+    runtimeOnly(mnLogging.logback.classic)
+
+    kspTest(mnSerde.micronaut.serde.processor)
+    kspTest(mnValidation.micronaut.validation.processor)
+    kspTest(mn.micronaut.inject.kotlin)
+
+    testImplementation(mnTest.micronaut.test.junit5)
+
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
+    testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mn.snakeyaml)
+    testRuntimeOnly(mnTest.junit.platform.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
+}
+
+kotlin {
+    jvmToolchain(17)
+}

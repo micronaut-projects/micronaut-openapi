@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
     alias(mn.plugins.kotlin.jvm)
@@ -30,6 +32,8 @@ dependencies {
     implementation(libs.micrometer.registry.prometheus)
     implementation(mn.kotlin.stdlib.asProvider())
     implementation(mn.kotlin.reflect)
+
+    testCompileOnly(projects.micronautOpenapiAnnotations)
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(mnTest.junit.jupiter.api)
@@ -72,4 +76,10 @@ tasks.register("removeMnFiles") {
 }
 tasks.compileKotlin {
     dependsOn(tasks.named("removeMnFiles"))
+}
+
+tasks.withType(KaptTask::class) {
+    if (name == "kaptTestKotlin") {
+        enabled = false
+    }
 }
