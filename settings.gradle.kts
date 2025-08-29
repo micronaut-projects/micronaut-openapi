@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "7.5.0"
+    id("io.micronaut.build.shared.settings") version "7.6.3"
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
