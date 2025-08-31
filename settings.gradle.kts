@@ -6,6 +6,12 @@ pluginManagement {
     includeBuild("build-logic")
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id("io.micronaut.build.shared.settings") version "7.6.4"
 }
@@ -14,34 +20,28 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "openapi-parent"
 
 include(
-        "openapi",
-        "openapi-annotations",
-        "openapi-bom",
-        "openapi-common",
-        "openapi-adoc",
-        "openapi-generator",
-        "docs-examples:example-groovy",
-        "docs-examples:example-java",
-        "docs-examples:example-kotlin-kapt",
-        "docs-examples:example-kotlin-ksp",
-        "test-suite-java-client-generator",
-        "test-suite-java-jaxrs",
-        "test-suite-java-spring",
-        "test-suite-java-server-generator",
-        "test-suite-kotlin-kapt-client-generator",
-        "test-suite-kotlin-kapt-server-generator",
-        "test-suite-kotlin-kapt-spring",
-        "test-suite-kotlin-ksp-client-generator",
-        "test-suite-kotlin-ksp-server-generator",
-        "test-suite-kotlin-ksp-spring",
-        "test-suite-generator-util",
+    "docs-examples:example-groovy",
+    "docs-examples:example-java",
+    "docs-examples:example-kotlin-kapt",
+    "docs-examples:example-kotlin-ksp",
+    "openapi",
+    "openapi-adoc",
+    "openapi-annotations",
+    "openapi-bom",
+    "openapi-common",
+    "openapi-generator",
+    "test-suite-client-generator-java",
+    "test-suite-client-generator-kotlin-kapt",
+    "test-suite-client-generator-kotlin-ksp",
+    "test-suite-generator-util",
+    "test-suite-jaxrs-java",
+    "test-suite-server-generator-java",
+    "test-suite-server-generator-kotlin-kapt",
+    "test-suite-server-generator-kotlin-ksp",
+    "test-suite-spring-java",
+    "test-suite-spring-kotlin-kapt",
+    "test-suite-spring-kotlin-ksp",
 )
-
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-    }
-}
 
 micronautBuild {
     useStandardizedProjectNames = true

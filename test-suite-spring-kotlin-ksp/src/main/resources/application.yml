@@ -17,7 +17,7 @@ management:
         include: health,beans, metrics,info,prometheus,loggers
   server:
     base-path: /my
-    port: 9090
+    port: 9092
 
 logging:
   pattern:
