@@ -255,8 +255,8 @@ public final class UrlUtils {
      * Final path and operation ID builders.
      */
     static class PathBuilders {
-        StringBuilder urlBuilder;
-        StringBuilder opIdBuilder;
+        final StringBuilder urlBuilder;
+        final StringBuilder opIdBuilder;
         boolean isFirst;
 
         public PathBuilders(StringBuilder urlBuilder, StringBuilder opIdBuilder, boolean isFirst) {

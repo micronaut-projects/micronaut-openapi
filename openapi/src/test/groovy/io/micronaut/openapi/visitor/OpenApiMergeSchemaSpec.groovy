@@ -746,4 +746,107 @@ class MyBean {}
         op.responses."200".content."text/xml".schema.type == "string"
         !op.responses."200".content."text/xml".schema.properties
     }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: project directories and include pattern"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "project:src/test/resources")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS, "**/openapi-service*.yml")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
+@OpenAPIDefinition
+class Application {
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        openApi.paths.size() == 2
+        openApi.paths."/op2/{id}"
+        openApi.paths."/op1/{id}"
+        !openApi.paths."/op3-excluded/{id}"
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: project directories and include pattern2"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "src/test/resources")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS, "openapi/included/*.yml")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
+@OpenAPIDefinition
+class Application {
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        openApi.paths.size() == 1
+        openApi.paths."/op2/{id}"
+        !openApi.paths."/op1/{id}"
+        !openApi.paths."/op3-excluded/{id}"
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: project directories and include and exclude pattern"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "project:src/test/resources")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS, "openapi/**/openapi-service*.yml")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS, "openapi/**/openapi-service1.yml")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
+@OpenAPIDefinition
+class Application {
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        openApi.paths.size() == 1
+        !openApi.paths."/op2/{id}"
+        openApi.paths."/op1/{id}"
+        !openApi.paths."/op3-excluded/{id}"
+    }
 }

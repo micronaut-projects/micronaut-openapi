@@ -54,6 +54,10 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_OPENAPI_PROPERTIES = "micronaut.internal.openapi.properties";
     /**
+     * Loaded openapi additional files properties from file.
+     */
+    String MICRONAUT_INTERNAL_OPENAPI_ADDITIONAL_FILES_PROPERTIES = "micronaut.internal.openapi.additional.files.properties";
+    /**
      * The name of the entry for Endpoint class tags in the context.
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS = "micronaut.internal.openapi.endpoint.props";

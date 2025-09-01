@@ -40,6 +40,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
 import static io.micronaut.openapi.visitor.StringUtil.MINUS;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.Utils.isKsp;
 
 /**
@@ -73,6 +74,11 @@ public final class FileUtils {
             }
         }
         return path.toAbsolutePath();
+    }
+
+    public static String normalizePath(String path) {
+        return path.replace("\\\\", SLASH)
+            .replace("\\", SLASH);
     }
 
     public static void createDirectories(Path f, VisitorContext context) {

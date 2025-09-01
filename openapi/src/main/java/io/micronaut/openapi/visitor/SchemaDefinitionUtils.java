@@ -841,7 +841,7 @@ public final class SchemaDefinitionUtils {
             }
         }
 
-        if (type != null && isProtobufMessageClass(type)) {
+        if (isProtobufMessageClass(type)) {
             type = type.getInterfaces().iterator().next();
         }
 
@@ -3093,16 +3093,13 @@ public final class SchemaDefinitionUtils {
         }
         boolean isSchema = io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName());
         if (isSchema) {
-            if (impl.isPresent()) {
-                final String className = impl.get();
-                bindSchemaForClassName(context, valueMap, className, jsonViewClass);
-            }
-            if (not.isPresent()) {
-                final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(not.get(), context), context, Collections.emptyList(), jsonViewClass);
+            impl.ifPresent(className -> bindSchemaForClassName(context, valueMap, className, jsonViewClass));
+            not.ifPresent(notStr -> {
+                final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(notStr, context), context, Collections.emptyList(), jsonViewClass);
                 var schemaMap = new HashMap<CharSequence, Object>();
                 schemaToValueMap(schemaMap, schemaNot);
                 valueMap.put(PROP_NOT, schemaMap);
-            }
+            });
             if (anyOfList.length > 0) {
                 bindSchemaForComposite(context, valueMap, anyOfList, PROP_ANY_OF, jsonViewClass);
             }
