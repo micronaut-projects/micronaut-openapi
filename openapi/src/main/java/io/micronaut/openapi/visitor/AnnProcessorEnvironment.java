@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
-import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
-import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
+import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;

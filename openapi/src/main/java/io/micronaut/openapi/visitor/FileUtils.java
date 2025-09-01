@@ -50,6 +50,10 @@ import static io.micronaut.openapi.visitor.Utils.isKsp;
 @Internal
 public final class FileUtils {
 
+    public static final String PROJECT_SCHEME = "project:";
+    public static final String FILE_SCHEME = "file:";
+    public static final String CLASSPATH_SCHEME = "classpath:";
+
     public static final String META_INF_DIR = "META-INF";
     public static final String DEFAULT_VIEWS_PATH = "swagger/views";
     public static final String DEFAULT_SPEC_PATH = "swagger/";

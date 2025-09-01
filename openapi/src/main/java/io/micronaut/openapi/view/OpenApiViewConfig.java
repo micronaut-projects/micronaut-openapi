@@ -44,13 +44,13 @@ import java.util.Optional;
 import java.util.Properties;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
-import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
-import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
-import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;

@@ -15,9 +15,11 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.util.NamingStrategyImpls;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
@@ -119,6 +121,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_INCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
@@ -268,7 +271,7 @@ public final class ConfigUtils {
 
                 String configuredClassName = entry.getKey();
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
-                String prop = MICRONAUT_OPENAPI_SCHEMA + StringUtil.DOT + configuredClassName;
+                String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
                 if (isMicronautProperty(prop)) {
                     continue;
                 }
@@ -280,7 +283,7 @@ public final class ConfigUtils {
                 String configuredClassName = entry.getKey();
 
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
-                String prop = MICRONAUT_OPENAPI_SCHEMA + StringUtil.DOT + configuredClassName;
+                String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
                 if (isMicronautProperty(prop)) {
                     continue;
                 }
@@ -345,7 +348,7 @@ public final class ConfigUtils {
             contextPath = getConfigProperty(SPRING_WEBFLUX_BASE_PATH, context);
         }
         if (contextPath == null) {
-            contextPath = StringUtils.EMPTY_STRING;
+            contextPath = EMPTY_STRING;
         }
 
         return contextPath;
@@ -1181,19 +1184,31 @@ public final class ConfigUtils {
         if (namingStrategy == null) {
             return null;
         }
-        return (PropertyNamingStrategies.NamingBase) switch (namingStrategy.toUpperCase(Locale.ENGLISH)) {
-            case "LOWER_CAMEL_CASE" -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
-            case "UPPER_CAMEL_CASE" -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE" -> PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE" -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE" -> PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE" -> PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE" -> PropertyNamingStrategies.LOWER_DOT_CASE;
-            default -> {
-                warn("Unknown naming strategy value: " + namingStrategy, context);
-                yield null;
-            }
-        };
+        try {
+            return (PropertyNamingStrategies.NamingBase) switch (NamingStrategyImpls.valueOf(namingStrategy.toUpperCase(Locale.ENGLISH))) {
+                case LOWER_CAMEL_CASE -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
+                case UPPER_CAMEL_CASE -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
+                case SNAKE_CASE -> PropertyNamingStrategies.SNAKE_CASE;
+                case UPPER_SNAKE_CASE -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
+                case LOWER_CASE -> PropertyNamingStrategies.LOWER_CASE;
+                case KEBAB_CASE -> PropertyNamingStrategies.KEBAB_CASE;
+                case LOWER_DOT_CASE -> PropertyNamingStrategies.LOWER_DOT_CASE;
+            };
+        } catch (Exception e) {
+            warn("Unknown naming strategy value: " + namingStrategy, context);
+            return null;
+        }
+    }
+
+    public static JsonInclude.Include getJacksonIncludeMode(VisitorContext context) {
+        var value = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_INCLUDE, context);
+        if (value == null) {
+            return JsonInclude.Include.USE_DEFAULTS;
+        }
+        // ALWAYS is the only value that has any impact on API spec generation.
+        return value.toUpperCase(Locale.ENGLISH).equals(JsonInclude.Include.ALWAYS.name())
+            ? JsonInclude.Include.ALWAYS
+            : JsonInclude.Include.USE_DEFAULTS;
     }
 
     public static String getConfigProperty(String key, VisitorContext context) {
