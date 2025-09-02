@@ -1,14 +1,18 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.openapi.javadoc.DocsFormat
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
+import spock.util.environment.RestoreSystemProperties
 
-class OpenApiOperationWithjavadocSpec extends AbstractOpenApiTypeElementSpec {
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_DOCS_FORMAT
 
-    void "test javadoc description, summary and parameters"() {
+class OpenApiOperationWithJavadocSpec extends AbstractOpenApiTypeElementSpec {
+
+    void "test javadoc description, summary and parameters with HTML_TO_MD"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -24,8 +28,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 class MyController {
 
     /**
-     * Description and summary here
-     * @param id UUID of test
+     * Description and <strong>summary</strong> here.
+     * @param id UUID of <i>test</i>
      */
     @Delete("/")
     public MyDto deleteObj(@QueryValue int id) {
@@ -34,9 +38,149 @@ class MyController {
 }
 
 /**
-* My dto description
+ * My dto <b>description</b>
+ *
+ * @property test property <i>desc</i>
+ */
+class MyDto {
+
+    private String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.delete
+        Schema schema = openAPI.components.schemas.MyDto
+
+        expect:
+        operation
+        operation.summary == 'Description and **summary** here.'
+        operation.description == 'Description and **summary** here.'
+
+        operation.parameters
+        operation.parameters.size() == 1
+        operation.parameters[0].name == 'id'
+        operation.parameters[0].description == 'UUID of *test*'
+
+        schema
+        schema.description == 'My dto **description**'
+        schema.properties.test
+        schema.properties.test.description == 'property *desc*'
+    }
+
+    @RestoreSystemProperties
+    void "test javadoc description, summary and parameters with MD_TO_HTML"() {
+        given:
+        System.setProperty(MICRONAUT_OPENAPI_DOCS_FORMAT, DocsFormat.MD_TO_HTML.name())
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Delete;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+
+@Controller
+class MyController {
+
+    /**
+     * Description and **summary** here.
+     * @param id UUID of *test*
+     */
+    @Delete("/")
+    public MyDto deleteObj(@QueryValue int id) {
+        return null;
+    }
+}
+
+/**
+ * My dto **description**
+ *
+ * @property test property *desc*
+ */
+class MyDto {
+
+    private String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.delete
+        Schema schema = openAPI.components.schemas.MyDto
+
+        expect:
+        operation
+        operation.summary == 'Description and <strong>summary</strong> here.'
+        operation.description == '<p>Description and <strong>summary</strong> here.</p>'
+
+        operation.parameters
+        operation.parameters.size() == 1
+        operation.parameters[0].name == 'id'
+        operation.parameters[0].description == 'UUID of <em>test</em>'
+
+        schema
+        schema.description == '<p>My dto <strong>description</strong></p>'
+        schema.properties.test
+        schema.properties.test.description == 'property <em>desc</em>'
+    }
+
+    @RestoreSystemProperties
+    void "test javadoc description, summary and parameters with PLAIN"() {
+        given:
+        System.setProperty(MICRONAUT_OPENAPI_DOCS_FORMAT, DocsFormat.PLAIN.name())
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Delete;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+
+@Controller
+class MyController {
+
+    /**
+     * Description and **summary** <strong>here</strong>.
+     * @param id UUID <em>of</em> *test*
+     */
+    @Delete("/")
+    public MyDto deleteObj(@QueryValue int id) {
+        return null;
+    }
+}
+
+/**
+* My <b>dto</b> **description**
 *
-* @property test property desc
+* @property test <i>property</i> *desc*
 */
 class MyDto {
 
@@ -61,18 +205,18 @@ class MyBean {}
 
         expect:
         operation
-        operation.summary == 'Description and summary here'
-        operation.description == 'Description and summary here'
+        operation.summary == 'Description and **summary** <strong>here</strong>.'
+        operation.description == 'Description and **summary** <strong>here</strong>.'
 
         operation.parameters
         operation.parameters.size() == 1
         operation.parameters[0].name == 'id'
-        operation.parameters[0].description == 'UUID of test'
+        operation.parameters[0].description == 'UUID <em>of</em> *test*'
 
         schema
+        schema.description == 'My <b>dto</b> **description**'
         schema.properties.test
-        schema.properties.test.description == 'property desc'
-
+        schema.properties.test.description == '<i>property</i> *desc*'
     }
 
     void "test Operation description, summary and parameters"() {

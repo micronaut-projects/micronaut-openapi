@@ -209,6 +209,18 @@ public final class ContextUtils {
         }
     }
 
+    public static void fail(String message, @Nullable VisitorContext context) {
+        fail(message, context, null);
+    }
+
+    public static void fail(String message, @Nullable VisitorContext context, @Nullable Element element) {
+        if (context != null) {
+            context.fail(message, element);
+        } else {
+            System.err.println(message);
+        }
+    }
+
     public static void addGeneratedResource(String path, @Nullable VisitorContext context) {
         if (context == null) {
             return;

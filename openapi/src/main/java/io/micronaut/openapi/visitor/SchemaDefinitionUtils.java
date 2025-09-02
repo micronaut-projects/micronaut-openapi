@@ -510,7 +510,7 @@ public final class SchemaDefinitionUtils {
             if (externalDocs != null) {
                 schema.setExternalDocs(externalDocs);
             }
-            setSchemaDescription(type, schema);
+            setSchemaDescription(type, schema, context);
             return createSchema()
                 .$ref(SchemaUtils.schemaRef(schema.getName()));
         }
@@ -1170,7 +1170,7 @@ public final class SchemaDefinitionUtils {
         }
 
         boolean notOnlyRef = false;
-        setSchemaDescription(element, topLevelSchema);
+        setSchemaDescription(element, topLevelSchema, context);
         if (StringUtils.isNotEmpty(topLevelSchema.getDescription())) {
             notOnlyRef = true;
         }
@@ -2037,7 +2037,7 @@ public final class SchemaDefinitionUtils {
             .ifPresent(schemaToBind::setDescription);
     }
 
-    private static void setSchemaDescription(Element element, Schema<?> schemaToBind) {
+    private static void setSchemaDescription(Element element, Schema<?> schemaToBind, VisitorContext context) {
         if (StringUtils.isNotEmpty(schemaToBind.getDescription())) {
             return;
         }

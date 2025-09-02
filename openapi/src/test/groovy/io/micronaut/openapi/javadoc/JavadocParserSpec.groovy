@@ -2,12 +2,16 @@ package io.micronaut.openapi.javadoc
 
 import spock.lang.Specification
 
+import static io.micronaut.openapi.javadoc.DocsFormat.HTML_TO_MD
+import static io.micronaut.openapi.javadoc.DocsFormat.MD_TO_HTML
+import static io.micronaut.openapi.javadoc.DocsFormat.PLAIN
+
 class JavadocParserSpec extends Specification {
 
     void 'test parse basic javadoc'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 This is a summary text. This is a description with <b>bold</b> and {@code some code}
 
@@ -39,7 +43,7 @@ value'''
     void 'test parse multiline javadoc'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 <p>This is a description with <b>bold</b> and {@code some code}.</p>
 
@@ -73,7 +77,7 @@ value'''
     void 'test parse multiline return value javadoc'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 <p>This is a description with <b>bold</b> and {@code some code}.</p>
 
@@ -111,7 +115,7 @@ value with more return description as it is multiline'''
     void 'test parse multiline javadoc param'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 Check if the given user has access to RabbitMQ.
 
@@ -134,7 +138,7 @@ Check if the given user has access to RabbitMQ.
     void 'test parse javadoc with summary tag'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 {@summary This is a summary text.} This is a description with <b>bold</b> and {@code some code}
 
@@ -160,13 +164,12 @@ return
 value'''
         desc.parameters['foo'] == 'The foo param'
         desc.parameters['bar'] == 'The `bar` param'
-
     }
 
     void 'test parse javadoc with complex javadoc'() {
 
         given:
-        var parser = new JavadocParser()
+        var parser = new JavadocParser(HTML_TO_MD)
         JavadocDescription desc = parser.parse('''
 Values separated with commas ",". In case of iterables, the values are converted to {@link String} and joined
 with comma delimiter. In case of {@link Map} or a POJO {@link Object} the keys and values are alternating and all
@@ -195,5 +198,70 @@ Note that ambiguity may arise when the values contain commas themselves after be
 [Examples]
 
 Note that ambiguity may arise when the values contain commas themselves after being converted to String.'''
+    }
+
+    void 'test parse javadoc with PLAIN format'() {
+
+        given:
+        var parser = new JavadocParser(PLAIN)
+        JavadocDescription desc = parser.parse('''Values separated with commas ",". In case of iterables, the values are converted to String and joined with comma delimiter. In case of Map or a POJO Object the keys and values are alternating and all delimited with commas.
+
+|  **Type**  |            **Example value**            | **Example representation** |
+|------------|-----------------------------------------|----------------------------|
+| Iterable   | param=\\["Mike", "Adam", "Kate"\\]        | "param=Mike,Adam,Kate"     |
+| Map        | param=\\["name": "Mike", "age": "30"\\]   | "param=name,Mike,age,30"   |
+| Object     | param={name: "Mike", age: 30}           | "param=name,Mike,age,30"   |
+[Examples]
+
+Note that ambiguity may arise when the values contain commas themselves after being converted to String.''')
+
+        expect:
+        desc.methodSummary
+        desc.methodDescription
+        desc.methodSummary == 'Values separated with commas ",".'
+        desc.methodDescription == '''Values separated with commas ",". In case of iterables, the values are converted to String and joined with comma delimiter. In case of Map or a POJO Object the keys and values are alternating and all delimited with commas.
+
+|  **Type**  |            **Example value**            | **Example representation** |
+|------------|-----------------------------------------|----------------------------|
+| Iterable   | param=\\["Mike", "Adam", "Kate"\\]        | "param=Mike,Adam,Kate"     |
+| Map        | param=\\["name": "Mike", "age": "30"\\]   | "param=name,Mike,age,30"   |
+| Object     | param={name: "Mike", age: 30}           | "param=name,Mike,age,30"   |
+[Examples]
+
+Note that ambiguity may arise when the values contain commas themselves after being converted to String.'''
+    }
+
+    void 'test parse javadoc with MD_TO_HTML format'() {
+
+        given:
+        var parser = new JavadocParser(MD_TO_HTML)
+        JavadocDescription desc = parser.parse('''Values separated with commas ",". In case of iterables, the values are converted to String and joined with comma delimiter. In case of Map or a POJO Object the keys and values are alternating and all delimited with commas.
+
+|  **Type**  |            **Example value**            | **Example representation** |
+|------------|-----------------------------------------|----------------------------|
+| Iterable   | param=\\["Mike", "Adam", "Kate"\\]        | "param=Mike,Adam,Kate"     |
+| Map        | param=\\["name": "Mike", "age": "30"\\]   | "param=name,Mike,age,30"   |
+| Object     | param={name: "Mike", age: 30}           | "param=name,Mike,age,30"   |
+[Examples]
+
+Note that ambiguity may arise when the values contain commas themselves after being converted to String.''')
+
+        expect:
+        desc.methodSummary
+        desc.methodDescription
+        desc.methodSummary == 'Values separated with commas ",".'
+        desc.methodDescription == '''<p>Values separated with commas ",". In case of iterables, the values are converted to String and joined with comma delimiter. In case of Map or a POJO Object the keys and values are alternating and all delimited with commas.</p>
+<table>
+<thead>
+<tr><th><strong>Type</strong></th><th><strong>Example value</strong></th><th><strong>Example representation</strong></th></tr>
+</thead>
+<tbody>
+<tr><td>Iterable  </td><td>param=["Mike", "Adam", "Kate"]</td><td>"param=Mike,Adam,Kate"</td></tr>
+<tr><td>Map</td><td>param=["name": "Mike", "age": "30"]  </td><td>"param=name,Mike,age,30"</td></tr>
+<tr><td>Object</td><td>param={name: "Mike", age: 30}</td><td>"param=name,Mike,age,30"</td></tr>
+</tbody>
+<caption>Examples</caption>
+</table>
+<p>Note that ambiguity may arise when the values contain commas themselves after being converted to String.</p>'''
     }
 }
