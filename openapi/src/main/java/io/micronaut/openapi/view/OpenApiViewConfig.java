@@ -51,6 +51,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
@@ -334,7 +335,7 @@ public final class OpenApiViewConfig {
         String projectDir = EMPTY_STRING;
         Path projectPath = context != null ? getProjectPath(context) : null;
         if (projectPath != null) {
-            projectDir = projectPath.toString().replace("\\\\", SLASH);
+            projectDir = normalizePath(projectPath.toString());
         }
         if (customPathStr.startsWith(PROJECT_SCHEME)) {
             customPathStr = customPathStr.replace(PROJECT_SCHEME, projectDir);

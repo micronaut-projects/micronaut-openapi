@@ -79,6 +79,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
+import static io.micronaut.openapi.visitor.Utils.resolveTags;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -1133,12 +1134,7 @@ public final class SchemaUtils {
             if (replace) {
                 from.getTags().forEach(to::addTagsItem);
             } else {
-                var tags = to.getTags();
-                if (tags == null) {
-                    tags = new ArrayList<>();
-                    to.setTags(tags);
-                }
-
+                var tags = resolveTags(to);
                 for (var tag : from.getTags()) {
                     var found = false;
                     for (var existedTag : tags) {

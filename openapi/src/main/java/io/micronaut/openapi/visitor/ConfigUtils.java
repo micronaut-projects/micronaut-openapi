@@ -32,6 +32,7 @@ import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -71,6 +72,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EN
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ADDITIONAL_FILES_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
@@ -101,8 +103,12 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENDPO
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
@@ -1247,11 +1253,28 @@ public final class ConfigUtils {
         return value;
     }
 
-    public static List<String> getAdditionalFiles(VisitorContext context) {
-        return getListStringsProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, null, context);
+    public static AdditionalFilesProperties getAdditionalFilesProperties(VisitorContext context) {
+
+        var additionalFilesProps = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ADDITIONAL_FILES_PROPERTIES, AdditionalFilesProperties.class, context);
+        if (additionalFilesProps != null) {
+            return additionalFilesProps;
+        }
+
+        additionalFilesProps = new AdditionalFilesProperties(
+            getListStringsProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, null, context),
+            getAdditionalFilesMergeMode(context),
+            getListStringsProperty(MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS, null, context),
+            getPatternStyle(MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE, context),
+            getListStringsProperty(MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS, null, context),
+            getPatternStyle(MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE, context)
+        );
+
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ADDITIONAL_FILES_PROPERTIES, additionalFilesProps, context);
+
+        return additionalFilesProps;
     }
 
-    public static MergeMode getAdditionalFilesMergeMode(VisitorContext context) {
+    private static MergeMode getAdditionalFilesMergeMode(VisitorContext context) {
         String str = getConfigProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, context);
         if (StringUtils.isEmpty(str)) {
             return MergeMode.REPLACE;
@@ -1261,6 +1284,19 @@ public final class ConfigUtils {
         } catch (Exception e) {
             warn("Unknown additional files mergeMode value: " + str, context);
             return MergeMode.REPLACE;
+        }
+    }
+
+    private static PatternStyle getPatternStyle(String propName, VisitorContext context) {
+        String str = getConfigProperty(propName, context);
+        if (StringUtils.isEmpty(str)) {
+            return PatternStyle.ANT;
+        }
+        try {
+            return PatternStyle.valueOf(str.toUpperCase(Locale.ENGLISH));
+        } catch (Exception e) {
+            warn("Unknown pattern style value: " + str, context);
+            return PatternStyle.ANT;
         }
     }
 
@@ -1447,6 +1483,27 @@ public final class ConfigUtils {
     }
 
     /**
+     * Additional files properties.
+     *
+     * @param additionalFiles list of additional files and directories
+     * @param mergeMode merge mode
+     * @param includePatterns include files pattern
+     * @param includePatternStyle include pattern style
+     * @param excludePatterns exclude files pattern
+     * @param excludePatternStyle exclude pattern style
+     */
+    @Internal
+    public record AdditionalFilesProperties(
+        List<String> additionalFiles,
+        MergeMode mergeMode,
+        List<String> includePatterns,
+        PatternStyle includePatternStyle,
+        List<String> excludePatterns,
+        PatternStyle excludePatternStyle
+    ) {
+    }
+
+    /**
      * Duplicate schema resolution mode.
      */
     public enum DuplicateResolution {
@@ -1460,5 +1517,18 @@ public final class ConfigUtils {
     public enum MergeMode {
         APPEND,
         REPLACE,
+    }
+
+    /**
+     * Merge mode for additional OpenAPI specification files.
+     */
+    public enum PatternStyle {
+        ANT,
+        REGEX,
+        ;
+
+        public PathMatcher getPathMatcher() {
+            return this.equals(PatternStyle.REGEX) ? PathMatcher.REGEX : PathMatcher.ANT;
+        }
     }
 }

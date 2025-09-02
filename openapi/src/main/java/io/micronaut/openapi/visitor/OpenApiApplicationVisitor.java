@@ -37,6 +37,7 @@ import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
+import io.micronaut.openapi.visitor.ConfigUtils.AdditionalFilesProperties;
 import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
@@ -60,7 +61,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -76,11 +76,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.ALL_ENDPOINTS_NAME;
 import static io.micronaut.openapi.visitor.ConfigUtils.MergeMode.REPLACE;
-import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFiles;
-import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFilesMergeMode;
+import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFilesProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEndpointsConfig;
@@ -112,6 +112,7 @@ import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
+import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
 import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
@@ -246,12 +247,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * @param context The visitor context
      */
     private void mergeAdditionalOpenApiFiles(OpenAPI openApi, VisitorContext context) {
-        List<String> additionalSwaggerFiles = getAdditionalFiles(context);
-        if (CollectionUtils.isEmpty(additionalSwaggerFiles)) {
+        var additionalFilesProps = getAdditionalFilesProperties(context);
+        if (CollectionUtils.isEmpty(additionalFilesProps.additionalFiles())) {
             return;
         }
 
-        for (var additionalSwaggerFile : additionalSwaggerFiles) {
+        for (var additionalSwaggerFile : additionalFilesProps.additionalFiles()) {
             additionalSwaggerFile = additionalSwaggerFile.trim();
 
             if (additionalSwaggerFile.startsWith(CLASSPATH_SCHEME)) {
@@ -277,7 +278,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     } catch (IOException e) {
                         warn("Unable to read file " + additionalSwaggerFile + ": " + e.getMessage(), context);
                     }
-                    copyOpenApi(openApi, parsedOpenApi, getAdditionalFilesMergeMode(context) == REPLACE);
+                    copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
 
                 } catch (IOException e) {
                     warn("Fail to load " + additionalSwaggerFile + "\n" + Utils.printStackTrace(e), context);
@@ -288,7 +289,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 String projectDir = StringUtils.EMPTY_STRING;
                 Path projectPath = getProjectPath(context);
                 if (projectPath != null) {
-                    projectDir = projectPath.toString().replace("\\\\", SLASH).replace("\\", SLASH);
+                    projectDir = normalizePath(projectPath.toString());
                 }
                 if (!projectDir.endsWith(SLASH)) {
                     projectDir += SLASH;
@@ -312,14 +313,50 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (Files.isDirectory(path)) {
                 info("Merging OpenAPI YAML and JSON files from location: " + path, context);
                 var foundAnyFile = new AtomicBoolean(false);
-                try (DirectoryStream<Path> paths = Files.newDirectoryStream(path, p -> {
-                    var pathStr = p.toString().toLowerCase();
-                    return FileUtils.isYaml(pathStr) || FileUtils.isJson(pathStr);
-                })) {
-                    foundAnyFile.set(true);
-                    for (var pathInDir : paths) {
-                        readAndMergeAdditionalFile(pathInDir, openApi, context);
-                    }
+                var includePathMatcher = additionalFilesProps.includePatternStyle().getPathMatcher();
+                var excludePathMatcher = additionalFilesProps.excludePatternStyle().getPathMatcher();
+                var dirPath = normalizePath(path.toString());
+                try (Stream<Path> paths = Files.walk(path)) {
+
+                    paths.filter(p -> {
+                        if (!Files.isRegularFile(p)) {
+                            return false;
+                        }
+                        var pathStr = normalizePath(p.toString());
+                        pathStr = pathStr.substring(dirPath.length());
+                        if (pathStr.startsWith(SLASH)) {
+                            pathStr = pathStr.substring(SLASH.length());
+                        }
+                        if (CollectionUtils.isNotEmpty(additionalFilesProps.includePatterns())) {
+                            var matched = false;
+                            for (var pattern : additionalFilesProps.includePatterns()) {
+                                if (includePathMatcher.matches(pattern, pathStr)) {
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            if (!matched) {
+                                return false;
+                            }
+                        }
+                        if (CollectionUtils.isNotEmpty(additionalFilesProps.excludePatterns())) {
+                            var matched = false;
+                            for (var pattern : additionalFilesProps.excludePatterns()) {
+                                if (excludePathMatcher.matches(pattern, pathStr)) {
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            if (matched) {
+                                return false;
+                            }
+                        }
+                        pathStr = pathStr.toLowerCase();
+                        return FileUtils.isYaml(pathStr) || FileUtils.isJson(pathStr);
+                    }).forEach(p -> {
+                        foundAnyFile.set(true);
+                        readAndMergeAdditionalFile(p, openApi, additionalFilesProps, context);
+                    });
                 } catch (IOException e) {
                     warn("Unable to read  file from " + path + ": " + e.getMessage(), context);
                 }
@@ -333,12 +370,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     return;
                 }
 
-                readAndMergeAdditionalFile(path, openApi, context);
+                readAndMergeAdditionalFile(path, openApi, additionalFilesProps, context);
             }
         }
     }
 
-    private void readAndMergeAdditionalFile(Path path, OpenAPI openApi, VisitorContext context) {
+    private void readAndMergeAdditionalFile(Path path, OpenAPI openApi, AdditionalFilesProperties additionalFilesProps, VisitorContext context) {
         boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
         info("Reading OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
         OpenAPI parsedOpenApi = null;
@@ -347,7 +384,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         } catch (IOException e) {
             warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context);
         }
-        copyOpenApi(openApi, parsedOpenApi, getAdditionalFilesMergeMode(context) == REPLACE);
+        copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
     }
 
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
@@ -452,14 +489,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return anode;
     }
 
-    public static JsonNode resolvePlaceholders(ObjectNode onode, UnaryOperator<String> propertyExpander) {
-        if (onode.isEmpty()) {
-            return onode;
+    public static JsonNode resolvePlaceholders(ObjectNode objNode, UnaryOperator<String> propertyExpander) {
+        if (objNode.isEmpty()) {
+            return objNode;
         }
-        final ObjectNode newNode = onode.objectNode();
-        var i = onode.fields();
-        while (i.hasNext()) {
-            var entry = i.next();
+        final ObjectNode newNode = objNode.objectNode();
+        for (var entry : objNode.properties()) {
             newNode.set(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
         }
         return newNode;
@@ -860,7 +895,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (extraSchemas.containsKey(schemaName)) {
                     continue;
                 }
-                // Create a copy of schemas map without processing schema
+                // Create a copy of schemas Map without processing schema
                 var schemasCopy = new HashMap<>(schemas);
                 schemasCopy.remove(schemaName);
                 // replace original schemas map to schemas map without processing schema

@@ -31,6 +31,10 @@ the element from the generated specification will always be taken. +
 With **replace** mode: If there are duplicate elements in the generated specification and additional specification files,
 the element from the generated specification will always be replaced by the element from the additional files.
 | Default: **replace**
+|`*micronaut.openapi.additional.include-patterns*` | System property that specifies the list of patterns for included files (separated by `,`) |
+|`*micronaut.openapi.additional.include-pattern-style*` | System property that specifies the pattern style for included files. Available values: **"ant"** and **"regex"**. | Default: **ant**
+|`*micronaut.openapi.additional.exclude-patterns*` | System property that specifies the list of patterns for excluded files (separated by `,`) |
+|`*micronaut.openapi.additional.exclude-pattern-style*` | System property that specifies the pattern style for excluded files. Available values: **"ant"** and **"regex"**. | Default: **ant**
 |`*micronaut.openapi.project.dir*` | System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path. | Default: calculated automatically
 |`*micronaut.openapi.security.default-schema-name*` | System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme. |
 |`*micronaut.openapi.security.enabled*` | If this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema. | Default: `true`

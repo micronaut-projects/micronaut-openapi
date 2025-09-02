@@ -45,6 +45,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
@@ -77,7 +78,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
-                projectDir = FILE_SCHEME + projectPath.toString().replace("\\\\", SLASH).replace("\\", SLASH);
+                projectDir = FILE_SCHEME + normalizePath(projectPath.toString());
                 projectResourcesPath = projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/main/resources/";
             }
 

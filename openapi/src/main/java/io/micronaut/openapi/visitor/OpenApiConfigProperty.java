@@ -170,6 +170,24 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE = "micronaut.openapi.additional.files-merge-mode";
     /**
+     * System property that specifies the list of patterns for included files.
+     */
+    String MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS = "micronaut.openapi.additional.include-patterns";
+    /**
+     * System property that specifies the pattern style for included files. Available values: "ant" and "regex".
+     * Default: ant
+     */
+    String MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE = "micronaut.openapi.additional.include-pattern-style";
+    /**
+     * System property that specifies the patterns for excluded files.
+     */
+    String MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS = "micronaut.openapi.additional.exclude-patterns";
+    /**
+     * System property that specifies the pattern style for excluded files. Available values: "ant" and "regex".
+     * Default: ant
+     */
+    String MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE = "micronaut.openapi.additional.exclude-pattern-style";
+    /**
      * System property that specifies the location of current project.
      */
     String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";

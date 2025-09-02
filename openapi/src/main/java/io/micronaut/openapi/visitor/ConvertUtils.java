@@ -393,9 +393,7 @@ public final class ConvertUtils {
             ApiResponses responses = null;
             if (responsesNode != null && !responsesNode.isEmpty()) {
                 responses = new ApiResponses();
-                var iter = responsesNode.fields();
-                while (iter.hasNext()) {
-                    var entry = iter.next();
+                for (var entry : responsesNode.properties()) {
                     responses.put(entry.getKey(), fixContentForGroovy(entry.getValue(), ApiResponse.class));
                 }
             }
