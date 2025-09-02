@@ -894,6 +894,26 @@ the element from the generated specification will always be replaced by the elem
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <strong>replace</strong></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.include-patterns</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the list of patterns for included files (separated by <code>,</code>)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.include-pattern-style</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the pattern style for included files. Available values: <strong>"ant"</strong> and <strong>"regex"</strong>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <strong>ant</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.exclude-patterns</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the list of patterns for excluded files (separated by <code>,</code>)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.exclude-pattern-style</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the pattern style for excluded files. Available values: <strong>"ant"</strong> and <strong>"regex"</strong>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <strong>ant</strong></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.project.dir</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: calculated automatically</p></td>

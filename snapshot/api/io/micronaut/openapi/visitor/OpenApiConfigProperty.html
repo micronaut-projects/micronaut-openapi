@@ -169,6 +169,16 @@ loadScripts(document, 'script');</script>
 <div class="block">System property that specifies jsonSchemaDialect URI.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">System property that specifies the pattern style for excluded files.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">System property that specifies the patterns for excluded files.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_FILES" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_FILES</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">System property that specifies the location of additional swagger YAML and JSON files to read from.</div>
@@ -177,6 +187,16 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">System property that specifies the mode of merge additional OpenAPI files.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">System property that specifies the pattern style for included files.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">System property that specifies the list of patterns for included files.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_ADOC_ENABLED" class="member-name-link">MICRONAUT_OPENAPI_ADOC_ENABLED</a></code></div>
@@ -871,6 +891,68 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS">
+<h3>MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS</span></div>
+<div class="block">System property that specifies the list of patterns for included files.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERNS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE">
+<h3>MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE</span></div>
+<div class="block">System property that specifies the pattern style for included files. Available values: "ant" and "regex".
+ Default: ant</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_INCLUDE_PATTERN_STYLE">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS">
+<h3>MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS</span></div>
+<div class="block">System property that specifies the patterns for excluded files.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERNS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE">
+<h3>MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE</span></div>
+<div class="block">System property that specifies the pattern style for excluded files. Available values: "ant" and "regex".
+ Default: ant</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_EXCLUDE_PATTERN_STYLE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
