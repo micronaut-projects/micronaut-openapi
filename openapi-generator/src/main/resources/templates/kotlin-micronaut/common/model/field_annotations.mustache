@@ -1,7 +1,7 @@
 {{#deprecated}}
-@Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
+    @Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
 {{/deprecated}}
-    {{>common/params/validation_field}}
+{{>common/params/validation_field}}
 {{#withXml}}
     {{#isXmlAttribute}}
     @{{{vendorExtensions.fieldAnnPrefix}}}XmlAttribute(name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}"

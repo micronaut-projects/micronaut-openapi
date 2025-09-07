@@ -1,90 +1,84 @@
-{{!
- If this is map and items are nullable, make sure that nulls are included.
- To determine what JsonInclude.Include method to use, consider the following:
- * If the field is required, always include it, even if it is null.
- * Else use custom behaviour, IOW use whatever is defined on the object mapper
- }}
     @JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
-    {{#isMap}}
-        {{#items.isNullable}}
+{{#isMap}}
+    {{#items.isNullable}}
     @JsonInclude(content = JsonInclude.Include.ALWAYS{{^required}}, value = JsonInclude.Include.USE_DEFAULTS{{/required}})
-        {{/items.isNullable}}
-        {{^items.isNullable}}
-            {{^required}}
-    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-            {{/required}}
-        {{/items.isNullable}}
-    {{/isMap}}
-    {{^isMap}}
-        {{#required}}
-            {{#isReadOnly}}
-    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-            {{/isReadOnly}}
-            {{^isReadOnly}}
-                {{#jsonIncludeAlwaysForRequiredFields}}
-    @JsonInclude(JsonInclude.Include.ALWAYS)
-                {{/jsonIncludeAlwaysForRequiredFields}}
-            {{/isReadOnly}}
-        {{/required}}
+    {{/items.isNullable}}
+    {{^items.isNullable}}
         {{^required}}
     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
         {{/required}}
-    {{/isMap}}
-    {{#withXml}}
-        {{^isContainer}}
+    {{/items.isNullable}}
+{{/isMap}}
+{{^isMap}}
+    {{#required}}
+        {{#isReadOnly}}
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+        {{/isReadOnly}}
+        {{^isReadOnly}}
+            {{#jsonIncludeAlwaysForRequiredFields}}
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+            {{/jsonIncludeAlwaysForRequiredFields}}
+        {{/isReadOnly}}
+    {{/required}}
+    {{^required}}
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    {{/required}}
+{{/isMap}}
+{{#withXml}}
+    {{^isContainer}}
     @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
     @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-        {{/isContainer}}
-        {{#isContainer}}
-            {{#isXmlWrapped}}
+    {{/isContainer}}
+    {{#isContainer}}
+        {{#isXmlWrapped}}
     // items.xmlName={{items.xmlName}}
     @JacksonXmlElementWrapper(useWrapping = {{isXmlWrapped}}, {{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#items.xmlName}}{{items.xmlName}}{{/items.xmlName}}{{^items.xmlName}}{{items.baseName}}{{/items.xmlName}}")
-            {{/isXmlWrapped}}
-        {{/isContainer}}
-    {{/withXml}}
-    {{#jackson}}
-        {{^micronaut_serde_jackson}}
-            {{#isDateTime}}
-                {{#vendorExtensions.formatPattern}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
-                {{/vendorExtensions.formatPattern}}
-                {{^vendorExtensions.formatPattern}}
-                    {{#dateTimeFormat}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateTimeFormat}}}")
-                    {{/dateTimeFormat}}
-                {{/vendorExtensions.formatPattern}}
-            {{/isDateTime}}
-            {{#isDate}}
-                {{#vendorExtensions.formatPattern}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
-                {{/vendorExtensions.formatPattern}}
-                {{^vendorExtensions.formatPattern}}
-                    {{#dateFormat}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
-                    {{/dateFormat}}
-                {{/vendorExtensions.formatPattern}}
-            {{/isDate}}
-        {{/micronaut_serde_jackson}}
-    {{/jackson}}
-    {{#micronaut_serde_jackson}}
+        {{/isXmlWrapped}}
+    {{/isContainer}}
+{{/withXml}}
+{{#jackson}}
+    {{^micronaut_serde_jackson}}
         {{#isDateTime}}
             {{#vendorExtensions.formatPattern}}
-    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
             {{/vendorExtensions.formatPattern}}
             {{^vendorExtensions.formatPattern}}
                 {{#dateTimeFormat}}
-    @JsonFormat(pattern = "{{{dateTimeFormat}}}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateTimeFormat}}}")
                 {{/dateTimeFormat}}
             {{/vendorExtensions.formatPattern}}
         {{/isDateTime}}
         {{#isDate}}
             {{#vendorExtensions.formatPattern}}
-    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
             {{/vendorExtensions.formatPattern}}
             {{^vendorExtensions.formatPattern}}
                 {{#dateFormat}}
-    @JsonFormat(pattern = "{{{dateFormat}}}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
                 {{/dateFormat}}
             {{/vendorExtensions.formatPattern}}
         {{/isDate}}
     {{/micronaut_serde_jackson}}
+{{/jackson}}
+{{#micronaut_serde_jackson}}
+    {{#isDateTime}}
+        {{#vendorExtensions.formatPattern}}
+    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+        {{/vendorExtensions.formatPattern}}
+        {{^vendorExtensions.formatPattern}}
+            {{#dateTimeFormat}}
+    @JsonFormat(pattern = "{{{dateTimeFormat}}}")
+            {{/dateTimeFormat}}
+        {{/vendorExtensions.formatPattern}}
+    {{/isDateTime}}
+    {{#isDate}}
+        {{#vendorExtensions.formatPattern}}
+    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+        {{/vendorExtensions.formatPattern}}
+        {{^vendorExtensions.formatPattern}}
+            {{#dateFormat}}
+    @JsonFormat(pattern = "{{{dateFormat}}}")
+            {{/dateFormat}}
+        {{/vendorExtensions.formatPattern}}
+    {{/isDate}}
+{{/micronaut_serde_jackson}}
