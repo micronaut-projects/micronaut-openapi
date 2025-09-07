@@ -372,7 +372,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
     public void setUserParameterMode(String userParameterMode) {
         if (userParameterMode == null) {
-            this.userParameterMode = null;
+            this.userParameterMode = UserParameterMode.NONE;
             return;
         }
         try {
