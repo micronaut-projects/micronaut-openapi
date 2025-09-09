@@ -1,12 +1,12 @@
 {{^vendorExtensions.isPrimitiveArray}}
 {{^vendorExtensions.withoutNullable}}
 {{#isNullable}}
-        {{#generateHardNullable}}
+{{#generateHardNullable}}
     @Nullable(inherited = true)
-        {{/generateHardNullable}}
-        {{^generateHardNullable}}
+{{/generateHardNullable}}
+{{^generateHardNullable}}
     @Nullable
-        {{/generateHardNullable}}
+{{/generateHardNullable}}
 {{/isNullable}}
 {{^isNullable}}
     {{#required}}
@@ -35,7 +35,6 @@
 {{/isNullable}}
 {{/vendorExtensions.withoutNullable}}
 {{/vendorExtensions.isPrimitiveArray}}
-{{!All the validation}}
 {{#useBeanValidation}}
     {{^vendorExtensions.isPrimitiveArray}}
     {{^isNullable}}
@@ -48,20 +47,17 @@
         {{/required}}
     {{/isNullable}}
     {{/vendorExtensions.isPrimitiveArray}}
-    {{!Validate all pojos and enums}}
     {{^isUuid}}
     {{^isContainer}}
         {{#isModel}}
     @Valid
         {{/isModel}}
     {{/isContainer}}
-    {{!Pattern}}
     {{#pattern}}
         {{^isByteArray}}{{^isDate}}{{^isDateTime}}{{^isEmail}}
     @Pattern(regexp = "{{{pattern}}}"{{#vendorExtensions.x-pattern-message}}, message = "{{{.}}}"{{/vendorExtensions.x-pattern-message}})
         {{/isEmail}}{{/isDateTime}}{{/isDate}}{{/isByteArray}}
     {{/pattern}}
-    {{!Min length && max length}}
     {{#minLength}}
         {{#maxLength}}
     @Size(min = {{minLength}}, max = {{maxLength}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
@@ -73,7 +69,6 @@
     {{^minLength}}{{#maxLength}}
     @Size(max = {{maxLength}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxLength}}{{/minLength}}
-    {{!Size}}
     {{#minItems}}{{#maxItems}}
     @Size(min = {{minItems}}, max = {{maxItems}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxItems}}{{/minItems}}
@@ -83,11 +78,9 @@
     {{^minItems}}{{#maxItems}}
     @Size(max = {{maxItems}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxItems}}{{/minItems}}
-    {{!Email}}
     {{#isEmail}}
     @Email{{#pattern}}(regexp = "{{{pattern}}}"{{#vendorExtensions.x-pattern-message}}, message = "{{{.}}}"{{/vendorExtensions.x-pattern-message}}){{/pattern}}{{^pattern}}{{#vendorExtensions.x-pattern-message}}(message = "{{{.}}}"){{/vendorExtensions.x-pattern-message}}{{/pattern}}
     {{/isEmail}}
-    {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
     {{#isInteger}}
         {{#minimum}}
     @Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
@@ -96,7 +89,6 @@
     @Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isInteger}}
-    {{!isLong set}}
     {{#isLong}}
         {{#minimum}}
     @Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}L{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
@@ -105,13 +97,11 @@
     @Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}L{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isLong}}
-    {{!Not Integer, not Long => we have a decimal value!}}
     {{^isInteger}}
-        {{^isLong}}{{!minimum for decimal value}}
+        {{^isLong}}
             {{#minimum}}
     @DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}{{^exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
             {{/minimum}}
-    {{!maximal for decimal value}}
             {{#maximum}}
     @DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}{{^exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
             {{/maximum}}

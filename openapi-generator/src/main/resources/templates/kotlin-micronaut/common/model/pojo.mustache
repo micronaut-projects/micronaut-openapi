@@ -52,7 +52,7 @@
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
-    {{#formatNoEmptyLines}}
+{{#formatNoEmptyLines}}
     {{#description}}
     /**
      * {{description}}
@@ -69,9 +69,9 @@
      */
         {{/deprecated}}
     {{/description}}
-    {{>common/model/field_annotations}}
+{{>common/model/field_annotations}}
     {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}{{#jvmRecord}}{{#vendorExtensions.isDataClass}}val{{/vendorExtensions.isDataClass}}{{^vendorExtensions.isDataClass}}var{{/vendorExtensions.isDataClass}}{{/jvmRecord}}{{^jvmRecord}}var{{/jvmRecord}} {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
-    {{/formatNoEmptyLines}}
+{{/formatNoEmptyLines}}
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
 {{#hasVars}}){{/hasVars}}{{#parent}} : {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}){{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}{{#-first}} : {{/-first}}{{^-first}}, {{/-first}}{{/parent}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
 

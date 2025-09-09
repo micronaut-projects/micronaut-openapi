@@ -28,7 +28,9 @@ dependencies {
     api(libs.managed.flexmark.html2md.converter) {
         exclude(group = "org.jetbrains", module = "annotations")
     }
-    api(libs.managed.flexmark.profile.pegdown)
+    api(libs.managed.flexmark.profile.pegdown) {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
 
     // this dependency needs to be updated manually. It's used by html2md
     api(libs.managed.jsoup)
