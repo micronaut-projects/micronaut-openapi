@@ -48,6 +48,8 @@ public final class EndpointUtils {
         entry("auditevents", "org.springframework.boot.actuate.audit.AuditEventsEndpoint"),
         entry("beans", "org.springframework.boot.actuate.beans.BeansEndpoint"),
         entry("caches", "org.springframework.boot.actuate.cache.CachesEndpoint"),
+        entry("configprops", "org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint"),
+        entry("conditions", "org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint"),
         entry("shutdown", "org.springframework.boot.actuate.context.ShutdownEndpoint"),
         entry("env", "org.springframework.boot.actuate.env.EnvironmentEndpoint"),
         entry("flyway", "org.springframework.boot.actuate.flyway.FlywayEndpoint"),
@@ -75,6 +77,7 @@ public final class EndpointUtils {
      */
     public static final Map<String, String> SPECIFIC_ENDPOINTS = Map.of(
         "org.springframework.boot.actuate.integration.IntegrationGraphEndpoint", "org.springframework.integration.graph.IntegrationGraphServer",
+        "org.springframework.boot.actuate.metrics.MetricsEndpoint", "io.micrometer.core.instrument.Meter",
         "org.springframework.boot.actuate.flyway.FlywayEndpoint", "org.flywaydb.core.Flyway",
         "org.springframework.boot.actuate.session.SessionsEndpoint", "org.springframework.session.Session",
         "org.springframework.boot.actuate.quartz.QuartzEndpoint", "org.quartz.Job",

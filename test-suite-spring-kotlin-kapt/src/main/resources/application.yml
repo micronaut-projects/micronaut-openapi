@@ -14,7 +14,7 @@ management:
         health: /test
       base-path: /actuator2
       exposure:
-        include: health,beans, metrics,info,prometheus,loggers
+        include: health,beans, metrics,info,prometheus,loggers, configprops, conditions
   server:
     base-path: /my
     port: 9091
