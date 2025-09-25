@@ -29,7 +29,6 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,7 +39,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
@@ -350,12 +348,9 @@ public final class OpenApiViewConfig {
         } else if (customPathStr.startsWith(FILE_SCHEME)) {
             customPathStr = customPathStr.substring(FILE_SCHEME.length());
         } else if (customPathStr.startsWith(CLASSPATH_SCHEME)) {
+            final var customPathStrFinal = customPathStr;
             var resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
-            Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
-            if (inOpt.isEmpty()) {
-                throw new IOException("Fail to load " + customPathStr);
-            }
-            try (InputStream in = inOpt.get();
+            try (var in = resourceLoader.getResourceAsStream(customPathStr).orElseThrow(() -> new IOException("Fail to load " + customPathStrFinal));
                  var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
             ) {
                 return readFile(reader);
