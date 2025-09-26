@@ -413,6 +413,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         typeMapping.put("float", "Float");
         typeMapping.put("long", "Long");
         typeMapping.put("double", "Double");
+        typeMapping.put("BigInteger", "BigInteger");
         typeMapping.put("ByteArray", "ByteArray");
         typeMapping.put("number", "BigDecimal");
         typeMapping.put("decimal", "BigDecimal");
@@ -447,6 +448,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         importMapping.put("File", "java.io.File");
         importMapping.put("BigDecimal", "java.math.BigDecimal");
+        importMapping.put("BigInteger", "java.math.BigInteger");
         importMapping.put("DateTime", "java.time.Instant");
         importMapping.put("LocalDateTime", "java.time.LocalDateTime");
         importMapping.put("OffsetDateTime", "java.time.OffsetDateTime");
@@ -1203,7 +1205,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                             param.isEnum = true;
                         }
                         if (param.isEnum) {
-                            addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                            addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, true);
                         }
                     }
                 }
@@ -1215,7 +1217,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         p.isEnum = true;
                     }
                     if (p.isEnum) {
-                        addEnumParamsForConverters(modelPackage, p, converterCounters, enumParams, enumImports);
+                        addEnumParamsForConverters(modelPackage, models.get(p.dataType), p, converterCounters, enumParams, enumImports, true);
                     }
                 });
                 op.formParams.clear();
@@ -1254,7 +1256,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 }
 
                 if (param.isEnum && !param.isBodyParam) {
-                    addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                    addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, true);
                 }
             }
 
@@ -1917,14 +1919,16 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         String varName = value;
 
         // number
-        if ("Int".equalsIgnoreCase(datatype)
+        if (
+            "Int".equalsIgnoreCase(datatype)
             || "Byte".equalsIgnoreCase(datatype)
             || "Short".equalsIgnoreCase(datatype)
             || "Integer".equalsIgnoreCase(datatype)
             || "Long".equalsIgnoreCase(datatype)
             || "Float".equalsIgnoreCase(datatype)
             || "Double".equalsIgnoreCase(datatype)
-            || "BigDecimal".equals(datatype)) {
+            || "BigDecimal".equals(datatype)
+        ) {
             varName = "NUMBER_" + varName;
             varName = varName.replaceAll("-", "MINUS_");
             varName = varName.replaceAll("\\+", "PLUS_");

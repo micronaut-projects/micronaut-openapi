@@ -1560,7 +1560,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                             param.isEnum = true;
                         }
                         if (param.isEnum) {
-                            addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                            addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, false);
                         }
                     }
                 }
@@ -1572,7 +1572,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         p.isEnum = true;
                     }
                     if (p.isEnum) {
-                        addEnumParamsForConverters(modelPackage, p, converterCounters, enumParams, enumImports);
+                        addEnumParamsForConverters(modelPackage, models.get(p.dataType), p, converterCounters, enumParams, enumImports, false);
                     }
                 });
                 op.formParams.clear();
@@ -1605,7 +1605,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
 
                 if (param.isEnum && !param.isBodyParam) {
-                    addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                    addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, false);
                 }
             }
             if (op.returnProperty != null) {

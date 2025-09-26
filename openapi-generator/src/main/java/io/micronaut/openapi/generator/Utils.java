@@ -618,10 +618,12 @@ public final class Utils {
 
     public static void addEnumParamsForConverters(
         String modelPackage,
+        CodegenModel enumModel,
         CodegenParameter param,
         Map<String, Integer> converterCounters,
         List<CodegenParameter> enumParams,
-        List<String> enumImports
+        List<String> enumImports,
+        boolean isKotlin
     ) {
         var converterName = param.dataType;
         var alreadyAdded = false;
@@ -631,17 +633,101 @@ public final class Utils {
                 break;
             }
         }
-        if (!alreadyAdded) {
-            var counter = converterCounters.get(converterName);
-            if (counter == null) {
-                converterCounters.put(converterName, 0);
-            } else {
-                converterCounters.put(converterName, counter + 1);
-            }
-            param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
-            enumParams.add(param);
-            enumImports.add(modelPackage + "." + param.dataType);
+        if (alreadyAdded) {
+            return;
         }
+
+        var counter = converterCounters.get(converterName);
+        converterCounters.put(converterName, counter == null ? 0 : counter + 1);
+        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+
+        var convertFun = (enumModel.isNullable ? "Optional.ofNullable(" : "Optional.of(")
+            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumModel.dataType) : getJavaEnumConvertFun(enumModel.dataType, enumImports)) + "))";
+
+        param.vendorExtensions.put("convertFun", convertFun);
+        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumModel.dataType) : getJavaEnumConvertToStrFun((String) enumModel.vendorExtensions.get("baseType")));
+        enumParams.add(param);
+        enumImports.add(modelPackage + "." + param.dataType);
+    }
+
+    private static String getKotlinEnumConvertToStrFun(String type) {
+        return "String".equals(type) ? "v.value" : "v.value.toString()";
+    }
+
+    private static String getJavaEnumConvertToStrFun(String type) {
+        if ("String".equals(type)) {
+            return "v.getValue()";
+        } else if (
+            "char".equals(type)
+                || "byte".equals(type)
+                || "short".equals(type)
+                || "int".equals(type)
+                || "long".equals(type)
+                || "float".equals(type)
+                || "double".equals(type)
+                || "boolean".equals(type)
+        ) {
+            return "String.valueOf(v.getValue())";
+        } else {
+            return "v.getValue().toString()";
+        }
+    }
+
+
+    private static String getKotlinEnumConvertFun(String type) {
+        if ("Char".equals(type)) {
+            return "v[0]";
+        } else if ("Byte".equals(type)) {
+            return "v.toByte()";
+        } else if ("Short".equals(type)) {
+            return "v.toShort()";
+        } else if ("Int".equals(type)) {
+            return "v.toInt()";
+        } else if ("Long".equals(type)) {
+            return "v.toLong()";
+        } else if ("Float".equals(type)) {
+            return "v.toFloat()";
+        } else if ("Double".equals(type)) {
+            return "v.toDouble()";
+        } else if ("Boolean".equals(type)) {
+            return "v.toBoolean()";
+        } else if ("BigDecimal".equals(type)) {
+            return "v.toBigDecimal()";
+        } else if ("BigInteger".equals(type)) {
+            return "v.toBigInteger()";
+        }
+        return "v";
+    }
+
+    private static String getJavaEnumConvertFun(String type, List<String> imports) {
+        if ("Character".equals(type) || "char".equals(type)) {
+            return "v.charAt(0)";
+        } else if ("Byte".equals(type) || "byte".equals(type)) {
+            return "Byte.valueOf(v)";
+        } else if ("Short".equals(type) || "short".equals(type)) {
+            return "Short.valueOf(v)";
+        } else if ("Integer".equals(type) || "int".equals(type)) {
+            return "Integer.valueOf(v)";
+        } else if ("Long".equals(type) || "long".equals(type)) {
+            return "Long.valueOf(v)";
+        } else if ("Float".equals(type) || "float".equals(type)) {
+            return "Float.valueOf(v)";
+        } else if ("Double".equals(type) || "double".equals(type)) {
+            return "Double.valueOf(v)";
+        } else if ("Boolean".equals(type) || "boolean".equals(type)) {
+            return "Boolean.valueOf(v)";
+        } else if ("BigDecimal".equals(type)) {
+            if (!imports.contains("java.math.BigDecimal")) {
+                imports.add("java.math.BigDecimal");
+            }
+            return "new BigDecimal(v)";
+        } else if ("BigInteger".equals(type)) {
+            if (!imports.contains("java.math.BigInteger")) {
+                imports.add("java.math.BigInteger");
+            }
+            return "new BigInteger(v)";
+        }
+        return "v";
     }
 
     public static boolean addUserParameter(CodegenOperation op, UserParameterMode userParameterMode, boolean isAnonymous, boolean isDenyAll) {
