@@ -5,6 +5,12 @@
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{^micronaut_serde_jackson}}
+@Introspected
+{{/micronaut_serde_jackson}}
 {{>common/model/typeInfoAnnotation}}
 {{>common/model/xmlAnnotation}}
 public {{>common/model/sealed}}interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{>common/model/permits}} {
