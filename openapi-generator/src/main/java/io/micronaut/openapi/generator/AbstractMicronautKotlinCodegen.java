@@ -112,6 +112,8 @@ import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
+import static io.micronaut.openapi.generator.Utils.normalizeStr;
+import static io.micronaut.openapi.generator.Utils.normalizeStrValue;
 import static io.micronaut.openapi.generator.Utils.processDuplicateVars;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
@@ -995,6 +997,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             List<CodegenOperation> opList = operations.computeIfAbsent(basePath, k -> new ArrayList<>());
             opList.add(co);
             co.baseName = basePath;
+            co.vendorExtensions.put("normalizedBaseName", normalizeStr(basePath));
             return;
         }
 
@@ -1004,6 +1007,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         super.addOperationToGroup(superSanitizeTag(tag), resourcePath, operation, co, operations);
+
+        var foundTag = co.tags.stream().filter(t -> t.getName().equals(tag)).findFirst().orElse(null);
+        co.vendorExtensions.put("normalizedBaseTag", normalizeStr(tag));
+        if (foundTag != null) {
+            co.vendorExtensions.put("normalizedTagDesc", normalizeStr(foundTag.getDescription()));
+        }
     }
 
     @Override
@@ -1121,6 +1130,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         for (CodegenOperation op : operationList) {
 
+            objs.put("normalizedBaseTag", op.vendorExtensions.get("normalizedBaseTag"));
+            objs.put("normalizedTagDesc", op.vendorExtensions.get("normalizedTagDesc"));
+
             handleImplicitHeaders(op);
             handleConstantParams(op);
 
@@ -1199,6 +1211,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         param.isBodyParam = true;
                         param.isFormParam = false;
                         param.vendorExtensions.put("isPart", true);
+                        param.vendorExtensions.put("baseNameNormalized", normalizeStr(param.baseName));
                         if (param.isEnumRef) {
                             param.isEnum = true;
                         }
@@ -1211,6 +1224,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     p.isBodyParam = true;
                     p.isFormParam = false;
                     p.vendorExtensions.put("isPart", true);
+                    p.vendorExtensions.put("baseNameNormalized", normalizeStr(p.baseName));
                     if (p.isEnumRef) {
                         p.isEnum = true;
                     }
@@ -1226,7 +1240,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     param.isEnum = true;
                 }
                 processGenericAnnotations(param, useBeanValidation, false, param.isNullable || !param.required,
-                    param.required, false, true, ksp);
+                    param.required, false, true, true, ksp);
                 param.vendorExtensions.put("isString", "string".equalsIgnoreCase(param.dataType));
                 param.vendorExtensions.put("withoutExample", param.example == null || param.example.equals(NULL_STRING));
                 if (useBeanValidation && ((!param.isContainer && param.isModel)
@@ -1237,7 +1251,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
                 if (isDateType(param.dataType)) {
                     if (StringUtils.isNotEmpty(param.pattern)) {
-                        param.vendorExtensions.put("formatPattern", param.pattern);
+                        param.vendorExtensions.put("formatPattern", normalizeStr(param.pattern));
                         param.pattern = null;
                     }
                     param.minItems = null;
@@ -1262,9 +1276,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             additionalProperties.put("enumParams", enumParams);
 
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false, ksp);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false, true, ksp);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
+
+            normalizeTextsInOperation(op);
         }
 
         if (needToAddImportFormat) {
@@ -1272,6 +1288,80 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         return objs;
+    }
+
+    private void normalizeTextsInOperation(CodegenOperation op) {
+
+        if (op.vendorExtensions.containsKey("x-deprecated-message")) {
+            op.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr(op.vendorExtensions.get("x-deprecated-message").toString()));
+        }
+
+        if (op.vendorExtensions.containsKey("x-roles")) {
+            var roles = (List<String>) op.vendorExtensions.get("x-roles");
+            var normalizedRoles = new ArrayList<String>(roles.size());
+            for (var role : roles) {
+                normalizedRoles.add(normalizeStr(role));
+            }
+            op.vendorExtensions.put("x-roles-normalized", normalizedRoles);
+        }
+
+        if (op.summary != null) {
+            op.vendorExtensions.put("summaryNormalized", normalizeStr(op.summary));
+        }
+        if (op.notes != null) {
+            op.vendorExtensions.put("notesNormalized", normalizeStr(op.notes));
+        }
+        if (op.tags != null) {
+            for (var tag : op.tags) {
+                tag.setName(normalizeStr(tag.getName()));
+            }
+        }
+        if (op.responses != null) {
+            for (var response : op.responses) {
+                response.vendorExtensions.put("messageNormalized", normalizeStr(response.message));
+            }
+        }
+        if (op.produces != null) {
+            for (var produce : op.produces) {
+                produce.put("mediaTypeNormalized", normalizeStr(produce.get("mediaType")));
+            }
+        }
+        if (op.consumes != null) {
+            for (var consume : op.consumes) {
+                consume.put("mediaTypeNormalized", normalizeStr(consume.get("mediaType")));
+            }
+        }
+        if (op.vendorExtensions.containsKey("swaggerParams")) {
+            for (var swaggerParam : (List<CodegenParameter>) op.vendorExtensions.get("swaggerParams")) {
+                swaggerParam.vendorExtensions.put("baseNameNormalized", normalizeStr(swaggerParam.baseName));
+                swaggerParam.vendorExtensions.put("descriptionNormalized", normalizeStr(swaggerParam.description));
+            }
+        }
+        if (op.authMethods != null) {
+            for (var authMethod : op.authMethods) {
+                authMethod.vendorExtensions.put("nameNormalized", normalizeStr(authMethod.name));
+                if (authMethod.scopes != null) {
+                    for (var scope : authMethod.scopes) {
+                        scope.put("scopeNormalized", normalizeStr((String) scope.get("scope")));
+                    }
+                }
+            }
+        }
+        op.vendorExtensions.put("pathNormalized", normalizeStr(op.path));
+
+        if (op.allParams != null) {
+            for (var param : op.allParams) {
+                param.vendorExtensions.put("baseNameNormalized", normalizeStr(param.baseName));
+                if (param.defaultValue != null) {
+                    param.vendorExtensions.put("defaultValueNormalized", normalizeStr(param.defaultValue));
+                }
+                normalizeStrValue("x-pattern-message", param.vendorExtensions);
+                normalizeStrValue("x-size-message", param.vendorExtensions);
+                normalizeStrValue("x-not-null-message", param.vendorExtensions);
+                normalizeStrValue("x-minimum-message", param.vendorExtensions);
+                normalizeStrValue("x-maximum-message", param.vendorExtensions);
+            }
+        }
     }
 
     /**
@@ -1727,7 +1817,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (realName.contains("`")) {
             realName = realName.replace("`", "");
         }
-        parameter.vendorExtensions.put("realName", realName);
+        parameter.vendorExtensions.put("realName", normalizeStr(realName));
 
         Schema parameterSchema;
         if (p.getSchema() != null) {
@@ -1766,7 +1856,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (ksp && !defaultValueInit.equals(NULL_STRING)) {
                 parameter.isNullable = false;
             }
-            parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
+            parameter.vendorExtensions.put("defaultValueInit", normalizeStr(defaultValueInit));
             parameter.vendorExtensions.put("defaultValueIsNotNull", !defaultValueInit.equals(NULL_STRING));
         }
 
@@ -1806,7 +1896,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.nameInCamelCase = camelize(realName, LOWERCASE_FIRST_LETTER);
             property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
         }
-        property.vendorExtensions.put("realName", realName);
+        property.vendorExtensions.put("realName", normalizeStr(realName));
 
         if (schema != null && schema.get$ref() != null) {
             var refSchema = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, schema.get$ref());
@@ -1838,7 +1928,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             defaultValueInit = NULL_STRING;
         }
         if (defaultValueInit != null) {
-            property.vendorExtensions.put("defaultValueInit", defaultValueInit);
+            property.vendorExtensions.put("defaultValueInit", normalizeStr(defaultValueInit));
         }
 
         return property;
@@ -2173,6 +2263,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
             }
 
+            if (model.vendorExtensions.containsKey("x-deprecated-message")) {
+                model.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr((String) model.vendorExtensions.get("x-deprecated-message")));
+            }
+            model.vendorExtensions.put("descriptionNormalized", normalizeStr(model.description));
             model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("withRequiredOrOptionalVars", !requiredVarsWithoutDiscriminator.isEmpty() || !optionalVars.isEmpty());
@@ -2340,10 +2434,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         var baseType = (String) vendorExtensions.get("baseType");
         for (var enumVar : enumVars) {
+            var value = (String) enumVar.get("value");
             if ((boolean) enumVar.get("isString")) {
+                enumVar.put("valueNormalized", normalizeStr(value));
                 continue;
             }
-            var value = (String) enumVar.get("value");
             value = value.replace("\"", "");
             if ("char".equals(baseType) && !value.startsWith("'")) {
                 enumVar.put("value", "'" + value + "'");
@@ -2352,6 +2447,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             } else if ("byte".equalsIgnoreCase(baseType)) {
                 enumVar.put("value", value);
             }
+            enumVar.put("valueNormalized", enumVar.get("value"));
         }
     }
 
@@ -2459,6 +2555,22 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
 
+        property.vendorExtensions.put("baseNameNormalized", normalizeStr(property.baseName));
+        if (property.example != null) {
+            property.vendorExtensions.put("exampleNormalized", normalizeStr(property.example));
+        }
+        if (property.description != null) {
+            property.vendorExtensions.put("descriptionNormalized", normalizeStr(property.description));
+        }
+        if (property.vendorExtensions.containsKey("x-deprecated-message")) {
+            property.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr((String) property.vendorExtensions.get("x-deprecated-message")));
+        }
+        normalizeStrValue("x-pattern-message", property.vendorExtensions);
+        normalizeStrValue("x-size-message", property.vendorExtensions);
+        normalizeStrValue("x-not-null-message", property.vendorExtensions);
+        normalizeStrValue("x-minimum-message", property.vendorExtensions);
+        normalizeStrValue("x-maximum-message", property.vendorExtensions);
+
         property.vendorExtensions.put("withRequiredAndOptionalVars", model.vendorExtensions.get("withRequiredAndOptionalVars"));
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
@@ -2469,6 +2581,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if (NULL_STRING.equals(property.example)) {
             property.example = null;
+            property.vendorExtensions.remove("exampleNormalized");
         }
         if (useBeanValidation && (
             (!property.isContainer && property.isModel)
@@ -2480,7 +2593,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
         if (isDateType(property.dataType)) {
             if (StringUtils.isNotEmpty(property.pattern)) {
-                property.vendorExtensions.put("formatPattern", property.pattern);
+                property.vendorExtensions.put("formatPattern", normalizeStr(property.pattern));
                 property.pattern = null;
             }
             property.minItems = null;
@@ -2494,7 +2607,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         processGenericAnnotations(property, useBeanValidation, false, property.isNullable || property.isDiscriminator,
-            property.required, property.isReadOnly, true, ksp);
+            property.required, property.isReadOnly, true, true, ksp);
 
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, true, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);

@@ -1,16 +1,16 @@
 
 {{#isQueryParam}}
-        @QueryValue("{{{baseName}}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+        @QueryValue("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})
 {{/isQueryParam}}
 {{#isPathParam}}
-        @PathVariable("{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+        @PathVariable("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})
 {{/isPathParam}}
 {{#isHeaderParam}}
-        @Header("{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+        @Header("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})
 {{/isHeaderParam}}
 {{#isBodyParam}}
     {{#vendorExtensions.isPart}}
-        @Part("{{baseName}}")
+        @Part("{{{vendorExtensions.baseNameNormalized}}}")
     {{/vendorExtensions.isPart}}
     {{^vendorExtensions.isPart}}
         @Body
@@ -19,5 +19,5 @@
 {{#isFormParam}}
 {{/isFormParam}}
 {{#isCookieParam}}
-        @CookieValue("{{baseName}}"{{#defaultValue}}, defaultValue = "{{defaultValue}}"{{/defaultValue}})
+        @CookieValue("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})
 {{/isCookieParam}}

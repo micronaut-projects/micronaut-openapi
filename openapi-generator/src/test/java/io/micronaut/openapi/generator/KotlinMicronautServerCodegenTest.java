@@ -773,13 +773,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 @QueryValue("strParam3") @NotNull @Format(FORMAT_MULTI) strParam3: List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String>,
                 """,
             """
-                @QueryValue("intParam") @NotNull @Format(FORMAT_MULTI) intParam: List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Int>,
+                @QueryValue("intParam") @NotNull @Format(FORMAT_MULTI) intParam: List<@NotNull(message = "This is required int message") @Min(5, message = "This is min message") @Max(10, message = "This is max message") Int>,
                 """,
             """
-                @QueryValue("decimalParam") @NotNull @Format(FORMAT_MULTI) decimalParam: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal>,
+                @QueryValue("decimalParam") @NotNull @Format(FORMAT_MULTI) decimalParam: List<@NotNull(message = "This is required decimal message") @DecimalMin("5.5", message = "This is decimal min message") @DecimalMax("10.5", message = "This is decimal max message") BigDecimal>,
                 """,
             """
-                @QueryValue("decimalParam2") @NotNull(message = "This is required param message") @Format(FORMAT_MULTI) decimalParam2: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal>,
+                @QueryValue("decimalParam2") @NotNull(message = "This is required param message") @Format(FORMAT_MULTI) decimalParam2: List<@NotNull(message = "This is required decimal message") @DecimalMin("5.5", inclusive = false, message = "This is decimal min message") @DecimalMax("10.5", inclusive = false, message = "This is decimal max message") BigDecimal>,
                 """,
             """
                 @QueryValue("positiveParam") @NotNull @Format(FORMAT_MULTI) positiveParam: List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Int>,
@@ -1382,6 +1382,295 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     fun savePublic(
                         @Nullable authentication: Authentication? = null,
                     ): Mono<Void>
+                """
+        );
+    }
+
+    @Test
+    void testDollarSign() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/dollar-sign.yml");
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/Tag1Api.kt",
+            """
+                @Controller
+                @Tag(name = "\\$tag1", description = "Desc for tag with \\$dollarSign")
+                interface Tag1Api {
+                
+                    /**
+                     * {@summary summary with $dollarSign}
+                     * contains $strings
+                     *
+                     * @param dollarPathVar desc pathVar with $dollarSign (required)
+                     * @param schemaTitleWithDollarDollarSign Request body desc with $dollarSign (required)
+                     * @param dollarQueryVar desc queryVar with $dollarSign (optional, default to ref2/$ref)
+                     *        Deprecated: Deprecated message with $dollarSign
+                     * @param dollarHeaderVar desc header with $dollarSign (optional, default to $dollar)
+                     * @param dollarCookieVar desc cookie with $dollarSign (optional, default to $dollar)
+                     * @param dollarPropDouble (optional)
+                     * @param dollarPropLong (optional)
+                     * @param dollarPropInt (optional)
+                     * @param dollarPropEmail (optional)
+                     * @param dollarPropListMinMax (optional)
+                     * @param dollarPropListMin (optional)
+                     * @param dollarPropListMax (optional)
+                     * @param dollarPropStrMinMax (optional)
+                     * @param dollarPropStrMin (optional)
+                     * @param dollarPropStrMax (optional)
+                     * @param dollarPropStrPattern (optional)
+                     *
+                     * @return desc resp 200 with $dollarSign (status code 200)
+                     *         or desc resp 404 with $dollarSign (status code 404)
+                     *
+                     * @deprecated Deprecated message with $dollarSign
+                     *
+                     * @see <a href="https://external2.server.com/$dollar-sign">summary with $dollarSign Documentation</a>
+                     */
+                    @Deprecated("Deprecated message with \\$dollarSign")
+                    @Operation(
+                        operationId = "getStrings",
+                        summary = "summary with \\$dollarSign",
+                        description = "contains \\$strings",
+                        tags = [ "\\$tag1", "\\$tag2" ],
+                        responses = [
+                            ApiResponse(responseCode = "200", description = "desc resp 200 with \\$dollarSign", content = [
+                                Content(mediaType = "\\$application/json", schema = Schema(implementation = String::class)),
+                            ]),
+                            ApiResponse(responseCode = "404", description = "desc resp 404 with \\$dollarSign", content = [
+                                Content(mediaType = "\\$application/json", schema = Schema(implementation = String::class)),
+                            ]),
+                        ],
+                        parameters = [
+                            Parameter(name = "\\$pathVar", description = "desc pathVar with \\$dollarSign", required = true, `in` = ParameterIn.PATH),
+                            Parameter(name = "\\$queryVar", deprecated = true, description = "desc queryVar with \\$dollarSign", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$headerVar", description = "desc header with \\$dollarSign", `in` = ParameterIn.HEADER),
+                            Parameter(name = "\\$cookieVar", description = "desc cookie with \\$dollarSign", `in` = ParameterIn.COOKIE),
+                            Parameter(name = "\\$propDouble", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propLong", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propInt", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propEmail", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propListMinMax", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propListMin", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propListMax", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propStrMinMax", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propStrMin", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propStrMax", `in` = ParameterIn.QUERY),
+                            Parameter(name = "\\$propStrPattern", `in` = ParameterIn.QUERY),
+                        ],
+                        security = [
+                            SecurityRequirement(name = "\\$notSimpleAuth"),
+                            SecurityRequirement(name = "\\$OAuth2", scopes = ["\\$read", "\\$write"]),
+                        ],
+                    )
+                    @Get("/\\$paths/{\\$pathVar}")
+                    @Produces("\\$application/json")
+                    @Consumes("\\$application/json")
+                    @Secured("\\\\\\$notRead", "\\\\\\$notWrite")
+                    fun getStrings(
+                        @PathVariable("\\$pathVar", defaultValue = "\\$dollar") @NotNull dollarPathVar: String = "\\$dollar",
+                        @Body @NotNull @Valid schemaTitleWithDollarDollarSign: SchemaTitleWithDollarDollarSign,
+                        @QueryValue("\\$queryVar", defaultValue = "ref2/\\$ref") @Nullable @java.lang.Deprecated dollarQueryVar: DollarGetDollarStringsDollarQueryVarParameter? = DollarGetDollarStringsDollarQueryVarParameter.REF2__REF,
+                        @Header("\\$headerVar", defaultValue = "\\$dollar") @Nullable dollarHeaderVar: String? = "\\$dollar",
+                        @CookieValue("\\$cookieVar", defaultValue = "\\$dollar") @Nullable dollarCookieVar: String? = "\\$dollar",
+                        @QueryValue("\\$propDouble") @Nullable @DecimalMin("10", message = "Message with \\$dollarSign") @DecimalMax("100", message = "Message with \\$dollarSign") dollarPropDouble: BigDecimal? = null,
+                        @QueryValue("\\$propLong") @Nullable @Min(10L, message = "Message with \\$dollarSign") @Max(100L, message = "Message with \\$dollarSign") dollarPropLong: Long? = null,
+                        @QueryValue("\\$propInt") @Nullable @Min(10, message = "Message with \\$dollarSign") @Max(100, message = "Message with \\$dollarSign") dollarPropInt: Int? = null,
+                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String? = null,
+                        @QueryValue("\\$propListMinMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMinMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMin") @Nullable @Format(FORMAT_MULTI) dollarPropListMin: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propStrMinMax") @Nullable @Size(min = 10, max = 100, message = "Message with \\$dollarSign") dollarPropStrMinMax: String? = null,
+                        @QueryValue("\\$propStrMin") @Nullable @Size(min = 10, message = "Message with \\$dollarSign") dollarPropStrMin: String? = null,
+                        @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String? = null,
+                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
+                    ): Mono<String>
+                
+                }
+                """
+            );
+
+        assertFileContains(path + "model/DollarGetDollarStringsDollarQueryVarParameter.kt",
+            """
+                enum class DollarGetDollarStringsDollarQueryVarParameter(
+                    @get:JsonValue
+                    val value: String,
+                ) {
+                
+                    /**
+                     * desc enumConst1 with $dollarSign
+                     */
+                    @JsonProperty("ref1/\\$ref")
+                    REF1__REF("ref1/\\$ref"),
+                    /**
+                     * desc enumConst2 with $dollarSign
+                     */
+                    @Deprecated("")
+                    @JsonProperty("ref2/\\$ref")
+                    REF2__REF("ref2/\\$ref"),
+                    ;
+                
+                    override fun toString(): String = value
+                
+                    companion object {
+                
+                        @JvmField
+                        val VALUE_MAPPING = entries.associateBy { it.value }
+                
+                        /**
+                         * Create this enum from a value.
+                         *
+                         * @param value The value
+                         *
+                         * @return The enum
+                         */
+                        @JvmStatic
+                        @JsonCreator
+                        fun fromValue(value: String): DollarGetDollarStringsDollarQueryVarParameter {
+                            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+                            return VALUE_MAPPING[value]!!
+                        }
+                    }
+                }
+                """
+        );
+
+        assertFileContains(path + "model/SchemaTitleWithDollarDollarSign.kt",
+            """
+                /**
+                 * Schema desc with $dollarSign
+                 */
+                @Schema(description = "Schema desc with \\$dollarSign")
+                @Serdeable
+                @JsonPropertyOrder(
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP1,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_DOUBLE,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_LONG,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_INT,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_EMAIL,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_LIST_MIN_MAX,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_LIST_MIN,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_LIST_MAX,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_STR_MIN_MAX,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_STR_MIN,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_STR_MAX,
+                    SchemaTitleWithDollarDollarSign.JSON_PROPERTY_PROP2,
+                )
+                @Generated("io.micronaut.openapi.generator.KotlinMicronautServerCodegen")
+                data class SchemaTitleWithDollarDollarSign(
+                
+                    /**
+                     * Schema prop1 desc with $dollarSign
+                     *
+                     * @deprecated Deprecated message with $dollarSign
+                     */
+                    @Deprecated("Deprecated message with \\$dollarSign")
+                    @field:NotNull(message = "Message with \\\\\\$dollarSign")
+                    @field:Pattern(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\\\\\$dollarSign")
+                    @field:Size(min = 10, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$prop1", example = "\\$dollarSign", description = "Schema prop1 desc with \\$dollarSign", requiredMode = Schema.RequiredMode.REQUIRED, deprecated = true)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP1)
+                    var dollarProp1: String,
+                
+                    @field:Nullable
+                    @field:DecimalMin("10", message = "Message with \\\\\\$dollarSign")
+                    @field:DecimalMax("100", message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propDouble", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_DOUBLE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropDouble: BigDecimal? = null,
+                
+                    @field:Nullable
+                    @field:Min(10L, message = "Message with \\\\\\$dollarSign")
+                    @field:Max(100L, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propLong", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LONG)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropLong: Long? = null,
+                
+                    @field:Nullable
+                    @field:Min(10, message = "Message with \\\\\\$dollarSign")
+                    @field:Max(100, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propInt", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_INT)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropInt: Int? = null,
+                
+                    @field:Nullable
+                    @field:Email(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propEmail", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_EMAIL)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropEmail: String? = null,
+                
+                    @field:Nullable
+                    @field:Schema(name = "\\$propListMinMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MIN_MAX)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropListMinMax: List<@NotNull String>? = null,
+                
+                    @field:Nullable
+                    @field:Schema(name = "\\$propListMin", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MIN)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropListMin: List<@NotNull String>? = null,
+                
+                    @field:Nullable
+                    @field:Schema(name = "\\$propListMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MAX)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropListMax: List<@NotNull String>? = null,
+                
+                    @field:Nullable
+                    @field:Size(min = 10, max = 100, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propStrMinMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN_MAX)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropStrMinMax: String? = null,
+                
+                    @field:Nullable
+                    @field:Size(min = 10, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propStrMin", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropStrMin: String? = null,
+                
+                    @field:Nullable
+                    @field:Size(max = 100, message = "Message with \\\\\\$dollarSign")
+                    @field:Schema(name = "\\$propStrMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MAX)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var dollarPropStrMax: String? = null,
+                
+                    /**
+                     * @deprecated Deprecated message with $dollarSign
+                     */
+                    @Deprecated("Deprecated message with \\$dollarSign")
+                    @field:Nullable
+                    @field:Valid
+                    @field:Schema(name = "prop2", requiredMode = Schema.RequiredMode.NOT_REQUIRED, deprecated = true)
+                    @field:JsonProperty(JSON_PROPERTY_PROP2)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var prop2: DollarSomeDto? = null,
+                ) {
+                
+                    companion object {
+                
+                        const val JSON_PROPERTY_DOLLAR_PROP1 = "\\$prop1"
+                        const val JSON_PROPERTY_DOLLAR_PROP_DOUBLE = "\\$propDouble"
+                        const val JSON_PROPERTY_DOLLAR_PROP_LONG = "\\$propLong"
+                        const val JSON_PROPERTY_DOLLAR_PROP_INT = "\\$propInt"
+                        const val JSON_PROPERTY_DOLLAR_PROP_EMAIL = "\\$propEmail"
+                        const val JSON_PROPERTY_DOLLAR_PROP_LIST_MIN_MAX = "\\$propListMinMax"
+                        const val JSON_PROPERTY_DOLLAR_PROP_LIST_MIN = "\\$propListMin"
+                        const val JSON_PROPERTY_DOLLAR_PROP_LIST_MAX = "\\$propListMax"
+                        const val JSON_PROPERTY_DOLLAR_PROP_STR_MIN_MAX = "\\$propStrMinMax"
+                        const val JSON_PROPERTY_DOLLAR_PROP_STR_MIN = "\\$propStrMin"
+                        const val JSON_PROPERTY_DOLLAR_PROP_STR_MAX = "\\$propStrMax"
+                        const val JSON_PROPERTY_PROP2 = "prop2"
+                    }
+                }
                 """
         );
     }

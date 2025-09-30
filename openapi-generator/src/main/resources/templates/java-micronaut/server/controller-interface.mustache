@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @Controller
 {{/generateControllerAsAbstract}}
 {{#generateSwagger2Annotations}}
-@Tag(name = "{{{baseName}}}", description = {{#tagDescription}}"{{{.}}}"{{/tagDescription}}{{^tagDescription}}"The {{{baseName}}} API"{{/tagDescription}})
+@Tag(name = "{{{vendorExtensions.normalizedBaseTag}}}"{{#vendorExtensions.normalizedTagDesc}}, description = "{{{.}}}"{{/vendorExtensions.normalizedTagDesc}})
 {{/generateSwagger2Annotations}}
 public interface {{classname}} {
 

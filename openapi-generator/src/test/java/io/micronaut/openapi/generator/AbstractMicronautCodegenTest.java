@@ -34,10 +34,10 @@ public abstract class AbstractMicronautCodegenTest {
     protected final String PETSTORE_PATH = "src/test/resources/petstore.json";
 
     /**
-     * @param codegen - the code generator
+     * @param codegen the code generator
      * @param opts codegen options
-     * @param configPath - the path to the config starting from src/test/resources
-     * @param filesToGenerate - which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
+     * @param configPath the path to the config starting from src/test/resources
+     * @param filesToGenerate which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
      *
      * @return - the path to the generated folder
      */
@@ -82,10 +82,10 @@ public abstract class AbstractMicronautCodegenTest {
     /**
      * Generate standard set of file types: SUPPORTING_FILES, APIS, MODELS with compilation.
      *
-     * @param codegen - the code generator
-     * @param configPath - the path to the config starting from src/test/resources
+     * @param codegen the code generator
+     * @param configPath the path to the config starting from src/test/resources
      *
-     * @return - the path to the generated folder
+     * @return the path to the generated folder
      */
     protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath) {
         return generateFiles(codegen, configPath, true, SUPPORTING_FILES, APIS, MODELS);
@@ -94,21 +94,21 @@ public abstract class AbstractMicronautCodegenTest {
     /**
      * Generate standard set of file types: SUPPORTING_FILES, APIS, MODELS.
      *
-     * @param codegen - the code generator
+     * @param codegen the code generator
      * @param withCompile with compilation of generated files
-     * @param configPath - the path to the config starting from src/test/resources
+     * @param configPath the path to the config starting from src/test/resources
      *
-     * @return - the path to the generated folder
+     * @return the path to the generated folder
      */
     protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath, boolean withCompile) {
         return generateFiles(codegen, configPath, withCompile, SUPPORTING_FILES, APIS, MODELS);
     }
 
     /**
-     * @param codegen - the code generator
-     * @param configPath - the path to the config starting from src/test/resources
+     * @param codegen the code generator
+     * @param configPath the path to the config starting from src/test/resources
      * @param withCompile with compilation of generated files
-     * @param filesToGenerate - which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
+     * @param filesToGenerate which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
      *
      * @return - the path to the generated folder
      */
@@ -153,9 +153,9 @@ public abstract class AbstractMicronautCodegenTest {
     /**
      * Compile files using the kotlin compiler and assert the compilation succeeded
      *
-     * @param directory        - path of a directory of generated files to be compiled
-     * @param jvmTarget        - jvmTarget version to compile to
-     * @param extraSourceFiles - extra source files to add to the compilation - useful for adding dummy types
+     * @param directory path of a directory of generated files to be compiled
+     * @param jvmTarget jvmTarget version to compile to
+     * @param extraSourceFiles extra source files to add to the compilation - useful for adding dummy types
      */
     public static void assertFilesCompile(String directory, String jvmTarget, SourceFile... extraSourceFiles) {
         var sourceFiles = new ArrayList<SourceFile>();

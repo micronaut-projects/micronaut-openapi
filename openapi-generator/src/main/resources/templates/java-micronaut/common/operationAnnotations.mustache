@@ -32,10 +32,10 @@
      * @see <a href="{{url}}">{{{summary}}} Documentation</a>
     {{/externalDocs}}
      */
-    {{#generateSwagger2Annotations}}
-        {{#isDeprecated}}
+    {{#isDeprecated}}
     @Deprecated
-        {{/isDeprecated}}
+    {{/isDeprecated}}
+    {{#generateSwagger2Annotations}}
     @Operation(
         operationId = "{{{operationId}}}",
         {{#summary}}

@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 @Controller
 {{/generateControllerAsAbstract}}
 {{#generateSwagger2Annotations}}
-@Tag(name = "{{{baseName}}}", description = {{#tagDescription}}"{{{.}}}"{{/tagDescription}}{{^tagDescription}}"The {{{baseName}}} API"{{/tagDescription}})
+@Tag(name = "{{{normalizedBaseTag}}}"{{#normalizedTagDesc}}, description = "{{{.}}}"{{/normalizedTagDesc}})
 {{/generateSwagger2Annotations}}
 interface {{classname}} {
 
@@ -51,16 +51,16 @@ interface {{classname}} {
     {{#operation}}
         {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}
-    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{vendorExtensions.pathNormalized}}}")
     {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
-    @Produces({{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}})
+    @Produces({{#produces}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{/produces}})
     {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
     {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
-    @Consumes({{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}})
+    @Consumes({{#consumes}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{/consumes}})
     {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{!security annotations}}
     {{#useAuth}}
-    @Secured({{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}})
+    @Secured({{#vendorExtensions.x-roles-normalized}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles-normalized}})
     {{/useAuth}}
     {{!the method definition}}
     {{#vendorExtensions.x-operation-extra-annotation}}
@@ -74,7 +74,7 @@ interface {{classname}} {
         {{^vendorExtensions.formatPattern}}
             {{#isDateTime}}{{#dateTimeFormat}}@Format("{{{dateTimeFormat}}}"){{/dateTimeFormat}}{{/isDateTime}}
             {{#isDate}}{{#dateFormat}}@Format("{{{dateFormat}}}"){{/dateFormat}}{{/isDate}}
-            {{^isDateTime}}{{^isDate}}{{#vendorExtensions.format}}@Format({{{vendorExtensions.format}}}) {{/vendorExtensions.format}}{{/isDate}}{{/isDateTime}}
+            {{^isDateTime}}{{^isDate}}{{#vendorExtensions.format}}@Format({{{.}}}) {{/vendorExtensions.format}}{{/isDate}}{{/isDateTime}}
         {{/vendorExtensions.formatPattern}}
         {{#isDeprecated}}
             @java.lang.Deprecated
