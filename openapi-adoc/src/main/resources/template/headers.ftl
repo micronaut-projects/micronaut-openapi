@@ -35,7 +35,7 @@ __explode__
       </#if>
     </#compress>
 
-<.<!<#assign schemaType = header.getSchema() /><#include template_schemaType />
+<.<!<#assign schemaType = header.getSchema() /><#include template_schemaType /><@renderSchemaType schemaType=schemaType />
   </#list>
 !===
 </#if>

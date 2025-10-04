@@ -1,0 +1,33 @@
+openapi: 3.0.1
+info:
+  title: Service
+  version: 1.0.0
+paths:
+  /:
+    get:
+      operationId: fetchOffers
+      parameters:
+        - name: p
+          in: query
+          explode: false
+          schema:
+            nullable: true
+            allOf:
+              - $ref: "#/components/schemas/MyDto"
+      responses:
+        "201":
+          description: fetchOffers 201 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyDto"
+components:
+  schemas:
+    MyDto:
+      type: object
+      properties:
+        payload:
+          type: string
+          format: byte
+        payload2:
+          type: string

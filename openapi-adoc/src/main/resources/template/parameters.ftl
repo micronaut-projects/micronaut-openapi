@@ -50,7 +50,7 @@ Style: ${parameter.getStyle()} +
       <#assign content = parameter.getContent() />
       <#include template_content />
     </#if>
-<.<|<#if parameter.getSchema()??><#assign schemaType = parameter.getSchema() /><#include template_schemaType /></#if>
+<.<|<#if parameter.getSchema()??><#assign schemaType = parameter.getSchema() /><#include template_schemaType /><@renderSchemaType schemaType=schemaType /></#if>
   </#list>
 |===
 </#if>
