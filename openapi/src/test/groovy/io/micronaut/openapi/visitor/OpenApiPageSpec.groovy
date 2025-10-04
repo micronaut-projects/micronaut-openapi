@@ -85,7 +85,6 @@ class MyBean {}
         sortOrderSchema.properties.ignoreCase
         sortOrderSchema.properties.direction
         sortOrderSchema.properties.property
-        sortOrderSchema.properties.ascending
 
         sortOrderDirectionSchema.enum[0] == 'ASC'
         sortOrderDirectionSchema.enum[1] == 'DESC'
