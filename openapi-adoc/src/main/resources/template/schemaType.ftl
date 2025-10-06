@@ -1,3 +1,4 @@
+<#macro renderSchemaType schemaType>
 <#compress>
 <#if schemaType.getItems()??>
   <#if schemaType.getItems().getType()??>
@@ -13,10 +14,17 @@ enum (${schemaType.getEnum()?join(", ")})
   <#if schemaType.getType()??>
 ${schemaType.getType()}
   <#else>
+    <#if schemaType.get$ref()??>
 <<${schemaType.get$ref()?replace("#", "")?replace("/", "_")},${schemaType.get$ref()?remove_beginning("#/components/schemas/")}>>
+    <#else>
+      <#list schemaType.getAllOf() as allOfSchema>
+<@renderSchemaType schemaType=allOfSchema />
+      </#list>
+    </#if>
   </#if>
   <#if schemaType.getFormat()?has_content>
 (${schemaType.getFormat()})
   </#if>
 </#if>
 </#compress>
+</#macro>

@@ -1,6 +1,7 @@
 package io.micronaut.openapi.adoc;
 
 import freemarker.template.TemplateException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ class OpenApiToAdocConverterTest {
     final Path outputDir = Path.of("build/test/freemarker");
 
     @BeforeEach
-    void setup() throws IOException {
+    void beforeEach() throws IOException {
         if (Files.exists(outputDir)) {
             Files.walk(outputDir)
                 .sorted(Comparator.reverseOrder())
@@ -26,10 +27,27 @@ class OpenApiToAdocConverterTest {
         }
     }
 
+    @AfterEach
+    void afterEach() throws IOException {
+        if (Files.exists(outputDir)) {
+            Files.walk(outputDir)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+        }
+
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED);
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH);
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME);
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH);
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH);
+        System.clearProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX + "links");
+    }
+
     @Test
     void testFreemarker() throws IOException, TemplateException {
 
-        System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, "/yaml/swagger_petstore.yaml");
+        System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, "/yaml/swagger_petstore.yml");
         System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, "myresult.adoc");
         System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, outputDir.toString());
         System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH, "classpath:/customDir");
@@ -42,5 +60,21 @@ class OpenApiToAdocConverterTest {
 
         var adoc = Files.readString(resultFile);
         assertTrue(adoc.contains("!!!!!!test custom template"));
+    }
+
+    @Test
+    void testSchemaWithAllOf() throws IOException, TemplateException {
+
+        System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, "/yaml/schemaWithAllOf.yml");
+        System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, "myresult.adoc");
+        System.setProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, outputDir.toString());
+
+        OpenApiToAdocConverter.convert();
+
+        var resultFile = outputDir.resolve("myresult.adoc");
+        assertTrue(Files.exists(resultFile));
+
+        var adoc = Files.readString(resultFile);
+        assertTrue(adoc.contains("<.<|<<_components_schemas_MyDto,MyDto>>"));
     }
 }

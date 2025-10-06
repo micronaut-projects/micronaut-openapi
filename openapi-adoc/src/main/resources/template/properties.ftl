@@ -12,7 +12,7 @@
 __required__
 </#if>
 <.<|<#include template_propertyDescription />
-<.<|<#assign schemaType = propSchema /><#include template_schemaType />
+<.<|<#assign schemaType = propSchema /><#include template_schemaType /><@renderSchemaType schemaType=schemaType />
 </#list>
 |===
 </#if>

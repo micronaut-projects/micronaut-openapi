@@ -57,7 +57,7 @@ public final class SwaggerUtils {
     public static OpenAPI readOpenApiFromLocation(String location) {
 
         var isJson = location.endsWith(".json");
-        var adjustedLocation = location.replace("\\\\", "/").replace("\\", "/").toLowerCase();
+        var adjustedLocation = location.replace("\\\\", "/").replace("\\", "/");
         try {
             if (adjustedLocation.startsWith("jar:")) {
                 try (var in = new URI(adjustedLocation).toURL().openStream()) {

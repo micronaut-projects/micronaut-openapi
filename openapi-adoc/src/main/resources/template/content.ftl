@@ -3,7 +3,7 @@
   <#list content as mediaTypeName, mediaType>
       <#if mediaType.getExample()?has_content><#assign example = mediaType.getExample() /><#include template_examples /></#if>
       <#assign schemaType = mediaType.getSchema() />
-${mediaTypeName}:: <#include template_schemaType />
+${mediaTypeName}:: <#include template_schemaType /><@renderSchemaType schemaType=schemaType />
 
       <#assign propSchema = schemaType />
       <#include template_propertyDescription />
