@@ -2928,7 +2928,14 @@ public final class SchemaDefinitionUtils {
             if (classElement != null) {
                 for (FieldElement field : classElement.getFields()) {
                     if (field.getName().equals(publicField.getName())) {
-                        fieldJavadoc = Utils.getJavadocParser().parse(publicField.getDocumentation().orElse(field.getDocumentation().orElse(null)));
+                        Optional<String> documentation;
+                        if (publicField instanceof PropertyElement propEl) {
+                            documentation = propEl.getReadMethod().flatMap(Element::getDocumentation)
+                                .or(publicField::getDocumentation);
+                        } else {
+                            documentation = publicField.getDocumentation();
+                        }
+                        fieldJavadoc = Utils.getJavadocParser().parse(documentation.orElse(field.getDocumentation().orElse(null)));
                         break;
                     }
                 }
