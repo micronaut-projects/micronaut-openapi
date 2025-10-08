@@ -53,6 +53,7 @@ import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.PropertyElementQuery;
 import io.micronaut.inject.ast.TypedElement;
@@ -2044,6 +2045,11 @@ public final class SchemaDefinitionUtils {
 
         processJacksonDescription(element, schemaToBind);
         if (StringUtils.isNotEmpty(schemaToBind.getDescription())) {
+            return;
+        }
+
+        if (element instanceof ParameterElement) {
+            // Before 4.10 parameter description was not returned by default, now the logic below is incorrect for parameters
             return;
         }
 
