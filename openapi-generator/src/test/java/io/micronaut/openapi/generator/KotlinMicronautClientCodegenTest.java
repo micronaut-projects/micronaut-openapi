@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -2196,24 +2195,110 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.LongPrimitiveEnum",
             "import org.openapitools.model.ShortPrimitiveEnum",
             "import org.openapitools.model.StringEnum",
-            "class EnumConverterClientConfig(",
+            "class EnumConverterClientConfig {",
             """
                     @Bean
-                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
-                        commonToEnumConverter(StringEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
-                        commonToStrConverter(StringEnum::class.java, objectMapper)
+                    fun toEnumStringEnum() = TypeConverter<String, StringEnum> { v, _, _ -> Optional.of(StringEnum.fromValue(v)) }
                 """,
             """
                     @Bean
-                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
-                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                
+                    fun toStrStringEnum() = TypeConverter<StringEnum, String> { v, _, _ -> Optional.of(v.value) }
+                """,
+            """
                     @Bean
-                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
-                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                    fun toEnumIntEnum() = TypeConverter<String, IntEnum> { v, _, _ -> Optional.of(IntEnum.fromValue(v.toInt())) }
+                """,
+            """
+                    @Bean
+                    fun toStrIntEnum() = TypeConverter<IntEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumLongEnum() = TypeConverter<String, LongEnum> { v, _, _ -> Optional.of(LongEnum.fromValue(v.toLong())) }
+                """,
+            """
+                    @Bean
+                    fun toStrLongEnum() = TypeConverter<LongEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDecimalEnum() = TypeConverter<String, DecimalEnum> { v, _, _ -> Optional.of(DecimalEnum.fromValue(v.toBigDecimal())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDecimalEnum() = TypeConverter<DecimalEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumFloatEnum() = TypeConverter<String, FloatEnum> { v, _, _ -> Optional.of(FloatEnum.fromValue(v.toFloat())) }
+                """,
+            """
+                    @Bean
+                    fun toStrFloatEnum() = TypeConverter<FloatEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDoubleEnum() = TypeConverter<String, DoubleEnum> { v, _, _ -> Optional.of(DoubleEnum.fromValue(v.toDouble())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDoubleEnum() = TypeConverter<DoubleEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumBytePrimitiveEnum() = TypeConverter<String, BytePrimitiveEnum> { v, _, _ -> Optional.of(BytePrimitiveEnum.fromValue(v.toByte())) }
+                """,
+            """
+                    @Bean
+                    fun toStrBytePrimitiveEnum() = TypeConverter<BytePrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumShortPrimitiveEnum() = TypeConverter<String, ShortPrimitiveEnum> { v, _, _ -> Optional.of(ShortPrimitiveEnum.fromValue(v.toShort())) }
+                """,
+            """
+                    @Bean
+                    fun toStrShortPrimitiveEnum() = TypeConverter<ShortPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumIntPrimitiveEnum() = TypeConverter<String, IntPrimitiveEnum> { v, _, _ -> Optional.of(IntPrimitiveEnum.fromValue(v.toInt())) }
+                """,
+            """
+                    @Bean
+                    fun toStrIntPrimitiveEnum() = TypeConverter<IntPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumLongPrimitiveEnum() = TypeConverter<String, LongPrimitiveEnum> { v, _, _ -> Optional.of(LongPrimitiveEnum.fromValue(v.toLong())) }
+                """,
+            """
+                    @Bean
+                    fun toStrLongPrimitiveEnum() = TypeConverter<LongPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumFloatPrimitiveEnum() = TypeConverter<String, FloatPrimitiveEnum> { v, _, _ -> Optional.of(FloatPrimitiveEnum.fromValue(v.toFloat())) }
+                """,
+            """
+                    @Bean
+                    fun toStrFloatPrimitiveEnum() = TypeConverter<FloatPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDoublePrimitiveEnum() = TypeConverter<String, DoublePrimitiveEnum> { v, _, _ -> Optional.of(DoublePrimitiveEnum.fromValue(v.toDouble())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDoublePrimitiveEnum() = TypeConverter<DoublePrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumCharPrimitiveEnum() = TypeConverter<String, CharPrimitiveEnum> { v, _, _ -> Optional.of(CharPrimitiveEnum.fromValue(v[0])) }
+                """,
+            """
+                    @Bean
+                    fun toStrCharPrimitiveEnum() = TypeConverter<CharPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
                 """
         );
     }
@@ -2241,25 +2326,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.LongPrimitiveEnum",
             "import org.openapitools.model.ShortPrimitiveEnum",
             "import org.openapitools.model.StringEnum",
-            "class EnumConverterMyApiClientConfig(",
-            """
-                    @Bean
-                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
-                        commonToEnumConverter(StringEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
-                        commonToStrConverter(StringEnum::class.java, objectMapper)
-                """,
-            """
-                    @Bean
-                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
-                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
-                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                """
+            "class EnumConverterMyApiClientConfig {"
         );
     }
 
