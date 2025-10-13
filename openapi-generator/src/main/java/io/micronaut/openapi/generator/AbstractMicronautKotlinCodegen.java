@@ -562,6 +562,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             additionalProperties.remove(ADDITIONAL_ENUM_TYPE_ANNOTATIONS);
         }
 
+        // Need to remove invokerPackage prop, to disable warning in logs
+        String addInvokerPackage = null;
+        if (additionalProperties.containsKey(INVOKER_PACKAGE)) {
+            addInvokerPackage = (String) additionalProperties.get(INVOKER_PACKAGE);
+            additionalProperties.remove(INVOKER_PACKAGE);
+        }
+
         super.processOpts();
 
         // Get properties
@@ -569,10 +576,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             title = (String) additionalProperties.get(OPT_TITLE);
         }
 
-        if (additionalProperties.containsKey(INVOKER_PACKAGE)) {
-            packageName = (String) additionalProperties.get(INVOKER_PACKAGE);
+        if (addInvokerPackage != null) {
+            packageName = addInvokerPackage;
+            additionalProperties.put(INVOKER_PACKAGE, packageName);
+            additionalProperties.put(PACKAGE_NAME, packageName);
         } else {
             additionalProperties.put(INVOKER_PACKAGE, packageName);
+            additionalProperties.put(PACKAGE_NAME, packageName);
+        }
+
+        if (additionalProperties.containsKey(PACKAGE_NAME)) {
+            packageName = (String) additionalProperties.get(PACKAGE_NAME);
+            additionalProperties.put(INVOKER_PACKAGE, packageName);
+        } else {
+            additionalProperties.put(INVOKER_PACKAGE, packageName);
+            additionalProperties.put(PACKAGE_NAME, packageName);
         }
 
         if (additionalProperties.containsKey(API_PACKAGE)) {
