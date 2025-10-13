@@ -41,9 +41,6 @@
 @Data
     {{/requiredPropertiesInConstructor}}
 {{/lombok}}
-{{#micronaut_serde_jackson}}
-@Serdeable
-{{/micronaut_serde_jackson}}
 {{#jackson}}
     {{#vendorExtensions.hasOwnVars}}
         {{#vendorExtensions.withMultipleVars}}
@@ -61,16 +58,17 @@
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
 {{/additionalModelTypeAnnotations}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{^micronaut_serde_jackson}}
+@Introspected
+{{/micronaut_serde_jackson}}
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
 {{>common/model/xmlAnnotation}}
-{{#useBeanValidation}}
-    {{^micronaut_serde_jackson}}
-@Introspected
-    {{/micronaut_serde_jackson}}
-{{/useBeanValidation}}
 {{#vendorExtensions.x-class-extra-annotation}}
 {{{.}}}
 {{/vendorExtensions.x-class-extra-annotation}}
