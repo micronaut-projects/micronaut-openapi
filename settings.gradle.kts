@@ -13,7 +13,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "7.6.4"
+    id("io.micronaut.build.shared.settings") version "8.0.0-M4"
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
