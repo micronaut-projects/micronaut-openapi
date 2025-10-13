@@ -46,7 +46,6 @@ micronaut-grpc = "4.11.0"
 micronaut-spring = "5.11.2"
 micronaut-docs = "2.0.0"
 micronaut-shared-settings = "7.6.4"
-sonatype-scan = "3.1.4"
 
 # javascript libraries
 js-swagger-ui = "5.29.3"
@@ -115,7 +114,6 @@ micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-p
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
-sonatype-scan = { module = "org.sonatype.gradle.plugins:scan-gradle-plugin", version.ref = "sonatype-scan" }
 kotlin-compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlin-compile-testing" }
 
 micronaut-shared-settings = { module = "io.micronaut.build.shared.settings:io.micronaut.build.shared.settings.gradle.plugin", version.ref = "micronaut-shared-settings" }
