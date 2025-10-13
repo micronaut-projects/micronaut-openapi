@@ -41,24 +41,24 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-@Client({{#configureClientId}}{{#clientPath}}id = {{/clientPath}}{{/configureClientId}}"{{#configureClientId}}{{clientId}}{{/configureClientId}}{{^configureClientId}}\${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}{{/configureClientId}}"{{#configureClientId}}{{#clientPath}}, path = "\${{openbrace}}{{#configureClientId}}{{{clientId}}}{{/configureClientId}}{{^configureClientId}}{{{applicationName}}}{{/configureClientId}}{{basePathSeparator}}base-path{{closebrace}}"{{/clientPath}}{{/configureClientId}})
+@Client({{#configureClientId}}{{#clientPath}}id = {{/clientPath}}{{/configureClientId}}"{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}\${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}{{/configureClientId}}"{{#configureClientId}}{{#clientPath}}, path = "\${{openbrace}}{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}{{{appNameNormalized}}}{{/configureClientId}}{{basePathSeparator}}base-path{{closebrace}}"{{/clientPath}}{{/configureClientId}})
 interface {{classname}} {
 {{#operations}}
 
     {{#operation}}
     {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}{{!
-}}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+}}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{vendorExtensions.pathNormalized}}}")
     {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
-    {{#produces}}{{#-first}}@Consumes({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/produces}}
+    {{#produces}}{{#-first}}@Consumes({{/-first}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/produces}}
     {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
     {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
-    {{#consumes}}{{#-first}}@Produces({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/consumes}}
+    {{#consumes}}{{#-first}}@Produces({{/-first}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/consumes}}
     {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}
-    @Authorization("{{{name}}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}})
+    @Authorization("{{{vendorExtensions.nameNormalized}}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{{scopeNormalized}}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}})
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}
@@ -73,3 +73,4 @@ interface {{classname}} {
 {{/operations}}
 }
 {{/formatOneEmptyLine}}
+

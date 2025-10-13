@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.micronaut.openapi.generator.Utils.addUserParameter;
+import static io.micronaut.openapi.generator.Utils.normalizeStr;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
@@ -289,7 +290,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                         var scopes = authMethods.get(0).scopes;
                         if (scopes != null && !scopes.isEmpty()) {
                             for (var scope : scopes) {
-                                roles.add("\"" + escapeText(scope.get("scope").toString()) + "\"");
+                                roles.add("\"" + escapeText(normalizeStr(scope.get("scope").toString())) + "\"");
                             }
                         } else {
                             roles.add(AUTHORIZED_ROLE);
@@ -304,7 +305,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                             case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
                             case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
                             case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
-                            default -> "\"" + escapeText(role) + "\"";
+                            default -> "\"" + normalizeStr(escapeText(role)) + "\"";
                         }).toList();
                 }
 

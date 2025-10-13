@@ -8,7 +8,7 @@
 {{/isDeprecated}}
  */
 {{#isDeprecated}}
-@Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
+@Deprecated("{{#vendorExtensions.x-deprecated-message-normalized}}{{{.}}}{{/vendorExtensions.x-deprecated-message-normalized}}")
 {{/isDeprecated}}
 {{#withXml}}
 @XmlType(name="{{datatypeWithEnum}}")
@@ -24,7 +24,8 @@
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}}(
-    @get:JsonValue val value: {{{dataType}}},
+    @get:JsonValue
+    val value: {{{dataType}}},
 ){{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 
     {{#allowableValues}}
@@ -40,8 +41,8 @@
             {{#deprecated}}
     @Deprecated("")
             {{/deprecated}}
-    @JsonProperty({{{strValue}}})
-    {{{name}}}({{{value}}}),{{#-last}}
+    @JsonProperty({{{strValueNormalized}}})
+    {{{name}}}({{{valueNormalized}}}),{{#-last}}
     ;{{/-last}}
         {{/enumVars}}
     {{/allowableValues}}
@@ -88,3 +89,4 @@
 {{/formatNoEmptyLines}}
     }
 }
+
