@@ -1549,7 +1549,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/\\$paths/{\\$pathVar}")
                     @Produces("\\$application/json")
                     @Consumes("\\$application/json")
-                    @Secured("\\\\\\$notRead", "\\\\\\$notWrite")
+                    @Secured("\\$notRead", "\\$notWrite")
                     fun getStrings(
                         @PathVariable("\\$pathVar", defaultValue = "\\$dollar") @NotNull dollarPathVar: String = "\\$dollar",
                         @Body @NotNull @Valid schemaTitleWithDollarDollarSign: SchemaTitleWithDollarDollarSign,
@@ -1559,14 +1559,14 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         @QueryValue("\\$propDouble") @Nullable @DecimalMin("10", message = "Message with \\$dollarSign") @DecimalMax("100", message = "Message with \\$dollarSign") dollarPropDouble: BigDecimal? = null,
                         @QueryValue("\\$propLong") @Nullable @Min(10L, message = "Message with \\$dollarSign") @Max(100L, message = "Message with \\$dollarSign") dollarPropLong: Long? = null,
                         @QueryValue("\\$propInt") @Nullable @Min(10, message = "Message with \\$dollarSign") @Max(100, message = "Message with \\$dollarSign") dollarPropInt: Int? = null,
-                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String? = null,
+                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String? = null,
                         @QueryValue("\\$propListMinMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMinMax: List<@NotNull String>? = null,
                         @QueryValue("\\$propListMin") @Nullable @Format(FORMAT_MULTI) dollarPropListMin: List<@NotNull String>? = null,
                         @QueryValue("\\$propListMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMax: List<@NotNull String>? = null,
                         @QueryValue("\\$propStrMinMax") @Nullable @Size(min = 10, max = 100, message = "Message with \\$dollarSign") dollarPropStrMinMax: String? = null,
                         @QueryValue("\\$propStrMin") @Nullable @Size(min = 10, message = "Message with \\$dollarSign") dollarPropStrMin: String? = null,
                         @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String? = null,
-                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
+                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
                     ): Mono<String>
                 
                 }
@@ -1624,7 +1624,6 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                  * Schema desc with $dollarSign
                  */
                 @Schema(description = "Schema desc with \\$dollarSign")
-                @Serdeable
                 @JsonPropertyOrder(
                     SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP1,
                     SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_DOUBLE,
@@ -1639,6 +1638,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     SchemaTitleWithDollarDollarSign.JSON_PROPERTY_DOLLAR_PROP_STR_MAX,
                     SchemaTitleWithDollarDollarSign.JSON_PROPERTY_PROP2,
                 )
+                @Serdeable
                 @Generated("io.micronaut.openapi.generator.KotlinMicronautServerCodegen")
                 data class SchemaTitleWithDollarDollarSign(
                 
@@ -1648,39 +1648,39 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                      * @deprecated Deprecated message with $dollarSign
                      */
                     @Deprecated("Deprecated message with \\$dollarSign")
-                    @field:NotNull(message = "Message with \\\\\\$dollarSign")
-                    @field:Pattern(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\\\\\$dollarSign")
-                    @field:Size(min = 10, message = "Message with \\\\\\$dollarSign")
+                    @field:NotNull(message = "Message with \\$dollarSign")
+                    @field:Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign")
+                    @field:Size(min = 10, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$prop1", example = "\\$dollarSign", description = "Schema prop1 desc with \\$dollarSign", requiredMode = Schema.RequiredMode.REQUIRED, deprecated = true)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP1)
                     var dollarProp1: String,
                 
                     @field:Nullable
-                    @field:DecimalMin("10", message = "Message with \\\\\\$dollarSign")
-                    @field:DecimalMax("100", message = "Message with \\\\\\$dollarSign")
+                    @field:DecimalMin("10", message = "Message with \\$dollarSign")
+                    @field:DecimalMax("100", message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propDouble", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_DOUBLE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropDouble: BigDecimal? = null,
                 
                     @field:Nullable
-                    @field:Min(10L, message = "Message with \\\\\\$dollarSign")
-                    @field:Max(100L, message = "Message with \\\\\\$dollarSign")
+                    @field:Min(10L, message = "Message with \\$dollarSign")
+                    @field:Max(100L, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propLong", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LONG)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropLong: Long? = null,
                 
                     @field:Nullable
-                    @field:Min(10, message = "Message with \\\\\\$dollarSign")
-                    @field:Max(100, message = "Message with \\\\\\$dollarSign")
+                    @field:Min(10, message = "Message with \\$dollarSign")
+                    @field:Max(100, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propInt", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_INT)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropInt: Int? = null,
                 
                     @field:Nullable
-                    @field:Email(regexp = "poi\\\\.feedback\\\\.Review\\\\$0(.)*", message = "Message with \\\\\\$dollarSign")
+                    @field:Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propEmail", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_EMAIL)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1705,21 +1705,21 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     var dollarPropListMax: List<@NotNull String>? = null,
                 
                     @field:Nullable
-                    @field:Size(min = 10, max = 100, message = "Message with \\\\\\$dollarSign")
+                    @field:Size(min = 10, max = 100, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMinMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropStrMinMax: String? = null,
                 
                     @field:Nullable
-                    @field:Size(min = 10, message = "Message with \\\\\\$dollarSign")
+                    @field:Size(min = 10, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMin", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropStrMin: String? = null,
                 
                     @field:Nullable
-                    @field:Size(max = 100, message = "Message with \\\\\\$dollarSign")
+                    @field:Size(max = 100, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
