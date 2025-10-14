@@ -47,6 +47,7 @@ micronautBuild {
     useStandardizedProjectNames = true
     importMicronautCatalog()
     importMicronautCatalog("micronaut-security")
+    importMicronautCatalog("micronaut-views")
     importMicronautCatalog("micronaut-serde")
     importMicronautCatalog("micronaut-rxjava2")
     importMicronautCatalog("micronaut-rxjava3")

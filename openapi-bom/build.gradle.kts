@@ -4,6 +4,8 @@ plugins {
 
 micronautBom {
     suppressions {
+        acceptedVersionRegressions.add("freemarker")
+        acceptedLibraryRegressions.add("freemarker")
         acceptedVersionRegressions.add("swagger-compat")
         acceptedLibraryRegressions.add("swagger")
         acceptedVersionRegressions.add("slf4j")
