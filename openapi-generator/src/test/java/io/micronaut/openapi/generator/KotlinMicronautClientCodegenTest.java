@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -1160,13 +1159,13 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @QueryValue("strParam3") @NotNull @Format(FORMAT_MULTI) strParam3: List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String>,
                 """,
             """
-                @QueryValue("intParam") @NotNull @Format(FORMAT_MULTI) intParam: List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Int>,
+                @QueryValue("intParam") @NotNull @Format(FORMAT_MULTI) intParam: List<@NotNull(message = "This is required int message") @Min(5, message = "This is min message") @Max(10, message = "This is max message") Int>,
                 """,
             """
-                @QueryValue("decimalParam") @NotNull @Format(FORMAT_MULTI) decimalParam: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal>,
+                @QueryValue("decimalParam") @NotNull @Format(FORMAT_MULTI) decimalParam: List<@NotNull(message = "This is required decimal message") @DecimalMin("5.5", message = "This is decimal min message") @DecimalMax("10.5", message = "This is decimal max message") BigDecimal>,
                 """,
             """
-                @QueryValue("decimalParam2") @NotNull(message = "This is required param message") @Format(FORMAT_MULTI) decimalParam2: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal>,
+                @QueryValue("decimalParam2") @NotNull(message = "This is required param message") @Format(FORMAT_MULTI) decimalParam2: List<@NotNull(message = "This is required decimal message") @DecimalMin("5.5", inclusive = false, message = "This is decimal min message") @DecimalMax("10.5", inclusive = false, message = "This is decimal max message") BigDecimal>,
                 """,
             """
                 @QueryValue("positiveParam") @NotNull @Format(FORMAT_MULTI) positiveParam: List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Int>,
@@ -1198,8 +1197,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """,
             """
                     @field:NotNull(message = "This is required int message")
-                    @field:Min(value = 5, message = "This is min message")
-                    @field:Max(value = 10, message = "This is max message")
+                    @field:Min(5, message = "This is min message")
+                    @field:Max(10, message = "This is max message")
                     @field:JsonProperty(JSON_PROPERTY_INT_PROP)
                     var intProp: Int,
                 """,
@@ -1221,44 +1220,44 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """,
             """
                     @field:Nullable
-                    @field:Min(value = 0, message = "This is positive message")
+                    @field:Min(0, message = "This is positive message")
                     @field:JsonProperty(JSON_PROPERTY_POSITIVE_PROP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var positiveProp: Int? = null,
                 """,
             """
                     @field:Nullable
-                    @field:Min(value = 0, message = "This is positive or zero message")
+                    @field:Min(0, message = "This is positive or zero message")
                     @field:JsonProperty(JSON_PROPERTY_POSITIVE_OR_ZERO_PROP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var positiveOrZeroProp: Int? = null,
                 """,
             """
                     @field:Nullable
-                    @field:Max(value = 0, message = "This is negative message")
+                    @field:Max(0, message = "This is negative message")
                     @field:JsonProperty(JSON_PROPERTY_NEGATIVE_PROP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var negativeProp: Int? = null,
                 """,
             """
                     @field:Nullable
-                    @field:Max(value = 0, message = "This is negative or zero message")
+                    @field:Max(0, message = "This is negative or zero message")
                     @field:JsonProperty(JSON_PROPERTY_NEGATIVE_OR_ZERO_PROP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var negativeOrZeroProp: Int? = null,
                 """,
             """
                     @field:Nullable
-                    @field:DecimalMin(value = "5.5", message = "This is decimal min message")
-                    @field:DecimalMax(value = "10.5", message = "This is decimal max message")
+                    @field:DecimalMin("5.5", message = "This is decimal min message")
+                    @field:DecimalMax("10.5", message = "This is decimal max message")
                     @field:JsonProperty(JSON_PROPERTY_DECIMAL_PROP)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var decimalProp: BigDecimal? = null,
                 """,
             """
                     @field:Nullable
-                    @field:DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message")
-                    @field:DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message")
+                    @field:DecimalMin("5.5", inclusive = false, message = "This is decimal min message")
+                    @field:DecimalMax("10.5", inclusive = false, message = "This is decimal max message")
                     @field:JsonProperty(JSON_PROPERTY_DECIMAL_PROP2)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var decimalProp2: BigDecimal? = null,
@@ -2153,7 +2152,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "BookInfo.kt",
             """
                 @JsonSubTypes(
-                    JsonSubTypes.Type(value = ExtendedBookInfo::class, name = "EXTENDED"),
+                    JsonSubTypes.Type(ExtendedBookInfo::class, name = "EXTENDED"),
                 )
                 open class BookInfo(
                 
@@ -2196,24 +2195,110 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.LongPrimitiveEnum",
             "import org.openapitools.model.ShortPrimitiveEnum",
             "import org.openapitools.model.StringEnum",
-            "class EnumConverterClientConfig(",
+            "class EnumConverterClientConfig {",
             """
                     @Bean
-                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
-                        commonToEnumConverter(StringEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
-                        commonToStrConverter(StringEnum::class.java, objectMapper)
+                    fun toEnumStringEnum() = TypeConverter<String, StringEnum> { v, _, _ -> Optional.of(StringEnum.fromValue(v)) }
                 """,
             """
                     @Bean
-                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
-                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                
+                    fun toStrStringEnum() = TypeConverter<StringEnum, String> { v, _, _ -> Optional.of(v.value) }
+                """,
+            """
                     @Bean
-                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
-                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
+                    fun toEnumIntEnum() = TypeConverter<String, IntEnum> { v, _, _ -> Optional.of(IntEnum.fromValue(v.toInt())) }
+                """,
+            """
+                    @Bean
+                    fun toStrIntEnum() = TypeConverter<IntEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumLongEnum() = TypeConverter<String, LongEnum> { v, _, _ -> Optional.of(LongEnum.fromValue(v.toLong())) }
+                """,
+            """
+                    @Bean
+                    fun toStrLongEnum() = TypeConverter<LongEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDecimalEnum() = TypeConverter<String, DecimalEnum> { v, _, _ -> Optional.of(DecimalEnum.fromValue(v.toBigDecimal())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDecimalEnum() = TypeConverter<DecimalEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumFloatEnum() = TypeConverter<String, FloatEnum> { v, _, _ -> Optional.of(FloatEnum.fromValue(v.toFloat())) }
+                """,
+            """
+                    @Bean
+                    fun toStrFloatEnum() = TypeConverter<FloatEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDoubleEnum() = TypeConverter<String, DoubleEnum> { v, _, _ -> Optional.of(DoubleEnum.fromValue(v.toDouble())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDoubleEnum() = TypeConverter<DoubleEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumBytePrimitiveEnum() = TypeConverter<String, BytePrimitiveEnum> { v, _, _ -> Optional.of(BytePrimitiveEnum.fromValue(v.toByte())) }
+                """,
+            """
+                    @Bean
+                    fun toStrBytePrimitiveEnum() = TypeConverter<BytePrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumShortPrimitiveEnum() = TypeConverter<String, ShortPrimitiveEnum> { v, _, _ -> Optional.of(ShortPrimitiveEnum.fromValue(v.toShort())) }
+                """,
+            """
+                    @Bean
+                    fun toStrShortPrimitiveEnum() = TypeConverter<ShortPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumIntPrimitiveEnum() = TypeConverter<String, IntPrimitiveEnum> { v, _, _ -> Optional.of(IntPrimitiveEnum.fromValue(v.toInt())) }
+                """,
+            """
+                    @Bean
+                    fun toStrIntPrimitiveEnum() = TypeConverter<IntPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumLongPrimitiveEnum() = TypeConverter<String, LongPrimitiveEnum> { v, _, _ -> Optional.of(LongPrimitiveEnum.fromValue(v.toLong())) }
+                """,
+            """
+                    @Bean
+                    fun toStrLongPrimitiveEnum() = TypeConverter<LongPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumFloatPrimitiveEnum() = TypeConverter<String, FloatPrimitiveEnum> { v, _, _ -> Optional.of(FloatPrimitiveEnum.fromValue(v.toFloat())) }
+                """,
+            """
+                    @Bean
+                    fun toStrFloatPrimitiveEnum() = TypeConverter<FloatPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumDoublePrimitiveEnum() = TypeConverter<String, DoublePrimitiveEnum> { v, _, _ -> Optional.of(DoublePrimitiveEnum.fromValue(v.toDouble())) }
+                """,
+            """
+                    @Bean
+                    fun toStrDoublePrimitiveEnum() = TypeConverter<DoublePrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
+                """,
+            """
+                    @Bean
+                    fun toEnumCharPrimitiveEnum() = TypeConverter<String, CharPrimitiveEnum> { v, _, _ -> Optional.of(CharPrimitiveEnum.fromValue(v[0])) }
+                """,
+            """
+                    @Bean
+                    fun toStrCharPrimitiveEnum() = TypeConverter<CharPrimitiveEnum, String> { v, _, _ -> Optional.of(v.value.toString()) }
                 """
         );
     }
@@ -2241,25 +2326,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.LongPrimitiveEnum",
             "import org.openapitools.model.ShortPrimitiveEnum",
             "import org.openapitools.model.StringEnum",
-            "class EnumConverterMyApiClientConfig(",
-            """
-                    @Bean
-                    fun toEnumStringEnum(): TypeConverter<String, StringEnum> =
-                        commonToEnumConverter(StringEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrStringEnum(): TypeConverter<StringEnum, String> =
-                        commonToStrConverter(StringEnum::class.java, objectMapper)
-                """,
-            """
-                    @Bean
-                    fun toEnumShortPrimitiveEnum(): TypeConverter<String, ShortPrimitiveEnum> =
-                        commonToEnumConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                
-                    @Bean
-                    fun toStrShortPrimitiveEnum(): TypeConverter<ShortPrimitiveEnum, String> =
-                        commonToStrConverter(ShortPrimitiveEnum::class.java, objectMapper)
-                """
+            "class EnumConverterMyApiClientConfig {"
         );
     }
 
@@ -2405,6 +2472,101 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      *
                      * @return Response description {@see <a href='https://support.zendesk.com/hc/en-us/articles/235721587'>Viewing and restoring archived articles</a>} (status code 200)
                      */
+                """
+        );
+    }
+
+    @Test
+    void testDollarSign() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setClientId("$myClientId");
+        codegen.setClientPath(true);
+        codegen.setConfigureAuthorization(true);
+        codegen.setGenerateOperationOnlyForFirstTag(true);
+        codegen.setAuthFilterClientIds("$myClientId");
+        codegen.setAuthFilterExcludedClientIds("$notMyClientId");
+        codegen.setBasePathSeparator("$sep");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/dollar-sign.yml");
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/Tag1Api.kt",
+            """
+                @Client(id = "\\$myClientId", path = "\\${\\$myClientId\\$sepbase-path}")
+                interface Tag1Api {
+                
+                    /**
+                     * {@summary summary with $dollarSign}
+                     * contains $strings
+                     *
+                     * @param dollarPathVar desc pathVar with $dollarSign (required)
+                     * @param schemaTitleWithDollarDollarSign Request body desc with $dollarSign (required)
+                     * @param dollarQueryVar desc queryVar with $dollarSign (optional, default to ref2/$ref)
+                     *        Deprecated: Deprecated message with $dollarSign
+                     * @param dollarHeaderVar desc header with $dollarSign (optional, default to $dollar)
+                     * @param dollarCookieVar desc cookie with $dollarSign (optional, default to $dollar)
+                     * @param dollarPropDouble (optional)
+                     * @param dollarPropLong (optional)
+                     * @param dollarPropInt (optional)
+                     * @param dollarPropEmail (optional)
+                     * @param dollarPropListMinMax (optional)
+                     * @param dollarPropListMin (optional)
+                     * @param dollarPropListMax (optional)
+                     * @param dollarPropStrMinMax (optional)
+                     * @param dollarPropStrMin (optional)
+                     * @param dollarPropStrMax (optional)
+                     * @param dollarPropStrPattern (optional)
+                     *
+                     * @return desc resp 200 with $dollarSign (status code 200)
+                     *         or desc resp 404 with $dollarSign (status code 404)
+                     *
+                     * @deprecated Deprecated message with $dollarSign
+                     *
+                     * @see <a href="https://external2.server.com/$dollar-sign">summary with $dollarSign Documentation</a>
+                     */
+                    @Deprecated("Deprecated message with \\$dollarSign")
+                    @Get("/\\$paths/{\\$pathVar}")
+                    @Consumes("\\$application/json")
+                    @Produces("\\$application/json")
+                    @Authorization("\\$notSimpleAuth")
+                    @Authorization("\\$OAuth2", scopes = ["\\$read", "\\$write"])
+                    fun getStrings(
+                        @PathVariable("\\$pathVar", defaultValue = "\\$dollar") @NotNull dollarPathVar: String = "\\$dollar",
+                        @Body @NotNull @Valid schemaTitleWithDollarDollarSign: SchemaTitleWithDollarDollarSign,
+                        @QueryValue("\\$queryVar", defaultValue = "ref2/\\$ref") @Nullable @java.lang.Deprecated dollarQueryVar: DollarGetDollarStringsDollarQueryVarParameter? = DollarGetDollarStringsDollarQueryVarParameter.REF2__REF,
+                        @Header("\\$headerVar", defaultValue = "\\$dollar") @Nullable dollarHeaderVar: String? = "\\$dollar",
+                        @CookieValue("\\$cookieVar", defaultValue = "\\$dollar") @Nullable dollarCookieVar: String? = "\\$dollar",
+                        @QueryValue("\\$propDouble") @Nullable @DecimalMin("10", message = "Message with \\$dollarSign") @DecimalMax("100", message = "Message with \\$dollarSign") dollarPropDouble: BigDecimal? = null,
+                        @QueryValue("\\$propLong") @Nullable @Min(10L, message = "Message with \\$dollarSign") @Max(100L, message = "Message with \\$dollarSign") dollarPropLong: Long? = null,
+                        @QueryValue("\\$propInt") @Nullable @Min(10, message = "Message with \\$dollarSign") @Max(100, message = "Message with \\$dollarSign") dollarPropInt: Int? = null,
+                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String? = null,
+                        @QueryValue("\\$propListMinMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMinMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMin") @Nullable @Format(FORMAT_MULTI) dollarPropListMin: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propStrMinMax") @Nullable @Size(min = 10, max = 100, message = "Message with \\$dollarSign") dollarPropStrMinMax: String? = null,
+                        @QueryValue("\\$propStrMin") @Nullable @Size(min = 10, message = "Message with \\$dollarSign") dollarPropStrMin: String? = null,
+                        @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String? = null,
+                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
+                    ): Mono<String>
+                }
+                """
+        );
+        assertFileContains(path + "auth/config/ApiKeyAuthConfig.kt",
+            """
+                @EachProperty("security.\\$myClientId.api-key-auth")
+                class ApiKeyAuthConfig @ConfigurationInject constructor(
+                """
+        );
+        assertFileContains(path + "auth/config/HttpBasicAuthConfig.kt",
+            """
+                @EachProperty("security.\\$myClientId.basic-auth")
+                class HttpBasicAuthConfig @ConfigurationInject constructor(
+                """
+        );
+        assertFileContains(path + "auth/AuthorizationFilter.kt",
+            """
+                @Filter(serviceId = ["\\$myClientId"], excludeServiceId = ["\\$notMyClientId"], patterns = [Filter.MATCH_ALL_PATTERN])
+                open class AuthorizationFilter(
                 """
         );
     }

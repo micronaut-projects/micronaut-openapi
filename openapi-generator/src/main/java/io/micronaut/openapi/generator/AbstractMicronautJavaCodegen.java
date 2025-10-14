@@ -1560,7 +1560,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                             param.isEnum = true;
                         }
                         if (param.isEnum) {
-                            addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                            addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, false);
                         }
                     }
                 }
@@ -1572,7 +1572,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         p.isEnum = true;
                     }
                     if (p.isEnum) {
-                        addEnumParamsForConverters(modelPackage, p, converterCounters, enumParams, enumImports);
+                        addEnumParamsForConverters(modelPackage, models.get(p.dataType), p, converterCounters, enumParams, enumImports, false);
                     }
                 });
                 op.formParams.clear();
@@ -1582,7 +1582,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (param.isEnumRef) {
                     param.isEnum = true;
                 }
-                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
+                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
                 if (useBeanValidation && !param.isContainer && param.isModel) {
                     param.vendorExtensions.put("withValid", true);
                 }
@@ -1605,11 +1605,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
 
                 if (param.isEnum && !param.isBodyParam) {
-                    addEnumParamsForConverters(modelPackage, param, converterCounters, enumParams, enumImports);
+                    addEnumParamsForConverters(modelPackage, models.get(param.dataType), param, converterCounters, enumParams, enumImports, false);
                 }
             }
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
@@ -2370,7 +2370,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         prop.dataType = discriminator.getPropertyType();
         prop.datatypeWithEnum = discriminator.getPropertyType();
         prop.baseType = discriminator.getPropertyType();
-        processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
+        processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
@@ -2398,7 +2398,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             property.maxLength = null;
         }
 
-        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
+        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
 
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, false, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, false, property.vendorExtensions);
@@ -2432,7 +2432,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             var parentVars = new ArrayList<CodegenProperty>();
             for (var v : parent.allVars) {
                 if (notContainsProp(v, model.vars)) {
-                    processGenericAnnotations(v, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false);
+                    processGenericAnnotations(v, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
                     parentVars.add(v);
                 }
             }

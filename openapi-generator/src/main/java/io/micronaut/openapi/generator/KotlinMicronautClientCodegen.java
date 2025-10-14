@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static io.micronaut.openapi.generator.Utils.normalizeStr;
 import static io.micronaut.openapi.generator.Utils.processMultipartBody;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 
@@ -62,6 +63,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
     public static final String AUTHORIZATION_FILTER_PATTERN_STYLE = "authorizationFilterPatternStyle";
     public static final String BASE_PATH_SEPARATOR = "basePathSeparator";
     public static final String CLIENT_ID = "clientId";
+    public static final String CLIENT_ID_NORMALIZED = "clientIdNormalized";
 
     public static final String NAME = "kotlin-micronaut-client";
 
@@ -154,6 +156,14 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
 
         var removedParams = new HashSet<String>();
         var alreadyAddedMultipartBodyImport = false;
+        var clientIdNormalized = normalizeStr(clientId);
+
+        if (clientId != null) {
+            objs.put("clientIdNormalized", clientIdNormalized);
+        }
+        if (appName != null) {
+            objs.put("appNameNormalized", normalizeStr(appName));
+        }
 
         for (CodegenOperation op : operationList) {
             postProcessMultipartParam(op, op.bodyParams, removedParams);
@@ -185,7 +195,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         if (generateEnumConverters && !enumParams.isEmpty()) {
             var enumConfigName = "Client";
             if (clientId != null) {
-                enumConfigName = StringUtils.capitalize(clientId.replace("-", ""));
+                enumConfigName = StringUtils.capitalize(clientId.replace("-", "")
+                    .replace("$", "Dollar"));
             }
             var enumConfigClassName = "EnumConverter" + enumConfigName + "Config";
             additionalProperties.put("enumConfigClassName", enumConfigClassName);
@@ -279,10 +290,12 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             )) {
                 authFilterClientIds = Collections.emptyList();
             } else {
-                var parsedAuthFilterClientIds = readListOfStringsProperty(authFilterClientIds);
+                var parsedAuthFilterClientIds = readListOfStringsProperty(authFilterClientIds).stream()
+                    .map(Utils::normalizeStr)
+                    .toList();
                 writePropertyBack(OPT_AUTH_FILTER_CLIENT_IDS, parsedAuthFilterClientIds);
                 if (parsedAuthFilterClientIds.isEmpty() && clientId != null) {
-                    authFilterClientIds = List.of(clientId);
+                    authFilterClientIds = List.of(normalizeStr(clientId));
                     writePropertyBack(OPT_AUTH_FILTER_CLIENT_IDS, authFilterClientIds);
                 }
             }
@@ -290,7 +303,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             if (additionalProperties.containsKey(OPT_AUTH_FILTER_EXCLUDED_CLIENT_IDS)) {
                 authFilterExcludedClientIds = additionalProperties.get(OPT_AUTH_FILTER_EXCLUDED_CLIENT_IDS);
             }
-            writePropertyBack(OPT_AUTH_FILTER_EXCLUDED_CLIENT_IDS, readListOfStringsProperty(authFilterExcludedClientIds));
+            writePropertyBack(OPT_AUTH_FILTER_EXCLUDED_CLIENT_IDS, readListOfStringsProperty(authFilterExcludedClientIds).stream()
+                .map(Utils::normalizeStr)
+                .toList());
 
             if (additionalProperties.containsKey(AUTHORIZATION_FILTER_PATTERN_STYLE)) {
                 var additionalPropertiesOpt = (String) additionalProperties.get(AUTHORIZATION_FILTER_PATTERN_STYLE);
@@ -309,6 +324,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             if (authConfigName == null) {
                 authConfigName = clientId;
             }
+            authConfigName = normalizeStr(authConfigName);
             writePropertyBack(OPT_AUTH_CONFIG_NAME, authConfigName);
         }
 
@@ -325,6 +341,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         if (this.clientId != null) {
             writePropertyBack(OPT_CONFIGURE_CLIENT_ID, true);
             writePropertyBack(CLIENT_ID, this.clientId);
+            writePropertyBack(CLIENT_ID_NORMALIZED, normalizeStr(this.clientId));
         }
 
         if (additionalProperties.containsKey(OPT_CLIENT_PATH)) {
@@ -336,6 +353,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         if (basePathSeparator != null) {
             this.basePathSeparator = basePathSeparator.toString();
         }
+        this.basePathSeparator = normalizeStr(this.basePathSeparator);
         writePropertyBack(BASE_PATH_SEPARATOR, this.basePathSeparator);
 
         // Api file

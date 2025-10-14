@@ -879,27 +879,160 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             "import org.openapitools.model.ShortPrimitiveEnum;",
             "import org.openapitools.model.StringEnum;",
             "public class EnumConverterServerConfig {",
-            "public EnumConverterServerConfig(ObjectMapper objectMapper) {",
             """
                     @Bean
                     public TypeConverter<String, StringEnum> toEnumStringEnum() {
-                        return commonToEnumConverter(StringEnum.class, objectMapper);
+                        return (v, c, ctx) -> Optional.of(StringEnum.fromValue(v));
                     }
-
+                """,
+            """
                     @Bean
                     public TypeConverter<StringEnum, String> toStrStringEnum() {
-                        return commonToStrConverter(StringEnum.class, objectMapper);
+                        return (v, c, ctx) -> Optional.of(v.getValue());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, IntEnum> toEnumIntEnum() {
+                        return (v, c, ctx) -> Optional.of(IntEnum.fromValue(Integer.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<IntEnum, String> toStrIntEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue().toString());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, LongEnum> toEnumLongEnum() {
+                        return (v, c, ctx) -> Optional.of(LongEnum.fromValue(Long.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<LongEnum, String> toStrLongEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue().toString());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, DecimalEnum> toEnumDecimalEnum() {
+                        return (v, c, ctx) -> Optional.of(DecimalEnum.fromValue(new BigDecimal(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<DecimalEnum, String> toStrDecimalEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue().toString());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, FloatEnum> toEnumFloatEnum() {
+                        return (v, c, ctx) -> Optional.of(FloatEnum.fromValue(Float.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<FloatEnum, String> toStrFloatEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue().toString());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, DoubleEnum> toEnumDoubleEnum() {
+                        return (v, c, ctx) -> Optional.of(DoubleEnum.fromValue(Double.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<DoubleEnum, String> toStrDoubleEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue().toString());
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, BytePrimitiveEnum> toEnumBytePrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(BytePrimitiveEnum.fromValue(Byte.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<BytePrimitiveEnum, String> toStrBytePrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
                     }
                 """,
             """
                     @Bean
                     public TypeConverter<String, ShortPrimitiveEnum> toEnumShortPrimitiveEnum() {
-                        return commonToEnumConverter(ShortPrimitiveEnum.class, objectMapper);
+                        return (v, c, ctx) -> Optional.of(ShortPrimitiveEnum.fromValue(Short.valueOf(v)));
                     }
-
+                """,
+            """
                     @Bean
                     public TypeConverter<ShortPrimitiveEnum, String> toStrShortPrimitiveEnum() {
-                        return commonToStrConverter(ShortPrimitiveEnum.class, objectMapper);
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, IntPrimitiveEnum> toEnumIntPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(IntPrimitiveEnum.fromValue(Integer.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<IntPrimitiveEnum, String> toStrIntPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, LongPrimitiveEnum> toEnumLongPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(LongPrimitiveEnum.fromValue(Long.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<LongPrimitiveEnum, String> toStrLongPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, FloatPrimitiveEnum> toEnumFloatPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(FloatPrimitiveEnum.fromValue(Float.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<FloatPrimitiveEnum, String> toStrFloatPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, DoublePrimitiveEnum> toEnumDoublePrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(DoublePrimitiveEnum.fromValue(Double.valueOf(v)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<DoublePrimitiveEnum, String> toStrDoublePrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<String, CharPrimitiveEnum> toEnumCharPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(CharPrimitiveEnum.fromValue(v.charAt(0)));
+                    }
+                """,
+            """
+                    @Bean
+                    public TypeConverter<CharPrimitiveEnum, String> toStrCharPrimitiveEnum() {
+                        return (v, c, ctx) -> Optional.of(String.valueOf(v.getValue()));
                     }
                 """
         );
@@ -1000,26 +1133,26 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileExists(path + "config/EnumConverterServerConfig.java");
         assertFileContains(path + "config/EnumConverterServerConfig.java",
             """
-                    @Bean
-                    public TypeConverter<String, DataDirection> toEnumDataDirection() {
-                        return commonToEnumConverter(DataDirection.class, objectMapper);
-                    }
-                
-                    @Bean
-                    public TypeConverter<DataDirection, String> toStrDataDirection() {
-                        return commonToStrConverter(DataDirection.class, objectMapper);
-                    }
-                
-                    @Bean
-                    public TypeConverter<String, DataChannel> toEnumDataChannel() {
-                        return commonToEnumConverter(DataChannel.class, objectMapper);
-                    }
-                
-                    @Bean
-                    public TypeConverter<DataChannel, String> toStrDataChannel() {
-                        return commonToStrConverter(DataChannel.class, objectMapper);
-                    }
-                """
+                        @Bean
+                        public TypeConverter<String, DataDirection> toEnumDataDirection() {
+                            return (v, c, ctx) -> Optional.of(DataDirection.fromValue(v));
+                        }
+                    
+                        @Bean
+                        public TypeConverter<DataDirection, String> toStrDataDirection() {
+                            return (v, c, ctx) -> Optional.of(v.getValue());
+                        }
+                    
+                        @Bean
+                        public TypeConverter<String, DataChannel> toEnumDataChannel() {
+                            return (v, c, ctx) -> Optional.of(DataChannel.fromValue(v));
+                        }
+                    
+                        @Bean
+                        public TypeConverter<DataChannel, String> toStrDataChannel() {
+                            return (v, c, ctx) -> Optional.of(v.getValue());
+                        }
+                    """
         );
 
         assertFileExists(path + "api/BasApi.java");

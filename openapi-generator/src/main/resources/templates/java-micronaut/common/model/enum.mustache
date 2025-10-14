@@ -19,6 +19,9 @@
 {{#micronaut_serde_jackson}}
 @Serdeable
 {{/micronaut_serde_jackson}}
+{{^micronaut_serde_jackson}}
+@Introspected
+{{/micronaut_serde_jackson}}
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}

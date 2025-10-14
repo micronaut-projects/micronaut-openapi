@@ -26,45 +26,45 @@
      *
      * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
     {{/isDeprecated}}
-    {{#externalDocs}}
-     * {{{description}}}
+    {{#externalDocs}}{{#description}}
+     *  {{{description}}}{{/description}}
      *
      * @see <a href="{{url}}">{{{summary}}} Documentation</a>
     {{/externalDocs}}
      */
+    {{#isDeprecated}}
+    @Deprecated("{{#vendorExtensions.x-deprecated-message-normalized}}{{{.}}}{{/vendorExtensions.x-deprecated-message-normalized}}")
+    {{/isDeprecated}}
     {{#generateSwagger2Annotations}}
-        {{#isDeprecated}}
-    @Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
-        {{/isDeprecated}}
     @Operation(
         operationId = "{{{operationId}}}",
-        {{#summary}}
+        {{#vendorExtensions.summaryNormalized}}
         summary = "{{{.}}}",
-        {{/summary}}
-        {{#notes}}
+        {{/vendorExtensions.summaryNormalized}}
+        {{#vendorExtensions.notesNormalized}}
         description = "{{{.}}}",
-        {{/notes}}
+        {{/vendorExtensions.notesNormalized}}
         {{#tags.1}}
         {{!generate only when at least 2 tags}}
         tags = [ {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} ],
         {{/tags.1}}
         responses = [
             {{#responses}}
-            ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = [
+            ApiResponse(responseCode = "{{{code}}}", description = "{{{vendorExtensions.messageNormalized}}}"{{#baseType}}, content = [
                 {{#produces}}
-                Content(mediaType = "{{{mediaType}}}", {{#isArray}}array = ArraySchema({{/isArray}}schema = Schema(implementation = {{{baseType}}}::class){{#isArray}}){{/isArray}}),
+                Content(mediaType = "{{{mediaTypeNormalized}}}", {{#isArray}}array = ArraySchema({{/isArray}}schema = Schema(implementation = {{{baseType}}}::class){{#isArray}}){{/isArray}}),
                 {{/produces}}
             ]{{/baseType}}),
             {{/responses}}
         ],{{#vendorExtensions.hasNotBodyParam}}
         parameters = [
             {{#vendorExtensions.swaggerParams}}
-            Parameter(name = "{{baseName}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}),
+            Parameter(name = "{{{vendorExtensions.baseNameNormalized}}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#vendorExtensions.descriptionNormalized}}, description = "{{{.}}}"{{/vendorExtensions.descriptionNormalized}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}),
             {{/vendorExtensions.swaggerParams}}
         ],{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}}
         security = [
             {{#authMethods}}
-            SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/scopes.1}}{{/isOAuth}}),
+            SecurityRequirement(name = "{{{vendorExtensions.nameNormalized}}}"{{#isOAuth}}{{#scopes.1}}, scopes = [{{#scopes}}"{{{scopeNormalized}}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/scopes.1}}{{/isOAuth}}),
             {{/authMethods}}
         ],{{/hasAuthMethods}}
     )

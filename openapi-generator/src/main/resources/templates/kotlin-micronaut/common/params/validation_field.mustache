@@ -62,27 +62,27 @@
     {{/isEmail}}
     {{#isInteger}}
         {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{{.}}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
         {{/minimum}}
         {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{{.}}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isInteger}}
     {{#isLong}}
         {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}L{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{{.}}}L{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
         {{/minimum}}
         {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}L{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{{.}}}L{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isLong}}
     {{^isInteger}}
         {{^isLong}}
             {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}{{^exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMin("{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
             {{/minimum}}
             {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}{{^exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMax("{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}

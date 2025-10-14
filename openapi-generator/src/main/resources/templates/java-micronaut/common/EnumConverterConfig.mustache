@@ -4,65 +4,29 @@ package {{invokerPackage}}.config;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.core.convert.TypeConverter;
-import io.micronaut.serde.ObjectMapper;
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
 {{/generatedAnnotation}}
-{{#lombok}}
-import lombok.RequiredArgsConstructor;
-{{/lombok}}
 {{#enumImports}}
 import {{{.}}};
 {{/enumImports}}
+import java.util.Optional;
 
-import java.io.IOException;
-
-{{#lombok}}
-@RequiredArgsConstructor
-{{/lombok}}
 @Factory
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 public class {{{enumConfigClassName}}} {
-
-    private final ObjectMapper objectMapper;
-{{^lombok}}
-
-    public {{{enumConfigClassName}}}(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-{{/lombok}}
 {{#enumParams}}
 
     @Bean
     public TypeConverter<String, {{{dataType}}}> toEnum{{{vendorExtensions.converterName}}}() {
-        return commonToEnumConverter({{{dataType}}}.class, objectMapper);
+        return (v, c, ctx) -> {{{vendorExtensions.convertFun}}};
     }
 
     @Bean
     public TypeConverter<{{{dataType}}}, String> toStr{{{vendorExtensions.converterName}}}() {
-        return commonToStrConverter({{{dataType}}}.class, objectMapper);
+        return (v, c, ctx) -> Optional.of({{{vendorExtensions.convertToStrFun}}});
     }
 {{/enumParams}}
-
-    public static <T> TypeConverter<T, String> commonToStrConverter(Class<T> clazz, ObjectMapper objectMapper) {
-        return TypeConverter.of(clazz, String.class, (value) -> {
-            try {
-                return objectMapper.writeValueAsString(value);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static <T> TypeConverter<String, T> commonToEnumConverter(Class<T> clazz, ObjectMapper objectMapper) {
-        return TypeConverter.of(String.class, clazz, (value) -> {
-            try {
-                return objectMapper.readValue(value, clazz);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
 }

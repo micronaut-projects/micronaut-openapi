@@ -8,16 +8,13 @@
 {{/isDeprecated}}
  */
 {{#isDeprecated}}
-@Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
+@Deprecated("{{#vendorExtensions.x-deprecated-message-normalized}}{{{vendorExtensions.x-deprecated-message-normalized}}}{{/vendorExtensions.x-deprecated-message-normalized}}")
 {{/isDeprecated}}
-{{#description}}
+{{#vendorExtensions.descriptionNormalized}}
     {{#generateSwagger2Annotations}}
-@Schema({{#vendorExtensions.realName}}name = "{{{vendorExtensions.realName}}}", {{/vendorExtensions.realName}}description = "{{{description}}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}})
+@Schema({{#vendorExtensions.realName}}name = "{{{.}}}", {{/vendorExtensions.realName}}description = "{{{vendorExtensions.descriptionNormalized}}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}})
     {{/generateSwagger2Annotations}}
-{{/description}}
-{{#micronaut_serde_jackson}}
-@Serdeable
-{{/micronaut_serde_jackson}}
+{{/vendorExtensions.descriptionNormalized}}
 {{#jackson}}
     {{#vendorExtensions.hasOwnVars}}
 @JsonPropertyOrder(
@@ -30,16 +27,17 @@
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
 {{/additionalModelTypeAnnotations}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{^micronaut_serde_jackson}}
+@Introspected
+{{/micronaut_serde_jackson}}
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
 {{>common/model/xmlAnnotation}}
-{{#useBeanValidation}}
-    {{^micronaut_serde_jackson}}
-@Introspected
-    {{/micronaut_serde_jackson}}
-{{/useBeanValidation}}
 {{#vendorExtensions.x-class-extra-annotation}}
 {{{.}}}
 {{/vendorExtensions.x-class-extra-annotation}}
@@ -137,7 +135,7 @@
     {{/serializableModel}}
 
     {{#vars}}
-        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
+        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{vendorExtensions.baseNameNormalized}}"
     {{/vars}}
     }
     {{/vendorExtensions.hasOwnVars}}
@@ -154,3 +152,4 @@
         {{/serializableModel}}
     {{/vendorExtensions.hasOwnVars}}
 {{closebrace}}
+

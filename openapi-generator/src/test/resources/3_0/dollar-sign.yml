@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  version: $1.0.0
+  title: Tittle with $dollarSign
+  description: API desc with $dollarSign
+  contact:
+    name: Name with $dollarSign
+    email: email$@withDollar.com
+    url: https://some.server.com/$dollar-sign
+  license:
+    name: Name with $dollarSign
+    url: https://some.another.server.com/$dollar-sign
+tags:
+  - name: $tag1
+    description: Desc for tag with $dollarSign
+  - name: $tag2
+    description: Desc for tag with $dollarSign2
+externalDocs:
+  description: Desc with $dollarSign
+  url: https://external.server.com/$dollar-sign
+security:
+  - simpleAuth: [ $read, $write ]
+  - $notSimpleAuth: [ $notRead, $notWrite ]
+servers:
+  - url: https://localhost:8000/api/$/$sign
+    description: Api server desc with $dollarSign
+    variables:
+      API_$VERSION:
+        description: Api API_$VERSION desc with $dollarSign
+        enum:
+          - $v1
+          - $v2
+          - $v3
+          - $v4
+          - $v5
+          - $v6
+          - $v7
+        default: $v6
+paths:
+  /$paths/{$pathVar}:
+    get:
+      operationId: $get$Strings
+      description: contains $strings
+      summary: summary with $dollarSign
+      deprecated: true
+      x-deprecated-message: Deprecated message with $dollarSign
+      security:
+        - $notSimpleAuth: [ $notRead, $notWrite ]
+        - $OAuth2: [ $read, $write ]
+      externalDocs:
+        url: https://external2.server.com/$dollar-sign
+      tags:
+        - $tag1
+        - $tag2
+      servers:
+        - url: https://localhost:9090/api/$/$sign
+          description: Another api server desc with $dollarSign
+          variables:
+            API_NOT_$VERSION:
+              description: Api API_NOT_$VERSION desc with $dollarSign
+              enum:
+                - $v1
+                - $v2
+              default: $v1
+      parameters:
+        - name: $queryVar
+          in: query
+          description: desc queryVar with $dollarSign
+          required: false
+          deprecated: true
+          x-deprecated-message: Deprecated message with $dollarSign
+          schema:
+            type: string
+            default: ref2/$ref
+            enum:
+              - ref1/$ref
+              - ref2/$ref
+            x-enum-descriptions:
+              - desc enumConst1 with $dollarSign
+              - desc enumConst2 with $dollarSign
+            x-deprecated:
+              - ref2/$ref
+        - name: $pathVar
+          in: path
+          description: desc pathVar with $dollarSign
+          required: true
+          schema:
+            type: string
+            default: $dollar
+        - name: $headerVar
+          in: header
+          description: desc header with $dollarSign
+          required: false
+          schema:
+            type: string
+            default: $dollar
+        - name: $cookieVar
+          in: cookie
+          description: desc cookie with $dollarSign
+          required: false
+          schema:
+            type: string
+            default: $dollar
+        - name: $propDouble
+          in: query
+          schema:
+            type: number
+            minimum: 10
+            maximum: 100
+            x-minimum-message: Message with $dollarSign
+            x-maximum-message: Message with $dollarSign
+        - name: $propLong
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 10
+            maximum: 100
+            x-minimum-message: Message with $dollarSign
+            x-maximum-message: Message with $dollarSign
+        - name: $propInt
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 10
+            maximum: 100
+            x-minimum-message: Message with $dollarSign
+            x-maximum-message: Message with $dollarSign
+        - name: $propEmail
+          in: query
+          schema:
+            type: string
+            format: email
+            pattern: poi\.feedback\.Review$0(.)*
+            x-pattern-message: Message with $dollarSign
+        - name: $propListMinMax
+          in: query
+          schema:
+            type: array
+            minLength: 10
+            maxLength: 100
+            x-size-message: Message with $dollarSign
+            items:
+              type: string
+        - name: $propListMin
+          in: query
+          schema:
+            type: array
+            maxLength: 100
+            x-size-message: Message with $dollarSign
+            items:
+              type: string
+        - name: $propListMax
+          in: query
+          schema:
+            type: array
+            maxLength: 100
+            x-size-message: Message with $dollarSign
+            items:
+              type: string
+        - name: $propStrMinMax
+          in: query
+          schema:
+            type: string
+            minLength: 10
+            maxLength: 100
+            x-size-message: Message with $dollarSign
+        - name: $propStrMin
+          in: query
+          schema:
+            type: string
+            minLength: 10
+            x-size-message: Message with $dollarSign
+        - name: $propStrMax
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+            x-size-message: Message with $dollarSign
+        - name: $propStrPattern
+          in: query
+          schema:
+            type: string
+            pattern: poi\.feedback\.Review$0(.)*
+            x-pattern-message: Message with $dollarSign
+      requestBody:
+        description: Request body desc with $dollarSign
+        required: true
+        content:
+          $application/json:
+            schema:
+              type: object
+              title: Schema title with $dollarSign
+              description: Schema desc with $dollarSign
+              externalDocs:
+                url: https://external2.server.com/$dollar-sign
+              required:
+                - $prop1
+              properties:
+                $propDouble:
+                  type: number
+                  minimum: 10
+                  maximum: 100
+                  x-minimum-message: Message with $dollarSign
+                  x-maximum-message: Message with $dollarSign
+                $propLong:
+                  type: integer
+                  format: int64
+                  minimum: 10
+                  maximum: 100
+                  x-minimum-message: Message with $dollarSign
+                  x-maximum-message: Message with $dollarSign
+                $propInt:
+                  type: integer
+                  format: int32
+                  minimum: 10
+                  maximum: 100
+                  x-minimum-message: Message with $dollarSign
+                  x-maximum-message: Message with $dollarSign
+                $propEmail:
+                  type: string
+                  format: email
+                  pattern: poi\.feedback\.Review$0(.)*
+                  x-pattern-message: Message with $dollarSign
+                $propListMinMax:
+                  type: array
+                  minLength: 10
+                  maxLength: 100
+                  x-size-message: Message with $dollarSign
+                  items:
+                    type: string
+                $propListMin:
+                  type: array
+                  maxLength: 100
+                  x-size-message: Message with $dollarSign
+                  items:
+                    type: string
+                $propListMax:
+                  type: array
+                  maxLength: 100
+                  x-size-message: Message with $dollarSign
+                  items:
+                    type: string
+                $propStrMinMax:
+                  type: string
+                  minLength: 10
+                  maxLength: 100
+                  x-size-message: Message with $dollarSign
+                $propStrMin:
+                  type: string
+                  minLength: 10
+                  x-size-message: Message with $dollarSign
+                $propStrMax:
+                  type: string
+                  maxLength: 100
+                  x-size-message: Message with $dollarSign
+                $prop1:
+                  type: string
+                  title: Schema prop1 title with $dollarSign
+                  description: Schema prop1 desc with $dollarSign
+                  example: $dollarSign
+                  deprecated: true
+                  pattern: poi\.feedback\.Review$0(.)*
+                  nullable: false
+                  minLength: 10
+                  x-not-null-message: Message with $dollarSign
+                  x-pattern-message: Message with $dollarSign
+                  x-size-message: Message with $dollarSign
+                  x-deprecated-message: Deprecated message with $dollarSign
+                prop2:
+                  $ref: '#/components/schemas/$SomeDto'
+      responses:
+        "200":
+          description: desc resp 200 with $dollarSign
+          content:
+            $application/json:
+              schema:
+                type: string
+                description: Content desc resp with $dollarSign
+        "404":
+          description: desc resp 404 with $dollarSign
+          content:
+            $application/json:
+              schema:
+                type: string
+                description: Content desc resp with $dollarSign
+components:
+  schemas:
+    $SomeDto:
+      type: object
+      title: Schema title with $dollarSign
+      description: Schema desc with $dollarSign
+      deprecated: true
+      x-deprecated-message: Deprecated message with $dollarSign
+      properties:
+        $prop1:
+          type: string
+          title: Schema prop1 title with $dollarSign
+          description: Schema prop1 desc with $dollarSign
+  securitySchemes:
+    simpleAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    $notSimpleAuth:
+      scheme: basic
+      type: http
+    $OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            $read: Grants $read access
+            $write: Grants $write access
+            $admin: Grants $access to admin operations

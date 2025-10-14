@@ -289,7 +289,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                         var scopes = authMethods.get(0).scopes;
                         if (scopes != null && !scopes.isEmpty()) {
                             for (var scope : scopes) {
-                                roles.add("\"" + escapeText(scope.get("scope").toString()) + "\"");
+                                roles.add("\"" + scope.get("scope").toString() + "\"");
                             }
                         } else {
                             roles.add(AUTHORIZED_ROLE);
@@ -304,7 +304,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                             case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
                             case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
                             case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
-                            default -> "\"" + escapeText(role) + "\"";
+                            default -> "\"" + role + "\"";
                         }).toList();
                 }
 

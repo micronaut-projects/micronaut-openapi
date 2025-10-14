@@ -114,7 +114,7 @@ public final class Utils {
 
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
-                                                 boolean ksp) {
+                                                 boolean isKotlin, boolean ksp) {
         var ext = parameter.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(parameter.dataType) || isKotlinPrimitiveArray(parameter.dataType));
@@ -122,16 +122,16 @@ public final class Utils {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
-            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
 
         if (parameter.items != null) {
-            processGenericAnnotations(parameter.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+            processGenericAnnotations(parameter.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
         }
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
-                                                 boolean ksp) {
+                                                 boolean isKotlin, boolean ksp) {
         var ext = property.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(property.dataType) || isKotlinPrimitiveArray(property.dataType));
@@ -139,25 +139,25 @@ public final class Utils {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
 
         if (property.items != null) {
-            processGenericAnnotations(property.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, ksp);
+            processGenericAnnotations(property.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
         }
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
-                                                 boolean withNullablePostfix, boolean ksp) {
+                                                 boolean withNullablePostfix, boolean isKotlin, boolean ksp) {
         String genericAnnotations = null;
         dataType = addAnnotationsToPrimitiveArray(dataType, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         dataTypeWithEnum = addAnnotationsToPrimitiveArray(dataTypeWithEnum, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
-            genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable, ksp);
-            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix, ksp);
+            genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable, isKotlin, ksp);
+            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix, isKotlin, ksp);
             if (isMap) {
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
@@ -216,7 +216,7 @@ public final class Utils {
         };
     }
 
-    private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable, boolean ksp) {
+    private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable, boolean isKotlin, boolean ksp) {
 
         var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
 
@@ -236,6 +236,13 @@ public final class Utils {
         var notNullMsg = (String) prop.vendorExtensions.get("x-not-null-message");
         var minMsg = (String) prop.vendorExtensions.get("x-minimum-message");
         var maxMsg = (String) prop.vendorExtensions.get("x-maximum-message");
+        if (isKotlin) {
+            patternMsg = normalizeStr(patternMsg);
+            sizeMsg = normalizeStr(sizeMsg);
+            notNullMsg = normalizeStr(notNullMsg);
+            minMsg = normalizeStr(minMsg);
+            maxMsg = normalizeStr(maxMsg);
+        }
 
         if (StringUtils.isNotEmpty(prop.pattern) && !prop.isDate && !prop.isDateTime) {
             if ("email".equals(type) || "email".equalsIgnoreCase(prop.dataFormat) || prop.isEmail) {
@@ -338,7 +345,7 @@ public final class Utils {
                     result.append(" ");
                 } else {
                     result.append("@Min(");
-                    if (minMsg != null) {
+                    if (!isKotlin && minMsg != null) {
                         result.append("value = ");
                     }
                     result.append(longNumber);
@@ -352,7 +359,7 @@ public final class Utils {
                 }
             } catch (Exception e) {
                 result.append("@DecimalMin(");
-                if (prop.exclusiveMinimum || minMsg != null) {
+                if (!isKotlin && (prop.exclusiveMinimum || minMsg != null)) {
                     result.append("value = ");
                 }
                 result.append('"').append(prop.minimum).append('"');
@@ -385,7 +392,7 @@ public final class Utils {
                     result.append(" ");
                 } else {
                     result.append("@Max(");
-                    if (maxMsg != null) {
+                    if (!isKotlin && maxMsg != null) {
                         result.append("value = ");
                     }
                     result.append(longNumber);
@@ -400,7 +407,7 @@ public final class Utils {
                 }
             } catch (Exception e) {
                 result.append("@DecimalMax(");
-                if (prop.exclusiveMaximum || maxMsg != null) {
+                if (!isKotlin && (prop.exclusiveMaximum || maxMsg != null)) {
                     result.append("value = ");
                 }
                 result.append('"').append(prop.maximum).append('"');
@@ -470,7 +477,27 @@ public final class Utils {
                 value = "\"" + value + "\"";
             }
             varMap.put("strValue", value);
+            varMap.put("strValueNormalized", normalizeStr(value));
         }
+    }
+
+    public static void normalizeStrValue(String key, Map<String, Object> exts) {
+        if (exts.containsKey(key + "-alreadyNormalized")) {
+            return;
+        }
+        var value = exts.get(key);
+        if (value == null) {
+            return;
+        }
+        exts.put(key, normalizeStr(value.toString()));
+        exts.put(key + "-alreadyNormalized", true);
+    }
+
+    public static String normalizeStr(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.replace("$", "\\$");
     }
 
     public static String toApiName(String name, String prefix, String suffix) {
@@ -618,10 +645,12 @@ public final class Utils {
 
     public static void addEnumParamsForConverters(
         String modelPackage,
+        CodegenModel enumModel,
         CodegenParameter param,
         Map<String, Integer> converterCounters,
         List<CodegenParameter> enumParams,
-        List<String> enumImports
+        List<String> enumImports,
+        boolean isKotlin
     ) {
         var converterName = param.dataType;
         var alreadyAdded = false;
@@ -631,17 +660,100 @@ public final class Utils {
                 break;
             }
         }
-        if (!alreadyAdded) {
-            var counter = converterCounters.get(converterName);
-            if (counter == null) {
-                converterCounters.put(converterName, 0);
-            } else {
-                converterCounters.put(converterName, counter + 1);
-            }
-            param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
-            enumParams.add(param);
-            enumImports.add(modelPackage + "." + param.dataType);
+        if (alreadyAdded) {
+            return;
         }
+
+        var counter = converterCounters.get(converterName);
+        converterCounters.put(converterName, counter == null ? 0 : counter + 1);
+        param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
+
+        var convertFun = (enumModel.isNullable ? "Optional.ofNullable(" : "Optional.of(")
+            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumModel.dataType) : getJavaEnumConvertFun(enumModel.dataType, enumImports)) + "))";
+
+        param.vendorExtensions.put("convertFun", convertFun);
+        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumModel.dataType) : getJavaEnumConvertToStrFun((String) enumModel.vendorExtensions.get("baseType")));
+        enumParams.add(param);
+        enumImports.add(modelPackage + "." + param.dataType);
+    }
+
+    private static String getKotlinEnumConvertToStrFun(String type) {
+        return "String".equals(type) ? "v.value" : "v.value.toString()";
+    }
+
+    private static String getJavaEnumConvertToStrFun(String type) {
+        if ("String".equals(type)) {
+            return "v.getValue()";
+        } else if (
+            "char".equals(type)
+                || "byte".equals(type)
+                || "short".equals(type)
+                || "int".equals(type)
+                || "long".equals(type)
+                || "float".equals(type)
+                || "double".equals(type)
+                || "boolean".equals(type)
+        ) {
+            return "String.valueOf(v.getValue())";
+        } else {
+            return "v.getValue().toString()";
+        }
+    }
+
+    private static String getKotlinEnumConvertFun(String type) {
+        if ("Char".equals(type)) {
+            return "v[0]";
+        } else if ("Byte".equals(type)) {
+            return "v.toByte()";
+        } else if ("Short".equals(type)) {
+            return "v.toShort()";
+        } else if ("Int".equals(type)) {
+            return "v.toInt()";
+        } else if ("Long".equals(type)) {
+            return "v.toLong()";
+        } else if ("Float".equals(type)) {
+            return "v.toFloat()";
+        } else if ("Double".equals(type)) {
+            return "v.toDouble()";
+        } else if ("Boolean".equals(type)) {
+            return "v.toBoolean()";
+        } else if ("BigDecimal".equals(type)) {
+            return "v.toBigDecimal()";
+        } else if ("BigInteger".equals(type)) {
+            return "v.toBigInteger()";
+        }
+        return "v";
+    }
+
+    private static String getJavaEnumConvertFun(String type, List<String> imports) {
+        if ("Character".equals(type) || "char".equals(type)) {
+            return "v.charAt(0)";
+        } else if ("Byte".equals(type) || "byte".equals(type)) {
+            return "Byte.valueOf(v)";
+        } else if ("Short".equals(type) || "short".equals(type)) {
+            return "Short.valueOf(v)";
+        } else if ("Integer".equals(type) || "int".equals(type)) {
+            return "Integer.valueOf(v)";
+        } else if ("Long".equals(type) || "long".equals(type)) {
+            return "Long.valueOf(v)";
+        } else if ("Float".equals(type) || "float".equals(type)) {
+            return "Float.valueOf(v)";
+        } else if ("Double".equals(type) || "double".equals(type)) {
+            return "Double.valueOf(v)";
+        } else if ("Boolean".equals(type) || "boolean".equals(type)) {
+            return "Boolean.valueOf(v)";
+        } else if ("BigDecimal".equals(type)) {
+            if (!imports.contains("java.math.BigDecimal")) {
+                imports.add("java.math.BigDecimal");
+            }
+            return "new BigDecimal(v)";
+        } else if ("BigInteger".equals(type)) {
+            if (!imports.contains("java.math.BigInteger")) {
+                imports.add("java.math.BigInteger");
+            }
+            return "new BigInteger(v)";
+        }
+        return "v";
     }
 
     public static boolean addUserParameter(CodegenOperation op, UserParameterMode userParameterMode, boolean isAnonymous, boolean isDenyAll) {
