@@ -482,11 +482,15 @@ public final class Utils {
     }
 
     public static void normalizeStrValue(String key, Map<String, Object> exts) {
+        if (exts.containsKey(key + "-alreadyNormalized")) {
+            return;
+        }
         var value = exts.get(key);
         if (value == null) {
             return;
         }
         exts.put(key, normalizeStr(value.toString()));
+        exts.put(key + "-alreadyNormalized", true);
     }
 
     public static String normalizeStr(String str) {
@@ -695,7 +699,6 @@ public final class Utils {
             return "v.getValue().toString()";
         }
     }
-
 
     private static String getKotlinEnumConvertFun(String type) {
         if ("Char".equals(type)) {

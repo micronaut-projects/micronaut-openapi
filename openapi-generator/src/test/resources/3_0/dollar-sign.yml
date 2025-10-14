@@ -132,7 +132,7 @@ paths:
           schema:
             type: string
             format: email
-            pattern: poi\.feedback\.Review\$0(.)*
+            pattern: poi\.feedback\.Review$0(.)*
             x-pattern-message: Message with $dollarSign
         - name: $propListMinMax
           in: query
@@ -182,7 +182,7 @@ paths:
           in: query
           schema:
             type: string
-            pattern: poi\.feedback\.Review\$0(.)*
+            pattern: poi\.feedback\.Review$0(.)*
             x-pattern-message: Message with $dollarSign
       requestBody:
         description: Request body desc with $dollarSign
@@ -221,7 +221,7 @@ paths:
                 $propEmail:
                   type: string
                   format: email
-                  pattern: poi\.feedback\.Review\$0(.)*
+                  pattern: poi\.feedback\.Review$0(.)*
                   x-pattern-message: Message with $dollarSign
                 $propListMinMax:
                   type: array
@@ -261,7 +261,7 @@ paths:
                   description: Schema prop1 desc with $dollarSign
                   example: $dollarSign
                   deprecated: true
-                  pattern: poi\.feedback\.Review\$0(.)*
+                  pattern: poi\.feedback\.Review$0(.)*
                   nullable: false
                   minLength: 10
                   x-not-null-message: Message with $dollarSign
