@@ -7,7 +7,7 @@ dependencies {
     api(libs.managed.pegdown)
     api(libs.managed.parboiled)
     api(libs.managed.jsoup)
-    api(libs.managed.freemarker)
+    api(mnViews.freemarker)
 
     implementation(projects.micronautOpenapiCommon)
 

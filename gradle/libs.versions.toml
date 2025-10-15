@@ -6,7 +6,6 @@ managed-jsoup = "1.21.2"
 managed-html2md-converter = "0.64.8"
 managed-flexmark = "0.64.8"
 managed-parboiled = "1.4.1"
-managed-freemarker = "2.3.34"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "1.3"
 
@@ -26,9 +25,10 @@ guava = "33.5.0-jre"
 commonmark = "0.27.0"
 kotlin-compile-testing = "1.6.0"
 
-micronaut = "4.9.11"
+micronaut = "4.10.4"
 micronaut-platform = "4.9.4"
 micronaut-jaxrs = "4.9.2"
+micronaut-views = "5.8.0"
 micronaut-security = "4.15.0"
 micronaut-serde = "2.15.5"
 micronaut-rxjava2 = "2.9.0"
@@ -69,12 +69,12 @@ managed-flexmark-profile-pegdown = { module = "com.vladsch.flexmark:flexmark-pro
 
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 managed-parboiled = { module = "org.parboiled:parboiled-java", version.ref = "managed-parboiled" }
-managed-freemarker = { module = "org.freemarker:freemarker", version.ref = "managed-freemarker" }
 managed-pegdown = { module = "org.pegdown:pegdown", version.ref = "managed-pegdown" }
 managed-evo-inflector = { module = "org.atteo:evo-inflector", version.ref = "managed-evo-inflector" }
 
 # Micronaut
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
+micronaut-views = { module = "io.micronaut.views:micronaut-views-bom", version.ref = "micronaut-views" }
 micronaut-jaxrs = { module = "io.micronaut.jaxrs:micronaut-jaxrs-bom", version.ref = "micronaut-jaxrs" }
 micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
