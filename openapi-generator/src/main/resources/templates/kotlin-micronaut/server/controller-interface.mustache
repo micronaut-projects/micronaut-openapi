@@ -43,7 +43,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 @Controller
 {{/generateControllerAsAbstract}}
 {{#generateSwagger2Annotations}}
+    {{#normalizedBaseTag}}
 @Tag(name = "{{{normalizedBaseTag}}}"{{#normalizedTagDesc}}, description = "{{{.}}}"{{/normalizedTagDesc}})
+    {{/normalizedBaseTag}}
 {{/generateSwagger2Annotations}}
 interface {{classname}} {
 
@@ -58,11 +60,9 @@ interface {{classname}} {
     {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
     @Consumes({{#consumes}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{/consumes}})
     {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
-    {{!security annotations}}
     {{#useAuth}}
     @Secured({{#vendorExtensions.x-roles-normalized}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles-normalized}})
     {{/useAuth}}
-    {{!the method definition}}
     {{#vendorExtensions.x-operation-extra-annotation}}
     {{{.}}}
     {{/vendorExtensions.x-operation-extra-annotation}}

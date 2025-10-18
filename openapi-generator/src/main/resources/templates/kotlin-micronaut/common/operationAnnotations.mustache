@@ -14,23 +14,21 @@
         {{#-first}}
      *
         {{/-first}}
-     * @param {{paramName}}{{#description}} {{{description}}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#vendorExtensions.x-deprecated-message}}
+     * @param {{{vendorExtensions.realName}}}{{#description}} {{{description}}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#vendorExtensions.x-deprecated-message}}
      *        Deprecated: {{{.}}}{{/vendorExtensions.x-deprecated-message}}
     {{/vendorExtensions.originalParams}}
-    {{#returnType}}
+{{#returnType}}
      *
      * @return {{#responses}}{{{message}}} (status code {{code}}){{^-last}}
      *         or {{/-last}}{{/responses}}
-    {{/returnType}}
+{{/returnType}}
     {{#isDeprecated}}
      *
-     * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
-    {{/isDeprecated}}
+     * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}{{/isDeprecated}}
     {{#externalDocs}}{{#description}}
      *  {{{description}}}{{/description}}
      *
-     * @see <a href="{{url}}">{{{summary}}} Documentation</a>
-    {{/externalDocs}}
+     * @see <a href="{{url}}">{{{summary}}} Documentation</a>{{/externalDocs}}
      */
     {{#isDeprecated}}
     @Deprecated("{{#vendorExtensions.x-deprecated-message-normalized}}{{{.}}}{{/vendorExtensions.x-deprecated-message-normalized}}")

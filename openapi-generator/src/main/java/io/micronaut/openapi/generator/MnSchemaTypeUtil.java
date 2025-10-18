@@ -34,6 +34,7 @@ public final class MnSchemaTypeUtil {
     public static final String FORMAT_INT8 = "int8";
     public static final String FORMAT_INT16 = "int16";
     public static final String FORMAT_SHORT = "short";
+    public static final String FORMAT_LONG = "long";
 
     private MnSchemaTypeUtil() {
     }
