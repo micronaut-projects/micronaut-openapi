@@ -752,7 +752,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-
+            
                 @Nullable(inherited = true)
                 @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @JsonProperty(JSON_PROPERTY_DATE)
@@ -1133,26 +1133,26 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileExists(path + "config/EnumConverterServerConfig.java");
         assertFileContains(path + "config/EnumConverterServerConfig.java",
             """
-                        @Bean
-                        public TypeConverter<String, DataDirection> toEnumDataDirection() {
-                            return (v, c, ctx) -> Optional.of(DataDirection.fromValue(v));
-                        }
-                    
-                        @Bean
-                        public TypeConverter<DataDirection, String> toStrDataDirection() {
-                            return (v, c, ctx) -> Optional.of(v.getValue());
-                        }
-                    
-                        @Bean
-                        public TypeConverter<String, DataChannel> toEnumDataChannel() {
-                            return (v, c, ctx) -> Optional.of(DataChannel.fromValue(v));
-                        }
-                    
-                        @Bean
-                        public TypeConverter<DataChannel, String> toStrDataChannel() {
-                            return (v, c, ctx) -> Optional.of(v.getValue());
-                        }
-                    """
+                    @Bean
+                    public TypeConverter<String, DataDirection> toEnumDataDirection() {
+                        return (v, c, ctx) -> Optional.of(DataDirection.fromValue(v));
+                    }
+                
+                    @Bean
+                    public TypeConverter<DataDirection, String> toStrDataDirection() {
+                        return (v, c, ctx) -> Optional.of(v.getValue());
+                    }
+                
+                    @Bean
+                    public TypeConverter<String, DataChannel> toEnumDataChannel() {
+                        return (v, c, ctx) -> Optional.of(DataChannel.fromValue(v));
+                    }
+                
+                    @Bean
+                    public TypeConverter<DataChannel, String> toStrDataChannel() {
+                        return (v, c, ctx) -> Optional.of(v.getValue());
+                    }
+                """
         );
 
         assertFileExists(path + "api/BasApi.java");
@@ -1280,5 +1280,26 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     );
                 """
         );
+    }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterServerConfig.java", """
+                @Bean
+                public TypeConverter<String, ParamEnum> toEnumParamEnum() {
+                    return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
+                }
+            
+                @Bean
+                public TypeConverter<ParamEnum, String> toStrParamEnum() {
+                    return (v, c, ctx) -> Optional.of(v.getValue());
+                }
+            """);
     }
 }

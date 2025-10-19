@@ -1756,4 +1756,21 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterServerConfig.kt", """
+                @Bean
+                fun toEnumParamEnum() = TypeConverter<String, ParamEnum> { v, _, _ -> Optional.of(ParamEnum.fromValue(v)) }
+            
+                @Bean
+                fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
+            """);
+    }
 }

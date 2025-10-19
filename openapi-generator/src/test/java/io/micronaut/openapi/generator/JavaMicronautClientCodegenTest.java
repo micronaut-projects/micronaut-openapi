@@ -2195,4 +2195,25 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterClientConfig.java", """
+                    @Bean
+                    public TypeConverter<String, ParamEnum> toEnumParamEnum() {
+                        return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
+                    }
+                
+                    @Bean
+                    public TypeConverter<ParamEnum, String> toStrParamEnum() {
+                        return (v, c, ctx) -> Optional.of(v.getValue());
+                    }
+                """);
+    }
 }
