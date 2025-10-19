@@ -103,7 +103,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#addEnumNameMapping(java.util.Map)" class="member-name-link">addEnumNameMapping(Map&lt;String, String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/generator/Utils.html#addEnumParamsForConverters(java.lang.String,org.openapitools.codegen.CodegenModel,org.openapitools.codegen.CodegenParameter,java.util.Map,java.util.List,java.util.List,boolean)" class="member-name-link">addEnumParamsForConverters(String, CodegenModel, CodegenParameter, Map&lt;String, Integer&gt;, List&lt;CodegenParameter&gt;, List&lt;String&gt;, boolean)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#addEnumParamsForConverters(java.lang.String,org.openapitools.codegen.CodegenParameter,java.util.Map,java.util.List,java.util.List,boolean)" class="member-name-link">addEnumParamsForConverters(String, CodegenParameter, Map&lt;String, Integer&gt;, List&lt;CodegenParameter&gt;, List&lt;String&gt;, boolean)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/Components31Mixin.html#addExtension(java.lang.String,java.lang.Object)" class="member-name-link">addExtension(String, Object)</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Components31Mixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Components31Mixin</a></dt>
 <dd>&nbsp;</dd>
@@ -348,7 +348,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html" title="class in io.micronaut.openapi.annotation.mappers">OpenAPISecurityAnnotationMapper</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ServerVariableRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/DependentRequiredRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentRequiredRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">DependentRequiredRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
@@ -1678,6 +1678,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_INT16" class="member-name-link">FORMAT_INT16</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_INT8" class="member-name-link">FORMAT_INT8</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_LONG" class="member-name-link">FORMAT_LONG</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_SHORT" class="member-name-link">FORMAT_SHORT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
 <dd>&nbsp;</dd>
@@ -6988,7 +6990,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Return the variable name by removing invalid characters and proper escaping if
  it's a reserved word.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;ServerVariable&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ServerVariableRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/DependentRequiredRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;DependentRequired&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentRequiredRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">DependentRequiredRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#treeToValue(com.fasterxml.jackson.databind.JsonNode,java.lang.Class,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">treeToValue(JsonNode, Class&lt;T&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>
