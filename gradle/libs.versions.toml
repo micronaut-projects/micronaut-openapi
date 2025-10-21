@@ -45,7 +45,7 @@ micronaut-session = "4.8.0"
 micronaut-grpc = "4.12.0"
 micronaut-spring = "5.12.0"
 micronaut-docs = "3.0.0"
-micronaut-shared-settings = "7.6.4"
+micronaut-shared-settings = "8.0.0-M5"
 
 # javascript libraries
 js-swagger-ui = "5.29.5"
