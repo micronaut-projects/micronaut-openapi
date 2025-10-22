@@ -282,6 +282,15 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED = "micronaut.openapi.swagger.file.generation.enabled";
     /**
+     * System property to set operation duplicate resolution. Available values:
+     *  - auto - micronaut-openapi automatically add index suffix to duplicate operation ID.
+     *  - error - micronaut-openapi throws an exception when found duplicate operation ID.
+     * <br>
+     * Default: auto
+     */
+    String MICRONAUT_OPENAPI_OPERATION_DUPLICATE_RESOLUTION = "micronaut.openapi.operation.duplicate-resolution";
+
+    /**
      * System property that enables extra schema processing.
      */
     String MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED = "micronaut.openapi.schema.extra.enabled";
