@@ -645,7 +645,6 @@ public final class Utils {
 
     public static void addEnumParamsForConverters(
         String modelPackage,
-        CodegenModel enumModel,
         CodegenParameter param,
         Map<String, Integer> converterCounters,
         List<CodegenParameter> enumParams,
@@ -664,15 +663,20 @@ public final class Utils {
             return;
         }
 
+        var enumValueType = (String) param.vendorExtensions.get("enumValueType");
+        if (enumValueType == null) {
+            return;
+        }
+        var isNullable = param.vendorExtensions.containsKey("enumValueIsNullable");
         var counter = converterCounters.get(converterName);
         converterCounters.put(converterName, counter == null ? 0 : counter + 1);
         param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
 
-        var convertFun = (enumModel.isNullable ? "Optional.ofNullable(" : "Optional.of(")
-            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumModel.dataType) : getJavaEnumConvertFun(enumModel.dataType, enumImports)) + "))";
+        var convertFun = (isNullable ? "Optional.ofNullable(" : "Optional.of(")
+            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumValueType) : getJavaEnumConvertFun(enumValueType, enumImports)) + "))";
 
         param.vendorExtensions.put("convertFun", convertFun);
-        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumModel.dataType) : getJavaEnumConvertToStrFun((String) enumModel.vendorExtensions.get("baseType")));
+        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumValueType) : getJavaEnumConvertToStrFun(enumValueType));
         enumParams.add(param);
         enumImports.add(modelPackage + "." + param.dataType);
     }
