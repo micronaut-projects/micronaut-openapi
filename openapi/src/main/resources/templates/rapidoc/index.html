@@ -22,7 +22,10 @@
                 return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
             }
             const cookie = extract(document.cookie)
-            const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie
+            contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
+            if (!isSafeContextPath(contextPath)) {
+                contextPath = '';
+            }
             const head = document.getElementsByTagName('head')[0];
             {{rapipdf.script}}
             const rapidocJs = script(contextPath + "{{rapidoc.js.url.prefix}}rapidoc-min.js", head, true)
@@ -48,6 +51,37 @@
                 }
                 head.appendChild(el);
                 return el;
+            }
+            function isSafeContextPath(cp) {
+                if (typeof cp !== 'string') return false;
+                cp = cp.trim();
+                if (cp === '') return true; // allow empty = root
+
+                try {
+                    // Build against current origin to normalize
+                    const u = new URL(cp, window.location.origin);
+
+                    // Must be same origin and http(s)
+                    if (u.origin !== window.location.origin) return false;
+                    if (!(u.protocol === 'http:' || u.protocol === 'https:')) return false;
+
+                    // Path only: no query or fragment
+                    if (u.search !== '' || u.hash !== '') return false;
+
+                    const p = u.pathname;
+
+                    // Must start with a single slash and contain only safe path chars
+                    if (!p.startsWith('/')) return false;
+                    if (!/^\/[A-Za-z0-9._~\-\/]*$/.test(p)) return false;
+
+                    // Disallow protocol relative indicators traversal and HTML breaking chars
+                    if (p.includes('//') || p.includes('..')) return false;
+                    if (/[<>"'`\\]/.test(p)) return false;
+
+                    return true;
+                } catch {
+                    return false;
+                }
             }
         </script>
     </body>
