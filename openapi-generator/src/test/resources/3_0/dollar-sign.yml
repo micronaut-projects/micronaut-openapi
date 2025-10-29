@@ -72,6 +72,8 @@ paths:
           schema:
             type: string
             default: ref2/$ref
+            deprecated: true
+            x-deprecated-message: Deprecated message with $dollarSign
             enum:
               - ref1/$ref
               - ref2/$ref
@@ -80,6 +82,9 @@ paths:
               - desc enumConst2 with $dollarSign
             x-deprecated:
               - ref2/$ref
+            x-enum-deprecated-messages:
+              - ""
+              - Deprecated message with $dollarSign2
         - name: $pathVar
           in: path
           description: desc pathVar with $dollarSign

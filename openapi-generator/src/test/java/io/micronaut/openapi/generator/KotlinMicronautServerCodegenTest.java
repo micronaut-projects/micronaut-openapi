@@ -1571,10 +1571,20 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 
                 }
                 """
-            );
+        );
 
         assertFileContains(path + "model/DollarGetDollarStringsDollarQueryVarParameter.kt",
             """
+                /**
+                 * Gets or Sets $get$Strings_$queryVar_parameter
+                 *
+                 * @param value The value represented by this enum
+                 *
+                 * @deprecated Deprecated message with $dollarSign
+                 */
+                @Deprecated("Deprecated message with \\$dollarSign")
+                @Serdeable
+                @Generated("io.micronaut.openapi.generator.KotlinMicronautServerCodegen")
                 enum class DollarGetDollarStringsDollarQueryVarParameter(
                     @get:JsonValue
                     val value: String,
@@ -1585,10 +1595,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("ref1/\\$ref")
                     REF1__REF("ref1/\\$ref"),
+                
                     /**
                      * desc enumConst2 with $dollarSign
+                     *
+                     * @deprecated Deprecated message with $dollarSign2
                      */
-                    @Deprecated("")
+                    @Deprecated("Deprecated message with \\$dollarSign2")
                     @JsonProperty("ref2/\\$ref")
                     REF2__REF("ref2/\\$ref"),
                     ;

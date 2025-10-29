@@ -111,11 +111,13 @@ import static io.micronaut.openapi.generator.Utils.NULL_STRING;
 import static io.micronaut.openapi.generator.Utils.addEnumParamsForConverters;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.calcQueryValueFormat;
+import static io.micronaut.openapi.generator.Utils.findEnumVar;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.normalizeStr;
 import static io.micronaut.openapi.generator.Utils.normalizeStrValue;
 import static io.micronaut.openapi.generator.Utils.processDuplicateVars;
+import static io.micronaut.openapi.generator.Utils.processEnumExt;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.BYTE_FORMAT;
@@ -1319,8 +1321,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     private void normalizeTextsInOperation(CodegenOperation op) {
 
-        if (op.vendorExtensions.containsKey("x-deprecated-message")) {
-            op.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr(op.vendorExtensions.get("x-deprecated-message").toString()));
+        var deprecatedMessage = op.vendorExtensions.get("x-deprecated-message");
+        var xDeprecated = op.vendorExtensions.get("x-deprecated");
+        if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
+            deprecatedMessage = xDeprecatedStr;
+            op.vendorExtensions.put("x-deprecated-message", xDeprecatedStr);
+        }
+        if (deprecatedMessage != null) {
+            op.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr(deprecatedMessage.toString()));
         }
 
         if (op.vendorExtensions.containsKey("x-roles")) {
@@ -2357,8 +2365,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
             }
 
-            if (model.vendorExtensions.containsKey("x-deprecated-message")) {
-                model.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr((String) model.vendorExtensions.get("x-deprecated-message")));
+            var deprecatedMessage = model.vendorExtensions.get("x-deprecated-message");
+            var xDeprecated = model.vendorExtensions.get("x-deprecated");
+            if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
+                deprecatedMessage = xDeprecatedStr;
+                model.vendorExtensions.put("x-deprecated-message", xDeprecatedStr);
+            }
+            if (deprecatedMessage != null) {
+                model.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr(deprecatedMessage.toString()));
             }
             model.vendorExtensions.put("descriptionNormalized", normalizeStr(model.description));
             model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
@@ -2482,49 +2496,48 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     protected void updateEnumVarsWithExtensions(List<Map<String, Object>> enumVars, Map<String, Object> vendorExtensions, String dataType) {
-        super.updateEnumVarsWithExtensions(enumVars, vendorExtensions, dataType);
         if (vendorExtensions == null) {
             return;
         }
-        var xDeprecated = (List<Object>) vendorExtensions.get("x-deprecated");
+
+        processEnumExt(enumVars, vendorExtensions, "enumDescription", List.of("x-enum-descriptions", "x-xl4-enum-doc"));
+        processEnumExt(enumVars, vendorExtensions, "enumDeprecatedMessage", List.of("x-enum-deprecated-messages", "x-xl4-enum-deprecated"), true);
+
+        var deprecatedExt = vendorExtensions.get("x-deprecated");
+        List<?> xDeprecated = null;
+        Map<?, ?> xDeprecatedMap = null;
+        if (deprecatedExt instanceof List<?> deprecatedList) {
+            xDeprecated = deprecatedList;
+        } else if (deprecatedExt instanceof Map<?, ?> deprecatedMap) {
+            xDeprecated = new ArrayList<>(deprecatedMap.keySet());
+            xDeprecatedMap = deprecatedMap;
+        }
+        var deprecatedMessagesExt = vendorExtensions.get("x-enum-deprecated-messages");
+        if (deprecatedMessagesExt == null) {
+            deprecatedMessagesExt = vendorExtensions.get("x-xl4-enum-deprecated");
+        }
+        if (xDeprecated == null && deprecatedMessagesExt instanceof Map<?, ?> deprecatedMap) {
+            xDeprecated = new ArrayList<>(deprecatedMap.keySet());
+            xDeprecatedMap = deprecatedMap;
+        }
         if (xDeprecated != null && !xDeprecated.isEmpty()) {
             for (var deprecatedItem : xDeprecated) {
-                Map<String, Object> foundEnumVar = null;
-                for (var enumVar : enumVars) {
-                    var isString = (boolean) enumVar.get("isString");
-                    var value = (String) enumVar.get("value");
-                    if (!isString) {
-                        if (value.startsWith("(short)")) {
-                            value = value.replace("(short) ", "");
-                        }
-                        var argPos = value.indexOf('(');
-                        // case for BigDecimal
-                        if (argPos >= 0) {
-                            value = value.substring(argPos + 1, value.indexOf(')'));
-                        }
-                        var upperValue = value.toUpperCase(Locale.ENGLISH);
-                        if (upperValue.endsWith("F")
-                            || upperValue.endsWith("L")
-                            || upperValue.endsWith("D")) {
-                            value = value.substring(0, value.length() - 1);
-                        }
-                        if (!value.contains("'")) {
-                            value = value.replace("'", "");
-                        }
-                        if (!value.contains("\"")) {
-                            value = "\"" + value + "\"";
-                        }
-                    }
-                    if (value.equals("\"" + deprecatedItem + '"')) {
-                        foundEnumVar = enumVar;
-                        break;
-                    }
+                Map<String, Object> foundEnumVar = findEnumVar(deprecatedItem.toString(), enumVars);
+                if (foundEnumVar == null) {
+                    continue;
                 }
-                if (foundEnumVar != null) {
-                    foundEnumVar.put("deprecated", true);
+                foundEnumVar.put("deprecated", true);
+                if (xDeprecatedMap != null) {
+                    var deprecatedMessage = xDeprecatedMap.get(deprecatedItem);
+                    if (deprecatedMessage instanceof String deprecatedMessageStr) {
+                        foundEnumVar.put("enumDeprecatedMessage", deprecatedMessageStr);
+                        foundEnumVar.put("enumDeprecatedMessageNormalized", normalizeStr(deprecatedMessageStr));
+                    }
                 }
             }
         }
+
+        processEnumExt(enumVars, vendorExtensions, "name", List.of("x-enum-varnames"));
 
         var baseType = (String) vendorExtensions.get("baseType");
         for (var enumVar : enumVars) {
@@ -2656,8 +2669,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (property.description != null) {
             property.vendorExtensions.put("descriptionNormalized", normalizeStr(property.description));
         }
-        if (property.vendorExtensions.containsKey("x-deprecated-message")) {
-            property.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr((String) property.vendorExtensions.get("x-deprecated-message")));
+        var deprecatedMessage = property.vendorExtensions.get("x-deprecated-message");
+        var xDeprecated = property.vendorExtensions.get("x-deprecated");
+        if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
+            deprecatedMessage = xDeprecatedStr;
+            property.vendorExtensions.put("x-deprecated-message", xDeprecatedStr);
+        }
+        if (deprecatedMessage != null) {
+            property.vendorExtensions.put("x-deprecated-message-normalized", normalizeStr(deprecatedMessage.toString()));
         }
         normalizeStrValue("x-pattern-message", property.vendorExtensions);
         normalizeStrValue("x-size-message", property.vendorExtensions);
