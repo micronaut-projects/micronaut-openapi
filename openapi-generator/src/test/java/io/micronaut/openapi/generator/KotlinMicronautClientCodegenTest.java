@@ -2587,4 +2587,145 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
             """);
     }
+
+    @Test
+    void testEnumExtensions() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-extensions.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/EnumWithList.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap2.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithDifferentExts.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+    }
 }

@@ -31,12 +31,21 @@
 {{#formatSingleLine}}public enum {{>common/model/enumName}}{{#vendorExtensions.x-implements}}{{#-first}} implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{/formatSingleLine}} {
 
     {{#allowableValues}}
-        {{#enumVars}}
+        {{#enumVars}}{{#formatNoEmptyLines}}
             {{#enumDescription}}
     /**
      * {{{enumDescription}}}
+{{#deprecated}}
+     *
+     * @deprecated{{#enumDeprecatedMessage}} {{{.}}}{{/enumDeprecatedMessage}}{{/deprecated}}
      */
             {{/enumDescription}}
+            {{^enumDescription}}{{#deprecated}}
+    /**
+     *
+     * @deprecated{{#enumDeprecatedMessage}} {{{.}}}{{/enumDeprecatedMessage}}
+     */
+            {{/deprecated}}{{/enumDescription}}
             {{#withXml}}
     @XmlEnumValue({{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}}{{{value}}}{{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}})
             {{/withXml}}
@@ -46,6 +55,7 @@
     @JsonProperty({{{strValue}}})
     {{{name}}}({{{value}}}),{{#-last}}
     ;{{/-last}}
+        {{/formatNoEmptyLines}}
         {{/enumVars}}
     {{/allowableValues}}
 

@@ -4,7 +4,7 @@
  * @param value The value represented by this enum
 {{#isDeprecated}}
  *
- * @deprecated {{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
+ * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
 {{/isDeprecated}}
  */
 {{#isDeprecated}}
@@ -32,21 +32,31 @@
 ){{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 
     {{#allowableValues}}
-        {{#enumVars}}
+        {{#enumVars}}{{#formatNoEmptyLines}}
             {{#enumDescription}}
     /**
-     * {{enumDescription}}
+     * {{{enumDescription}}}
+{{#deprecated}}
+     *
+     * @deprecated{{#enumDeprecatedMessage}} {{{.}}}{{/enumDeprecatedMessage}}{{/deprecated}}
      */
             {{/enumDescription}}
+            {{^enumDescription}}{{#deprecated}}
+    /**
+     *
+     * @deprecated{{#enumDeprecatedMessage}} {{{.}}}{{/enumDeprecatedMessage}}
+     */
+            {{/deprecated}}{{/enumDescription}}
             {{#withXml}}
     @XmlEnumValue({{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}}{{{value}}}{{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}})
             {{/withXml}}
             {{#deprecated}}
-    @Deprecated("")
+    @Deprecated("{{#enumDeprecatedMessageNormalized}}{{{.}}}{{/enumDeprecatedMessageNormalized}}")
             {{/deprecated}}
     @JsonProperty({{{strValueNormalized}}})
     {{{name}}}({{{valueNormalized}}}),{{#-last}}
     ;{{/-last}}
+        {{/formatNoEmptyLines}}
         {{/enumVars}}
     {{/allowableValues}}
 
