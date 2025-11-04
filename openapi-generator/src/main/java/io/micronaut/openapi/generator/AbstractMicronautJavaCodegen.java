@@ -342,6 +342,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // Add reserved words
         var micronautReservedWords = List.of(
+            // lost words in openapi generator
+            "true", "false",
             // special words
             "Object", "List", "File", "OffsetDateTime", "LocalDate", "LocalTime",
             "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",

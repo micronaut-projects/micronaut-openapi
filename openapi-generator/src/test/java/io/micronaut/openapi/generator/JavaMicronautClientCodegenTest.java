@@ -2357,4 +2357,60 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     NUM("NUM"),
                 """);
     }
+
+    @Test
+    void testTrueFalse() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/true-false.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/OrderApi.java", """
+                /**
+                 * getOrderById
+                 *
+                 * @param _true (optional)
+                 * @param _false (optional)
+                 * @param _null (optional)
+                 * @param _boolean (optional)
+                 * @param propertyClass (optional)
+                 *
+                 * @return OK (status code 200)
+                 */
+                @Get("/orders/{id}")
+                Mono<@NotNull String> getOrderById(
+                    @QueryValue("true") @Nullable String _true,
+                    @QueryValue("false") @Nullable String _false,
+                    @QueryValue("null") @Nullable String _null,
+                    @QueryValue("boolean") @Nullable String _boolean,
+                    @QueryValue("class") @Nullable String propertyClass
+                );
+            """);
+
+        assertFileContains(path + "model/CDBAttributeUsageUiBoolean.java", """
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_TRUE)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _true;
+            
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_FALSE)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _false;
+            
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_NULL)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _null;
+            """);
+    }
 }
