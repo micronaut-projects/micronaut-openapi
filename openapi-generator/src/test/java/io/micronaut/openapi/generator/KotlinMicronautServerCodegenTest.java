@@ -1571,10 +1571,20 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 
                 }
                 """
-            );
+        );
 
         assertFileContains(path + "model/DollarGetDollarStringsDollarQueryVarParameter.kt",
             """
+                /**
+                 * Gets or Sets $get$Strings_$queryVar_parameter
+                 *
+                 * @param value The value represented by this enum
+                 *
+                 * @deprecated Deprecated message with $dollarSign
+                 */
+                @Deprecated("Deprecated message with \\$dollarSign")
+                @Serdeable
+                @Generated("io.micronaut.openapi.generator.KotlinMicronautServerCodegen")
                 enum class DollarGetDollarStringsDollarQueryVarParameter(
                     @get:JsonValue
                     val value: String,
@@ -1585,10 +1595,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("ref1/\\$ref")
                     REF1__REF("ref1/\\$ref"),
+                
                     /**
                      * desc enumConst2 with $dollarSign
+                     *
+                     * @deprecated Deprecated message with $dollarSign2
                      */
-                    @Deprecated("")
+                    @Deprecated("Deprecated message with \\$dollarSign2")
                     @JsonProperty("ref2/\\$ref")
                     REF2__REF("ref2/\\$ref"),
                     ;
@@ -1755,5 +1768,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 }
                 """
         );
+    }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterServerConfig.kt", """
+                @Bean
+                fun toEnumParamEnum() = TypeConverter<String, ParamEnum> { v, _, _ -> Optional.of(ParamEnum.fromValue(v)) }
+            
+                @Bean
+                fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
+            """);
     }
 }

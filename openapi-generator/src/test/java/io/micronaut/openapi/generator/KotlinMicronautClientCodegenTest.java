@@ -2570,4 +2570,218 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterClientConfig.kt", """
+                @Bean
+                fun toEnumParamEnum() = TypeConverter<String, ParamEnum> { v, _, _ -> Optional.of(ParamEnum.fromValue(v)) }
+            
+                @Bean
+                fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
+            """);
+    }
+
+    @Test
+    void testEnumExtensions() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-extensions.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/EnumWithList.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap2.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithDifferentExts.kt", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated("This is enum deprecated message")
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated("This is deprecated message1")
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated("This is deprecated message2")
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+    }
+
+    @Test
+    void testTrueFalse() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/true-false.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/OrderApi.kt", """
+                /**
+                 * getOrderById
+                 *
+                 * @param true (optional)
+                 * @param false (optional)
+                 * @param null (optional)
+                 * @param boolean (optional)
+                 * @param propertyClass (optional)
+                 *
+                 * @return OK (status code 200)
+                 */
+                @Get("/orders/{id}")
+                fun getOrderById(
+                    @QueryValue("true") @Nullable `true`: String? = null,
+                    @QueryValue("false") @Nullable `false`: String? = null,
+                    @QueryValue("null") @Nullable `null`: String? = null,
+                    @QueryValue("boolean") @Nullable boolean: String? = null,
+                    @QueryValue("class") @Nullable propertyClass: String? = null,
+                ): Mono<String>
+            """);
+
+        assertFileContains(path + "model/CDBAttributeUsageUiBoolean.kt", """
+                /**
+                 * a.
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_TRUE)
+                @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
+                var `true`: Map<String, Any?>,
+            
+                /**
+                 * a.
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_FALSE)
+                @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
+                var `false`: Map<String, Any?>,
+            
+                /**
+                 * a.
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_NULL)
+                @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
+                var `null`: Map<String, Any?>,
+            """);
+    }
 }

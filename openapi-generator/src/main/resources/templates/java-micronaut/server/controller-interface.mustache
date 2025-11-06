@@ -38,8 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/generateSwagger2Annotations}}
 {{/formatNoEmptyLines}}
-
 {{#formatOneEmptyLine}}
+{{#formatNoEmptyLines}}
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
@@ -47,9 +47,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @Controller
 {{/generateControllerAsAbstract}}
 {{#generateSwagger2Annotations}}
-@Tag(name = "{{{vendorExtensions.normalizedBaseTag}}}"{{#vendorExtensions.normalizedTagDesc}}, description = "{{{.}}}"{{/vendorExtensions.normalizedTagDesc}})
+    {{#normalizedBaseTag}}
+@Tag(name = "{{{normalizedBaseTag}}}"{{#normalizedTagDesc}}, description = "{{{.}}}"{{/normalizedTagDesc}})
+    {{/normalizedBaseTag}}
 {{/generateSwagger2Annotations}}
 public interface {{classname}} {
+{{/formatNoEmptyLines}}
 
 {{#operations}}
     {{#operation}}

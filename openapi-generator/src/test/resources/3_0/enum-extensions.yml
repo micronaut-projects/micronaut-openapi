@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: title
+  description: description
+  version: ''
+servers:
+  - url: /
+components:
+  schemas:
+    EnumWithList:
+      type: string
+      deprecated: true
+      x-deprecated-message: This is enum deprecated message
+      enum:
+        - CGI
+        - CGU
+        - BRB
+        - NUM
+      x-deprecated:
+        - CGU
+        - BRB
+      x-enum-varnames:
+        - A
+        - B
+        - C
+      x-enum-descriptions:
+        - doc1
+        -
+        - doc3
+      x-enum-deprecated-messages:
+        - ""
+        - This is deprecated message1
+        - This is deprecated message2
+    EnumWithMap:
+      type: string
+      deprecated: true
+      x-deprecated-message: This is enum deprecated message
+      enum:
+        - CGI
+        - CGU
+        - BRB
+        - NUM
+      x-deprecated:
+        CGU: This is deprecated message1
+        BRB: This is deprecated message2
+      x-enum-varnames:
+        CGI: A
+        CGU: B
+        BRB: C
+      x-enum-descriptions:
+        CGI: doc1
+        BRB: doc3
+    EnumWithMap2:
+      type: string
+      deprecated: true
+      x-deprecated-message: This is enum deprecated message
+      enum:
+        - CGI
+        - CGU
+        - BRB
+        - NUM
+      x-enum-deprecated-messages:
+        CGU: This is deprecated message1
+        BRB: This is deprecated message2
+      x-enum-varnames:
+        CGI: A
+        CGU: B
+        BRB: C
+      x-enum-descriptions:
+        CGI: doc1
+        BRB: doc3
+    EnumWithDifferentExts:
+      type: string
+      deprecated: true
+      x-deprecated: This is enum deprecated message
+      enum:
+        - CGI
+        - CGU
+        - BRB
+        - NUM
+      x-xl4-enum-deprecated:
+        CGU: This is deprecated message1
+        BRB: This is deprecated message2
+      x-enum-varnames:
+        CGI: A
+        CGU: B
+        BRB: C
+      x-xl4-enum-doc:
+        CGI: doc1
+        BRB: doc3

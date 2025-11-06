@@ -2195,4 +2195,222 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testEnumNullable() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", false, SUPPORTING_FILES, APIS);
+        generateFiles(codegen, "src/test/resources/3_0/enum-nullable.yml", true, MODELS);
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "config/EnumConverterClientConfig.java", """
+                @Bean
+                public TypeConverter<String, ParamEnum> toEnumParamEnum() {
+                    return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
+                }
+            
+                @Bean
+                public TypeConverter<ParamEnum, String> toStrParamEnum() {
+                    return (v, c, ctx) -> Optional.of(v.getValue());
+                }
+            """);
+    }
+
+    @Test
+    void testEnumExtensions() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum-extensions.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/EnumWithList.java", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap.java", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithMap2.java", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+        assertFileContains(path + "model/EnumWithDifferentExts.java", """
+                 *
+                 * @deprecated This is enum deprecated message
+                 */
+                @Deprecated
+                """,
+            """
+                    /**
+                     * doc1
+                     */
+                    @JsonProperty("CGI")
+                    A("CGI"),
+                
+                    /**
+                     *
+                     * @deprecated This is deprecated message1
+                     */
+                    @Deprecated
+                    @JsonProperty("CGU")
+                    B("CGU"),
+                
+                    /**
+                     * doc3
+                     *
+                     * @deprecated This is deprecated message2
+                     */
+                    @Deprecated
+                    @JsonProperty("BRB")
+                    C("BRB"),
+                
+                    @JsonProperty("NUM")
+                    NUM("NUM"),
+                """);
+    }
+
+    @Test
+    void testTrueFalse() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/true-false.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/OrderApi.java", """
+                /**
+                 * getOrderById
+                 *
+                 * @param _true (optional)
+                 * @param _false (optional)
+                 * @param _null (optional)
+                 * @param _boolean (optional)
+                 * @param propertyClass (optional)
+                 *
+                 * @return OK (status code 200)
+                 */
+                @Get("/orders/{id}")
+                Mono<@NotNull String> getOrderById(
+                    @QueryValue("true") @Nullable String _true,
+                    @QueryValue("false") @Nullable String _false,
+                    @QueryValue("null") @Nullable String _null,
+                    @QueryValue("boolean") @Nullable String _boolean,
+                    @QueryValue("class") @Nullable String propertyClass
+                );
+            """);
+
+        assertFileContains(path + "model/CDBAttributeUsageUiBoolean.java", """
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_TRUE)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _true;
+            
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_FALSE)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _false;
+            
+                /**
+                 * a.
+                 */
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_NULL)
+                @JsonInclude(content = JsonInclude.Include.ALWAYS)
+                private Map<String, Object> _null;
+            """);
+    }
 }

@@ -645,7 +645,6 @@ public final class Utils {
 
     public static void addEnumParamsForConverters(
         String modelPackage,
-        CodegenModel enumModel,
         CodegenParameter param,
         Map<String, Integer> converterCounters,
         List<CodegenParameter> enumParams,
@@ -664,15 +663,20 @@ public final class Utils {
             return;
         }
 
+        var enumValueType = (String) param.vendorExtensions.get("enumValueType");
+        if (enumValueType == null) {
+            return;
+        }
+        var isNullable = param.vendorExtensions.containsKey("enumValueIsNullable");
         var counter = converterCounters.get(converterName);
         converterCounters.put(converterName, counter == null ? 0 : counter + 1);
         param.vendorExtensions.put("converterName", converterName + (counter != null ? counter : ""));
 
-        var convertFun = (enumModel.isNullable ? "Optional.ofNullable(" : "Optional.of(")
-            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumModel.dataType) : getJavaEnumConvertFun(enumModel.dataType, enumImports)) + "))";
+        var convertFun = (isNullable ? "Optional.ofNullable(" : "Optional.of(")
+            + param.dataType + ".fromValue(" + (isKotlin ? getKotlinEnumConvertFun(enumValueType) : getJavaEnumConvertFun(enumValueType, enumImports)) + "))";
 
         param.vendorExtensions.put("convertFun", convertFun);
-        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumModel.dataType) : getJavaEnumConvertToStrFun((String) enumModel.vendorExtensions.get("baseType")));
+        param.vendorExtensions.put("convertToStrFun", isKotlin ? getKotlinEnumConvertToStrFun(enumValueType) : getJavaEnumConvertToStrFun(enumValueType));
         enumParams.add(param);
         enumImports.add(modelPackage + "." + param.dataType);
     }
@@ -778,5 +782,74 @@ public final class Utils {
         op.allParams.add(userParam);
 
         return true;
+    }
+
+    public static void processEnumExt(List<Map<String, Object>> enumVars, Map<String, Object> vendorExtensions, String key, List<String> extensionKeys) {
+        processEnumExt(enumVars, vendorExtensions, key, extensionKeys, false);
+    }
+
+    public static void processEnumExt(List<Map<String, Object>> enumVars, Map<String, Object> vendorExtensions, String key, List<String> extensionKeys, boolean withNormalization) {
+        Object value = null;
+        for (var extKey : extensionKeys) {
+            value = vendorExtensions.get(extKey);
+            if (value != null) {
+                break;
+            }
+        }
+        if (value instanceof List<?> valuesList) {
+            int size = Math.min(enumVars.size(), valuesList.size());
+            for (int i = 0; i < size; i++) {
+                enumVars.get(i).put(key, valuesList.get(i));
+                if (withNormalization) {
+                    enumVars.get(i).put(key + "Normalized", normalizeStr(valuesList.get(i).toString()));
+                }
+            }
+        } else if (value instanceof Map<?, ?> valuesMap) {
+            for (var entry : valuesMap.entrySet()) {
+                Map<String, Object> foundEnumVar = findEnumVar(entry.getKey().toString(), enumVars);
+                if (foundEnumVar == null) {
+                    continue;
+                }
+                foundEnumVar.put(key, entry.getValue().toString());
+                if (withNormalization) {
+                    foundEnumVar.put(key + "Normalized", normalizeStr(entry.getValue().toString()));
+                }
+            }
+        }
+    }
+
+    public static Map<String, Object> findEnumVar(String enumConstName, List<Map<String, Object>> enumVars) {
+        for (var enumVar : enumVars) {
+            var isString = (boolean) enumVar.get("isString");
+            var value = (String) enumVar.get("value");
+            if (!isString) {
+                if (value.startsWith("(short)")) {
+                    value = value.replace("(short) ", "");
+                } else if (value.startsWith("(byte)")) {
+                    value = value.replace("(byte) ", "");
+                }
+                var argPos = value.indexOf('(');
+                // case for BigDecimal
+                if (argPos >= 0) {
+                    value = value.substring(argPos + 1, value.indexOf(')'));
+                }
+                var upperValue = value.toUpperCase(Locale.ENGLISH);
+                if (upperValue.endsWith("F")
+                    || upperValue.endsWith("L")
+                    || upperValue.endsWith("D")) {
+                    value = value.substring(0, value.length() - 1);
+                }
+                if (!value.contains("'")) {
+                    value = value.replace("'", "");
+                }
+                if (!value.contains("\"")) {
+                    value = "\"" + value + "\"";
+                }
+            }
+            if (value.equals("\"" + enumConstName + '"')) {
+                return enumVar;
+            }
+        }
+        return null;
     }
 }

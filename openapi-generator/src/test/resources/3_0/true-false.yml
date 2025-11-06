@@ -1,0 +1,112 @@
+openapi: 3.1.0
+info:
+  title: title
+  description: description
+  version: ''
+servers:
+  - url: /
+paths:
+  '/orders/{id}':
+    get:
+      tags:
+        - Order
+      operationId: getOrderById
+      parameters:
+        - name: 'true'
+          in: query
+          schema:
+            type: string
+        - name: 'false'
+          in: query
+          schema:
+            type: string
+        - name: 'null'
+          in: query
+          schema:
+            type: string
+        - name: boolean
+          in: query
+          schema:
+            type: string
+        - name: class
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    CDBAttributeUsage:
+      type: object
+      description: g
+      properties:
+        instance:
+          type: boolean
+          description: d
+        instanceOrder:
+          type: integer
+          format: int64
+          description: d
+        ui:
+          type: object
+          description: d
+          properties:
+            group:
+              type: object
+              description: d
+              properties:
+                id:
+                  type: string
+                  description: d.
+              required:
+                - id
+            boolean:
+              type: object
+              description: d
+              properties:
+                'true':
+                  $ref: '#/components/schemas/MLString'
+                  description: x
+                'false':
+                  $ref: '#/components/schemas/MLString'
+                  description: x
+                'null':
+                  $ref: '#/components/schemas/MLString'
+                  description: x
+                toggle:
+                  type: object
+                  description: x
+                  properties:
+                    'true':
+                      $ref: '#/components/schemas/MLString'
+                      description: f
+                    'false':
+                      $ref: '#/components/schemas/MLString'
+                      description: f
+                  required:
+                    - 'true'
+                    - 'false'
+              required:
+                - 'null'
+                - 'true'
+                - 'false'
+                - toggle
+          required:
+            - boolean
+            - group
+        unit:
+          type: boolean
+          description: v
+        unitOrder:
+          type: integer
+          format: int64
+          description: a
+    MLString:
+      type: object
+      additionalProperties: true
+      description: a.

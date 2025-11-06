@@ -1,0 +1,24 @@
+openapi: 3.0.1
+info:
+  title: example
+  version: 1.0.0
+paths:
+  /example:
+    get:
+      operationId: example
+      parameters:
+        - name: param
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ParamEnum'
+      responses:
+        "200":
+          description: success
+components:
+  schemas:
+    ParamEnum:
+      type: string
+      enum:
+        - A
+        - B
