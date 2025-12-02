@@ -1,6 +1,6 @@
 package io.micronaut.openapi.test.filter;
 
-import io.micronaut.core.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;

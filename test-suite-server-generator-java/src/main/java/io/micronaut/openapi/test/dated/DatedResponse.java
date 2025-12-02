@@ -2,8 +2,8 @@ package io.micronaut.openapi.test.dated;
 
 import java.time.ZonedDateTime;
 
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A response that contains information about last modification.

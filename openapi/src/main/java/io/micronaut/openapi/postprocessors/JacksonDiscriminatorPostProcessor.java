@@ -15,7 +15,7 @@
  */
 package io.micronaut.openapi.postprocessors;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.micronaut.openapi.visitor.Utils;

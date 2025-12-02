@@ -15,7 +15,7 @@
  */
 package io.micronaut.openapi.javadoc;
 
-import io.micronaut.core.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
