@@ -3,6 +3,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.ast.transform.test.AbstractBeanDefinitionSpec
 import io.micronaut.http.MediaType
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Ignore
 import spock.lang.Issue
@@ -382,5 +383,95 @@ public class MyBean {}
         openAPI.components.schemas.FooRecord.properties.foo.type == 'string'
         openAPI.components.schemas.FooRecord.properties.bar
         openAPI.components.schemas.FooRecord.properties.bar.type == 'string'
+    }
+
+    void "test java records with groovy22"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test
+
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+
+@Controller
+class ExecutionController {
+    
+    @Get(uri="/execution/{id}/output")
+    @Operation(
+        summary="Execution Output",
+        tags = ["Job Executions"]
+    )
+    @ApiResponse(
+        responseCode = '200',
+        description = "Log Output Response",
+        content = [
+            @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(type = "object"),
+                examples=[
+                    @ExampleObject(
+                        name = 'log-output-compacted',
+                        description = 'Compacted JSON log output',
+                        value="""{
+  "id": 1,
+  "compacted": "true",
+  "entries": [
+    {
+      "time": "17:00:00",
+      "log": "First log message"
+    }
+  ]
+}"""
+                    )
+                ]
+            ),
+            @Content(
+                mediaType = MediaType.TEXT_PLAIN,
+                schema = @Schema(type = "string"),
+                examples = [
+                    @ExampleObject(
+                        name = 'log-output-text',
+                        description = 'Textual log output',
+                        value = """Log output text..."""
+                    )
+                ]
+            )
+        ]
+    )
+    def apiExecutionOutput() {
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        var openApi = Utils.testReference
+
+        then:
+        var content = openApi.paths."/execution/{id}/output".get.responses."200".content
+
+        content.size() == 2
+        content."application/json".schema.type == "object"
+        content."application/json".examples instanceof Map<String, Example>
+
+        def examplesMap = (Map<String, Example>) content."application/json".examples
+        examplesMap."log-output-compacted"
+        examplesMap."log-output-compacted".description == "Compacted JSON log output"
+        examplesMap."log-output-compacted".value.id == 1
+
+        content."text/plain".schema.type == "string"
+        content."text/plain".examples instanceof Map<String, Example>
+
+        def examplesMap2 = (Map<String, Example>) content."text/plain".examples
+        examplesMap2."log-output-text"
+        examplesMap2."log-output-text".description == "Textual log output"
+        examplesMap2."log-output-text".value == "Log output text..."
     }
 }

@@ -17,6 +17,8 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.Internal;
 
+import java.util.Set;
+
 /**
  * Common property names in OpenAPI and Micronaut objects and annotations.
  *
@@ -47,6 +49,7 @@ public interface OpenApiModelProp {
     String PROP_HIDDEN = "hidden";
     String PROP_EXAMPLE = "example";
     String PROP_EXAMPLE_SET_FLAG = "exampleSetFlag";
+    String PROP_ENCODING = "encoding";
     String PROP_EXAMPLES = "examples";
     String PROP_NOT = "not";
     String PROP_ALL_OF = "allOf";
@@ -115,4 +118,12 @@ public interface OpenApiModelProp {
     String PROP_ACCESS = "access";
 
     String MICRONAUT_EXT_PARENT_RESPONSE = "x-micronaut-parent-response";
+
+    Set<String> CONTENT_PROPS = Set.of(
+        PROP_SCHEMA,
+        PROP_EXAMPLES,
+        PROP_EXAMPLE,
+        PROP_ENCODING,
+        PROP_EXTENSIONS
+    );
 }
