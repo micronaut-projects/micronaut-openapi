@@ -37,7 +37,6 @@ micronaut-gradle-plugin = "4.6.1"
 micronaut-groovy = "4.7.0"
 micronaut-validation = "5.0.0-M1"
 micronaut-data = "4.14.1"
-micronaut-test = "4.10.2"
 micronaut-kotlin = "4.7.0"
 micronaut-logging = "1.7.1"
 micronaut-session = "4.8.0"
@@ -85,7 +84,6 @@ micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", versio
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
 micronaut-session = { module = "io.micronaut.session:micronaut-session-bom", version.ref = "micronaut-session" }
 micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
-micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
 micronaut-grpc = { module = "io.micronaut.grpc:micronaut-grpc-bom", version.ref = "micronaut-grpc" }
 micronaut-spring = { module = "io.micronaut.spring:micronaut-spring-bom", version.ref = "micronaut-spring" }
