@@ -500,6 +500,14 @@ public final class Utils {
         return str.replace("$", "\\$");
     }
 
+    public static String normalizeJavaClass(String className) {
+        return className.endsWith(".class") ? className : className + ".class";
+    }
+
+    public static String normalizeKotlinClass(String className) {
+        return className.endsWith("::class") ? className : className + "::class";
+    }
+
     public static String toApiName(String name, String prefix, String suffix) {
         if (name.isEmpty()) {
             return "DefaultApi";
@@ -558,16 +566,25 @@ public final class Utils {
     }
 
     public static List<String> readListOfStringsProperty(String property, Map<String, Object> additionalProperties) {
+        return readListOfStringsProperty(property, additionalProperties, Collections.emptyList());
+    }
+
+    public static List<String> readListOfStringsProperty(String property, Map<String, Object> additionalProperties, List<String> defaultValue) {
         var value = additionalProperties.get(property);
         if (value == null) {
-            return Collections.emptyList();
+            additionalProperties.put(property, defaultValue);
+            return defaultValue;
         }
         return readListOfStringsProperty(value);
     }
 
     public static List<String> readListOfStringsProperty(Object value) {
+        return readListOfStringsProperty(value, Collections.emptyList());
+    }
+
+    public static List<String> readListOfStringsProperty(Object value, List<String> defaultValue) {
         if (value == null) {
-            return Collections.emptyList();
+            return defaultValue;
         }
         List<String> parsedValues;
         if (value instanceof Collection<?> valueCol) {
@@ -593,19 +610,47 @@ public final class Utils {
         return parsedValues;
     }
 
-    public static boolean readBooleanProperty(String propertyKey, Map<String, Object> additionalProperties, boolean defaultValue) {
-        var value = additionalProperties.get(propertyKey);
+    public static String readProperty(String property, Map<String, Object> additionalProperties, String defaultValue) {
+        var value = additionalProperties.get(property);
+        if (value == null) {
+            additionalProperties.put(property, defaultValue);
+            return defaultValue;
+        }
+        return value.toString();
+    }
+
+    public static boolean readBooleanProperty(String property, Map<String, Object> additionalProperties, boolean defaultValue) {
+        var value = additionalProperties.get(property);
+        if (value == null) {
+            additionalProperties.put(property, defaultValue);
+            return defaultValue;
+        }
         if (value instanceof Boolean boolValue) {
             return boolValue;
         } else if (value instanceof String strValue) {
+            return Boolean.parseBoolean(strValue);
+        }
+        LOG.warn("The value (generator's option {}) must be either boolean or string. Default to `{}`.", property, defaultValue);
+        return defaultValue;
+    }
+
+    public static int readIntProperty(String property, Map<String, Object> additionalProperties, int defaultValue) {
+        var value = additionalProperties.get(property);
+        if (value == null) {
+            additionalProperties.put(property, defaultValue);
+            return defaultValue;
+        }
+        if (value instanceof Integer intValue) {
+            return intValue;
+        } else if (value instanceof String strValue) {
             try {
-                return Boolean.parseBoolean(strValue);
+                return Integer.parseInt(strValue);
             } catch (NumberFormatException e) {
-                LOG.warn("Can't parse generator's option {}. Value: {}", propertyKey, value);
+                LOG.warn("Can't parse generator's option {}. Value: {}", property, value);
                 return defaultValue;
             }
         }
-        LOG.warn("The value (generator's option {}) must be either boolean or string. Default to `{}`.", propertyKey, defaultValue);
+        LOG.warn("The value (generator's option {}) must be either int or string. Default to `{}`.", property, defaultValue);
         return defaultValue;
     }
 

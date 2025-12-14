@@ -2950,4 +2950,79 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             ) : ObjectSort(o, ascending) {
             """);
     }
+
+    @Test
+    void testRetryable() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.retryable = true;
+        String outputPathApi = generateFiles(codegen, PETSTORE_PATH);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/PetApi.kt", """
+            @Retryable
+            @Client("\\${openapi-micronaut-client.base-path}")
+            """,
+            "import io.micronaut.retry.annotation.Retryable");
+    }
+
+    @Test
+    void testRetryableAll() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.retryable = true;
+        codegen.retryableIncludes = List.of("java.lang.IllegalAccessException", "java.lang.RuntimeException::class");
+        codegen.retryableExcludes = List.of("java.lang.IllegalAccessException", "java.lang.RuntimeException::class");
+        codegen.retryableAttempts = 10;
+        codegen.retryableDelay = "10s";
+        codegen.retryableMaxDelay = "100s";
+        codegen.retryableMultiplier = "2.32";
+        codegen.retryableJitter = "5.43";
+        codegen.retryablePredicate = "io.micronaut.retry.annotation.DefaultRetryPredicate";
+        codegen.retryableCapturedException = "Exception";
+
+        String outputPathApi = generateFiles(codegen, PETSTORE_PATH);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/PetApi.kt", """
+            @Retryable(
+                java.lang.IllegalAccessException::class, java.lang.RuntimeException::class,
+                excludes = [java.lang.IllegalAccessException::class, java.lang.RuntimeException::class],
+                attempts = "10",
+                delay = "10s",
+                maxDelay = "100s",
+                multiplier = "2.32",
+                jitter = "5.43",
+                predicate = io.micronaut.retry.annotation.DefaultRetryPredicate::class,
+                capturedException = Exception::class,
+            )
+            @Client("\\${openapi-micronaut-client.base-path}")
+            """);
+    }
+
+    @Test
+    void testRetryableNotAll() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.retryable = true;
+        codegen.retryableAttempts = 10;
+        codegen.retryableDelay = "10s";
+        codegen.retryableMaxDelay = "100s";
+        codegen.retryableMultiplier = "2.32";
+        codegen.retryablePredicate = "io.micronaut.retry.annotation.DefaultRetryPredicate";
+
+        String outputPathApi = generateFiles(codegen, PETSTORE_PATH);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/PetApi.kt", """
+            @Retryable(
+                attempts = "10",
+                delay = "10s",
+                maxDelay = "100s",
+                multiplier = "2.32",
+                predicate = io.micronaut.retry.annotation.DefaultRetryPredicate::class,
+            )
+            @Client("\\${openapi-micronaut-client.base-path}")
+            """);
+    }
 }
