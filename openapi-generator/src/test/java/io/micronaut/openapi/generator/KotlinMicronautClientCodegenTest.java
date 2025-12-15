@@ -2917,4 +2917,37 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Category.kt", "public data class Category(");
         assertFileContains(path + "model/OrderStatus.kt", "public enum class OrderStatus(", "public val value: String,");
     }
+
+    @Test
+    void testIntermediateReference() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/intermediate-reference.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/BuiltInClientObjectSort.kt", """
+            class BuiltInClientObjectSort(
+            
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_FIELD)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var `field`: BuiltInClientObjectSortAllOfField? = null,
+            
+                /**
+                 * Used as a discriminator value between implementations of this type
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_O)
+                o: String? = null,
+            
+                /**
+                 * Specifies whether the sort order is ascending or descending. If not specified, ascending sort is assumed.
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_ASCENDING)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                ascending: Boolean? = null,
+            ) : ObjectSort(o, ascending) {
+            """);
+    }
 }
