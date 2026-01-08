@@ -474,6 +474,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private boolean jvmOverloads;
         private boolean jvmRecord;
         private boolean javaCompatibility = true;
+        private boolean modelMutable = true;
 
         @Override
         public KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -613,6 +614,12 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautClientOptionsBuilder withModelMutable(boolean modelMutable) {
+            this.modelMutable = modelMutable;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
@@ -637,7 +644,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 coroutines,
                 jvmOverloads,
                 jvmRecord,
-                javaCompatibility
+                javaCompatibility,
+                modelMutable
             );
         }
     }
@@ -665,7 +673,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         boolean coroutines,
         boolean jvmOverloads,
         boolean jvmRecord,
-        boolean javaCompatibility
+        boolean javaCompatibility,
+        boolean modelMutable
     ) {
     }
 }

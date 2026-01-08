@@ -211,6 +211,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean jvmOverloads;
     protected boolean jvmRecord;
     protected boolean javaCompatibility = true;
+    protected boolean modelMutable = true;
     protected String implicitHeadersRegex;
     protected String appName;
     protected String dateFormat;
@@ -657,6 +658,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             javaCompatibility = convertPropertyToBoolean(OPT_JAVA_COMPATIBILITY);
         }
         writePropertyBack(OPT_JAVA_COMPATIBILITY, javaCompatibility);
+
+        if (additionalProperties.containsKey(MODEL_MUTABLE)) {
+            modelMutable = convertPropertyToBoolean(MODEL_MUTABLE);
+        }
+        writePropertyBack(MODEL_MUTABLE, modelMutable);
 
         if (additionalProperties.containsKey(OPT_GENERATED_ANNOTATION)) {
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
@@ -3381,6 +3387,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setJavaCompatibility(boolean javaCompatibility) {
         this.javaCompatibility = javaCompatibility;
+    }
+
+    public void setModelMutable(boolean modelMutable) {
+        this.modelMutable = modelMutable;
     }
 
     public void setAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations) {
