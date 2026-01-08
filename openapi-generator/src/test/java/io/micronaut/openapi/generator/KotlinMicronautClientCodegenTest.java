@@ -2760,7 +2760,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/CDBAttributeUsageUiBoolean.kt", """
                 /**
-                 * a.
+                 * x
                  */
                 @field:NotNull
                 @field:JsonProperty(JSON_PROPERTY_TRUE)
@@ -2768,7 +2768,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 var `true`: Map<String, Any?>,
             
                 /**
-                 * a.
+                 * x
                  */
                 @field:NotNull
                 @field:JsonProperty(JSON_PROPERTY_FALSE)
@@ -2776,7 +2776,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 var `false`: Map<String, Any?>,
             
                 /**
-                 * a.
+                 * x
                  */
                 @field:NotNull
                 @field:JsonProperty(JSON_PROPERTY_NULL)

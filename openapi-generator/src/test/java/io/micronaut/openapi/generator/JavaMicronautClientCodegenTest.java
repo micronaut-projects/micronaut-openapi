@@ -2389,7 +2389,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/CDBAttributeUsageUiBoolean.java", """
                 /**
-                 * a.
+                 * x
                  */
                 @NotNull
                 @JsonProperty(JSON_PROPERTY_TRUE)
@@ -2397,7 +2397,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 private Map<String, Object> _true;
             
                 /**
-                 * a.
+                 * x
                  */
                 @NotNull
                 @JsonProperty(JSON_PROPERTY_FALSE)
@@ -2405,7 +2405,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 private Map<String, Object> _false;
             
                 /**
-                 * a.
+                 * x
                  */
                 @NotNull
                 @JsonProperty(JSON_PROPERTY_NULL)
