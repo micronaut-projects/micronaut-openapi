@@ -2554,13 +2554,13 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "auth/config/ApiKeyAuthConfig.kt",
             """
                 @EachProperty("security.\\$myClientId.api-key-auth")
-                class ApiKeyAuthConfig @ConfigurationInject constructor(
+                open class ApiKeyAuthConfig @ConfigurationInject constructor(
                 """
         );
         assertFileContains(path + "auth/config/HttpBasicAuthConfig.kt",
             """
                 @EachProperty("security.\\$myClientId.basic-auth")
-                class HttpBasicAuthConfig @ConfigurationInject constructor(
+                open class HttpBasicAuthConfig @ConfigurationInject constructor(
                 """
         );
         assertFileContains(path + "auth/AuthorizationFilter.kt",
@@ -2890,5 +2890,31 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 open val atBaseType: String? = null,
             ) {
             """);
+    }
+
+    @Test
+    void testNonPublicApi() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setNonPublicApi(true);
+        String outputPathApi = generateFiles(codegen, PETSTORE_PATH);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/PetApi.kt", "internal interface PetApi {");
+        assertFileContains(path + "model/Category.kt", "internal data class Category(");
+        assertFileContains(path + "model/OrderStatus.kt", "internal enum class OrderStatus(");
+    }
+
+    @Test
+    void testExplicitApi() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setExplicitApi(true);
+        String outputPathApi = generateFiles(codegen, PETSTORE_PATH);
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/PetApi.kt", "public interface PetApi {", "public fun addPet(");
+        assertFileContains(path + "model/Category.kt", "public data class Category(");
+        assertFileContains(path + "model/OrderStatus.kt", "public enum class OrderStatus(", "public val value: String,");
     }
 }

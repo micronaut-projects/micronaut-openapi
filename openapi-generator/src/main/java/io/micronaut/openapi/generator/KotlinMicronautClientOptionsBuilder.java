@@ -246,4 +246,22 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withModelMutable(boolean modelMutable);
+
+    /**
+     * Generates code with explicit access modifiers to comply with Kotlin Explicit API Mode.
+     *
+     * @param explicitApi if true, then `public` modifier will be added t public methods and classes.
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withExplicitApi(boolean explicitApi);
+
+    /**
+     * If true, generated code will be with `internal` modifier.
+     *
+     * @param nonPublicApi If true, generated code will be with `internal` modifier.
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withNonPublicApi(boolean nonPublicApi);
 }

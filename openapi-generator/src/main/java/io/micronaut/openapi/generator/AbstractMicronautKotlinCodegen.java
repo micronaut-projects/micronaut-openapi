@@ -128,6 +128,7 @@ import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.NON_PUBLIC_API;
 import static org.openapitools.codegen.CodegenConstants.PACKAGE_NAME;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
@@ -360,6 +361,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
         cliOptions.add(CliOption.newBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS, "If set to true, @JsonInclude annotation will be with value ALWAYS for required properties in POJO's", jsonIncludeAlwaysForRequiredFields));
+        cliOptions.add(CliOption.newBoolean(NON_PUBLIC_API, CodegenConstants.NON_PUBLIC_API_DESC));
 
         cliOptions.add(CliOption.newBoolean(OPT_JVM_OVERLOADS, "Add or not @JvmOverloads annotation for classes with properties with default values.", jvmOverloads));
         cliOptions.add(CliOption.newBoolean(OPT_JVM_RECORD, "Add or not @JvmRecord annotation to data classes.", jvmRecord));
@@ -619,6 +621,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         // Get boolean properties
+        if (additionalProperties.containsKey(NON_PUBLIC_API)) {
+            nonPublicApi = convertPropertyToBoolean(NON_PUBLIC_API);
+        }
+        writePropertyBack(NON_PUBLIC_API, nonPublicApi);
+
         if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
             useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
