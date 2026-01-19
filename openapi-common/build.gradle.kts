@@ -6,7 +6,6 @@ plugins {
 dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
 }
 

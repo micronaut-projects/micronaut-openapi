@@ -22,7 +22,6 @@ dependencies {
     api(projects.micronautOpenapiCommon)
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
     api(libs.managed.flexmark.html2md.converter) {
