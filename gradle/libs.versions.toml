@@ -24,12 +24,12 @@ commons-text = "1.14.0"
 guava = "33.5.0-jre"
 commonmark = "0.27.0"
 kotlin-compile-testing = "1.6.0"
-micronaut = "5.0.0-M3"
-micronaut-platform = "4.10.3"
+micronaut = "5.0.0-M8"
+micronaut-platform = "4.10.7"
 micronaut-jaxrs = "4.10.0"
 micronaut-views = "5.9.0"
 micronaut-security = "4.16.0"
-micronaut-serde = "3.0.0-M1"
+micronaut-serde = "3.0.0-M2"
 micronaut-rxjava2 = "2.9.0"
 micronaut-rxjava3 = "3.9.0"
 micronaut-reactor = "4.0.0-M1"
@@ -38,7 +38,6 @@ micronaut-groovy = "4.7.0"
 micronaut-validation = "5.0.0-M1"
 micronaut-data = "4.14.1"
 micronaut-kotlin = "4.7.0"
-micronaut-logging = "1.7.1"
 micronaut-session = "4.8.0"
 micronaut-grpc = "4.12.0"
 micronaut-spring = "5.12.0"
@@ -73,7 +72,6 @@ managed-evo-inflector = { module = "org.atteo:evo-inflector", version.ref = "man
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
 micronaut-views = { module = "io.micronaut.views:micronaut-views-bom", version.ref = "micronaut-views" }
 micronaut-jaxrs = { module = "io.micronaut.jaxrs:micronaut-jaxrs-bom", version.ref = "micronaut-jaxrs" }
-micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
 micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
