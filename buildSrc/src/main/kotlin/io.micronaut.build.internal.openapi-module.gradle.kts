@@ -7,3 +7,7 @@ repositories {
     mavenCentral()
     google()
 }
+
+dependencies {
+    implementation("io.micronaut:micronaut-module-info:5.0.0-M8")
+}

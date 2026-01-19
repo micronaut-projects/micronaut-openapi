@@ -2,8 +2,7 @@ import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 description = """
@@ -88,6 +87,3 @@ ksp {
     arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
 }
 
-kotlin {
-    jvmToolchain(21)
-}

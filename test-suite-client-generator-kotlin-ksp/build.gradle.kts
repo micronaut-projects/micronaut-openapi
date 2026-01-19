@@ -1,7 +1,6 @@
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 description = """
@@ -41,6 +40,3 @@ dependencies {
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
-kotlin {
-    jvmToolchain(21)
-}

@@ -2,9 +2,7 @@ import org.jetbrains.kotlin.gradle.internal.KaptTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.kapt)
-    alias(mn.plugins.kotlin.allopen)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 sourceSets {
@@ -42,14 +40,6 @@ dependencies {
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
-
-kotlin {
-    jvmToolchain(21)
 }
 
 kapt {

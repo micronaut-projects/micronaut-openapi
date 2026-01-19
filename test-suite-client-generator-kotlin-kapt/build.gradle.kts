@@ -1,7 +1,6 @@
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-kapt-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.kapt)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 description = """
@@ -39,8 +38,4 @@ dependencies {
     testRuntimeOnly(mn.snakeyaml)
     testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
-}
-
-kotlin {
-    jvmToolchain(21)
 }

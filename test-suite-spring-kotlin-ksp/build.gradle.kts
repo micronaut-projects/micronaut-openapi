@@ -2,9 +2,7 @@ import com.google.devtools.ksp.gradle.KspTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.allopen)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 sourceSets {
@@ -42,14 +40,6 @@ dependencies {
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mnTest.junit.platform.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
-
-kotlin {
-    jvmToolchain(21)
 }
 
 ksp {
@@ -95,8 +85,6 @@ tasks.compileTestKotlin {
     dependsOn(tasks.named("removeMnTestFiles"))
 }
 
-tasks.withType(KspTask::class) {
-    if (name == "kspTestKotlin") {
-        enabled = false
-    }
+afterEvaluate {
+    tasks.named("kspTestKotlin") { enabled = false }
 }
