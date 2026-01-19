@@ -3,7 +3,7 @@ import io.micronaut.gradle.MicronautTestRuntime
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 plugins {
-    id("io.micronaut.minimal.application") version libs.versions.micronaut.gradle.plugin.get()
+    id("io.micronaut.minimal.application")
     java
 }
 
