@@ -7,6 +7,7 @@ dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
     api(libs.managed.swagger.models)
+    testImplementation(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {
