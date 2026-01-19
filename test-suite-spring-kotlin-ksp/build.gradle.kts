@@ -1,5 +1,3 @@
-import com.google.devtools.ksp.gradle.KspTask
-
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
     id("io.micronaut.build.internal.kotlin-ksp")
