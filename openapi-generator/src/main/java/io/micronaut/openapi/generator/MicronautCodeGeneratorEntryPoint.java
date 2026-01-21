@@ -425,6 +425,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setJvmOverloads(kotlinServerOptions.jvmOverloads());
             kotlinServerCodegen.setJvmRecord(kotlinServerOptions.jvmRecord());
             kotlinServerCodegen.setJavaCompatibility(kotlinServerOptions.javaCompatibility());
+            kotlinServerCodegen.setModelMutable(kotlinServerOptions.modelMutable());
         }
     }
 
@@ -465,6 +466,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinClientCodegen.setJvmOverloads(kotlinClientOptions.jvmOverloads());
             kotlinClientCodegen.setJvmRecord(kotlinClientOptions.jvmRecord());
             kotlinClientCodegen.setJavaCompatibility(kotlinClientOptions.javaCompatibility());
+            kotlinClientCodegen.setModelMutable(kotlinClientOptions.modelMutable());
         }
     }
 

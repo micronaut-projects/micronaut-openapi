@@ -404,6 +404,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean jvmOverloads;
         private boolean jvmRecord;
         private boolean javaCompatibility = true;
+        private boolean modelMutable = true;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -501,6 +502,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withModelMutable(boolean modelMutable) {
+            this.modelMutable = modelMutable;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -518,7 +525,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generateStreamingFileUpload,
                 jvmOverloads,
                 jvmRecord,
-                javaCompatibility
+                javaCompatibility,
+                modelMutable
             );
         }
     }
@@ -539,7 +547,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generateStreamingFileUpload,
         boolean jvmOverloads,
         boolean jvmRecord,
-        boolean javaCompatibility
+        boolean javaCompatibility,
+        boolean modelMutable
     ) {
     }
 }

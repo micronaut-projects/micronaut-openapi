@@ -168,4 +168,13 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withJavaCompatibility(boolean javaCompatibility);
+
+    /**
+     * If set to true, generated model will be with `var` keywords, otherwise - `val`.
+     *
+     * @param modelMutable generate code with mutable / immutable models
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withModelMutable(boolean modelMutable);
 }

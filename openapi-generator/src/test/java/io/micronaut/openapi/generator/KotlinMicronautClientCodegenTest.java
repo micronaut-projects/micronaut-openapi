@@ -2158,7 +2158,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
-                    open var name: String,
+                    open val name: String,
                 """);
         assertFileContains(modelPath + "ExtendedBookInfo.kt",
             """
@@ -2168,7 +2168,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
-                    var isbn: String,
+                    val isbn: String,
                 """);
     }
 
@@ -2782,6 +2782,113 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_NULL)
                 @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
                 var `null`: Map<String, Any?>,
+            """);
+    }
+
+    @Test
+    void testModelImmutable() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setModelMutable(false);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/sealed/oneOf_polymorphismAndInheritance.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/Foo.kt", """
+            class Foo(
+            
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_FOO_PROP_A)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                val fooPropA: String? = null,
+            
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_FOO_PROP_B)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                val fooPropB: String? = null,
+            
+                /**
+                 * When sub-classing, this defines the sub-class Extensible name
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_TYPE)
+                atType: String? = null,
+            
+                /**
+                 * Hyperlink reference
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_HREF)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                href: String? = null,
+            
+                /**
+                 * unique identifier
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_ID)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                id: String? = null,
+            
+                /**
+                 * A URI to a JSON-Schema file that defines additional attributes and relationships
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                atSchemaLocation: String? = null,
+            
+                /**
+                 * When sub-classing, this defines the super-class
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                atBaseType: String? = null,
+            ) : Entity(atType, href, id, atSchemaLocation, atBaseType), FooRefOrValue {
+            """);
+
+        assertFileContains(path + "model/Entity.kt", """
+            open class Entity(
+            
+                /**
+                 * When sub-classing, this defines the sub-class Extensible name
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_AT_TYPE)
+                open val atType: String? = null,
+            
+                /**
+                 * Hyperlink reference
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_HREF)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open val href: String? = null,
+            
+                /**
+                 * unique identifier
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_ID)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open val id: String? = null,
+            
+                /**
+                 * A URI to a JSON-Schema file that defines additional attributes and relationships
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open val atSchemaLocation: String? = null,
+            
+                /**
+                 * When sub-classing, this defines the super-class
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open val atBaseType: String? = null,
+            ) {
             """);
     }
 }
