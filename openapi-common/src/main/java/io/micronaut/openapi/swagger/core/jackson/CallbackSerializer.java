@@ -21,19 +21,20 @@ import java.util.Map.Entry;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class CallbackSerializer extends JsonSerializer<Callback> {
+public class CallbackSerializer extends ValueSerializer<Callback> {
 
     @Override
-    public void serialize(Callback value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Callback value, JsonGenerator jgen, SerializationContext provider) throws JacksonIOException {
 
         // has extensions
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {

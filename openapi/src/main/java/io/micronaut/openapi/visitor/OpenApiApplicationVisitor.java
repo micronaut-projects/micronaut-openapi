@@ -15,11 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import io.micronaut.context.env.Environment;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
@@ -53,6 +52,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import tools.jackson.core.JacksonException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -275,7 +275,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     OpenAPI parsedOpenApi = null;
                     try {
                         parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(openapiFile, OpenAPI.class);
-                    } catch (IOException e) {
+                    } catch (JacksonException e) {
                         warn("Unable to read file " + additionalSwaggerFile + ": " + e.getMessage(), context);
                     }
                     copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
@@ -381,7 +381,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         OpenAPI parsedOpenApi = null;
         try {
             parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context);
         }
         copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
@@ -507,7 +507,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return node;
             }
             final String newText = propertyExpander.apply(text);
-            return text.equals(newText) ? node : TextNode.valueOf(newText);
+            return text.equals(newText) ? node : StringNode.valueOf(newText);
         } else if (node.isArray()) {
             return resolvePlaceholders((ArrayNode) node, propertyExpander);
         } else if (node.isObject()) {
@@ -704,7 +704,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (endpointGroupInfo != null) {
                     addExtensions(opCopy, endpointGroupInfo.getExtensions());
                 }
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
             }
             setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), opCopy != null ? opCopy : endpointInfo.getOperation());
@@ -759,7 +759,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             OpenAPI openApiCopy;
             try {
                 openApiCopy = Utils.getJsonMapper().treeToValue(Utils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
                 return null;
             }
@@ -911,7 +911,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemas.remove(schemaName);
             }
             openApi.getComponents().setSchemas(schemas);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             // do nothing
         }
         return removed;

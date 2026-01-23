@@ -23,25 +23,27 @@ import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme> {
+public class SecuritySchemeDeserializer extends ValueDeserializer<SecurityScheme> {
 
     protected boolean openapi31;
 
     @Override
     public SecurityScheme deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+        throws JacksonIOException {
         ObjectMapper mapper;
         if (openapi31) {
             mapper = OpenApiUtils.getJsonMapper31();
@@ -58,7 +60,7 @@ public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme>
             String type = inNode.asText();
             if (Arrays.stream(SecurityScheme.Type.values()).noneMatch(t -> t.toString().equals(type))) {
                 // wrong type, throw exception
-                throw new JsonParseException(jp, String.format("SecurityScheme type %s not allowed", type));
+                throw new StreamReadException(jp, String.format("SecurityScheme type %s not allowed", type));
             }
             result = new SecurityScheme()
                 .description(getFieldText("description", node));

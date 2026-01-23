@@ -16,10 +16,9 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
@@ -55,6 +54,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import tools.jackson.core.JacksonException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
@@ -148,7 +148,7 @@ public final class ConvertUtils {
         JsonNode node = toJson(values, context);
         try {
             return ConvertUtils.treeToValue(node, type, context);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return null;
@@ -274,7 +274,7 @@ public final class ConvertUtils {
         if (object instanceof String string) {
             try {
                 return CONVERT_JSON_MAPPER.readValue(string, MAP_TYPE_REFERENCE);
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 return null;
             }
         }
@@ -291,9 +291,9 @@ public final class ConvertUtils {
      *
      * @return The converted instance
      *
-     * @throws JsonProcessingException if error
+     * @throws JacksonException if error
      */
-    public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JsonProcessingException {
+    public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JacksonException {
 
         var fixed = false;
         T value;
@@ -329,7 +329,7 @@ public final class ConvertUtils {
         Object defaultValue;
         try {
             defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType, elFormat, context);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             defaultValue = defaultValueNode != null ? defaultValueNode.textValue() : null;
         }
 
@@ -347,7 +347,7 @@ public final class ConvertUtils {
                 }
                 try {
                     allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType, elFormat, context));
-                } catch (IOException e) {
+                } catch (JacksonException e) {
                     allowableValues.add(allowableValueNode.textValue());
                 }
             }
@@ -357,7 +357,7 @@ public final class ConvertUtils {
         return value;
     }
 
-    private static <T> Map<String, T> deserMap(String name, JsonNode jn, Class<T> clazz) throws JsonProcessingException {
+    private static <T> Map<String, T> deserMap(String name, JsonNode jn, Class<T> clazz) throws JacksonException {
 
         var mapNode = jn.get(name);
         if (mapNode == null) {
@@ -376,7 +376,7 @@ public final class ConvertUtils {
         return !result.isEmpty() ? result : null;
     }
 
-    private static <T> T fixForGroovy(JsonNode jn, Class<T> clazz, Exception e) throws JsonProcessingException {
+    private static <T> T fixForGroovy(JsonNode jn, Class<T> clazz, Exception e) throws JacksonException {
 
         // fix for problem with groovy. Jackson throw exception with Operation class with content and mediaType
         // see https://github.com/micronaut-projects/micronaut-openapi/issues/1418
@@ -409,7 +409,7 @@ public final class ConvertUtils {
         }
     }
 
-    private static <T> T fixContentForGroovy(JsonNode parentNode, Class<T> clazz) throws JsonProcessingException {
+    private static <T> T fixContentForGroovy(JsonNode parentNode, Class<T> clazz) throws JacksonException {
         if (parentNode == null) {
             return null;
         }
@@ -463,17 +463,17 @@ public final class ConvertUtils {
         return value;
     }
 
-    private static void processMediaType(Content result, JsonNode content) throws JsonProcessingException {
+    private static void processMediaType(Content result, JsonNode content) throws JacksonException {
         var mediaType = content.has(PROP_MEDIA_TYPE) ? content.get(PROP_MEDIA_TYPE).asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
         var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
         result.addMediaType(mediaType, mediaTypeObj);
     }
 
-    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) throws JsonProcessingException {
+    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) throws JacksonException {
         return normalizeValue(valueStr, type, format, context, false);
     }
 
-    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context, boolean isMicronautFormat) throws JsonProcessingException {
+    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context, boolean isMicronautFormat) throws JacksonException {
         if (valueStr == null) {
             return null;
         }
@@ -555,7 +555,7 @@ public final class ConvertUtils {
                     }
                     resolveComponents(openApi).addSecuritySchemes(name, securityScheme);
                 }
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 // ignore
             }
         }
@@ -602,7 +602,7 @@ public final class ConvertUtils {
                 typeAndFormat = Pair.of(schemaType, schemaFormat);
             }
             schema.setDefault(ConvertUtils.normalizeValue(defaultValue, typeAndFormat.getFirst(), typeAndFormat.getSecond(), context, isMicronautFormat));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Can't convert " + defaultValue + " to " + schemaType + ": " + e.getMessage(), context);
             schema.setDefault(defaultValue);
         }

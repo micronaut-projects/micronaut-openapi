@@ -21,21 +21,22 @@ import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.models.media.Encoding;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class EncodingStyleEnumDeserializer extends JsonDeserializer<Encoding.StyleEnum> {
+public class EncodingStyleEnumDeserializer extends ValueDeserializer<Encoding.StyleEnum> {
 
     @Override
     public Encoding.StyleEnum deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+        throws JacksonIOException {
         JsonNode node = jp.getCodec().readTree(jp);
         if (node != null) {
             String value = node.asText();

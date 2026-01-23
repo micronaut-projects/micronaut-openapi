@@ -21,19 +21,22 @@ import java.util.Map.Entry;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class ApiResponsesSerializer extends JsonSerializer<ApiResponses> {
+public class ApiResponsesSerializer extends ValueSerializer<ApiResponses> {
 
     @Override
-    public void serialize(ApiResponses value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(ApiResponses value, JsonGenerator jgen, SerializationContext provider) throws JacksonIOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();

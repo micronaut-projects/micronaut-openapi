@@ -22,11 +22,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.PropertyNamingStrategy;
+import tools.jackson.databind.annotation.JsonNaming;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -86,6 +85,7 @@ import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import tools.jackson.core.JacksonException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
@@ -681,7 +681,7 @@ public final class SchemaDefinitionUtils {
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schema.getType(), schema.getFormat(), context));
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ":\n" + Utils.printStackTrace(e), context, element);
                     if (!TYPE_STRING.equals(schema.getType())) {
                         info("Changing enum type from " + type.getName() + " to " + TYPE_STRING, context, element);
@@ -3034,7 +3034,7 @@ public final class SchemaDefinitionUtils {
             } else {
                 warn("Error reading Swagger Schema for element [" + element + "]: " + schemaJson, context, element);
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
         // fix for example = "null"

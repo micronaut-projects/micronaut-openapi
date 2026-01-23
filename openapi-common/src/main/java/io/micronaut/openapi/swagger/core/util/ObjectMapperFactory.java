@@ -75,19 +75,19 @@ import org.yaml.snakeyaml.LoaderOptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.Module;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLFactoryBuilder;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ser.ValueSerializerModifier;
+import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 /**
  * This class is copied from swagger-core library.
@@ -108,10 +108,10 @@ public class ObjectMapperFactory {
         loaderOptions.setAllowDuplicateKeys(false);
         YAMLFactory factory = new YAMLFactoryBuilder(new YAMLFactory())
             .loaderOptions(loaderOptions)
-            .disable(Feature.WRITE_DOC_START_MARKER)
-            .enable(Feature.MINIMIZE_QUOTES)
-            .enable(Feature.SPLIT_LINES)
-            .enable(Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
+            .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
+            .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
+            .enable(YAMLWriteFeature.SPLIT_LINES)
+            .enable(YAMLWriteFeature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
             .build();
 
         return create(factory, openapi31);
@@ -139,16 +139,16 @@ public class ObjectMapperFactory {
                 @Override
                 public void setupModule(SetupContext context) {
                     super.setupModule(context);
-                    context.addBeanSerializerModifier(new BeanSerializerModifier() {
+                    context.addBeanSerializerModifier(new ValueSerializerModifier() {
                         @Override
-                        public JsonSerializer<?> modifySerializer(
-                            SerializationConfig config, BeanDescription desc, JsonSerializer<?> serializer) {
+                        public ValueSerializer<?> modifySerializer(
+                            SerializationConfig config, BeanDescription desc, ValueSerializer<?> serializer) {
                             if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new SchemaSerializer((JsonSerializer<Object>) serializer);
+                                return new SchemaSerializer((ValueSerializer<Object>) serializer);
                             } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
+                                return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
                             } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new ExampleSerializer((JsonSerializer<Object>) serializer);
+                                return new ExampleSerializer((ValueSerializer<Object>) serializer);
                             }
                             return serializer;
                         }
@@ -160,16 +160,16 @@ public class ObjectMapperFactory {
                 @Override
                 public void setupModule(SetupContext context) {
                     super.setupModule(context);
-                    context.addBeanSerializerModifier(new BeanSerializerModifier() {
+                    context.addBeanSerializerModifier(new ValueSerializerModifier() {
                         @Override
-                        public JsonSerializer<?> modifySerializer(
-                            SerializationConfig config, BeanDescription desc, JsonSerializer<?> serializer) {
+                        public ValueSerializer<?> modifySerializer(
+                            SerializationConfig config, BeanDescription desc, ValueSerializer<?> serializer) {
                             if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new Schema31Serializer((JsonSerializer<Object>) serializer);
+                                return new Schema31Serializer((ValueSerializer<Object>) serializer);
                             } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
+                                return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
                             } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new ExampleSerializer((JsonSerializer<Object>) serializer);
+                                return new ExampleSerializer((ValueSerializer<Object>) serializer);
                             }
                             return serializer;
                         }

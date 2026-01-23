@@ -16,10 +16,9 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.util.NamingStrategyImpls;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.util.NamingStrategyImpls;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
@@ -49,6 +48,7 @@ import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -1012,7 +1012,7 @@ public final class ConfigUtils {
         }
         try {
             return OpenApiUtils.getConvertJsonMapper().readValue(value, TYPE_EXTENSIONS);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Fail to parse " + TYPE_EXTENSIONS.getType().toString() + ": " + value + " - " + e.getMessage(), context);
         }
         return Collections.emptyMap();
@@ -1032,7 +1032,7 @@ public final class ConfigUtils {
         }
         try {
             return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
         }
         return Collections.emptyList();

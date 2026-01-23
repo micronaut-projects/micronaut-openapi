@@ -15,7 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.ArrayUtils;
@@ -1531,7 +1532,7 @@ public final class SchemaUtils {
             }
             try {
                 schema.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 warn("Can't convert " + allowableValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), context, element);
                 schema.addEnumItemObject(allowableValue);
             }

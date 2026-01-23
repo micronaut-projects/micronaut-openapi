@@ -15,14 +15,13 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.media.ArbitrarySchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -40,6 +39,7 @@ import io.swagger.v3.oas.models.media.PasswordSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
+import tools.jackson.databind.ValueDeserializer;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -53,7 +53,7 @@ import java.util.Set;
  *
  * @since 4.6.0
  */
-public class ModelDeserializer extends JsonDeserializer<Schema> {
+public class ModelDeserializer extends ValueDeserializer<Schema> {
 
     static Boolean useArbitrarySchema = false;
 
@@ -163,7 +163,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         if (schema != null) {
             try {
                 schema.jsonSchema(OpenApiUtils.getJsonMapper31().readValue(OpenApiUtils.getJsonMapper31().writeValueAsString(node), Map.class));
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 System.err.println("Exception converting jsonSchema to Map " + e.getMessage());
             }
         }
@@ -186,7 +186,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 ((ObjectNode) node).remove("additionalProperties");
             }
             schema = OpenApiUtils.getJsonMapper31().convertValue(node, JsonSchema.class);
-            if (type instanceof TextNode) {
+            if (type instanceof StringNode) {
                 schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
             } else if (type instanceof ArrayNode) {
                 Set<String> types = new LinkedHashSet<>();

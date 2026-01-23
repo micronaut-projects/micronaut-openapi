@@ -19,34 +19,34 @@ import java.io.IOException;
 
 import io.swagger.v3.oas.models.media.Schema;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class SchemaSerializer extends JsonSerializer<Schema> implements ResolvableSerializer {
+public class SchemaSerializer extends ValueSerializer<Schema> {
 
-    private final JsonSerializer<Object> defaultSerializer;
+    private final ValueSerializer<Object> defaultSerializer;
 
-    public SchemaSerializer(JsonSerializer<Object> serializer) {
+    public SchemaSerializer(ValueSerializer<Object> serializer) {
         defaultSerializer = serializer;
     }
 
     @Override
-    public void resolve(SerializerProvider serializerProvider) throws JsonMappingException {
-        if (defaultSerializer instanceof ResolvableSerializer resolvableSerializer) {
+    public void resolve(SerializationContext serializerProvider) throws DatabindException {
+        if (defaultSerializer instanceof ValueSerializer resolvableSerializer) {
             resolvableSerializer.resolve(serializerProvider);
         }
     }
 
     @Override
-    public void serialize(Schema value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Schema value, JsonGenerator jgen, SerializationContext provider) throws JacksonIOException {
 
         if (value.get$ref() == null || value.get$ref().isBlank()) {
 

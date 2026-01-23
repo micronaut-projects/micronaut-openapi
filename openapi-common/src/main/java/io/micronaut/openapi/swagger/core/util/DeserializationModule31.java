@@ -26,11 +26,11 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.deser.ValueDeserializerModifier;
 
 /**
  * This class is copied from swagger-core library.
@@ -53,9 +53,9 @@ public class DeserializationModule31 extends SimpleModule {
         addDeserializer(Paths.class, new Paths31Deserializer());
         addDeserializer(Callback.class, new Callback31Deserializer());
 
-        setDeserializerModifier(new BeanDeserializerModifier() {
+        setDeserializerModifier(new ValueDeserializerModifier() {
             @Override
-            public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
+            public ValueDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, ValueDeserializer<?> deserializer) {
                 if (beanDesc.getBeanClass() == OpenAPI.class) {
                     return new OpenAPI31Deserializer(deserializer);
                 }

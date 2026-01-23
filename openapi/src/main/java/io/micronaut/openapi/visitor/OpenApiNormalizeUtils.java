@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -31,6 +30,7 @@ import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import tools.jackson.core.JacksonException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -314,7 +314,7 @@ public final class OpenApiNormalizeUtils {
                 String serializedDefaultValue;
                 try {
                     serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     return null;
                 }
                 schema.setDefault(null);
@@ -325,7 +325,7 @@ public final class OpenApiNormalizeUtils {
                 String serializedAllOfDefaultValue;
                 try {
                     serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     return null;
                 }
                 boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);

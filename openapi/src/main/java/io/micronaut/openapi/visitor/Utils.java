@@ -15,7 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.MediaType;

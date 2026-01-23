@@ -21,19 +21,19 @@ import java.util.Map.Entry;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class PathsSerializer extends JsonSerializer<Paths> {
+public class PathsSerializer extends ValueSerializer<Paths> {
 
     @Override
-    public void serialize(Paths value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Paths value, JsonGenerator jgen, SerializationContext provider) throws IOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();

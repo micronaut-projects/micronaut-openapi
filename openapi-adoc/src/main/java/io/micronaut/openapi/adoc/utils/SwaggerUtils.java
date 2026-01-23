@@ -15,8 +15,8 @@
  */
 package io.micronaut.openapi.adoc.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -49,7 +49,7 @@ public final class SwaggerUtils {
                 openApi = mapper.readValue(swaggerFileContent, OpenAPI.class);
             }
             return openApi;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Can't parse swagger file", e);
         }
     }

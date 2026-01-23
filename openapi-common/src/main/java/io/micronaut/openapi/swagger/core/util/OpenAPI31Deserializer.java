@@ -15,36 +15,34 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.databind.ValueDeserializer;
 
-public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> implements ResolvableDeserializer {
+public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI>  {
 
-    private final JsonDeserializer<?> defaultDeserializer;
+    private final ValueDeserializer<?> defaultDeserializer;
 
-    public OpenAPI31Deserializer(JsonDeserializer<?> defaultDeserializer) {
+    public OpenAPI31Deserializer(ValueDeserializer<?> defaultDeserializer) {
         super(OpenAPI.class);
         this.defaultDeserializer = defaultDeserializer;
     }
 
     @Override
-    public OpenAPI deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public OpenAPI deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonIOException {
         OpenAPI openAPI = (OpenAPI) defaultDeserializer.deserialize(jp, ctxt);
         openAPI.setSpecVersion(SpecVersion.V31);
         return openAPI;
     }
 
     @Override
-    public void resolve(DeserializationContext ctxt) throws JsonMappingException {
-        ((ResolvableDeserializer) defaultDeserializer).resolve(ctxt);
+    public void resolve(DeserializationContext ctxt) throws DatabindException {
+        defaultDeserializer.resolve(ctxt);
     }
 }
