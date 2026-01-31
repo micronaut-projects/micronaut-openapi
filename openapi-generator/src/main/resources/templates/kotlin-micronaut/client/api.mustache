@@ -41,6 +41,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
+{{#retryableAnnotation}}
+{{{.}}}
+{{/retryableAnnotation}}
 @Client({{#configureClientId}}{{#clientPath}}id = {{/clientPath}}{{/configureClientId}}"{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}\${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}{{/configureClientId}}"{{#configureClientId}}{{#clientPath}}, path = "\${{openbrace}}{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}{{{appNameNormalized}}}{{/configureClientId}}{{basePathSeparator}}base-path{{closebrace}}"{{/clientPath}}{{/configureClientId}})
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}interface {{classname}} {
 {{#operations}}
