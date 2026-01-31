@@ -834,7 +834,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         normalizeOpenApi(openApi, context);
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
-        new OpenApiOperationsPostProcessor().processOperations(openApi);
+        new OpenApiOperationsPostProcessor().processOperations(openApi, context);
 
         removeUnusedSchemas(openApi);
 
