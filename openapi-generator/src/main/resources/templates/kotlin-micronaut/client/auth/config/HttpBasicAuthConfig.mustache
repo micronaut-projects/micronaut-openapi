@@ -14,7 +14,7 @@ import {{javaxPackage}}.annotation.Generated
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @EachProperty("security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.basic-auth")
-class HttpBasicAuthConfig @ConfigurationInject constructor(
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}open class HttpBasicAuthConfig @ConfigurationInject constructor(
     @Parameter
     override val name: String,
     @NonNull

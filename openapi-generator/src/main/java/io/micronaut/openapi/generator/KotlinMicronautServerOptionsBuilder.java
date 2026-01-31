@@ -177,4 +177,13 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withModelMutable(boolean modelMutable);
+
+    /**
+     * If true, generated code will be with `internal` modifier.
+     *
+     * @param nonPublicApi If true, generated code will be with `internal` modifier.
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withNonPublicApi(boolean nonPublicApi);
 }

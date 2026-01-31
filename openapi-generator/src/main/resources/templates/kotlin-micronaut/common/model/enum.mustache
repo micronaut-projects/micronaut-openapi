@@ -26,9 +26,9 @@
 {{#additionalEnumTypeAnnotations}}
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}}(
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}}(
     @get:JsonValue
-    val value: {{{dataType}}},
+    {{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}val value: {{{dataType}}},
 ){{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 
     {{#allowableValues}}

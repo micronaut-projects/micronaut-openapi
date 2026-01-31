@@ -405,6 +405,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean jvmRecord;
         private boolean javaCompatibility = true;
         private boolean modelMutable = true;
+        private boolean nonPublicApi;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -508,6 +509,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withNonPublicApi(boolean nonPublicApi) {
+            this.nonPublicApi = nonPublicApi;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -526,7 +533,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 jvmOverloads,
                 jvmRecord,
                 javaCompatibility,
-                modelMutable
+                modelMutable,
+                nonPublicApi
             );
         }
     }
@@ -548,7 +556,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean jvmOverloads,
         boolean jvmRecord,
         boolean javaCompatibility,
-        boolean modelMutable
+        boolean modelMutable,
+        boolean nonPublicApi
     ) {
     }
 }

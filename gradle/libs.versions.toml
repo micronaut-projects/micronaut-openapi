@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.41"
+managed-swagger = "2.2.42"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.22.1"
 # deprecated, use managed-flexmark
@@ -22,10 +22,10 @@ commons-codec = "1.20.0"
 commons-io = "2.21.0"
 commons-text = "1.15.0"
 guava = "33.5.0-jre"
-commonmark = "0.27.0"
+commonmark = "0.27.1"
 kotlin-compile-testing = "1.6.0"
 
-micronaut = "4.10.13"
+micronaut = "4.10.14"
 micronaut-platform = "4.10.7"
 micronaut-jaxrs = "4.10.0"
 micronaut-views = "5.9.0"
@@ -53,7 +53,7 @@ js-openapi-explorer = "2.4.788"
 js-redoc = "2.5.1"
 js-rapidoc = "9.3.8"
 js-rapipdf = "2.2.1"
-js-scalar = "1.43.1"
+js-scalar = "1.44.4"
 
 [libraries]
 # Managed

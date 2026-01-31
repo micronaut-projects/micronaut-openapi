@@ -58,6 +58,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
     public static final String OPT_AUTH_CONFIG_NAME = "authConfigName";
     public static final String OPT_AUTH_FILTER_CLIENT_IDS = "authFilterClientIds";
     public static final String OPT_AUTH_FILTER_EXCLUDED_CLIENT_IDS = "authFilterExcludedClientIds";
+    public static final String OPT_EXPLICIT_API = "explicitApi";
     public static final String ADDITIONAL_CLIENT_TYPE_ANNOTATIONS = "additionalClientTypeAnnotations";
     public static final String AUTHORIZATION_FILTER_PATTERN = "authorizationFilterPattern";
     public static final String AUTHORIZATION_FILTER_PATTERN_STYLE = "authorizationFilterPatternStyle";
@@ -82,6 +83,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
     protected boolean useApiKeyAuth = true;
     protected boolean authFilter = true;
     protected boolean generateAuthClasses = true;
+    protected boolean explicitApi;
 
     KotlinMicronautClientCodegen() {
 
@@ -106,6 +108,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newBoolean(OPT_USE_API_KEY_AUTH, "Generate ApiKeyAuthConfig config or not"));
         cliOptions.add(CliOption.newBoolean(OPT_AUTH_FILTER, "Generate AuthorizationFilter or not"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_AUTH_CLASSES, "Generate authorization classes or not"));
+        cliOptions.add(CliOption.newBoolean(OPT_EXPLICIT_API, "Generates code with explicit access modifiers to comply with Kotlin Explicit API Mode."));
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "false");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "false");
 
@@ -221,6 +224,11 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
 
         writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, false);
         writePropertyBack(OPT_CONFIGURE_CLIENT_ID, false);
+
+        if (additionalProperties.containsKey(OPT_EXPLICIT_API)) {
+            explicitApi = convertPropertyToBoolean(OPT_EXPLICIT_API);
+        }
+        writePropertyBack(OPT_EXPLICIT_API, explicitApi);
 
         final String invokerFolder = (sourceFolder + '/' + packageName).replace(".", "/");
 
@@ -444,6 +452,10 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         this.configureAuthorization = configureAuthorization;
     }
 
+    public void setExplicitApi(boolean explicitApi) {
+        this.explicitApi = explicitApi;
+    }
+
     @Override
     public KotlinMicronautClientOptionsBuilder optionsBuilder() {
         return new DefaultClientOptionsBuilder();
@@ -475,6 +487,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private boolean jvmRecord;
         private boolean javaCompatibility = true;
         private boolean modelMutable = true;
+        private boolean explicitApi;
+        private boolean nonPublicApi;
 
         @Override
         public KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -620,6 +634,18 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautClientOptionsBuilder withExplicitApi(boolean explicitApi) {
+            this.explicitApi = explicitApi;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautClientOptionsBuilder withNonPublicApi(boolean nonPublicApi) {
+            this.nonPublicApi = nonPublicApi;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
@@ -645,7 +671,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 jvmOverloads,
                 jvmRecord,
                 javaCompatibility,
-                modelMutable
+                modelMutable,
+                explicitApi,
+                nonPublicApi
             );
         }
     }
@@ -674,7 +702,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         boolean jvmOverloads,
         boolean jvmRecord,
         boolean javaCompatibility,
-        boolean modelMutable
+        boolean modelMutable,
+        boolean explicitApi,
+        boolean nonPublicApi
     ) {
     }
 }

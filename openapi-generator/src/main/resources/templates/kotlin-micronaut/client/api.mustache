@@ -42,7 +42,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @Client({{#configureClientId}}{{#clientPath}}id = {{/clientPath}}{{/configureClientId}}"{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}\${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}{{/configureClientId}}"{{#configureClientId}}{{#clientPath}}, path = "\${{openbrace}}{{#configureClientId}}{{{clientIdNormalized}}}{{/configureClientId}}{{^configureClientId}}{{{appNameNormalized}}}{{/configureClientId}}{{basePathSeparator}}base-path{{closebrace}}"{{/clientPath}}{{/configureClientId}})
-interface {{classname}} {
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}interface {{classname}} {
 {{#operations}}
 
     {{#operation}}
@@ -65,7 +65,7 @@ interface {{classname}} {
     {{#vendorExtensions.x-operation-extra-annotation}}
     {{{.}}}
     {{/vendorExtensions.x-operation-extra-annotation}}
-    {{#coroutines}}suspend {{/coroutines}}fun {{nickname}}({{#allParams}}
+    {{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}{{#coroutines}}suspend {{/coroutines}}fun {{nickname}}({{#allParams}}
         {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}},{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
     {{/formatNoEmptyLines}}

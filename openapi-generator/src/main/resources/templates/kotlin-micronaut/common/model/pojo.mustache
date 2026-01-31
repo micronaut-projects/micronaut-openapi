@@ -47,7 +47,7 @@
 @JvmRecord
     {{/jvmRecord}}
 {{/vendorExtensions.isDataClass}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
 {{#formatNoEmptyLines}}
@@ -124,7 +124,7 @@
     {{/vars}}
 
     {{#vendorExtensions.hasOwnVars}}
-    companion object {
+    {{#nonPublicApi}}internal {{/nonPublicApi}}companion object {
     {{#serializableModel}}
 
         {{#javaCompatibility}}
