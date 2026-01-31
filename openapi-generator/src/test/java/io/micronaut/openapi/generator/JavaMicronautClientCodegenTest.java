@@ -2413,4 +2413,22 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 private Map<String, Object> _null;
             """);
     }
+
+    @Test
+    void testIntermediateReference() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/intermediate-reference.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/BuiltInClientObjectSort.java",
+            "public class BuiltInClientObjectSort extends ObjectSort {",
+            """
+            @Override
+            public BuiltInClientObjectSort o(String o) {
+                super.set_o(o);
+                return this;
+            }
+        """);
+    }
 }

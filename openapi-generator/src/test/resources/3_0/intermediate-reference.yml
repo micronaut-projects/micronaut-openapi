@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: title
+  description: description
+  version: ''
+servers:
+  - url: /
+components:
+  schemas:
+    AttributeClientObjectSort:
+      allOf:
+        - $ref: '#/components/schemas/ObjectSort'
+        - type: object
+          properties:
+            attribute:
+              $ref: '#/components/schemas/CFARef'
+              description: Name of the unit attribute to sort the response by
+    ClientObjectSort:
+      $ref: '#/components/schemas/ObjectSort'
+    ObjectSort:
+      type: object
+      discriminator:
+        propertyName: _o
+      properties:
+        _o:
+          type: string
+          description: Used as a discriminator value between implementations of this type
+        ascending:
+          type: boolean
+          description: >-
+            Specifies whether the sort order is ascending or descending. If
+            not specified, ascending sort is assumed.
+      required:
+        - _o
+    CFARef:
+      type: string
+      description: ref
+    BuiltInClientObjectSort:
+      allOf:
+        - $ref: '#/components/schemas/ObjectSort'
+        - type: object
+          properties:
+            field:
+              type: string
+              enum:
+                - unitId
+                - clientId
+                - clientClass
+                - unitClass
+    BuiltInUnitObjectSort:
+      allOf:
+        - $ref: '#/components/schemas/ClientObjectSort'
+        - type: object
+          properties:
+            field:
+              type: string
+              enum:
+                - unitId
+                - unitClass
+    CampaignUnitsRequest:
+      allOf:
+        - $ref: '#/components/schemas/PageRequest'
+        - type: object
+          properties:
+            compare:
+              type: boolean
+              description: m
+            id:
+              type: integer
+              format: int64
+              description: x
+            objectSort:
+              type: array
+              description: List of sort requirements.
+              items:
+                $ref: '#/components/schemas/ClientObjectSort'
+      description: r
+      required:
+        - id
+    PageRequest:
+      type: object
+      description: Base type for requests that contain pagination instructions
+      properties:
+        noCount:
+          type: boolean
+          default: false
+          description: b.
+        page:
+          type: integer
+          format: int64
+          default: 0
+          description: a
+          minimum: 0
+        pageSize:
+          type: integer
+          format: int64
+          default: 10
+          description: x
+          minimum: 1

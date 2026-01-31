@@ -225,6 +225,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected Map<String, CodegenModel> allModels = new HashMap<>();
     protected List<String> additionalOneOfTypeAnnotations = new LinkedList<>();
     protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
+    // simple class name -> full qualified class name
+    protected Map<String, String> importsToDrop = new HashMap<>();
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -1171,6 +1173,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         var enumImports = new ArrayList<String>();
 
         for (CodegenOperation op : operationList) {
+
+            op.imports.removeIf(importsToDrop::containsKey);
 
             objs.put("normalizedBaseTag", op.vendorExtensions.get("normalizedBaseTag"));
             objs.put("normalizedTagDesc", op.vendorExtensions.get("normalizedTagDesc"));
@@ -2341,10 +2345,46 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
         }
 
+        for (ModelsMap models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            var parentModel = model.getParentModel();
+            if (parentModel != null
+                && parentModel.isAlias
+                && parentModel.getRef() != null
+                && model.interfaces != null
+                && model.interfaceModels != null
+            ) {
+                for (var interfaceModel : model.interfaceModels) {
+                    if (!interfaceModel.name.equals(parentModel.dataType)) {
+                        continue;
+                    }
+                    importsToDrop.put(model.parent, modelPackage + '.' + model.parent);
+                    model.imports.removeIf(importsToDrop::containsKey);
+                    model.parent = interfaceModel.name;
+                    model.parentSchema = interfaceModel.schemaName;
+                    model.parentModel = interfaceModel;
+                    model.parentRequiredVars = interfaceModel.requiredVars;
+                    model.parentVars = interfaceModel.vars;
+                    model.interfaces = null;
+                    model.interfaceModels = null;
+                    break;
+                }
+                if (model.interfaces != null) {
+                    model.interfaces.removeIf(name -> name.equals(parentModel.dataType));
+                }
+                if (model.interfaceModels != null) {
+                    model.interfaceModels.removeIf(iModel -> iModel.name.equals(parentModel.dataType));
+                }
+            }
+        }
+
         var isServer = isServer();
 
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
+
+            models.getImports().removeIf(impMap -> importsToDrop.containsValue(impMap.get("import")));
+            model.imports.removeIf(importsToDrop::containsKey);
 
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
