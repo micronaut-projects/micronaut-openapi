@@ -48,7 +48,7 @@ public class ParameterDeserializer extends ValueDeserializer<Parameter> {
         throws JacksonIOException {
         Parameter result = null;
 
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = jp.readValueAsTree();
         JsonNode sub = node.get("$ref");
         JsonNode inNode = node.get("in");
         JsonNode desc = node.get("description");

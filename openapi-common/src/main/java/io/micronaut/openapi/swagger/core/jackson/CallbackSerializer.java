@@ -45,22 +45,26 @@ public class CallbackSerializer extends ValueSerializer<Callback> {
                 if (!value.isEmpty()) {
                     // write map
                     for (Entry<String, PathItem> entry : value.entrySet()) {
-                        jgen.writeObjectField(entry.getKey(), entry.getValue());
+                        jgen.writeName(entry.getKey());
+                        jgen.writePOJO(entry.getValue());
                     }
                 }
             } else { // handle ref schema serialization skipping all other props ...
-                jgen.writeStringField("$ref", value.get$ref());
+                jgen.writeName("$ref");
+                jgen.writeString(value.get$ref());
             }
             for (String ext : value.getExtensions().keySet()) {
-                jgen.writeObjectField(ext, value.getExtensions().get(ext));
+                jgen.writeName(ext);
+                jgen.writePOJO(value.getExtensions().get(ext));
             }
             jgen.writeEndObject();
         } else {
             if (value == null || value.get$ref() == null || value.get$ref().isBlank()) {
-                provider.defaultSerializeValue(value, jgen);
+                provider.writeValue(jgen, value);
             } else { // handle ref schema serialization skipping all other props
                 jgen.writeStartObject();
-                jgen.writeStringField("$ref", value.get$ref());
+                jgen.writeName("$ref");
+                jgen.writeString(value.get$ref());
                 jgen.writeEndObject();
             }
         }

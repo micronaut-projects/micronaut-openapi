@@ -53,7 +53,8 @@ public class SchemaSerializer extends ValueSerializer<Schema> {
             if (value.getExampleSetFlag() && value.getExample() == null) {
                 jgen.writeStartObject();
                 defaultSerializer.unwrappingSerializer(null).serialize(value, jgen, provider);
-                jgen.writeNullField("example");
+                jgen.writeName("example");
+                jgen.writeNull();
                 jgen.writeEndObject();
             } else {
                 defaultSerializer.serialize(value, jgen, provider);
@@ -62,7 +63,8 @@ public class SchemaSerializer extends ValueSerializer<Schema> {
         } else {
             // handle ref schema serialization skipping all other props
             jgen.writeStartObject();
-            jgen.writeStringField("$ref", value.get$ref());
+            jgen.writeName("$ref");
+            jgen.writeString(value.get$ref());
             jgen.writeEndObject();
         }
     }

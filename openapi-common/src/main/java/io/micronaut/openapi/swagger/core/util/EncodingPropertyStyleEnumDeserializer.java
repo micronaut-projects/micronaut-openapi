@@ -37,7 +37,7 @@ public class EncodingPropertyStyleEnumDeserializer extends ValueDeserializer<Enc
     @Override
     public EncodingProperty.StyleEnum deserialize(JsonParser jp, DeserializationContext ctxt)
         throws JacksonIOException {
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = jp.readValueAsTree();
         if (node != null) {
             String value = node.asText();
             return getStyleEnum(value);

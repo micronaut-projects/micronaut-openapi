@@ -52,7 +52,7 @@ public class SecuritySchemeDeserializer extends ValueDeserializer<SecurityScheme
         }
         SecurityScheme result = null;
 
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = jp.readValueAsTree();
 
         JsonNode inNode = node.get("type");
 
@@ -87,9 +87,7 @@ public class SecuritySchemeDeserializer extends ValueDeserializer<SecurityScheme
                 result
                     .type(SecurityScheme.Type.MUTUALTLS);
             }
-            final Iterator<String> fieldNames = node.fieldNames();
-            while (fieldNames.hasNext()) {
-                final String fieldName = fieldNames.next();
+            for (String fieldName : node.propertyNames()) {
                 if (fieldName.startsWith("x-")) {
                     final JsonNode fieldValue = node.get(fieldName);
                     final Object value = OpenApiUtils.getJsonMapper().treeToValue(fieldValue, Object.class);

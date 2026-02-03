@@ -51,7 +51,8 @@ public class ExampleSerializer extends ValueSerializer<Example> {
         if (example.getValueSetFlag() && example.getValue() == null) {
             jgen.writeStartObject();
             defaultSerializer.unwrappingSerializer(null).serialize(example, jgen, provider);
-            jgen.writeNullField("value");
+            jgen.writeName("value");
+            jgen.writeNull();
             jgen.writeEndObject();
         } else {
             defaultSerializer.serialize(example, jgen, provider);

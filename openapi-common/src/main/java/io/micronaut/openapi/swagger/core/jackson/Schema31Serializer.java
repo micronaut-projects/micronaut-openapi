@@ -55,7 +55,8 @@ public class Schema31Serializer extends ValueSerializer<Schema> {
         if (value.getExampleSetFlag() && value.getExample() == null) {
             jgen.writeStartObject();
             defaultSerializer.unwrappingSerializer(null).serialize(value, jgen, provider);
-            jgen.writeNullField("example");
+            jgen.writeName("example");
+            jgen.writeNull();
             jgen.writeEndObject();
         } else {
             defaultSerializer.serialize(value, jgen, provider);

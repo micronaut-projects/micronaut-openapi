@@ -22,8 +22,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
 import tools.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
@@ -43,15 +41,15 @@ public class ApiResponsesSerializer extends ValueSerializer<ApiResponses> {
 
             if (!value.isEmpty()) {
                 for (Entry<String, ApiResponse> entry : value.entrySet()) {
-                    jgen.writeObjectField(entry.getKey(), entry.getValue());
-                }
+                    jgen.writeName(entry.getKey());
+                    jgen.writePOJO(entry.getValue());                }
             }
             for (Entry<String, Object> entry : value.getExtensions().entrySet()) {
-                jgen.writeObjectField(entry.getKey(), entry.getValue());
-            }
+                jgen.writeName(entry.getKey());
+                jgen.writePOJO(entry.getValue());            }
             jgen.writeEndObject();
         } else {
-            provider.defaultSerializeValue(value, jgen);
+            provider.writeValue(jgen, value);
         }
     }
 }

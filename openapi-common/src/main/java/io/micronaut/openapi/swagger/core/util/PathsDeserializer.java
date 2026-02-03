@@ -54,11 +54,10 @@ public class PathsDeserializer extends ValueDeserializer<Paths> {
         }
 
         Paths result = new Paths();
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = jp.readValueAsTree();
         ObjectNode objectNode = (ObjectNode) node;
         Map<String, Object> extensions = new LinkedHashMap<>();
-        for (Iterator<String> it = objectNode.fieldNames(); it.hasNext(); ) {
-            String childName = it.next();
+        for (String childName : objectNode.propertyNames()) {
             JsonNode child = objectNode.get(childName);
             // if name start with `x-` consider it an extension
             if (childName.startsWith("x-")) {

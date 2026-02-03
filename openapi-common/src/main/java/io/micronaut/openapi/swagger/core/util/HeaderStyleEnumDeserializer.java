@@ -36,7 +36,7 @@ public class HeaderStyleEnumDeserializer extends ValueDeserializer<Header.StyleE
     @Override
     public Header.StyleEnum deserialize(JsonParser jp, DeserializationContext ctxt)
         throws JacksonIOException {
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = jp.readValueAsTree();
         if (node != null) {
             String value = node.asText();
             return getStyleEnum(value);

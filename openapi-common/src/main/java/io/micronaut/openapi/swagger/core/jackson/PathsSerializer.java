@@ -22,6 +22,7 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
 import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
 
@@ -33,22 +34,24 @@ import tools.jackson.databind.ValueSerializer;
 public class PathsSerializer extends ValueSerializer<Paths> {
 
     @Override
-    public void serialize(Paths value, JsonGenerator jgen, SerializationContext provider) throws IOException {
+    public void serialize(Paths value, JsonGenerator jgen, SerializationContext provider) throws JacksonIOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();
 
             if (!value.isEmpty()) {
                 for (Entry<String, PathItem> entry : value.entrySet()) {
-                    jgen.writeObjectField(entry.getKey(), entry.getValue());
+                    jgen.writeName(entry.getKey());
+                    jgen.writePOJO(entry.getValue());
                 }
             }
             for (Entry<String, Object> entry : value.getExtensions().entrySet()) {
-                jgen.writeObjectField(entry.getKey(), entry.getValue());
+                jgen.writeName(entry.getKey());
+                jgen.writePOJO(entry.getValue());
             }
             jgen.writeEndObject();
         } else {
-            provider.defaultSerializeValue(value, jgen);
+            provider.writeValue(jgen, value);
         }
     }
 }

@@ -17,6 +17,7 @@ package io.micronaut.openapi.swagger.core.util;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
@@ -68,8 +69,8 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
     protected boolean openapi31 = false;
 
     @Override
-    public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        JsonNode node = jp.getCodec().readTree(jp);
+    public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonIOException {
+        JsonNode node = jp.readValueAsTree();
 
         Schema schema = null;
 
@@ -190,7 +191,7 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
                 schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
             } else if (type instanceof ArrayNode) {
                 Set<String> types = new LinkedHashSet<>();
-                type.elements().forEachRemaining(n -> types.add(n.textValue()));
+                type.iterator().forEachRemaining(n -> types.add(n.textValue()));
                 schema.types(types);
             }
             if (additionalProperties != null) {

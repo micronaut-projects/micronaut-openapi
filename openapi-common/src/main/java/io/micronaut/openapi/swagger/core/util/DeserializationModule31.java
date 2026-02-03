@@ -55,7 +55,7 @@ public class DeserializationModule31 extends SimpleModule {
 
         setDeserializerModifier(new ValueDeserializerModifier() {
             @Override
-            public ValueDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, ValueDeserializer<?> deserializer) {
+            public ValueDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription.Supplier beanDesc, ValueDeserializer<?> deserializer) {
                 if (beanDesc.getBeanClass() == OpenAPI.class) {
                     return new OpenAPI31Deserializer(deserializer);
                 }
