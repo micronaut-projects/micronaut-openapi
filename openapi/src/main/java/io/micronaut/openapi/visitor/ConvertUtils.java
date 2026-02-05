@@ -365,10 +365,9 @@ public final class ConvertUtils {
         }
         ((ObjectNode) jn).remove(name);
 
-        var iter = mapNode.fieldNames();
+        var propertyNames = mapNode.propertyNames();
         var result = new HashMap<String, T>();
-        while (iter.hasNext()) {
-            var entryKey = iter.next();
+        for (var entryKey : propertyNames) {
             var objectNode = mapNode.get(entryKey);
             var object = CONVERT_JSON_MAPPER.treeToValue(objectNode, clazz);
             result.put(entryKey, object);

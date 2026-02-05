@@ -445,7 +445,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (properties != null) {
                 var newProps = new LinkedHashMap<String, Schema>(properties.size());
                 for (var entry : properties.entrySet()) {
-                    newProps.put(propertyNamingStrategy.translate(entry.getKey()), entry.getValue());
+                    newProps.put(propertyNamingStrategy.nameForField(null, null, entry.getKey()), entry.getValue());
                 }
                 schema.setProperties(newProps);
             }
@@ -453,7 +453,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(required)) {
                 var newRequired = new ArrayList<String>(required.size());
                 for (var req : required) {
-                    newRequired.add(propertyNamingStrategy.translate(req));
+                    newRequired.add(propertyNamingStrategy.nameForField(null, null, req));
                 }
                 schema.setRequired(newRequired);
             }

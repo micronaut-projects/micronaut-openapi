@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
+import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.PropertyNamingStrategy;
@@ -88,7 +89,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import tools.jackson.core.JacksonException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -1351,7 +1351,7 @@ public final class SchemaDefinitionUtils {
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
-                                            } catch (JsonProcessingException e) {
+                                            } catch (JacksonException e) {
                                                 // do nothing
                                             }
                                         }
@@ -1664,7 +1664,7 @@ public final class SchemaDefinitionUtils {
         JsonNode node = toJson(annotationName, values, context, jsonViewClass);
         try {
             return ConvertUtils.treeToValue(node, type, context);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return null;
@@ -3294,7 +3294,7 @@ public final class SchemaDefinitionUtils {
                 }
             });
             if (strategy instanceof PropertyNamingStrategies.NamingBase namingBase) {
-                return namingBase.translate(name);
+                return namingBase.nameForField(null, null, name);
             }
         }
         return name;
@@ -3376,7 +3376,7 @@ public final class SchemaDefinitionUtils {
                     propertySchema.setName(propertyName);
                 }
                 addProperty(parentSchema, propertyName, propertySchema, isRequired);
-            } catch (IOException e) {
+            } catch (JacksonIOException e) {
                 warn("Exception cloning property " + e.getMessage(), context);
             }
         }
