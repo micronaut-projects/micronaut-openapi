@@ -1437,4 +1437,101 @@ class MyBean {}
         schemas.Parent.properties.id.exampleSetFlag
         schemas.Parent.properties.id.example == null
     }
+
+    void "test records with additional fields"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Controller
+class HelloController {
+
+    @Put("/record")
+    CostCenter recordMethod() {
+        return null;
+    }
+}
+
+record CostCenter(
+    @Nullable
+    UUID id,
+    @NotNull
+    String name,
+    @NotNull
+    String code,
+    @Nullable
+    String frgnKey,
+    @NotNull
+    UUID userCreated,
+    @Nullable
+    LocalDateTime dateCreated,
+    @NotNull
+    UUID userUpdated,
+    @Nullable
+    LocalDateTime lastUpdated,
+    Integer version
+) {
+
+    /**
+     * Some description field labelJsonProp
+     */
+    @JsonProperty("labelJsonProp")
+    @Schema(name = "labelSchema")
+    @NotNull
+    @Size(min = 10, max = 20)
+    public String label123() {
+        return null;
+    }
+
+    /**
+     * Some description field labelJsonProp2
+     */
+    @JsonProperty("labelJsonProp2")
+    public String label321() {
+        return null;
+    }
+
+    /**
+     * @return Some description field label
+     */
+    @JsonProperty
+    public String label() {
+        return null;
+    }
+
+    /**
+     * This field must be skipped
+     */
+    @JsonProperty
+    public void labelSkip() {
+    }
+}
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schema = openApi.components.schemas?.CostCenter
+
+        then: "the components are valid"
+        schema
+        schema.properties.labelSchema
+        schema.properties.labelJsonProp2
+        schema.properties.label
+        schema.properties.labelSkip == null
+    }
 }
