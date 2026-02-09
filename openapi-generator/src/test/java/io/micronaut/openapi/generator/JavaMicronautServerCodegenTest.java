@@ -1,11 +1,14 @@
 package io.micronaut.openapi.generator;
 
+import com.tschuchort.compiletesting.SourceFile;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+
+import java.io.File;
 
 import static io.micronaut.openapi.generator.assertions.TestUtils.assertExtraAnnotationFiles;
 import static java.util.stream.Collectors.groupingBy;
@@ -339,7 +342,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         super.setName(name);
                         return this;
                     }
-                
+
                     @Override
                     public BasicBookInfo type(BookInfoType type) {
                         super.setType(type);
@@ -752,7 +755,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-            
+
                 @Nullable(inherited = true)
                 @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @JsonProperty(JSON_PROPERTY_DATE)
@@ -1137,17 +1140,17 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     public TypeConverter<String, DataDirection> toEnumDataDirection() {
                         return (v, c, ctx) -> Optional.of(DataDirection.fromValue(v));
                     }
-                
+
                     @Bean
                     public TypeConverter<DataDirection, String> toStrDataDirection() {
                         return (v, c, ctx) -> Optional.of(v.getValue());
                     }
-                
+
                     @Bean
                     public TypeConverter<String, DataChannel> toEnumDataChannel() {
                         return (v, c, ctx) -> Optional.of(DataChannel.fromValue(v));
                     }
-                
+
                     @Bean
                     public TypeConverter<DataChannel, String> toStrDataChannel() {
                         return (v, c, ctx) -> Optional.of(v.getValue());
@@ -1283,6 +1286,60 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testUserParameterModeCustom() {
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.CUSTOM.name());
+        codegen.setUserParameterClass("com.example.CustomUserParameter");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", false, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(
+            outputPath,
+            SourceFile.Companion.java(
+                "com/example/CustomUserParameter.java",
+                """
+                package com.example;
+
+                public class CustomUserParameter {
+                }
+                """,
+                true,
+                false
+            )
+        );
+
+        String path = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.java",
+            "import com.example.CustomUserParameter;",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    Mono<Void> denyAllOp();
+                """,
+            """
+                    @Get("/pet")
+                    @Secured({"read", "admin"})
+                    Mono<Void> get(
+                        CustomUserParameter authentication
+                    );
+                """,
+            """
+                    @Post("/pet")
+                    @Secured({"write", "admin"})
+                    Mono<Void> save(
+                        CustomUserParameter authentication
+                    );
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<Void> savePublic(
+                        @Nullable(inherited = true) CustomUserParameter authentication
+                    );
+                """
+        );
+    }
+
+    @Test
     void testEnumNullable() {
 
         var codegen = new JavaMicronautServerCodegen();
@@ -1295,7 +1352,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 public TypeConverter<String, ParamEnum> toEnumParamEnum() {
                     return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
                 }
-            
+
                 @Bean
                 public TypeConverter<ParamEnum, String> toStrParamEnum() {
                     return (v, c, ctx) -> Optional.of(v.getValue());

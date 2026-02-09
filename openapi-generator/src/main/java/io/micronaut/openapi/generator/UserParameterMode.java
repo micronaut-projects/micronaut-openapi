@@ -23,6 +23,7 @@ public enum UserParameterMode {
     NONE(null, null, null, null),
     PRINCIPAL("principal", "The principal", "Principal", "java.security.Principal"),
     AUTHENTICATION("authentication", "The authentication", "Authentication", "io.micronaut.security.authentication.Authentication"),
+    CUSTOM("authentication", "The custom class", null, null),
     ;
 
     private final String paramName;

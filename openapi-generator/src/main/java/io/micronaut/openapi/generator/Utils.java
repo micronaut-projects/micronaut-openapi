@@ -805,7 +805,7 @@ public final class Utils {
         return "v";
     }
 
-    public static boolean addUserParameter(CodegenOperation op, UserParameterMode userParameterMode, boolean isAnonymous, boolean isDenyAll) {
+    public static boolean addUserParameter(CodegenOperation op, UserParameterMode userParameterMode, String userParameterClass, boolean isAnonymous, boolean isDenyAll) {
 
         if (userParameterMode == UserParameterMode.NONE || isDenyAll) {
             return false;
@@ -814,7 +814,13 @@ public final class Utils {
         CodegenParameter userParam = CodegenModelFactory.newInstance(CodegenModelType.PARAMETER);
         userParam.paramName = userParameterMode.getParamName();
         userParam.description = userParameterMode.getParamDescription();
-        userParam.dataType = userParameterMode.getClassName();
+
+        if (userParameterMode.equals(UserParameterMode.CUSTOM)) {
+            userParam.dataType = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+        } else {
+            userParam.dataType = userParameterMode.getClassName();
+        }
+
         userParam.unescapedDescription = userParam.description;
         userParam.required = true;
         if (!isAnonymous) {

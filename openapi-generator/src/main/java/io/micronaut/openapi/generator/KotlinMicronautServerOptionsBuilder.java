@@ -72,12 +72,23 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * NONE
      * PRINCIPAL
      * AUTHENTICATION
+     * CUSTOM
      *
      * @param userParameterMode user parameter mode
      *
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode);
+
+    /**
+     * Specifies the class to be used for the user parameter in generated controllers.
+     * Usable only in conjuction with {@link UserParameterMode#CUSTOM} user parameter mode.
+     *
+     * @param userParameterClass the fully qualified name of the class to use for the user parameter
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withUserParameterClass(String userParameterClass);
 
     /**
      * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
