@@ -343,7 +343,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     {{#deprecated}}
     @Deprecated
     {{/deprecated}}
-    public {{classname}} {{name}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
+    public {{classname}} {{#vendorExtensions.chainableName}}{{{.}}}{{/vendorExtensions.chainableName}}{{^vendorExtensions.chainableName}}{{{name}}}{{/vendorExtensions.chainableName}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{name}});
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -418,7 +418,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{^isReadOnly}}
 
     @Override
-    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
+    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{#vendorExtensions.chainableName}}{{{.}}}{{/vendorExtensions.chainableName}}{{^vendorExtensions.chainableName}}{{{name}}}{{/vendorExtensions.chainableName}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
         super.{{{setter}}}({{name}});
         return this;
     }

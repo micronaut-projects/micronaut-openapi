@@ -660,7 +660,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public String getOp() {
                         return op;
                     }
-                
+
                     /**
                      * Set the op property value
                      *
@@ -706,10 +706,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/FileCreateDto.java",
             """
                 public class FileCreateDto {
-                
+
                     public static final String JSON_PROPERTY_TYPE_CODE = "typeCode";
                     public static final String JSON_PROPERTY_ORG_NAME = "orgName";
-                
+
                     /**
                      * Customer type ORG
                      */
@@ -717,11 +717,11 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Pattern(regexp = "^ORG$")
                     @JsonProperty(JSON_PROPERTY_TYPE_CODE)
                     private String typeCode = "ORG";
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_ORG_NAME)
                     private String orgName;
-                
+
                     public FileCreateDto(String typeCode, String orgName) {
                         this.typeCode = typeCode;
                         this.orgName = orgName;
@@ -1311,7 +1311,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
                 @io.micronaut.serde.annotation.Serdeable.Serializable
                 public class Book {
-                
+
                     @Override
                 """);
 
@@ -1365,7 +1365,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public String getValueType() {
                         return valueType;
                     }
-                
+
                     /**
                      * Set the valueType property value
                      *
@@ -1374,7 +1374,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public void setValueType(String valueType) {
                         this.valueType = valueType;
                     }
-                
+
                     /**
                      * Set valueType in a chainable fashion.
                      *
@@ -1394,7 +1394,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public String getValueType() {
                         return valueType;
                     }
-                
+
                     /**
                      * Set the valueType property value
                      *
@@ -1403,7 +1403,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public void setValueType(String valueType) {
                         this.valueType = valueType;
                     }
-                
+
                     /**
                      * Set valueType in a chainable fashion.
                      *
@@ -1436,7 +1436,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     }
                     return super.equals(o);
                 }
-            
+
                 @Override
                 public int hashCode() {
                     return Objects.hash(super.hashCode());
@@ -1470,7 +1470,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-            
+
                 @Nullable
                 @JsonProperty(JSON_PROPERTY_DATE)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1645,7 +1645,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Pet.java", """
                 public Pet() {
                 }
-            
+
                 public Pet(String name, List<@NotNull String> photoUrls) {
                     this.name = name;
                     this.photoUrls = photoUrls;
@@ -2209,7 +2209,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 public TypeConverter<String, ParamEnum> toEnumParamEnum() {
                     return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
                 }
-            
+
                 @Bean
                 public TypeConverter<ParamEnum, String> toStrParamEnum() {
                     return (v, c, ctx) -> Optional.of(v.getValue());
@@ -2236,7 +2236,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2244,7 +2244,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2253,7 +2253,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2269,7 +2269,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2277,7 +2277,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2286,7 +2286,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2302,7 +2302,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2310,7 +2310,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2319,7 +2319,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2335,7 +2335,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2343,7 +2343,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2352,7 +2352,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2395,7 +2395,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonProperty(JSON_PROPERTY_TRUE)
                 @JsonInclude(content = JsonInclude.Include.ALWAYS)
                 private Map<String, Object> _true;
-            
+
                 /**
                  * x
                  */
@@ -2403,7 +2403,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonProperty(JSON_PROPERTY_FALSE)
                 @JsonInclude(content = JsonInclude.Include.ALWAYS)
                 private Map<String, Object> _false;
-            
+
                 /**
                  * x
                  */
@@ -2505,5 +2505,19 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             )
             @Client("${openapi-micronaut-client.base-path}")
             """);
+    }
+
+    @Test
+    void testDuplicateChainableMethodName() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/attr-name-started-with-set.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/V1ForecastIdGet200Response.java",
+            "public V1ForecastIdGet200Response _setName(String setName) {",
+            "public V1ForecastIdGet200Response name(String name) {",
+            "public void setName(String name) {"
+        );
     }
 }

@@ -35,6 +35,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
@@ -879,9 +880,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
-                default -> throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2,
+                     OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                default ->
+                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
         }
     }
@@ -3049,11 +3054,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         } else if ("Int".equals(dataType) || "Short".equals(dataType)) {
             example = withExample(example) ? example : "56";
         } else if ("Long".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "56", "L");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "56", "L");
         } else if ("Float".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "3.4", "F");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "3.4", "F");
         } else if ("Double".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "3.4", "D");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "3.4", "D");
         } else if ("Boolean".equals(dataType)) {
             example = withExample(example) ? example : "false";
         } else if ("File".equals(dataType) || "java.io.File".equals(dataType)) {
