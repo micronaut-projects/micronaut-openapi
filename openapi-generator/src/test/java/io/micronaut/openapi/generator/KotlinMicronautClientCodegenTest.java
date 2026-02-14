@@ -801,8 +801,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/multiplecontentpath")
                     @Produces("multipart/form-data")
                     fun myOp_1(
-                        @Nullable @Valid coordinates: Coordinates? = null,
-                        file: ByteArray? = null,
+                        @Body("coordinates") @Nullable @Valid coordinates: Coordinates? = null,
+                        @Body("file") file: ByteArray? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -3219,5 +3219,25 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 open var atBaseType: String? = null,
             ) {
             """);
+    }
+
+    @Test
+    void testMultipartFormDataParamNames() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/multipart-form-urlencoded.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Post("/auth/form-part")
+                    @Produces("application/x-www-form-urlencoded")
+                    fun indexPart(
+                        @Body("grant_type", defaultValue = "none") @NotNull grantType: String = "none",
+                        @Body("client_id") @NotNull clientId: String,
+                        @Body("not_required_param\\$") @Nullable notRequiredParamDollar: Int? = null,
+                    ): Mono<String>
+                """
+        );
     }
 }

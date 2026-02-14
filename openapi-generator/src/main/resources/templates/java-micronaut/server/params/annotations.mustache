@@ -20,6 +20,9 @@
     {{#vendorExtensions.isPart}}
         @Part("{{baseName}}")
     {{/vendorExtensions.isPart}}
+    {{^vendorExtensions.isPart}}
+        @Body({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{defaultValue}}"{{/defaultValue}})
+    {{/vendorExtensions.isPart}}
 {{/isFormParam}}
 {{#isCookieParam}}
         @CookieValue({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{defaultValue}}"{{/defaultValue}})

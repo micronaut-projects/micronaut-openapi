@@ -549,8 +549,8 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     Mono<HttpResponse<Void>> myOp_1(
-                        @Nullable(inherited = true) @Valid Coordinates coordinates,
-                        @Nullable(inherited = true) CompletedFileUpload file
+                        @Body("coordinates") @Nullable(inherited = true) @Valid Coordinates coordinates,
+                        @Body("file") @Nullable(inherited = true) CompletedFileUpload file
                     );
                 """,
             """
@@ -1374,6 +1374,28 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
                     @JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
                     private OrderDTOShoppingNotes shoppingNotes2;
+                """
+        );
+    }
+
+    @Test
+    void testMultipartFormDataParamNames() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUseAuth(false);
+        codegen.setGenerateSwaggerAnnotations(false);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/multipart-form-urlencoded.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/DefaultApi.java",
+            """
+                    @Post("/auth/form-part")
+                    @Consumes("application/x-www-form-urlencoded")
+                    Mono<@NotNull String> indexPart(
+                        @Body(value = "grant_type", defaultValue = "none") @NotNull String grantType,
+                        @Body("client_id") @NotNull String clientId,
+                        @Body("not_required_param$") @Nullable(inherited = true) Integer notRequiredParam$
+                    );
                 """
         );
     }

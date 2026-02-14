@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Auth API
+  version: 1.0.0
+paths:
+  /auth/form-part:
+    post:
+      summary: Receive params
+      operationId: indexPart
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  example: client_credentials
+                  default: none
+                client_id:
+                  type: string
+                  example: supervisor
+                not_required_param$:
+                  type: integer
+              required:
+                - grant_type
+                - client_id
+      responses:
+        '200':
+          description: Return objects
+          content:
+            application/json:
+              schema:
+                type: string
