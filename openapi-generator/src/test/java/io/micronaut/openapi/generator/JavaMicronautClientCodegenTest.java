@@ -295,7 +295,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BooksContainer.java",
             """
                     @JsonProperty(JSON_PROPERTY_BOOKS)
-                    private List<@Valid Book> books;
+                    private List<@Valid Book> books = new ArrayList<>();
                 """);
     }
 
@@ -311,8 +311,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody",
             ""
         );
-        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull ZonedDateTime>>> counts;");
-        assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
+        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull ZonedDateTime>>> counts = new ArrayList<>();");
+        assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books = new ArrayList<>();");
     }
 
     @Test
@@ -2537,6 +2537,22 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @Body("client_id") @NotNull String clientId,
                         @Body("not_required_param$") @Nullable Integer notRequiredParam$
                     );
+                """
+        );
+    }
+
+    @Test
+    void testMapDefaultValue() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/map-default-value.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/MyModel.java",
+            """
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_MY_MAP)
+                    private Map<String, @NotNull String> myMap = new HashMap<>();
                 """
         );
     }

@@ -2762,7 +2762,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("withRequiredAndOptionalVars", model.vendorExtensions.get("withRequiredAndOptionalVars"));
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
-        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals(NULL_STRING));
+        var defaultValueInit = property.vendorExtensions.get("defaultValueInit");
+        property.vendorExtensions.put("defaultValueIsNotNull", (property.defaultValue != null && !property.defaultValue.equals(NULL_STRING)) || (defaultValueInit != null && !defaultValueInit.equals(NULL_STRING)));
 
         var isParentVar = (Boolean) property.vendorExtensions.get("isParentVar");
         property.vendorExtensions.put("fieldAnnPrefix", isParentVar != null && isParentVar ? "" : "field:");
@@ -2800,7 +2801,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, true, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);
 
-        var defaultValueInit = (String) property.vendorExtensions.get("defaultValueInit");
         var valueWithDefaultValue = ksp && defaultValueInit != null && !defaultValueInit.equals(NULL_STRING);
         property.vendorExtensions.put("valueWithDefaultValue", valueWithDefaultValue);
         if (valueWithDefaultValue) {
@@ -3221,6 +3221,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var pair = toArrayDefaultValue(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, schema);
             defaultValueInit = pair.getLeft();
             defaultValueStr = pair.getRight();
+        } else if (ModelUtils.isMapSchema(schema) && !ModelUtils.isComposedSchema(schema)) {
+            if (schema.getProperties() != null && !schema.getProperties().isEmpty()) {
+                // object is complex object with free-form additional properties
+                if (schema.getDefault() != null) {
+                    defaultValueInit = super.toDefaultValue(schema);
+                    defaultValueStr = super.toDefaultValue(schema);
+                }
+            }
+
+            if (ModelUtils.getAdditionalProperties(schema) == null) {
+                return Pair.of(null, null);
+            }
+
+            defaultValueInit = schema.getDefault() != null ? "mutableMapOf()" : null;
+            defaultValueStr = null;
         } else if (ModelUtils.isStringSchema(schema)) {
             if (schema.getDefault() != null) {
                 String def = schema.getDefault().toString();
