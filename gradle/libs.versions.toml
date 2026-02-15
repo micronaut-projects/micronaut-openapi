@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.42"
+managed-swagger = "2.2.43"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.22.1"
 # deprecated, use managed-flexmark
@@ -9,51 +9,52 @@ managed-parboiled = "1.4.1"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "1.3"
 
+rhino = "1.9.1"
 jspecify = "1.0.0"
 jdt-annotation = "2.4.100"
 android-annotation = "1.9.1"
 spotbugs-annotations = "4.9.8"
-openapi-generator = "7.18.0"
+openapi-generator = "7.20.0"
 swagger-parser = "1.0.75"
-swagger-parser-v3 = "2.1.37"
+swagger-parser-v3 = "2.1.38"
 javaparser = "3.28.0"
 commons-lang3 = "3.20.0"
-commons-codec = "1.20.0"
+commons-codec = "1.21.0"
 commons-io = "2.21.0"
 commons-text = "1.15.0"
 guava = "33.5.0-jre"
 commonmark = "0.27.1"
 kotlin-compile-testing = "1.6.0"
 
-micronaut = "4.10.14"
-micronaut-platform = "4.10.7"
+micronaut = "4.10.15"
+micronaut-platform = "4.10.8"
 micronaut-jaxrs = "4.10.0"
 micronaut-views = "5.9.0"
-micronaut-security = "4.16.1"
+micronaut-security = "4.17.1"
 micronaut-serde = "2.16.2"
 micronaut-rxjava2 = "2.9.0"
 micronaut-rxjava3 = "3.9.0"
 micronaut-reactor = "3.9.1"
-micronaut-gradle-plugin = "4.6.1"
+micronaut-gradle-plugin = "4.6.2"
 micronaut-groovy = "4.7.0"
 micronaut-validation = "4.12.0"
-micronaut-data = "4.14.2"
+micronaut-data = "4.14.3"
 micronaut-test = "4.10.2"
 micronaut-kotlin = "4.7.0"
-micronaut-logging = "1.7.1"
+micronaut-logging = "1.7.3"
 micronaut-session = "4.8.0"
 micronaut-grpc = "4.12.0"
-micronaut-spring = "5.12.0"
+micronaut-spring = "5.12.1"
 micronaut-docs = "3.0.0"
 micronaut-shared-settings = "7.6.6"
 
 # javascript libraries
-js-swagger-ui = "5.31.0"
+js-swagger-ui = "5.31.2"
 js-openapi-explorer = "2.4.788"
-js-redoc = "2.5.1"
+js-redoc = "2.5.2"
 js-rapidoc = "9.3.8"
 js-rapipdf = "2.2.1"
-js-scalar = "1.44.4"
+js-scalar = "1.44.25"
 
 [libraries]
 # Managed
@@ -94,6 +95,7 @@ micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", vers
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin" }
 
 # Other
+rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
