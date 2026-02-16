@@ -339,7 +339,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         super.setName(name);
                         return this;
                     }
-                
+
                     @Override
                     public BasicBookInfo type(BookInfoType type) {
                         super.setType(type);
@@ -752,7 +752,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-            
+
                 @Nullable(inherited = true)
                 @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @JsonProperty(JSON_PROPERTY_DATE)
@@ -1137,17 +1137,17 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     public TypeConverter<String, DataDirection> toEnumDataDirection() {
                         return (v, c, ctx) -> Optional.of(DataDirection.fromValue(v));
                     }
-                
+
                     @Bean
                     public TypeConverter<DataDirection, String> toStrDataDirection() {
                         return (v, c, ctx) -> Optional.of(v.getValue());
                     }
-                
+
                     @Bean
                     public TypeConverter<String, DataChannel> toEnumDataChannel() {
                         return (v, c, ctx) -> Optional.of(DataChannel.fromValue(v));
                     }
-                
+
                     @Bean
                     public TypeConverter<DataChannel, String> toStrDataChannel() {
                         return (v, c, ctx) -> Optional.of(v.getValue());
@@ -1295,11 +1295,29 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 public TypeConverter<String, ParamEnum> toEnumParamEnum() {
                     return (v, c, ctx) -> Optional.of(ParamEnum.fromValue(v));
                 }
-            
+
                 @Bean
                 public TypeConverter<ParamEnum, String> toStrParamEnum() {
                     return (v, c, ctx) -> Optional.of(v.getValue());
                 }
             """);
+    }
+
+    @Test
+    void testSwaggerNullableFlag() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/OrderDTO.java",
+            """
+                    @Nullable(inherited = true)
+                    @Valid
+                    @Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
+                    @JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
+                    private OrderDTOShoppingNotes shoppingNotes2;
+                """
+        );
     }
 }
