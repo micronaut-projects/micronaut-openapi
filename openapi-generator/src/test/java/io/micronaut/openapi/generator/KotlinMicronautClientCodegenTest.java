@@ -3256,4 +3256,76 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testHttpResponseWrapperExt() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.generateHttpResponseOnlyForMultipleStatuses = true;
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/ParametersApi.kt",
+            """
+                    @Get("/sendPrimitives/{name}")
+                    fun sendPrimitives(
+                        @PathVariable("name") @NotNull name: String,
+                        @QueryValue("age") @NotNull age: BigDecimal,
+                        @Header("height") @NotNull height: Float,
+                        @QueryValue("isPositive") @NotNull isPositive: Boolean,
+                    ): Mono<HttpResponse<SendPrimitivesResponse>>
+                """,
+            """
+                    @Get("/getIgnoredHeader")
+                    @Consumes("text/plain")
+                    fun getIgnoredHeader(): Mono<HttpResponse<String?>>
+                """,
+            """
+                    @Get("/sendValidatedPrimitives")
+                    @Consumes("text/plain")
+                    fun sendValidatedPrimitives(
+                        @QueryValue("name") @Nullable @Pattern(regexp = "[a-zA-Z]+") @Size(min = 3) name: String? = null,
+                        @QueryValue("age") @Nullable @Min(10) @Max(200) age: Int? = null,
+                        @QueryValue("favoriteNumber") @Nullable @DecimalMin("-100.5") @DecimalMax("100.5") favoriteNumber: BigDecimal? = null,
+                        @QueryValue("height") @Nullable @DecimalMin("0.1", inclusive = false) @DecimalMax("3", inclusive = false) height: Double? = null,
+                    ): Mono<String?>
+                """
+        );
+
+        assertFileContains(path + "api/ResponseBodyApi.kt",
+            """
+                    @Get("/getPaginatedSimpleModel")
+                    fun getPaginatedSimpleModel(
+                        @QueryValue("page", defaultValue = "0") @Nullable @Min(0) page: Int? = 0,
+                    ): Mono<HttpResponse<List<SimpleModel>>>
+                """,
+            """
+                    @Get("/getSimpleModelWithNonMappedHeader")
+                    fun getSimpleModelWithNonMappedHeader(): Mono<SimpleModel>
+                """
+        );
+    }
+
+    @Test
+    void testNullableOperationReturnType() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.generateHttpResponseOnlyForMultipleStatuses = true;
+        codegen.reactive = false;
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/ParametersApi.kt",
+            """
+                    @Get("/sendValidatedPrimitives")
+                    @Consumes("text/plain")
+                    fun sendValidatedPrimitives(
+                        @QueryValue("name") @Nullable @Pattern(regexp = "[a-zA-Z]+") @Size(min = 3) name: String? = null,
+                        @QueryValue("age") @Nullable @Min(10) @Max(200) age: Int? = null,
+                        @QueryValue("favoriteNumber") @Nullable @DecimalMin("-100.5") @DecimalMax("100.5") favoriteNumber: BigDecimal? = null,
+                        @QueryValue("height") @Nullable @DecimalMin("0.1", inclusive = false) @DecimalMax("3", inclusive = false) height: Double? = null,
+                    ): String?
+                """
+        );
+    }
 }
