@@ -196,9 +196,15 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
             setUserParameterMode(userModeOpt);
             if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name())) {
+                if (!additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                    throw InvalidUserParameterException.kotlinNoClass();
+                }
+
                 userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
                 var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
                 importMapping.put(className, userParameterClass);
+            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                throw InvalidUserParameterException.kotlinModeNotCustomButClassSet();
             }
         }
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());

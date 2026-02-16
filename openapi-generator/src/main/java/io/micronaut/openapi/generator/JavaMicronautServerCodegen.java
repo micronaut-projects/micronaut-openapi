@@ -197,10 +197,16 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
             var userModeOpt = (String) additionalProperties.get(OPT_USER_PARAMETER_MODE);
             setUserParameterMode(userModeOpt);
 
-            if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name()) && additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+            if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name())) {
+                if (!additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                    throw InvalidUserParameterException.javaNoClass();
+                }
+
                 userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
                 var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
                 importMapping.put(className, userParameterClass);
+            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                throw InvalidUserParameterException.javaModeNotCustomButClassSet();
             }
         }
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
