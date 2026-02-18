@@ -39,7 +39,7 @@ class MicronautCodeGeneratorEntryPointTest {
             .withDefinitionFile(new URI("src/test/resources/3_0/security.yml"))
             .build();
 
-        assertThrows(InvalidUserParameterException.class, entrypoint::generate);
+        assertThrows(IllegalArgumentException.class, entrypoint::generate);
     }
 
     @Test
@@ -59,7 +59,7 @@ class MicronautCodeGeneratorEntryPointTest {
             .withDefinitionFile(new URI("src/test/resources/3_0/security.yml"))
             .build();
 
-        assertThrows(InvalidUserParameterException.class, entrypoint::generate);
+        assertThrows(IllegalArgumentException.class, entrypoint::generate);
     }
 
     @Test
@@ -79,7 +79,7 @@ class MicronautCodeGeneratorEntryPointTest {
             .withDefinitionFile(new URI("src/test/resources/3_0/security.yml"))
             .build();
 
-        assertThrows(InvalidUserParameterException.class, entrypoint::generate);
+        assertThrows(IllegalArgumentException.class, entrypoint::generate);
     }
 
     @Test
@@ -98,7 +98,7 @@ class MicronautCodeGeneratorEntryPointTest {
             .withDefinitionFile(new URI("src/test/resources/3_0/security.yml"))
             .build();
 
-        assertThrows(InvalidUserParameterException.class, entrypoint::generate);
+        assertThrows(IllegalArgumentException.class, entrypoint::generate);
     }
 
 

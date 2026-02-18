@@ -199,14 +199,14 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
             if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name())) {
                 if (!additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
-                    throw InvalidUserParameterException.javaNoClass();
+                    throw new IllegalArgumentException("User-defined authentication parameter class name option %s is required when %s is set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
                 }
 
                 userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
                 var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
                 importMapping.put(className, userParameterClass);
             } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
-                throw InvalidUserParameterException.javaModeNotCustomButClassSet();
+                throw new IllegalArgumentException("User-defined authentication parameter class name option %s is not allowed when %s is not set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
             }
         }
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
