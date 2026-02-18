@@ -203,7 +203,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
                 var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
                 importMapping.put(className, userParameterClass);
-            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS) && additionalProperties.get(OPT_USER_PARAMETER_CLASS) != null) {
                 throw new IllegalArgumentException("User-defined authentication parameter class name option %s is not allowed when %s is not set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
             }
         }
