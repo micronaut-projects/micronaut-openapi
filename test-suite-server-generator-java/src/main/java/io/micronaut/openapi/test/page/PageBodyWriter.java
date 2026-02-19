@@ -54,7 +54,8 @@ final class PageBodyWriter<T> implements MessageBodyWriter<Page<T>> {
 
     @Override
     public MessageBodyWriter<Page<T>> createSpecific(Argument<Page<T>> type) {
-        Argument<List<T>> bt = Argument.listOf(type.getTypeParameters()[0]);
+        Argument<T> innerType = (Argument<T>) type.getTypeParameters()[0];
+        Argument<List<T>> bt = Argument.listOf(innerType);
         MessageBodyWriter<List<T>> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
             .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
         return new PageBodyWriter<>(registry, writer, bt);
