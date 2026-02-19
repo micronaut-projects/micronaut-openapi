@@ -37,7 +37,6 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -239,6 +238,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isArraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
@@ -1124,10 +1124,11 @@ public final class SchemaDefinitionUtils {
      * @param schemaToBind The schema to bind
      * @param jsonViewClass Class from JsonView annotation
      * @param withProcessDeprecated Is need to process deprecates annotation
+     * @param isParameter is this element describes endpoint parameter or not
      * @return The bound schema
      */
     public static Schema<?> bindSchemaForElement(VisitorContext context, Element element, ClassElement elementType, Schema<?> schemaToBind,
-                                                 @Nullable ClassElement jsonViewClass, boolean withProcessDeprecated) {
+                                                 @Nullable ClassElement jsonViewClass, boolean withProcessDeprecated, boolean isParameter) {
         var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaAnn == null) {
             var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
@@ -1194,7 +1195,7 @@ public final class SchemaDefinitionUtils {
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NULLABLE).orElse(null);
         boolean isNullable = (isSchemaNullable == null && isNullable(element) && !isNotNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
-        if (isNullable) {
+        if (isNullable && (!isParameter || defaultValue == null)) {
             SchemaUtils.setNullable(topLevelSchema);
             notOnlyRef = true;
         }
@@ -1720,35 +1721,20 @@ public final class SchemaDefinitionUtils {
         } else {
             // check schema required flag
             var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
-            Boolean elementSchemaRequired = null;
-            boolean isAutoRequiredMode = true;
-            boolean isRequiredDefaultValueSet = false;
-            if (schemaAnn != null) {
-                elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
-                isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
-                var requiredMode = schemaAnn.enumValue(PROP_REQUIRED_MODE, io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
-                    .orElse(null);
-                if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
-                    elementSchemaRequired = true;
-                    isAutoRequiredMode = false;
-                } else if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED) {
-                    elementSchemaRequired = false;
-                    isAutoRequiredMode = false;
-                }
-            }
+            var reqMode = getReqMode(schemaAnn);
 
             // check field annotations (@NonNull, @Nullable, etc.)
             boolean isNotNullable = isNotNullable(element);
             // check as mandatory in constructor
             boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classEl, context);
-            boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
+            boolean required = reqMode.elementSchemaRequired() != null ? reqMode.elementSchemaRequired() : isNotNullable || isMandatoryInConstructor;
 
-            if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
+            if (reqMode.isRequiredDefaultValueSet() && reqMode.isAutoRequiredMode() && isNotNullable) {
                 required = true;
             }
 
             // check JsonInclude mode, if swagger schema required mode not set
-            if (elementSchemaRequired == null) {
+            if (reqMode.elementSchemaRequired() == null) {
                 var classJsonIncludeAnn = classEl != null ? getAnnotation(classEl, JsonInclude.class) : null;
                 JsonInclude.Include classIncludeMode = null;
                 if (classJsonIncludeAnn != null) {
@@ -1767,7 +1753,7 @@ public final class SchemaDefinitionUtils {
                 }
             }
 
-            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true);
+            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true, false);
             String propertyName = resolvePropertyName(element, classEl, propertySchema);
             propertyName = normalizePropertyName(propertyName, classEl, elementType);
             propertySchema.setRequired(null);
@@ -3047,7 +3033,7 @@ public final class SchemaDefinitionUtils {
                                                          AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                          @Nullable ClassElement jsonViewClass) {
 
-       ClassElement typeEl = null;
+        ClassElement typeEl = null;
         if (element instanceof TypedElement typedEl) {
             typeEl = typedEl.getType();
         } else if (element instanceof MethodElement methodEl) {

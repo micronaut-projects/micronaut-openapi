@@ -25,7 +25,10 @@ class PersonController {
     }
 }
 
-record Person(String name, Integer age) {}
+record Person(
+    String name,
+    Integer age
+) {}
 
 @jakarta.inject.Singleton
 class MyBean {}
@@ -174,7 +177,8 @@ class PetController {
 record Pet(
     @NotBlank
     @Size(max = 200)
-    String name) {}
+    String name
+) {}
 
 @jakarta.inject.Singleton
 class MyBean {}
@@ -189,13 +193,13 @@ class MyBean {}
         openAPI.components.schemas
         openAPI.components.schemas.size() == 1
 
-        Schema petchema = openAPI.components.schemas['Pet']
-        petchema.type == 'object'
-        petchema.description == null
-        petchema.properties.name.type == 'string'
-        petchema.properties.name.description == 'The name of the pet'
-        petchema.required
-        petchema.required.size() == 1
-        petchema.required.contains('name')
+        Schema petSchema = openAPI.components.schemas['Pet']
+        petSchema.type == 'object'
+        petSchema.description == null
+        petSchema.properties.name.type == 'string'
+        petSchema.properties.name.description == 'The name of the pet'
+        petSchema.required
+        petSchema.required.size() == 1
+        petSchema.required.contains('name')
     }
 }
