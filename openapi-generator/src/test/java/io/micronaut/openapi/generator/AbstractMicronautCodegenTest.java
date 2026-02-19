@@ -163,22 +163,20 @@ public abstract class AbstractMicronautCodegenTest {
             var pathStr = p.toString();
             return bfa.isRegularFile() && (pathStr.endsWith(".java") || pathStr.endsWith(".kt"));
         })) {
-            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile(), false)));
+            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile())));
         } catch (IOException e) {
             fail(e.getMessage(), e);
         }
         sourceFiles.addAll(List.of(extraSourceFiles));
-        // TODO: Re-enable full compilation check when kotlin-compile-testing supports Kotlin 2.0.20
-        // var compilation = new KotlinCompilation();
-        // compilation.setJvmTarget(JvmTarget.JVM_17.getDescription());
-        // compilation.setSources(sourceFiles);
-        // compilation.setInheritClassPath(true);
-        // if (jvmTarget != null) {
-        //     compilation.setJvmTarget(jvmTarget);
-        // }
-        // var result = compilation.compile();
-        // assertEquals(KotlinCompilation.ExitCode.OK, result.getExitCode());
-        System.out.println("Skipping compilation check due to kotlin-compile-testing incompatibility with Kotlin 2.0.20");
+        var compilation = new KotlinCompilation();
+        compilation.setJvmTarget(JvmTarget.JVM_17.getDescription());
+        compilation.setSources(sourceFiles);
+        compilation.setInheritClassPath(true);
+        if (jvmTarget != null) {
+            compilation.setJvmTarget(jvmTarget);
+        }
+        var result = compilation.compile();
+        assertEquals(KotlinCompilation.ExitCode.OK, result.getExitCode());
     }
 
     public static void assertFileContainsRegex(String path, String... regex) {
