@@ -52,7 +52,7 @@ final class DatedResponseBodyWriter<T> implements MessageBodyWriter<DatedRespons
     public MessageBodyWriter<DatedResponse<T>> createSpecific(
         Argument<DatedResponse<T>> type
     ) {
-        Argument<T> bt = type.getTypeParameters()[0];
+        Argument<T> bt = (Argument<T>) type.getTypeParameters()[0];
         MessageBodyWriter<T> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
             .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
         return new DatedResponseBodyWriter<>(registry, writer, bt);
