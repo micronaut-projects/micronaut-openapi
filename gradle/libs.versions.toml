@@ -36,12 +36,12 @@ micronaut-reactor = "4.0.0-M1"
 micronaut-gradle-plugin = "4.6.1"
 micronaut-groovy = "5.0.0-M1"
 micronaut-validation = "5.0.0-M1"
-micronaut-session = "4.8.0"
 micronaut-grpc = "4.12.0"
 micronaut-spring = "5.12.0"
 micronaut-data = "5.0.0-M2"
 micronaut-kotlin = "5.0.0-M1"
 micronaut-logging = "2.0.0-M2"
+micronaut-session = "5.0.0-M1"
 micronaut-shared-settings = "8.0.0-M17"
 
 # javascript libraries
