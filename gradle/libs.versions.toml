@@ -41,7 +41,7 @@ micronaut-kotlin = "4.7.0"
 micronaut-logging = "1.7.1"
 micronaut-session = "4.8.0"
 micronaut-grpc = "4.12.0"
-micronaut-spring = "5.12.0"
+micronaut-spring = "5.12.1"
 micronaut-shared-settings = "8.0.0-M17"
 
 # javascript libraries
