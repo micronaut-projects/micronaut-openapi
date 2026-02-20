@@ -50,6 +50,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
     public static final String OPT_AOT = "aot";
     public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
+    public static final String OPT_USER_PARAMETER_CLASS = "userParameterClass";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -76,6 +77,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
     protected UserParameterMode userParameterMode = UserParameterMode.NONE;
+    protected String userParameterClass;
 
     JavaMicronautServerCodegen() {
 
@@ -108,8 +110,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         userModeOptionsMap.put(UserParameterMode.NONE.name(), "Don't add principal / authentication parameter to controller methods");
         userModeOptionsMap.put(UserParameterMode.PRINCIPAL.name(), "Add java.security.Principal principal parameter to each controller method");
         userModeOptionsMap.put(UserParameterMode.AUTHENTICATION.name(), "Add io.micronaut.security.authentication.Authentication authentication parameter to each controller method");
+        userModeOptionsMap.put(UserParameterMode.CUSTOM.name(), "Add a user-defined authentication parameter to each controller method");
         userModeOption.setEnum(userModeOptionsMap);
         cliOptions.add(userModeOption);
+
+        cliOptions.add(CliOption.newString(OPT_USER_PARAMETER_CLASS, "User-defined authentication parameter class name"));
 
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
@@ -191,8 +196,21 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         if (additionalProperties.containsKey(OPT_USER_PARAMETER_MODE)) {
             var userModeOpt = (String) additionalProperties.get(OPT_USER_PARAMETER_MODE);
             setUserParameterMode(userModeOpt);
+
+            if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name())) {
+                if (!additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                    throw new IllegalArgumentException("User-defined authentication parameter class name option %s is required when %s is set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
+                }
+
+                userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
+                var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+                importMapping.put(className, userParameterClass);
+            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS) && additionalProperties.get(OPT_USER_PARAMETER_CLASS) != null) {
+                throw new IllegalArgumentException("User-defined authentication parameter class name option %s is not allowed when %s is not set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
+            }
         }
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
+        writePropertyBack(OPT_USER_PARAMETER_CLASS, userParameterClass);
 
         // Api file
         apiTemplateFiles.clear();
@@ -281,8 +299,16 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         if (useAuth) {
 
             var alreadyAddedPrincipalImport = false;
-            String importClassFullName = userParameterMode.getClassFullName();
-            String importClassName = userParameterMode.getClassName();
+            final String importClassFullName;
+            final String importClassName;
+
+            if (userParameterMode.equals(UserParameterMode.CUSTOM)) {
+                importClassFullName = userParameterClass;
+                importClassName = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+            } else {
+                importClassFullName = userParameterMode.getClassFullName();
+                importClassName = userParameterMode.getClassName();
+            }
 
             for (CodegenOperation operation : allOperations) {
 
@@ -318,7 +344,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 if (userParameterMode != UserParameterMode.NONE) {
                     var isAnonymous = roles.contains(ANONYMOUS_ROLE);
                     var isDenyAll = roles.contains(DENY_ALL_ROLE);
-                    addUserParameter(operation, userParameterMode, isAnonymous, isDenyAll);
+                    addUserParameter(operation, userParameterMode, userParameterClass, isAnonymous, isDenyAll);
 
                     if (importClassFullName != null && !alreadyAddedPrincipalImport) {
                         objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
@@ -405,6 +431,10 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
     }
 
+    public void setUserParameterClass(String userParameterClass) {
+        this.userParameterClass = userParameterClass;
+    }
+
     static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -413,6 +443,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
         private String userParameterMode = UserParameterMode.NONE.name();
+        private String userParameterClass;
         private boolean lombok;
         private boolean plural = true;
         private boolean fluxForArrays;
@@ -461,6 +492,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         @Override
         public JavaMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode) {
             this.userParameterMode = userParameterMode;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withUserParameterClass(String userParameterClass) {
+            this.userParameterClass = userParameterClass;
             return this;
         }
 
@@ -514,6 +551,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 generateControllerFromExamples,
                 useAuth,
                 userParameterMode,
+                userParameterClass,
                 lombok,
                 plural,
                 fluxForArrays,
@@ -533,6 +571,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean generateControllerFromExamples,
         boolean useAuth,
         String userParameterMode,
+        String userParameterClass,
         boolean lombok,
         boolean plural,
         boolean fluxForArrays,
