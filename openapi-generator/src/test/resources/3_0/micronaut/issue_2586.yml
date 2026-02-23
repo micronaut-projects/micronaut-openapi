@@ -1,0 +1,55 @@
+openapi: 3.0.1
+info:
+  title: test
+  description: desc
+  version: 0.0.1
+paths:
+  /:
+    get:
+      responses:
+        200:
+          description: OK
+components:
+  schemas:
+    package.Animal:
+      properties:
+        type:
+          $ref: '#/components/schemas/package.AnimalType'
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          CAT: '#/components/schemas/package.Cat'
+          DOG: '#/components/schemas/package.Dog'
+      nullable: false
+      oneOf:
+        - $ref: '#/components/schemas/package.Cat'
+        - $ref: '#/components/schemas/package.Dog'
+    package.AnimalType:
+      description: 'Animal Type'
+      type: string
+      enum:
+        - CAT
+        - DOG
+    package.Cat:
+      required:
+        - type
+        - catProperty
+      properties:
+        type:
+          $ref: '#/components/schemas/package.AnimalType'
+        catProperty:
+          description: "Cat Property"
+          type: string
+      type: object
+    package.Dog:
+      required:
+        - type
+        - dogProperty
+      properties:
+        type:
+          $ref: '#/components/schemas/package.AnimalType'
+        dogProperty:
+          description: "Dog Property"
+          type: string
+      type: object

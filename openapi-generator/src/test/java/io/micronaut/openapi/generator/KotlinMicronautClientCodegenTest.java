@@ -3025,4 +3025,35 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             @Client("\\${openapi-micronaut-client.base-path}")
             """);
     }
+
+    @Test
+    void testDiscriminatorOverrideIssue2586() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/micronaut/issue_2586.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/PackageCat.kt", """
+            data class PackageCat(
+            
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_TYPE)
+                override var type: PackageAnimalType? = null,
+            
+                /**
+                 * Cat Property
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_CAT_PROPERTY)
+                var catProperty: String,
+            ) : PackageAnimal {
+            
+                companion object {
+            
+                    const val JSON_PROPERTY_TYPE = "type"
+                    const val JSON_PROPERTY_CAT_PROPERTY = "catProperty"
+                }
+            }
+            """);
+    }
 }

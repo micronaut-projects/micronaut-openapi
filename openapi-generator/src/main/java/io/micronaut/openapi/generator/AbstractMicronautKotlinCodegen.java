@@ -2641,7 +2641,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (discriminator == null) {
             return;
         }
-        var oneOfInterfaceName = model.name;
+        var oneOfInterfaceName = model.classname;
         for (var modelMap : models) {
             var m = modelMap.getModels().get(0).getModel();
 
