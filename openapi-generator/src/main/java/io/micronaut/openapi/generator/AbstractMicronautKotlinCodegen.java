@@ -273,6 +273,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "MutableSet",
             "Map",
             "MutableMap",
+            "HashMap",
             "Any"
         );
 

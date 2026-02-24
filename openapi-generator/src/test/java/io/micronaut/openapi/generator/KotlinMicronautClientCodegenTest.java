@@ -3027,6 +3027,48 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testAdditionalPropertiesHashMapImport() {
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/additional-properties.yml");
+        String apiPath = outputPath + "src/main/kotlin/org/openapitools/model/";
+
+        assertFileNotContains(apiPath + "PatchDto.kt",
+                """
+                import org.openapitools.model.HashMap
+                """
+        );
+
+        assertFileContains(apiPath + "PatchDto.kt",
+                """
+                    data class PatchDto(
+    
+                        /**
+                         * Patch operation
+                         */
+                        @field:NotNull
+                        @field:JsonProperty(JSON_PROPERTY_OP)
+                        var op: String,
+    
+                        /**
+                         * Path to update
+                         */
+                        @field:NotNull
+                        @field:JsonProperty(JSON_PROPERTY_PATH)
+                        var path: String,
+    
+                        /**
+                         * Value to assign
+                         */
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_VALUE)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var `value`: Any? = null,
+                    ) : HashMap<String, Any>() {
+    
+                    """);
+    }
+
+    @Test
     void testDiscriminatorOverrideIssue2586() {
 
         var codegen = new KotlinMicronautClientCodegen();
