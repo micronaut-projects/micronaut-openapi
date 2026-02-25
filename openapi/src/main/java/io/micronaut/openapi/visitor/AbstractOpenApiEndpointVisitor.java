@@ -175,6 +175,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
@@ -952,8 +953,27 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             if (schema != null) {
-                schema = bindSchemaForElement(context, parameter, parameterType, schema, null, false);
+                schema = bindSchemaForElement(context, parameter, parameterType, schema, null, false, true);
                 newParameter.setSchema(schema);
+                var parameterAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+                AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = null;
+                if (parameterAnn != null) {
+                    schemaAnn = parameterAnn.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+                }
+                if (schemaAnn == null) {
+                    schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                }
+
+                var isParamRequired = parameterAnn != null ? parameterAnn.get(PROP_REQUIRED, Boolean.class).orElse(false) : false;
+                if (!isParamRequired) {
+                    var reqMode = getReqMode(schemaAnn);
+                    if (reqMode.isAutoRequiredMode()) {
+                        schema = SchemaUtils.unwrapComposedSchema(schema);
+                        if (newParameter.getRequired() != null && newParameter.getRequired() && schema.getDefault() != null) {
+                            newParameter.setRequired(null);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1152,7 +1172,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 return null;
             }
 
-            Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getAnnotationName(), paramAnn.getValues(), context, null);
+            var paramValues = new HashMap<>(toValueMap(paramAnn.getAnnotationName(), paramAnn.getValues(), context, null));
             Utils.normalizeEnumValues(paramValues, Collections.singletonMap(PROP_IN, ParameterIn.class));
             if (parameter.isAnnotationPresent(Header.class)) {
                 paramValues.put(PROP_IN, ParameterIn.HEADER.toString());

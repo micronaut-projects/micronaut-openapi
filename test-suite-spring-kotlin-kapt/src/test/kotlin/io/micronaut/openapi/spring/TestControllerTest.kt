@@ -94,7 +94,6 @@ class TestControllerTest {
         assertEquals("integer", ageParam.schema.type)
         assertEquals("int32", ageParam.schema.format)
         assertEquals(123, ageParam.schema.default)
-        assertTrue(ageParam.schema.nullable)
     }
 
     private fun getParamByName(name: String, params: List<Parameter?>): Parameter? =
