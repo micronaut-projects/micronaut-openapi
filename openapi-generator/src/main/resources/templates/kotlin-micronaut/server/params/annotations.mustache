@@ -17,6 +17,12 @@
     {{/vendorExtensions.isPart}}
 {{/isBodyParam}}
 {{#isFormParam}}
+    {{#vendorExtensions.isPart}}
+        @Part("{{{vendorExtensions.baseNameNormalized}}}")
+    {{/vendorExtensions.isPart}}
+    {{^vendorExtensions.isPart}}
+        @Body("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})
+    {{/vendorExtensions.isPart}}
 {{/isFormParam}}
 {{#isCookieParam}}
         @CookieValue("{{{vendorExtensions.baseNameNormalized}}}"{{#vendorExtensions.defaultValueNormalized}}, defaultValue = "{{{.}}}"{{/vendorExtensions.defaultValueNormalized}})

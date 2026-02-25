@@ -673,8 +673,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
-                        @Nullable @Valid coordinates: Coordinates? = null,
-                        @Nullable file: CompletedFileUpload? = null,
+                        @Body("coordinates") @Nullable @Valid coordinates: Coordinates? = null,
+                        @Body("file") @Nullable file: CompletedFileUpload? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -1856,6 +1856,28 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
                     @field:JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
                     var shoppingNotes2: OrderDTOShoppingNotes? = null,
+                """
+        );
+    }
+
+    @Test
+    void testMultipartFormDataParamNames() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUseAuth(false);
+        codegen.setGenerateSwaggerAnnotations(false);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/multipart-form-urlencoded.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Post("/auth/form-part")
+                    @Consumes("application/x-www-form-urlencoded")
+                    fun indexPart(
+                        @Body("grant_type", defaultValue = "none") @NotNull grantType: String = "none",
+                        @Body("client_id") @NotNull clientId: String,
+                        @Body("not_required_param\\$") @Nullable notRequiredParamDollar: Int? = null,
+                    ): Mono<String>
                 """
         );
     }

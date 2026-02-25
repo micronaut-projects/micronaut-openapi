@@ -746,8 +746,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/multiplecontentpath")
                     @Produces("multipart/form-data")
                     Mono<HttpResponse<Void>> myOp_1(
-                        @Nullable @Valid Coordinates coordinates,
-                        byte @Nullable [] file
+                        @Body("coordinates") @Nullable @Valid Coordinates coordinates,
+                        @Body("file") byte @Nullable [] file
                     );
                 """,
             """
@@ -2424,12 +2424,12 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/BuiltInClientObjectSort.java",
             "public class BuiltInClientObjectSort extends ObjectSort {",
             """
-            @Override
-            public BuiltInClientObjectSort o(String o) {
-                super.set_o(o);
-                return this;
-            }
-        """);
+                    @Override
+                    public BuiltInClientObjectSort o(String o) {
+                        super.set_o(o);
+                        return this;
+                    }
+                """);
     }
 
     @Test
@@ -2441,9 +2441,9 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPathApi + "src/main/java/org/openapitools/";
         assertFileContains(path + "api/PetApi.java", """
-            @Retryable
-            @Client("${openapi-micronaut-client.base-path}")
-            """,
+                @Retryable
+                @Client("${openapi-micronaut-client.base-path}")
+                """,
             "import io.micronaut.retry.annotation.Retryable;");
     }
 
@@ -2518,6 +2518,26 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "public V1ForecastIdGet200Response _setName(String setName) {",
             "public V1ForecastIdGet200Response name(String name) {",
             "public void setName(String name) {"
+        );
+    }
+
+    @Test
+    void testMultipartFormDataParamNames() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/multipart-form-urlencoded.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/DefaultApi.java",
+            """
+                    @Post("/auth/form-part")
+                    @Produces("application/x-www-form-urlencoded")
+                    Mono<@NotNull String> indexPart(
+                        @Body(value = "grant_type", defaultValue = "none") @NotNull String grantType,
+                        @Body("client_id") @NotNull String clientId,
+                        @Body("not_required_param$") @Nullable Integer notRequiredParam$
+                    );
+                """
         );
     }
 }
