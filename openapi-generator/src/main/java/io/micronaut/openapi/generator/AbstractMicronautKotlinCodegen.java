@@ -160,6 +160,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
+    public static final String OPT_USE_SEALED = "useSealed";
     public static final String OPT_COROUTINES = "coroutines";
     public static final String OPT_JVM_OVERLOADS = "jvmOverloads";
     public static final String OPT_JVM_RECORD = "jvmRecord";
@@ -202,6 +203,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean generatedAnnotation = true;
     protected String testTool;
     protected boolean reactive;
+    protected boolean useSealed;
     protected boolean coroutines;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
@@ -354,6 +356,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
+        cliOptions.add(CliOption.newBoolean(OPT_USE_SEALED, "Whether to generate sealed model interfaces and classes", useSealed));
         cliOptions.add(CliOption.newBoolean(OPT_COROUTINES, "Make functions suspend", coroutines));
         cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
         cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
@@ -487,6 +490,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setReactive(boolean reactive) {
         this.reactive = reactive;
+    }
+
+    public void setUseSealed(boolean useSealed) {
+        this.useSealed = useSealed;
     }
 
     public void setCoroutines(boolean coroutines) {
@@ -715,6 +722,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
             writePropertyBack(OPT_REACTIVE, reactive);
         }
+
+        if (additionalProperties.containsKey(OPT_USE_SEALED)) {
+            useSealed = convertPropertyToBoolean(OPT_USE_SEALED);
+        }
+        writePropertyBack(OPT_USE_SEALED, useSealed);
 
         if (additionalProperties.containsKey(OPT_DATE_FORMAT)) {
             dateFormat = (String) additionalProperties.get(OPT_DATE_FORMAT);

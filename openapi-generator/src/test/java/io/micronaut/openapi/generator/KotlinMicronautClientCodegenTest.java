@@ -280,27 +280,27 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String? = null,
-                
+
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -310,32 +310,32 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
                 class ExtendedBookInfo(
-                
+
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     requiredReadOnly: String? = null,
-                
+
                     @Nullable
                     @Size(min = 3)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     author: String? = null,
-                
+
                     @Nullable
                     @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     optionalReadOnly: String? = null,
-                
+
                     @Nullable
                     @JsonProperty(JSON_PROPERTY_TYPE)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -383,11 +383,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     open var type: BookInfoType? = null,
@@ -396,16 +396,16 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
-                
+
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @JsonProperty(JSON_PROPERTY_TYPE)
                     type: BookInfoType? = null,
@@ -414,21 +414,21 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
                 class DetailedBookInfo(
-                
+
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                
+
                     @NotNull
                     @Size(min = 3)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     author: String,
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @JsonProperty(JSON_PROPERTY_TYPE)
                     type: BookInfoType? = null,
@@ -663,11 +663,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/JsonOp.kt",
             """
                 open class JsonOp(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PATH)
                     open var path: String,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_OP)
                     open var op: String,
@@ -683,16 +683,16 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/OpAdd.kt",
             """
                 class OpAdd(
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_PATH)
                     path: String,
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_OP)
                     op: String,
@@ -711,7 +711,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/JsonOp.kt",
             """
                 interface JsonOp {
-                
+
                     val op: String?
                 }
                 """
@@ -723,11 +723,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PATH)
                     var path: String,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_OP)
                     override var op: String? = null,
@@ -768,7 +768,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/FileCreateDto.kt",
             """
                 data class FileCreateDto(
-                
+
                     /**
                      * Customer type ORG
                      */
@@ -776,7 +776,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Pattern(regexp = "^ORG$")
                     @field:JsonProperty(JSON_PROPERTY_TYPE_CODE)
                     var typeCode: String = "ORG",
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_ORG_NAME)
                     var orgName: String,
@@ -1355,7 +1355,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var name: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "valueType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_VALUE_TYPE)
@@ -1370,7 +1370,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var name: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "valueType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_VALUE_TYPE)
@@ -1398,7 +1398,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     other as SalesInvoiceCreateDto
                     return super.equals(other)
                 }
-            
+
                 override fun hashCode(): Int =
                     Objects.hash(super.hashCode())
             """);
@@ -1450,7 +1450,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.kt", """
                 var id: String? = null,
-            
+
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_DATE)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1519,34 +1519,34 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             arguments("oneOf_polymorphismAndInheritance.yml", Map.of(
                 "Bar.kt", """
                     class Bar(
-                    
+
                         @Nullable
                         @JsonProperty(JSON_PROPERTY_ID)
                         id: String? = null,
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_BAR_PROP_A)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var barPropA: String? = null,
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_FOO_PROP_B)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var fooPropB: String? = null,
-                    
+
                         @field:Nullable
                         @field:Valid
                         @field:JsonProperty(JSON_PROPERTY_FOO)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var foo: FooRefOrValue? = null,
-                    
+
                         /**
                          * When sub-classing, this defines the sub-class Extensible name
                          */
                         @Nullable
                         @JsonProperty(JSON_PROPERTY_AT_TYPE)
                         atType: String? = null,
-                    
+
                         /**
                          * Hyperlink reference
                          */
@@ -1554,7 +1554,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @JsonProperty(JSON_PROPERTY_HREF)
                         @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         href: String? = null,
-                    
+
                         /**
                          * A URI to a JSON-Schema file that defines additional attributes and relationships
                          */
@@ -1562,7 +1562,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
                         @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         atSchemaLocation: String? = null,
-                    
+
                         /**
                          * When sub-classing, this defines the super-class
                          */
@@ -1574,11 +1574,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     """,
                 "Banana.kt", """
                     data class Banana(
-                    
+
                         @field:NotNull
                         @field:JsonProperty(JSON_PROPERTY_LENGTH)
                         var length: Int,
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
                         override var fruitType: FruitType? = null,
@@ -1586,14 +1586,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     """,
                 "Entity.kt", """
                     open class Entity(
-                    
+
                         /**
                          * When sub-classing, this defines the sub-class Extensible name
                          */
                         @field:NotNull
                         @field:JsonProperty(JSON_PROPERTY_AT_TYPE)
                         open var atType: String? = null,
-                    
+
                         /**
                          * Hyperlink reference
                          */
@@ -1601,7 +1601,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @field:JsonProperty(JSON_PROPERTY_HREF)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         open var href: String? = null,
-                    
+
                         /**
                          * unique identifier
                          */
@@ -1609,7 +1609,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @field:JsonProperty(JSON_PROPERTY_ID)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         open var id: String? = null,
-                    
+
                         /**
                          * A URI to a JSON-Schema file that defines additional attributes and relationships
                          */
@@ -1617,7 +1617,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @field:JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         open var atSchemaLocation: String? = null,
-                    
+
                         /**
                          * When sub-classing, this defines the super-class
                          */
@@ -1630,7 +1630,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             arguments("oneOf_additionalProperties.yml", Map.of(
                 "SchemaA.kt", """
                     data class SchemaA(
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_PROP_A)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1647,7 +1647,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             arguments("oneOf_primitive.yml", Map.of(
                 "Child.kt", """
                     data class Child(
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_NAME)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1661,12 +1661,12 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 "Fruit.kt", "interface Fruit {",
                 "Banana.kt", """
                     data class Banana(
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_LENGTH_CM)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var lengthCm: BigDecimal? = null,
-                    
+
                         @Nullable
                         @JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
                         override var fruitType: String? = null,
@@ -1674,19 +1674,19 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     """,
                 "Apple.kt", """
                     data class Apple(
-                    
+
                         @field:Nullable
                         @field:Pattern(regexp = "^[a-zA-Z\\\\s]*$")
                         @field:JsonProperty(JSON_PROPERTY_CULTIVAR)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var cultivar: String? = null,
-                    
+
                         @field:Nullable
                         @field:Pattern(regexp = "/^[A-Z\\\\s]*$/i")
                         @field:JsonProperty(JSON_PROPERTY_ORIGIN)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var origin: String? = null,
-                    
+
                         @Nullable
                         @JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
                         override var fruitType: String? = null,
@@ -1698,7 +1698,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 "Fruit.kt", "interface Fruit",
                 "Grape.kt", """
                     data class Grape(
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_COLOR)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1707,7 +1707,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     """,
                 "Apple.kt", """
                     data class Apple(
-                    
+
                         @field:Nullable
                         @field:JsonProperty(JSON_PROPERTY_KIND)
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1789,7 +1789,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var currency: MyCur = MyCur.USD,
@@ -1817,7 +1817,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -2013,31 +2013,31 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @JvmRecord
                 data class Pet @JvmOverloads constructor(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     val name: String,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
                     val photoUrls: List<@NotNull String>,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_ID)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     val id: Long? = null,
-                
+
                     @field:Nullable
                     @field:Valid
                     @field:JsonProperty(JSON_PROPERTY_CATEGORY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     val category: Category? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_TAGS)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     val tags: List<@Valid Tag>? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_STATUS)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -2071,31 +2071,31 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "Pet.kt",
             """
                 data class Pet @JvmOverloads constructor(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     var name: String,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
                     var photoUrls: List<@NotNull String>,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_ID)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var id: Long? = null,
-                
+
                     @field:Nullable
                     @field:Valid
                     @field:JsonProperty(JSON_PROPERTY_CATEGORY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var category: Category? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_TAGS)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var tags: List<@Valid Tag>? = null,
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_STATUS)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -2116,23 +2116,23 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "CurrentWeather.kt",
             """
                 data class CurrentWeather(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_TIME)
                     var time: String,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_TEMPERATURE)
                     var temperature: Float,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_WINDSPEED)
                     var windspeed: Float,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_WINDDIRECTION)
                     var winddirection: Float,
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_WEATHERCODE)
                     var weathercode: Int,
@@ -2155,7 +2155,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     JsonSubTypes.Type(ExtendedBookInfo::class, name = "EXTENDED"),
                 )
                 open class BookInfo(
-                
+
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open val name: String,
@@ -2164,7 +2164,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen")
                 class ExtendedBookInfo(
-                
+
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
@@ -2371,7 +2371,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/FruitType.kt",
             """
                 data class FruitType(
-                
+
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
                     override var fruitType: String? = null,
@@ -2494,7 +2494,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                 @Client(id = "\\$myClientId", path = "\\${\\$myClientId\\$sepbase-path}")
                 interface Tag1Api {
-                
+
                     /**
                      * {@summary summary with $dollarSign}
                      * contains $strings
@@ -2582,7 +2582,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "config/EnumConverterClientConfig.kt", """
                 @Bean
                 fun toEnumParamEnum() = TypeConverter<String, ParamEnum> { v, _, _ -> Optional.of(ParamEnum.fromValue(v)) }
-            
+
                 @Bean
                 fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
             """);
@@ -2607,7 +2607,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2615,7 +2615,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message1")
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2624,7 +2624,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message2")
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2640,7 +2640,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2648,7 +2648,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message1")
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2657,7 +2657,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message2")
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2673,7 +2673,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2681,7 +2681,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message1")
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2690,7 +2690,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message2")
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2706,7 +2706,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                      */
                     @JsonProperty("CGI")
                     A("CGI"),
-                
+
                     /**
                      *
                      * @deprecated This is deprecated message1
@@ -2714,7 +2714,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message1")
                     @JsonProperty("CGU")
                     B("CGU"),
-                
+
                     /**
                      * doc3
                      *
@@ -2723,7 +2723,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Deprecated("This is deprecated message2")
                     @JsonProperty("BRB")
                     C("BRB"),
-                
+
                     @JsonProperty("NUM")
                     NUM("NUM"),
                 """);
@@ -2766,7 +2766,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_TRUE)
                 @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
                 var `true`: Map<String, Any?>,
-            
+
                 /**
                  * x
                  */
@@ -2774,7 +2774,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_FALSE)
                 @field:JsonInclude(content = JsonInclude.Include.ALWAYS)
                 var `false`: Map<String, Any?>,
-            
+
                 /**
                  * x
                  */
@@ -2795,24 +2795,24 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPathApi + "src/main/kotlin/org/openapitools/";
         assertFileContains(path + "model/Foo.kt", """
             class Foo(
-            
+
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_FOO_PROP_A)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 val fooPropA: String? = null,
-            
+
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_FOO_PROP_B)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 val fooPropB: String? = null,
-            
+
                 /**
                  * When sub-classing, this defines the sub-class Extensible name
                  */
                 @Nullable
                 @JsonProperty(JSON_PROPERTY_AT_TYPE)
                 atType: String? = null,
-            
+
                 /**
                  * Hyperlink reference
                  */
@@ -2820,7 +2820,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonProperty(JSON_PROPERTY_HREF)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 href: String? = null,
-            
+
                 /**
                  * unique identifier
                  */
@@ -2828,7 +2828,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonProperty(JSON_PROPERTY_ID)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 id: String? = null,
-            
+
                 /**
                  * A URI to a JSON-Schema file that defines additional attributes and relationships
                  */
@@ -2836,7 +2836,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 atSchemaLocation: String? = null,
-            
+
                 /**
                  * When sub-classing, this defines the super-class
                  */
@@ -2849,14 +2849,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/Entity.kt", """
             open class Entity(
-            
+
                 /**
                  * When sub-classing, this defines the sub-class Extensible name
                  */
                 @field:NotNull
                 @field:JsonProperty(JSON_PROPERTY_AT_TYPE)
                 open val atType: String? = null,
-            
+
                 /**
                  * Hyperlink reference
                  */
@@ -2864,7 +2864,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_HREF)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 open val href: String? = null,
-            
+
                 /**
                  * unique identifier
                  */
@@ -2872,7 +2872,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_ID)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 open val id: String? = null,
-            
+
                 /**
                  * A URI to a JSON-Schema file that defines additional attributes and relationships
                  */
@@ -2880,7 +2880,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 open val atSchemaLocation: String? = null,
-            
+
                 /**
                  * When sub-classing, this defines the super-class
                  */
@@ -2927,19 +2927,19 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPathApi + "src/main/kotlin/org/openapitools/";
         assertFileContains(path + "model/BuiltInClientObjectSort.kt", """
             class BuiltInClientObjectSort(
-            
+
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_FIELD)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var `field`: BuiltInClientObjectSortAllOfField? = null,
-            
+
                 /**
                  * Used as a discriminator value between implementations of this type
                  */
                 @Nullable
                 @JsonProperty(JSON_PROPERTY_O)
                 o: String? = null,
-            
+
                 /**
                  * Specifies whether the sort order is ascending or descending. If not specified, ascending sort is assumed.
                  */
@@ -2960,9 +2960,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPathApi + "src/main/kotlin/org/openapitools/";
         assertFileContains(path + "api/PetApi.kt", """
-            @Retryable
-            @Client("\\${openapi-micronaut-client.base-path}")
-            """,
+                @Retryable
+                @Client("\\${openapi-micronaut-client.base-path}")
+                """,
             "import io.micronaut.retry.annotation.Retryable");
     }
 
@@ -3041,21 +3041,21 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "PatchDto.kt",
                 """
                     data class PatchDto(
-    
+
                         /**
                          * Patch operation
                          */
                         @field:NotNull
                         @field:JsonProperty(JSON_PROPERTY_OP)
                         var op: String,
-    
+
                         /**
                          * Path to update
                          */
                         @field:NotNull
                         @field:JsonProperty(JSON_PROPERTY_PATH)
                         var path: String,
-    
+
                         /**
                          * Value to assign
                          */
@@ -3064,7 +3064,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                         var `value`: Any? = null,
                     ) : HashMap<String, Any>() {
-    
+
                     """);
     }
 
@@ -3077,11 +3077,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPathApi + "src/main/kotlin/org/openapitools/";
         assertFileContains(path + "model/PackageCat.kt", """
             data class PackageCat(
-            
+
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_TYPE)
                 override var type: PackageAnimalType? = null,
-            
+
                 /**
                  * Cat Property
                  */
@@ -3089,13 +3089,135 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonProperty(JSON_PROPERTY_CAT_PROPERTY)
                 var catProperty: String,
             ) : PackageAnimal {
-            
+
                 companion object {
-            
+
                     const val JSON_PROPERTY_TYPE = "type"
                     const val JSON_PROPERTY_CAT_PROPERTY = "catProperty"
                 }
             }
+            """);
+    }
+
+    @Test
+    public void testUseSealed() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setUseSealed(true);
+        codegen.setUseOneOfInterfaces(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/oneOf_polymorphismAndInheritance.yml");
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/Bar.kt", """
+            class Bar(
+
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_ID)
+                id: String? = null,
+
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_BAR_PROP_A)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var barPropA: String? = null,
+
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_FOO_PROP_B)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var fooPropB: String? = null,
+
+                @field:Nullable
+                @field:Valid
+                @field:JsonProperty(JSON_PROPERTY_FOO)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var foo: FooRefOrValue? = null,
+
+                /**
+                 * When sub-classing, this defines the sub-class Extensible name
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_TYPE)
+                atType: String? = null,
+
+                /**
+                 * Hyperlink reference
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_HREF)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                href: String? = null,
+
+                /**
+                 * A URI to a JSON-Schema file that defines additional attributes and relationships
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                atSchemaLocation: String? = null,
+
+                /**
+                 * When sub-classing, this defines the super-class
+                 */
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                atBaseType: String? = null,
+            ) : Entity(atType, href, id, atSchemaLocation, atBaseType), BarRefOrValue {
+            """);
+
+        assertFileContains(path + "model/Banana.kt", """
+            data class Banana(
+
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_LENGTH)
+                var length: Int,
+
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
+                override var fruitType: FruitType? = null,
+            ) : Fruit {
+            """);
+
+        assertFileContains(path + "model/Entity.kt", """
+            sealed class Entity(
+
+                /**
+                 * When sub-classing, this defines the sub-class Extensible name
+                 */
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_AT_TYPE)
+                open var atType: String? = null,
+
+                /**
+                 * Hyperlink reference
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_HREF)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open var href: String? = null,
+
+                /**
+                 * unique identifier
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_ID)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open var id: String? = null,
+
+                /**
+                 * A URI to a JSON-Schema file that defines additional attributes and relationships
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open var atSchemaLocation: String? = null,
+
+                /**
+                 * When sub-classing, this defines the super-class
+                 */
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                open var atBaseType: String? = null,
+            ) {
             """);
     }
 }

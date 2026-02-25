@@ -320,6 +320,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setGenerateEnumConverters(options.generateEnumConverters());
             kotlinCodeGen.setReactive(options.reactive);
+            kotlinCodeGen.setUseSealed(options.useSealed);
             kotlinCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
