@@ -49,11 +49,16 @@ components:
     OrderDTO:
       required:
         - id
+        - shopping_notes2
       properties:
         id:
           type: string
           format: uuid
         shopping_notes:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShoppingNotesDTO'
+        shopping_notes2:
           nullable: true
           oneOf:
             - $ref: '#/components/schemas/ShoppingNotesDTO'

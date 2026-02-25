@@ -1841,4 +1841,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
             """);
     }
+
+    @Test
+    void testSwaggerNullableFlag() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/OrderDTO.kt",
+            """
+                    @field:Nullable
+                    @field:Valid
+                    @field:Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
+                    @field:JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
+                    var shoppingNotes2: OrderDTOShoppingNotes? = null,
+                """
+        );
+    }
 }

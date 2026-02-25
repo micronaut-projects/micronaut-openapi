@@ -2054,6 +2054,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.vendorExtensions.put("defaultValueInit", normalizeStr(defaultValueInit));
         }
 
+        if (schema != null && schema.getNullable() != null && schema.getNullable()) {
+            property.vendorExtensions.put("nullable", true);
+        }
+
         return property;
     }
 

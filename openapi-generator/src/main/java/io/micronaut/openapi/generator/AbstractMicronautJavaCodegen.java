@@ -1008,6 +1008,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             property.vendorExtensions.put("defaultValueInit", defaultValueInit);
         }
 
+        if (schema != null && schema.getNullable() != null && schema.getNullable()) {
+            property.vendorExtensions.put("nullable", true);
+        }
+
         return property;
     }
 

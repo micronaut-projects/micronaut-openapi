@@ -1359,4 +1359,22 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 }
             """);
     }
+
+    @Test
+    void testSwaggerNullableFlag() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "model/OrderDTO.java",
+            """
+                    @Nullable(inherited = true)
+                    @Valid
+                    @Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
+                    @JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
+                    private OrderDTOShoppingNotes shoppingNotes2;
+                """
+        );
+    }
 }
