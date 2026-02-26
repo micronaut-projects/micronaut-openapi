@@ -1092,7 +1092,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             return arrayDefaultValue(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef,
                 isArray, itemsIsString, itemsIsNumeric, itemsIsFloat, itemsIsMap, schema);
-        } else if (ModelUtils.isMapSchema(schema) && !(ModelUtils.isComposedSchema(schema))) {
+        } else if (ModelUtils.isMapSchema(schema) && !ModelUtils.isComposedSchema(schema)) {
             if (schema.getProperties() != null && !schema.getProperties().isEmpty()) {
                 // object is complex object with free-form additional properties
                 if (schema.getDefault() != null) {
@@ -1110,7 +1110,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 return Pair.of(null, null);
             }
 
-            defaultValueInit = String.format(Locale.ROOT, "new %s<>()", instantiationTypes().getOrDefault("map", "HashMap"));
+            defaultValueInit = schema.getDefault() != null ? String.format(Locale.ROOT, "new %s<>()", instantiationTypes().getOrDefault("map", "HashMap")) : null;
             defaultValueStr = null;
         } else if (ModelUtils.isIntegerSchema(schema)) {
             if (schema.getDefault() != null) {
@@ -2586,7 +2586,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("lombok", lombok);
-        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals(NULL_STRING));
+        var defaultValueInit = property.vendorExtensions.get("defaultValueInit");
+        property.vendorExtensions.put("defaultValueIsNotNull", (property.defaultValue != null && !property.defaultValue.equals(NULL_STRING)) || (defaultValueInit != null && !defaultValueInit.equals(NULL_STRING)));
         property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if (useBeanValidation && (
             (!property.isContainer && property.isModel)

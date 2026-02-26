@@ -3240,4 +3240,20 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testMapDefaultValue() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/map-default-value.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/MyModel.kt",
+            """
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_MY_MAP)
+                    var myMap: Map<String, @NotNull String> = mutableMapOf(),
+                """
+        );
+    }
 }
