@@ -18,6 +18,8 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -78,6 +80,8 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_MODE;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.micronaut.openapi.visitor.Utils.resolveTags;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
@@ -1714,5 +1718,41 @@ public final class SchemaUtils {
             }
         }
         return true;
+    }
+
+    @Nullable
+    public static RequiredMode getReqMode(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+        Boolean elementSchemaRequired = null;
+        boolean isAutoRequiredMode = true;
+        boolean isRequiredDefaultValueSet = false;
+        if (schemaAnn != null) {
+            elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
+            isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
+            var requiredMode = schemaAnn.enumValue(PROP_REQUIRED_MODE, io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
+                .orElse(null);
+            if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
+                return new RequiredMode(true, false, isRequiredDefaultValueSet);
+            } else if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED) {
+                return new RequiredMode(false, false, isRequiredDefaultValueSet);
+            }
+        }
+        return new RequiredMode(elementSchemaRequired, isAutoRequiredMode, isRequiredDefaultValueSet);
+    }
+
+    public static Schema<?> unwrapComposedSchema(Schema<?> schema) {
+        if (!(schema instanceof ComposedSchema composedSchema)) {
+            return schema;
+        }
+        if (composedSchema.getAllOf() != null && composedSchema.getAllOf().size() == 1) {
+            return unwrapComposedSchema(composedSchema.getAllOf().get(0));
+        }
+        return schema;
+    }
+
+    public record RequiredMode(
+        Boolean elementSchemaRequired,
+        boolean isAutoRequiredMode,
+        boolean isRequiredDefaultValueSet
+    ) {
     }
 }

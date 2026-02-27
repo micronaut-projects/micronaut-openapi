@@ -35,6 +35,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.ObjectMapperFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
@@ -128,6 +129,7 @@ import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.NON_PUBLIC_API;
 import static org.openapitools.codegen.CodegenConstants.PACKAGE_NAME;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
@@ -158,6 +160,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
+    public static final String OPT_USE_SEALED = "useSealed";
     public static final String OPT_COROUTINES = "coroutines";
     public static final String OPT_JVM_OVERLOADS = "jvmOverloads";
     public static final String OPT_JVM_RECORD = "jvmRecord";
@@ -200,6 +203,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean generatedAnnotation = true;
     protected String testTool;
     protected boolean reactive;
+    protected boolean useSealed;
     protected boolean coroutines;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
@@ -211,6 +215,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean jvmOverloads;
     protected boolean jvmRecord;
     protected boolean javaCompatibility = true;
+    protected boolean modelMutable = true;
     protected String implicitHeadersRegex;
     protected String appName;
     protected String dateFormat;
@@ -223,6 +228,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected Map<String, CodegenModel> allModels = new HashMap<>();
     protected List<String> additionalOneOfTypeAnnotations = new LinkedList<>();
     protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
+    // simple class name -> full qualified class name
+    protected Map<String, String> importsToDrop = new HashMap<>();
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -268,6 +275,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "MutableSet",
             "Map",
             "MutableMap",
+            "HashMap",
             "Any"
         );
 
@@ -348,6 +356,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
+        cliOptions.add(CliOption.newBoolean(OPT_USE_SEALED, "Whether to generate sealed model interfaces and classes", useSealed));
         cliOptions.add(CliOption.newBoolean(OPT_COROUTINES, "Make functions suspend", coroutines));
         cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
         cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
@@ -359,6 +368,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
         cliOptions.add(CliOption.newBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS, "If set to true, @JsonInclude annotation will be with value ALWAYS for required properties in POJO's", jsonIncludeAlwaysForRequiredFields));
+        cliOptions.add(CliOption.newBoolean(NON_PUBLIC_API, CodegenConstants.NON_PUBLIC_API_DESC));
 
         cliOptions.add(CliOption.newBoolean(OPT_JVM_OVERLOADS, "Add or not @JvmOverloads annotation for classes with properties with default values.", jvmOverloads));
         cliOptions.add(CliOption.newBoolean(OPT_JVM_RECORD, "Add or not @JvmRecord annotation to data classes.", jvmRecord));
@@ -480,6 +490,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setReactive(boolean reactive) {
         this.reactive = reactive;
+    }
+
+    public void setUseSealed(boolean useSealed) {
+        this.useSealed = useSealed;
     }
 
     public void setCoroutines(boolean coroutines) {
@@ -618,6 +632,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         // Get boolean properties
+        if (additionalProperties.containsKey(NON_PUBLIC_API)) {
+            nonPublicApi = convertPropertyToBoolean(NON_PUBLIC_API);
+        }
+        writePropertyBack(NON_PUBLIC_API, nonPublicApi);
+
         if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
             useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
@@ -657,6 +676,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             javaCompatibility = convertPropertyToBoolean(OPT_JAVA_COMPATIBILITY);
         }
         writePropertyBack(OPT_JAVA_COMPATIBILITY, javaCompatibility);
+
+        if (additionalProperties.containsKey(MODEL_MUTABLE)) {
+            modelMutable = convertPropertyToBoolean(MODEL_MUTABLE);
+        }
+        writePropertyBack(MODEL_MUTABLE, modelMutable);
 
         if (additionalProperties.containsKey(OPT_GENERATED_ANNOTATION)) {
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
@@ -698,6 +722,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
             writePropertyBack(OPT_REACTIVE, reactive);
         }
+
+        if (additionalProperties.containsKey(OPT_USE_SEALED)) {
+            useSealed = convertPropertyToBoolean(OPT_USE_SEALED);
+        }
+        writePropertyBack(OPT_USE_SEALED, useSealed);
 
         if (additionalProperties.containsKey(OPT_DATE_FORMAT)) {
             dateFormat = (String) additionalProperties.get(OPT_DATE_FORMAT);
@@ -864,9 +893,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
-                default -> throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2,
+                     OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                default ->
+                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
         }
     }
@@ -1158,6 +1191,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         var enumImports = new ArrayList<String>();
 
         for (CodegenOperation op : operationList) {
+
+            op.imports.removeIf(importsToDrop::containsKey);
 
             objs.put("normalizedBaseTag", op.vendorExtensions.get("normalizedBaseTag"));
             objs.put("normalizedTagDesc", op.vendorExtensions.get("normalizedTagDesc"));
@@ -2031,6 +2066,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.vendorExtensions.put("defaultValueInit", normalizeStr(defaultValueInit));
         }
 
+        if (schema != null && schema.getNullable() != null && schema.getNullable()) {
+            property.vendorExtensions.put("nullable", true);
+        }
+
         return property;
     }
 
@@ -2328,10 +2367,46 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
         }
 
+        for (ModelsMap models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            var parentModel = model.getParentModel();
+            if (parentModel != null
+                && parentModel.isAlias
+                && parentModel.getRef() != null
+                && model.interfaces != null
+                && model.interfaceModels != null
+            ) {
+                for (var interfaceModel : model.interfaceModels) {
+                    if (!interfaceModel.name.equals(parentModel.dataType)) {
+                        continue;
+                    }
+                    importsToDrop.put(model.parent, modelPackage + '.' + model.parent);
+                    model.imports.removeIf(importsToDrop::containsKey);
+                    model.parent = interfaceModel.name;
+                    model.parentSchema = interfaceModel.schemaName;
+                    model.parentModel = interfaceModel;
+                    model.parentRequiredVars = interfaceModel.requiredVars;
+                    model.parentVars = interfaceModel.vars;
+                    model.interfaces = null;
+                    model.interfaceModels = null;
+                    break;
+                }
+                if (model.interfaces != null) {
+                    model.interfaces.removeIf(name -> name.equals(parentModel.dataType));
+                }
+                if (model.interfaceModels != null) {
+                    model.interfaceModels.removeIf(iModel -> iModel.name.equals(parentModel.dataType));
+                }
+            }
+        }
+
         var isServer = isServer();
 
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
+
+            models.getImports().removeIf(impMap -> importsToDrop.containsValue(impMap.get("import")));
+            model.imports.removeIf(importsToDrop::containsKey);
 
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
@@ -2583,7 +2658,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (discriminator == null) {
             return;
         }
-        var oneOfInterfaceName = model.name;
+        var oneOfInterfaceName = model.classname;
         for (var modelMap : models) {
             var m = modelMap.getModels().get(0).getModel();
 
@@ -2687,7 +2762,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("withRequiredAndOptionalVars", model.vendorExtensions.get("withRequiredAndOptionalVars"));
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
-        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals(NULL_STRING));
+        var defaultValueInit = property.vendorExtensions.get("defaultValueInit");
+        property.vendorExtensions.put("defaultValueIsNotNull", (property.defaultValue != null && !property.defaultValue.equals(NULL_STRING)) || (defaultValueInit != null && !defaultValueInit.equals(NULL_STRING)));
 
         var isParentVar = (Boolean) property.vendorExtensions.get("isParentVar");
         property.vendorExtensions.put("fieldAnnPrefix", isParentVar != null && isParentVar ? "" : "field:");
@@ -2725,7 +2801,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, true, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);
 
-        var defaultValueInit = (String) property.vendorExtensions.get("defaultValueInit");
         var valueWithDefaultValue = ksp && defaultValueInit != null && !defaultValueInit.equals(NULL_STRING);
         property.vendorExtensions.put("valueWithDefaultValue", valueWithDefaultValue);
         if (valueWithDefaultValue) {
@@ -2996,11 +3071,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         } else if ("Int".equals(dataType) || "Short".equals(dataType)) {
             example = withExample(example) ? example : "56";
         } else if ("Long".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "56", "L");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "56", "L");
         } else if ("Float".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "3.4", "F");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "3.4", "F");
         } else if ("Double".equals(dataType)) {
-            example = StringUtils.appendIfMissingIgnoreCase(withExample(example) ? example : "3.4", "D");
+            example = Strings.CI.appendIfMissing(withExample(example) ? example : "3.4", "D");
         } else if ("Boolean".equals(dataType)) {
             example = withExample(example) ? example : "false";
         } else if ("File".equals(dataType) || "java.io.File".equals(dataType)) {
@@ -3146,6 +3221,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var pair = toArrayDefaultValue(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, schema);
             defaultValueInit = pair.getLeft();
             defaultValueStr = pair.getRight();
+        } else if (ModelUtils.isMapSchema(schema) && !ModelUtils.isComposedSchema(schema)) {
+            if (schema.getProperties() != null && !schema.getProperties().isEmpty()) {
+                // object is complex object with free-form additional properties
+                if (schema.getDefault() != null) {
+                    defaultValueInit = super.toDefaultValue(schema);
+                    defaultValueStr = super.toDefaultValue(schema);
+                }
+            }
+
+            if (ModelUtils.getAdditionalProperties(schema) == null) {
+                return Pair.of(null, null);
+            }
+
+            defaultValueInit = schema.getDefault() != null ? "mutableMapOf()" : null;
+            defaultValueStr = null;
         } else if (ModelUtils.isStringSchema(schema)) {
             if (schema.getDefault() != null) {
                 String def = schema.getDefault().toString();
@@ -3381,6 +3471,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setJavaCompatibility(boolean javaCompatibility) {
         this.javaCompatibility = javaCompatibility;
+    }
+
+    public void setModelMutable(boolean modelMutable) {
+        this.modelMutable = modelMutable;
     }
 
     public void setAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations) {

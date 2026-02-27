@@ -1,5 +1,6 @@
 package io.micronaut.openapi.generator;
 
+import com.tschuchort.compiletesting.SourceFile;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -325,31 +326,31 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-                
+
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-                
+
                     @field:Nullable
                     @field:Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String? = null,
-                
+
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -360,37 +361,37 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
                 class ExtendedBookInfo(
-                
+
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                
+
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     requiredReadOnly: String? = null,
-                
+
                     @Nullable
                     @Size(min = 3)
                     @Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     author: String? = null,
-                
+
                     @Nullable
                     @Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     optionalReadOnly: String? = null,
-                
+
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -409,12 +410,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-                
+
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-                
+
                     @field:NotNull
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -426,18 +427,18 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
-                
+
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-                
+
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -447,24 +448,24 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
                 class DetailedBookInfo(
-                
+
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                
+
                     @NotNull
                     @Size(min = 3)
                     @Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_AUTHOR)
                     author: String,
-                
+
                     @NotNull
                     @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_NAME)
                     name: String,
-                
+
                     @Nullable
                     @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @JsonProperty(JSON_PROPERTY_TYPE)
@@ -672,8 +673,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
-                        @Nullable @Valid coordinates: Coordinates? = null,
-                        @Nullable file: CompletedFileUpload? = null,
+                        @Body("coordinates") @Nullable @Valid coordinates: Coordinates? = null,
+                        @Body("file") @Nullable file: CompletedFileUpload? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -891,7 +892,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.kt", """
                 var id: String? = null,
-            
+
                 @field:Nullable
                 @field:Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @field:JsonProperty(JSON_PROPERTY_DATE)
@@ -1031,7 +1032,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @field:Schema(name = "currency", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1061,7 +1062,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "currency", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_CURRENCY)
@@ -1329,13 +1330,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """
                     @Bean
                     fun toEnumDataDirection() = TypeConverter<String, DataDirection> { v, _, _ -> Optional.of(DataDirection.fromValue(v)) }
-                
+
                     @Bean
                     fun toStrDataDirection() = TypeConverter<DataDirection, String> { v, _, _ -> Optional.of(v.value) }
-                
+
                     @Bean
                     fun toEnumDataChannel() = TypeConverter<String, DataChannel> { v, _, _ -> Optional.of(DataChannel.fromValue(v)) }
-                
+
                     @Bean
                     fun toStrDataChannel() = TypeConverter<DataChannel, String> { v, _, _ -> Optional.of(v.value) }
                 """
@@ -1469,6 +1470,60 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testUserParameterModeCustom() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.CUSTOM.name());
+        codegen.setUserParameterClass("com.example.CustomUserParameter");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", false, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(
+            outputPath,
+            SourceFile.Companion.kotlin(
+                "com/example/CustomUserParameter.kt",
+                """
+                package com.example;
+
+                class CustomUserParameter
+                """,
+                true,
+                false
+            )
+        );
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            "import com.example.CustomUserParameter",
+            """
+                    @Post("/deny-all-endpoint")
+                    @Secured(SecurityRule.DENY_ALL)
+                    fun denyAllOp(): Mono<Void>
+                """,
+            """
+                    @Get("/pet")
+                    @Secured("read", "admin")
+                    fun get(
+                        authentication: CustomUserParameter,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet")
+                    @Secured("write", "admin")
+                    fun save(
+                        authentication: CustomUserParameter,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet-public")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun savePublic(
+                        @Nullable authentication: CustomUserParameter? = null,
+                    ): Mono<Void>
+                """
+        );
+    }
+
+    @Test
     void testDollarSign() {
 
         var codegen = new KotlinMicronautServerCodegen();
@@ -1480,7 +1535,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 @Controller
                 @Tag(name = "\\$tag1", description = "Desc for tag with \\$dollarSign")
                 interface Tag1Api {
-                
+
                     /**
                      * {@summary summary with $dollarSign}
                      * contains $strings
@@ -1568,7 +1623,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String? = null,
                         @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
                     ): Mono<String>
-                
+
                 }
                 """
         );
@@ -1589,13 +1644,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @get:JsonValue
                     val value: String,
                 ) {
-                
+
                     /**
                      * desc enumConst1 with $dollarSign
                      */
                     @JsonProperty("ref1/\\$ref")
                     REF1__REF("ref1/\\$ref"),
-                
+
                     /**
                      * desc enumConst2 with $dollarSign
                      *
@@ -1605,14 +1660,14 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @JsonProperty("ref2/\\$ref")
                     REF2__REF("ref2/\\$ref"),
                     ;
-                
+
                     override fun toString(): String = value
-                
+
                     companion object {
-                
+
                         @JvmField
                         val VALUE_MAPPING = entries.associateBy { it.value }
-                
+
                         /**
                          * Create this enum from a value.
                          *
@@ -1654,7 +1709,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 @Serdeable
                 @Generated("io.micronaut.openapi.generator.KotlinMicronautServerCodegen")
                 data class SchemaTitleWithDollarDollarSign(
-                
+
                     /**
                      * Schema prop1 desc with $dollarSign
                      *
@@ -1667,7 +1722,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Schema(name = "\\$prop1", example = "\\$dollarSign", description = "Schema prop1 desc with \\$dollarSign", requiredMode = Schema.RequiredMode.REQUIRED, deprecated = true)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP1)
                     var dollarProp1: String,
-                
+
                     @field:Nullable
                     @field:DecimalMin("10", message = "Message with \\$dollarSign")
                     @field:DecimalMax("100", message = "Message with \\$dollarSign")
@@ -1675,7 +1730,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_DOUBLE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropDouble: BigDecimal? = null,
-                
+
                     @field:Nullable
                     @field:Min(10L, message = "Message with \\$dollarSign")
                     @field:Max(100L, message = "Message with \\$dollarSign")
@@ -1683,7 +1738,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LONG)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropLong: Long? = null,
-                
+
                     @field:Nullable
                     @field:Min(10, message = "Message with \\$dollarSign")
                     @field:Max(100, message = "Message with \\$dollarSign")
@@ -1691,53 +1746,53 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_INT)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropInt: Int? = null,
-                
+
                     @field:Nullable
                     @field:Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propEmail", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_EMAIL)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropEmail: String? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "\\$propListMinMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MIN_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropListMinMax: List<@NotNull String>? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "\\$propListMin", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MIN)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropListMin: List<@NotNull String>? = null,
-                
+
                     @field:Nullable
                     @field:Schema(name = "\\$propListMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_LIST_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropListMax: List<@NotNull String>? = null,
-                
+
                     @field:Nullable
                     @field:Size(min = 10, max = 100, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMinMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropStrMinMax: String? = null,
-                
+
                     @field:Nullable
                     @field:Size(min = 10, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMin", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MIN)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropStrMin: String? = null,
-                
+
                     @field:Nullable
                     @field:Size(max = 100, message = "Message with \\$dollarSign")
                     @field:Schema(name = "\\$propStrMax", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_DOLLAR_PROP_STR_MAX)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var dollarPropStrMax: String? = null,
-                
+
                     /**
                      * @deprecated Deprecated message with $dollarSign
                      */
@@ -1749,9 +1804,9 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var prop2: DollarSomeDto? = null,
                 ) {
-                
+
                     companion object {
-                
+
                         const val JSON_PROPERTY_DOLLAR_PROP1 = "\\$prop1"
                         const val JSON_PROPERTY_DOLLAR_PROP_DOUBLE = "\\$propDouble"
                         const val JSON_PROPERTY_DOLLAR_PROP_LONG = "\\$propLong"
@@ -1781,9 +1836,66 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "config/EnumConverterServerConfig.kt", """
                 @Bean
                 fun toEnumParamEnum() = TypeConverter<String, ParamEnum> { v, _, _ -> Optional.of(ParamEnum.fromValue(v)) }
-            
+
                 @Bean
                 fun toStrParamEnum() = TypeConverter<ParamEnum, String> { v, _, _ -> Optional.of(v.value) }
             """);
+    }
+
+    @Test
+    void testSwaggerNullableFlag() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/OrderDTO.kt",
+            """
+                    @field:Nullable
+                    @field:Valid
+                    @field:Schema(name = "shopping_notes2", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)
+                    @field:JsonProperty(JSON_PROPERTY_SHOPPING_NOTES2)
+                    var shoppingNotes2: OrderDTOShoppingNotes? = null,
+                """
+        );
+    }
+
+    @Test
+    void testMultipartFormDataParamNames() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUseAuth(false);
+        codegen.setGenerateSwaggerAnnotations(false);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/multipart-form-urlencoded.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Post("/auth/form-part")
+                    @Consumes("application/x-www-form-urlencoded")
+                    fun indexPart(
+                        @Body("grant_type", defaultValue = "none") @NotNull grantType: String = "none",
+                        @Body("client_id") @NotNull clientId: String,
+                        @Body("not_required_param\\$") @Nullable notRequiredParamDollar: Int? = null,
+                    ): Mono<String>
+                """
+        );
+    }
+
+    @Test
+    void testMapDefaultValue() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/map-default-value.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "model/MyModel.kt",
+            """
+                    @field:NotNull
+                    @field:Schema(name = "myMap", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_MY_MAP)
+                    var myMap: Map<String, @NotNull String> = mutableMapOf(),
+                """
+        );
     }
 }

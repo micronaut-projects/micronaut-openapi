@@ -84,6 +84,7 @@ import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.CONTENT_PROPS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_BEARER_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
@@ -421,6 +422,15 @@ public final class ConvertUtils {
 
         var contentNode = parentNode.get(PROP_CONTENT);
         if (contentNode != null) {
+            // if content object has "mediaType" property, then that object is single Content-object
+            // otherwise, we have multiple content objects
+            // we don't need to fix anything for multiple objects
+            var contentFieldNames = new ArrayList<String>();
+            contentNode.fieldNames().forEachRemaining(contentFieldNames::add);
+            if (!contentFieldNames.stream().anyMatch(CONTENT_PROPS::contains)) {
+                return CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
+            }
+
             examples = deserMap(PROP_EXAMPLES, contentNode, Example.class);
             encoding = deserMap("encoding", contentNode, Encoding.class);
             extensions = deserMap(PROP_EXTENSIONS, contentNode, Object.class);

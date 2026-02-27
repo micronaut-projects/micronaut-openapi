@@ -1,7 +1,7 @@
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
 {{#isMap}}
     {{#items.isNullable}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude(content = JsonInclude.Include.ALWAYS{{^required}}, value = JsonInclude.Include.USE_DEFAULTS{{/required}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude({{^required}}JsonInclude.Include.USE_DEFAULTS, {{/required}}content = JsonInclude.Include.ALWAYS)
     {{/items.isNullable}}
     {{^items.isNullable}}
         {{^required}}

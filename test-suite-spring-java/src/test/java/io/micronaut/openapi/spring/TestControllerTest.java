@@ -97,7 +97,6 @@ class TestControllerTest {
         assertEquals("integer", ageParam.getSchema().getType());
         assertEquals("int32", ageParam.getSchema().getFormat());
         assertEquals(123, ageParam.getSchema().getDefault());
-        assertTrue(ageParam.getSchema().getNullable());
     }
 
     private Parameter getParamByName(String name, List<Parameter> params) {

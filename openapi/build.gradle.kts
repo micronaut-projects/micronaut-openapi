@@ -11,12 +11,7 @@ dependencies {
 
     implementation(mn.micronaut.core)
     implementation(mn.micronaut.inject)
-    implementation(mn.micronaut.http) {
-        exclude(group = "io.micronaut", module = "micronaut-core-reactive")
-        exclude(group = "io.micronaut", module = "micronaut-context")
-        exclude(group = "io.micronaut", module = "micronaut-context-propagation")
-        exclude(group = "io.projectreactor", module = "reactor-core")
-    }
+    implementation(mn.micronaut.http)
 
     api(projects.micronautOpenapiAnnotations)
     api(projects.micronautOpenapiCommon)

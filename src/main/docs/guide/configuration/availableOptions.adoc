@@ -62,6 +62,9 @@ You can set your custom paths separated by `,`. To set absolute paths use prefix
 classpath paths use prefix `classpath:` or use prefix `project:` to set paths from project
 directory. |
 |`*micronaut.openapi.docs.format*` | System property to set Javadoc / KDoc conversion mode. Available values: **PLAIN**, **HTML_TO_MD**, **MD_TO_HTML**. + | Default: `HTML_TO_MD`
+|`*micronaut.openapi.operation.duplicate-resolution*` | System property to set operation ID duplicate resolution. Available values: +
+`*auto*` - micronaut-openapi automatically add index suffix to duplicate operation ID. +
+`*error*` - micronaut-openapi throws an exception when found duplicate operation IDs. | Default: `auto`
 |`*micronaut.openapi.schema.extra.enable*` | If this property true, you can add some extra schemas to final OpenAPI spec file. | Default: `false`
 |`*micronaut.openapi.schema.duplicate-resolution*` | System property to set schema duplicate resolution. Available values: +
 `*auto*` - micronaut-openapi automatically add index suffix to duplicate schema. +

@@ -237,4 +237,121 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withJavaCompatibility(boolean javaCompatibility);
+
+    /**
+     * If set to true, generated model will be with `var` keywords, otherwise - `val`.
+     *
+     * @param modelMutable generate code with mutable / immutable models
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withModelMutable(boolean modelMutable);
+
+    /**
+     * Generates code with explicit access modifiers to comply with Kotlin Explicit API Mode.
+     *
+     * @param explicitApi if true, then `public` modifier will be added t public methods and classes.
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withExplicitApi(boolean explicitApi);
+
+    /**
+     * If true, generated code will be with `internal` modifier.
+     *
+     * @param nonPublicApi If true, generated code will be with `internal` modifier.
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withNonPublicApi(boolean nonPublicApi);
+
+    /**
+     * Add or not @Retryable annotation to client interface. Default: false
+     *
+     * @param retryable if true, then @Retryable annotation will be added to client interface
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryable(boolean retryable);
+
+    /**
+     * Set includes parameter for Retryable annotation.
+     *
+     * @param retryableIncludes includes value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableIncludes(List<String> retryableIncludes);
+
+    /**
+     * Set excludes parameter for Retryable annotation.
+     *
+     * @param retryableExcludes excludes value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableExcludes(List<String> retryableExcludes);
+
+    /**
+     * Set attempts parameter for Retryable annotation.
+     *
+     * @param retryableAttempts attempts value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableAttempts(int retryableAttempts);
+
+    /**
+     * Set delay parameter for Retryable annotation.
+     *
+     * @param retryableDelay delay value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableDelay(String retryableDelay);
+
+    /**
+     * Set maxDelay parameter for Retryable annotation.
+     *
+     * @param retryableMaxDelay maxDelay value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableMaxDelay(String retryableMaxDelay);
+
+    /**
+     * Set multiplier parameter for Retryable annotation.
+     *
+     * @param retryableMultiplier multiplier value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableMultiplier(String retryableMultiplier);
+
+    /**
+     * Set jitter parameter for Retryable annotation.
+     *
+     * @param retryableJitter jitter value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableJitter(String retryableJitter);
+
+    /**
+     * Set predicate parameter for Retryable annotation.
+     *
+     * @param retryablePredicate predicate value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryablePredicate(String retryablePredicate);
+
+    /**
+     * Set capturedException parameter for Retryable annotation.
+     *
+     * @param retryableCapturedException capturedException value for Retryable annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withRetryableCapturedException(String retryableCapturedException);
 }

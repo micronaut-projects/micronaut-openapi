@@ -320,6 +320,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setGenerateEnumConverters(options.generateEnumConverters());
             kotlinCodeGen.setReactive(options.reactive);
+            kotlinCodeGen.setUseSealed(options.useSealed);
             kotlinCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
@@ -357,6 +358,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaServerCodegen.setGenerateControllerFromExamples(javaServerOptions.generateControllerFromExamples());
             javaServerCodegen.setUseAuth(javaServerOptions.useAuth());
             javaServerCodegen.setUserParameterMode(javaServerOptions.userParameterMode());
+            javaServerCodegen.setUserParameterClass(javaServerOptions.userParameterClass());
             javaServerCodegen.setLombok(javaServerOptions.lombok());
             javaServerCodegen.setPlural(javaServerOptions.plural());
             javaServerCodegen.setFluxForArrays(javaServerOptions.fluxForArrays());
@@ -402,6 +404,17 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaClientCodegen.setFluxForArrays(javaClientOptions.fluxForArrays());
             javaClientCodegen.setLombok(javaClientOptions.lombok());
             javaClientCodegen.setNoArgsConstructor(javaClientOptions.noArgsConstructor());
+
+            javaClientCodegen.setRetryable(javaClientOptions.retryable());
+            javaClientCodegen.setRetryableIncludes(javaClientOptions.retryableIncludes());
+            javaClientCodegen.setRetryableExcludes(javaClientOptions.retryableExcludes());
+            javaClientCodegen.setRetryableAttempts(javaClientOptions.retryableAttempts());
+            javaClientCodegen.setRetryableDelay(javaClientOptions.retryableDelay());
+            javaClientCodegen.setRetryableMaxDelay(javaClientOptions.retryableMaxDelay());
+            javaClientCodegen.setRetryableMultiplier(javaClientOptions.retryableMultiplier());
+            javaClientCodegen.setRetryableJitter(javaClientOptions.retryableJitter());
+            javaClientCodegen.setRetryablePredicate(javaClientOptions.retryablePredicate());
+            javaClientCodegen.setRetryableCapturedException(javaClientOptions.retryableCapturedException());
         }
     }
 
@@ -418,6 +431,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setCoroutines(kotlinServerOptions.coroutines());
             kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
             kotlinServerCodegen.setUserParameterMode(kotlinServerOptions.userParameterMode());
+            kotlinServerCodegen.setUserParameterClass(kotlinServerOptions.userParameterClass());
             kotlinServerCodegen.setPlural(kotlinServerOptions.plural());
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
             kotlinServerCodegen.setGenerateStreamingFileUpload(kotlinServerOptions.generateStreamingFileUpload());
@@ -425,6 +439,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setJvmOverloads(kotlinServerOptions.jvmOverloads());
             kotlinServerCodegen.setJvmRecord(kotlinServerOptions.jvmRecord());
             kotlinServerCodegen.setJavaCompatibility(kotlinServerOptions.javaCompatibility());
+            kotlinServerCodegen.setModelMutable(kotlinServerOptions.modelMutable());
+            kotlinServerCodegen.setNonPublicApi(kotlinServerOptions.nonPublicApi());
         }
     }
 
@@ -465,6 +481,20 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinClientCodegen.setJvmOverloads(kotlinClientOptions.jvmOverloads());
             kotlinClientCodegen.setJvmRecord(kotlinClientOptions.jvmRecord());
             kotlinClientCodegen.setJavaCompatibility(kotlinClientOptions.javaCompatibility());
+            kotlinClientCodegen.setModelMutable(kotlinClientOptions.modelMutable());
+            kotlinClientCodegen.setExplicitApi(kotlinClientOptions.explicitApi());
+            kotlinClientCodegen.setNonPublicApi(kotlinClientOptions.nonPublicApi());
+
+            kotlinClientCodegen.setRetryable(kotlinClientOptions.retryable());
+            kotlinClientCodegen.setRetryableIncludes(kotlinClientOptions.retryableIncludes());
+            kotlinClientCodegen.setRetryableExcludes(kotlinClientOptions.retryableExcludes());
+            kotlinClientCodegen.setRetryableAttempts(kotlinClientOptions.retryableAttempts());
+            kotlinClientCodegen.setRetryableDelay(kotlinClientOptions.retryableDelay());
+            kotlinClientCodegen.setRetryableMaxDelay(kotlinClientOptions.retryableMaxDelay());
+            kotlinClientCodegen.setRetryableMultiplier(kotlinClientOptions.retryableMultiplier());
+            kotlinClientCodegen.setRetryableJitter(kotlinClientOptions.retryableJitter());
+            kotlinClientCodegen.setRetryablePredicate(kotlinClientOptions.retryablePredicate());
+            kotlinClientCodegen.setRetryableCapturedException(kotlinClientOptions.retryableCapturedException());
         }
     }
 

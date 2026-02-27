@@ -12,7 +12,7 @@
 @Introspected
 {{/micronaut_serde_jackson}}
 {{>common/model/typeInfoAnnotation}}
-{{/formatNoEmptyLines}}interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{#discriminator}} {
+{{/formatNoEmptyLines}}{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}{{#useSealed}}sealed {{/useSealed}}interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{#discriminator}} {
 
     val {{propertyName}}: {{propertyType}}
 }
