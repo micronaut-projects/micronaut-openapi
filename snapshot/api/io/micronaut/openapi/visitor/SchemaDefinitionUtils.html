@@ -99,8 +99,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
  io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn,
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
@@ -108,12 +108,13 @@ loadScripts(document, 'script');</script>
 <div class="block">Binds the schema for the given element.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean,boolean)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
- boolean&nbsp;withProcessDeprecated)</code></div>
+ boolean&nbsp;withProcessDeprecated,
+ boolean&nbsp;isParameter)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Binds the schema for the given element.</div>
 </div>
@@ -149,8 +150,8 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getSchemaNameToClassNameMap()" class="member-name-link">getSchemaNameToClassNameMap</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;classEl,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;parentSchema,
@@ -379,15 +380,16 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean)">
+<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean,boolean)">
 <h3>bindSchemaForElement</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindSchemaForElement</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
  @Nullable
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
- boolean&nbsp;withProcessDeprecated)</span></div>
+ boolean&nbsp;withProcessDeprecated,
+ boolean&nbsp;isParameter)</span></div>
 <div class="block">Binds the schema for the given element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -397,6 +399,7 @@ loadScripts(document, 'script');</script>
 <dd><code>schemaToBind</code> - The schema to bind</dd>
 <dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dd><code>withProcessDeprecated</code> - Is need to process deprecates annotation</dd>
+<dd><code>isParameter</code> - is this element describes endpoint parameter or not</dd>
 <dt>Returns:</dt>
 <dd>The bound schema</dd>
 </dl>
@@ -432,10 +435,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)">
+<section class="detail" id="bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)">
 <h3>bindSchemaAnnotationValue</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindSchemaAnnotationValue</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
  io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn,
  @Nullable
@@ -504,10 +507,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)">
+<section class="detail" id="processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)">
 <h3>processSchemaProperty</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">processSchemaProperty</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- io.micronaut.inject.ast.TypedElement&nbsp;element,
+ io.micronaut.inject.ast.Element&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  @Nullable
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;classEl,

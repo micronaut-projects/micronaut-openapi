@@ -238,6 +238,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#addOpenapiNormalizer(java.util.Map)" class="member-name-link">addOpenapiNormalizer(Map&lt;String, String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OperationUtils.html#addOperation(java.lang.String,io.micronaut.inject.ast.MethodElement)" class="member-name-link">addOperation(String, MethodElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OperationUtils.html" title="class in io.micronaut.openapi.visitor">OperationUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/GeneratorUtils.html#addOperationDeprecatedExtension(io.micronaut.inject.ast.MethodElement,io.swagger.v3.oas.models.Operation,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addOperationDeprecatedExtension(MethodElement, Operation, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorUtils.html" title="class in io.micronaut.openapi.visitor">GeneratorUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#addOperationToGroup(java.lang.String,java.lang.String,io.swagger.v3.oas.models.Operation,org.openapitools.codegen.CodegenOperation,java.util.Map)" class="member-name-link">addOperationToGroup(String, String, Operation, CodegenOperation, Map&lt;String, List&lt;CodegenOperation&gt;&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -304,7 +306,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#addTypeMapping(java.util.Map)" class="member-name-link">addTypeMapping(Map&lt;String, String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/generator/Utils.html#addUserParameter(org.openapitools.codegen.CodegenOperation,io.micronaut.openapi.generator.UserParameterMode,boolean,boolean)" class="member-name-link">addUserParameter(CodegenOperation, UserParameterMode, boolean, boolean)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#addUserParameter(org.openapitools.codegen.CodegenOperation,io.micronaut.openapi.generator.UserParameterMode,java.lang.String,boolean,boolean)" class="member-name-link">addUserParameter(CodegenOperation, UserParameterMode, String, boolean, boolean)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/GeneratorUtils.html#addValidationMessages(io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addValidationMessages(Element, Schema&lt;?&gt;, Map&lt;String, String&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorUtils.html" title="class in io.micronaut.openapi.visitor">GeneratorUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -348,7 +350,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html" title="class in io.micronaut.openapi.annotation.mappers">OpenAPISecurityAnnotationMapper</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ServerVariableRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/ApiResponsesRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ApiResponsesRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ApiResponsesRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
@@ -587,11 +589,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#BINARY" class="member-name-link">BINARY</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue(VisitorContext, TypedElement, Schema&lt;?&gt;, AnnotationValue&lt;Schema&gt;, ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue(VisitorContext, Element, Schema&lt;?&gt;, AnnotationValue&lt;Schema&gt;, ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
 <dd>
 <div class="block">Binds the schema for the given element.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean)" class="member-name-link">bindSchemaForElement(VisitorContext, TypedElement, ClassElement, Schema&lt;?&gt;, ClassElement, boolean)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean,boolean)" class="member-name-link">bindSchemaForElement(VisitorContext, Element, ClassElement, Schema&lt;?&gt;, ClassElement, boolean, boolean)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
 <dd>
 <div class="block">Binds the schema for the given element.</div>
 </dd>
@@ -626,6 +628,8 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:C">C</h2>
 <dl class="index">
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#calcChainableName(java.lang.String,java.util.Set)" class="member-name-link">calcChainableName(String, Set&lt;String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#calcClassesOutputPath(io.micronaut.inject.writer.GeneratedFile,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">calcClassesOutputPath(GeneratedFile, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/FileUtils.html#calcFinalFilename(java.lang.String,io.micronaut.openapi.visitor.group.OpenApiInfo,boolean,java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">calcFinalFilename(String, OpenApiInfo, boolean, String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></dt>
@@ -635,6 +639,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#calcProjectPath(io.micronaut.inject.writer.GeneratedFile,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">calcProjectPath(GeneratedFile, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Utils.html#calcQueryValueFormat(org.openapitools.codegen.CodegenParameter)" class="member-name-link">calcQueryValueFormat(CodegenParameter)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#calcRetryableAnnotation()" class="member-name-link">calcRetryableAnnotation()</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#calcRetryableAnnotation()" class="member-name-link">calcRetryableAnnotation()</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/Callback31Deserializer.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.util">Callback31Deserializer</a> - Class in <a href="io/micronaut/openapi/swagger/core/util/package-summary.html">io.micronaut.openapi.swagger.core.util</a></dt>
 <dd>
@@ -724,6 +732,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiExtraSchemaVisitor.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiExtraSchemaVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiExtraSchemaVisitor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OperationUtils.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OperationUtils.html" title="class in io.micronaut.openapi.visitor">OperationUtils</a></dt>
+<dd>
+<div class="block">Cleanup context.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
 <dd>
 <div class="block">Cleanup context.</div>
@@ -839,6 +851,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#contains(java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">contains(String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/TemplatePaths.html#CONTENT" class="member-name-link">CONTENT</a> - Static variable in interface io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/TemplatePaths.html" title="interface in io.micronaut.openapi.adoc">TemplatePaths</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiModelProp.html#CONTENT_PROPS" class="member-name-link">CONTENT_PROPS</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#CONTENT_TYPE_ANY" class="member-name-link">CONTENT_TYPE_ANY</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -995,6 +1009,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#currentTableColumn" class="member-name-link">currentTableColumn</a> - Variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#currentTableNode" class="member-name-link">currentTableNode</a> - Variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/UserParameterMode.html#CUSTOM" class="member-name-link">CUSTOM</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/UserParameterMode.html" title="enum class in io.micronaut.openapi.generator">UserParameterMode</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#customClasses()" class="member-name-link">customClasses()</a> - Static method in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>
@@ -1214,6 +1230,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#elementSchemaRequired()" class="member-name-link">elementSchemaRequired()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Returns the value of the <code>elementSchemaRequired</code> record component.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ElementUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
 <div class="block">Some util methods.</div>
@@ -1394,6 +1414,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/Pair.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Indicates whether some other object is "equal to" this one.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html" title="class in io.micronaut.openapi.visitor">UrlUtils.OpPath</a></dt>
 <dd>
 <div class="block">Indicates whether some other object is "equal to" this one.</div>
@@ -1488,6 +1512,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#EXPANDABLE_PROPERTIES_ARGUMENT" class="member-name-link">EXPANDABLE_PROPERTIES_ARGUMENT</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#expandProperties(java.lang.String,java.util.List,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">expandProperties(String, List&lt;Pair&lt;String, String&gt;&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#explicitApi" class="member-name-link">explicitApi</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#explicitObjectType" class="member-name-link">explicitObjectType</a> - Static variable in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
@@ -2089,6 +2115,14 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getDisallowAdditionalPropertiesIfNotPresent()" class="member-name-link">getDisallowAdditionalPropertiesIfNotPresent()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getDiscriminatorPropertyType(io.swagger.v3.oas.models.media.Schema,java.lang.String)" class="member-name-link">getDiscriminatorPropertyType(Schema, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>
+<div class="block">Get the property type for the discriminator</div>
+</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getDiscriminatorSchema(io.swagger.v3.oas.models.media.Schema,java.lang.String)" class="member-name-link">getDiscriminatorSchema(Schema, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>
+<div class="block">Get the Schema for the discriminator type.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/GroupProperties.html#getDisplayName()" class="member-name-link">getDisplayName()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.html" title="class in io.micronaut.openapi.visitor.group">GroupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getDocExtension()" class="member-name-link">getDocExtension()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
@@ -2385,6 +2419,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#getMethodDescription(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getMethodDescription(VisitorContext)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OperationUtils.html#getMethodsByOperationId(java.lang.String)" class="member-name-link">getMethodsByOperationId(String)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OperationUtils.html" title="class in io.micronaut.openapi.visitor">OperationUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/javadoc/JavadocDescription.html#getMethodSummary()" class="member-name-link">getMethodSummary()</a> - Method in class io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaConverterMixin.html#getMinContains()" class="member-name-link">getMinContains()</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaConverterMixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">SchemaConverterMixin</a></dt>
@@ -2425,6 +2461,12 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/Schema31Mixin.html#getNullable()" class="member-name-link">getNullable()</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Schema31Mixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Schema31Mixin</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getObjectAsStringList(java.lang.Object)" class="member-name-link">getObjectAsStringList(Object)</a> - Static method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getObjectAsStringListMap(java.lang.Object)" class="member-name-link">getObjectAsStringListMap(Object)</a> - Static method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getObjectAsStringMap(java.lang.Object)" class="member-name-link">getObjectAsStringMap(Object)</a> - Static method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getOneOfAnyOfDescendants(java.lang.String,java.lang.String,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">getOneOfAnyOfDescendants(String, String, Schema)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>
 <div class="block">This function is only used for composed schemas which have a discriminator
@@ -2441,6 +2483,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html#getOpenApis()" class="member-name-link">getOpenApis()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/EndpointInfo.html#getOperation()" class="member-name-link">getOperation()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#getOperationDuplicateResolution(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getOperationDuplicateResolution(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#getOperationOnPathItem(io.swagger.v3.oas.models.PathItem,io.micronaut.http.HttpMethod)" class="member-name-link">getOperationOnPathItem(PathItem, HttpMethod)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -2532,6 +2576,12 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#getProjectPath(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getProjectPath(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getPropertyAsStringList(java.lang.String)" class="member-name-link">getPropertyAsStringList(String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getPropertyAsStringListMap(java.lang.String)" class="member-name-link">getPropertyAsStringListMap(String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#getPropertyAsStringMap(java.lang.String)" class="member-name-link">getPropertyAsStringMap(String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#getPropertyExampleValue(org.openapitools.codegen.CodegenProperty)" class="member-name-link">getPropertyExampleValue(CodegenProperty)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#getPropertyExampleValue(org.openapitools.codegen.CodegenProperty,boolean)" class="member-name-link">getPropertyExampleValue(CodegenProperty, boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -2555,6 +2605,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getRemoveOperationIdPrefixCount()" class="member-name-link">getRemoveOperationIdPrefixCount()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getRemoveOperationIdPrefixDelimiter()" class="member-name-link">getRemoveOperationIdPrefixDelimiter()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#getReqMode(io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">getReqMode(AnnotationValue&lt;Schema&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/view/AbstractViewConfig.html#getResources()" class="member-name-link">getResources()</a> - Method in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a></dt>
 <dd>&nbsp;</dd>
@@ -2879,6 +2931,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/Pair.html#hashCode()" class="member-name-link">hashCode()</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#hashCode()" class="member-name-link">hashCode()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Returns a hash code value for this object.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html#hashCode()" class="member-name-link">hashCode()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html" title="class in io.micronaut.openapi.visitor">UrlUtils.OpPath</a></dt>
 <dd>
 <div class="block">Returns a hash code value for this object.</div>
@@ -2973,6 +3029,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#importMapping" class="member-name-link">importMapping</a> - Variable in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#importMapping()" class="member-name-link">importMapping()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#importsToDrop" class="member-name-link">importsToDrop</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#importsToDrop" class="member-name-link">importsToDrop</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/IncludeExcludeProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">IncludeExcludeProperties</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
@@ -3130,6 +3190,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#isArraySchema(io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">isArraySchema(Schema&lt;?&gt;, OpenAPI)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#isAutoRequiredMode()" class="member-name-link">isAutoRequiredMode()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Returns the value of the <code>isAutoRequiredMode</code> record component.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/security/SecurityProperties.html#isBasicAuthEnabled()" class="member-name-link">isBasicAuthEnabled()</a> - Method in class io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/SecurityProperties.html" title="class in io.micronaut.openapi.visitor.security">SecurityProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#isConstructorArgumentsAsRequired(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isConstructorArgumentsAsRequired(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
@@ -3295,7 +3359,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Checking if the element not nullable.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isNullable(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isNullable(TypedElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNullable(Element)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>
 <div class="block">Checks Nullable annotations / optional type to understand that the element can be null.</div>
 </dd>
@@ -3333,6 +3397,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#isRemoveOperationIdPrefix()" class="member-name-link">isRemoveOperationIdPrefix()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#isRequiredDefaultValueSet()" class="member-name-link">isRequiredDefaultValueSet()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Returns the value of the <code>isRequiredDefaultValueSet</code> record component.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#isReservedWord(java.lang.String)" class="member-name-link">isReservedWord(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#isReservedWord(java.lang.String)" class="member-name-link">isReservedWord(String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
@@ -3985,6 +4053,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Property that determines whether properties that have no view annotations are included in JSON serialization views.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_OPERATION_DUPLICATE_RESOLUTION" class="member-name-link">MICRONAUT_OPENAPI_OPERATION_DUPLICATE_RESOLUTION</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></dt>
+<dd>
+<div class="block">System property to set operation duplicate resolution.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_PROJECT_DIR" class="member-name-link">MICRONAUT_OPENAPI_PROJECT_DIR</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></dt>
 <dd>
 <div class="block">System property that specifies the location of current project.</div>
@@ -4196,6 +4268,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#modelFilename(java.lang.String,java.lang.String,java.lang.String)" class="member-name-link">modelFilename(String, String, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#modelMutable" class="member-name-link">modelMutable</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#modelNameMapping" class="member-name-link">modelNameMapping</a> - Variable in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#modelNameMapping()" class="member-name-link">modelNameMapping()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
@@ -4290,6 +4364,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/Utils.html#normalizeExtraAnnotations(java.lang.String,boolean,java.util.Map)" class="member-name-link">normalizeExtraAnnotations(String, boolean, Map&lt;String, Object&gt;)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeHeaders(java.util.Map,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeHeaders(Map&lt;String, Header&gt;, OpenAPI, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#normalizeJavaClass(java.lang.String)" class="member-name-link">normalizeJavaClass(String)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#normalizeKotlinClass(java.lang.String)" class="member-name-link">normalizeKotlinClass(String)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeOpenApi(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeOpenApi(OpenAPI, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -4653,6 +4731,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/OperationUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OperationUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Methods to construct OpenPI schema definition.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html#opIdPostfix()" class="member-name-link">opIdPostfix()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html" title="class in io.micronaut.openapi.visitor">UrlUtils.OpPath</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/openapi/visitor/UrlUtils.OpPath.html#param-opIdPostfix"><code>opIdPostfix</code></a> record component.</div>
@@ -4732,6 +4814,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_DATE_TIME_FORMAT" class="member-name-link">OPT_DATE_TIME_FORMAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_DATE_TIME_FORMAT" class="member-name-link">OPT_DATE_TIME_FORMAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_EXPLICIT_API" class="member-name-link">OPT_EXPLICIT_API</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_FLUX_FOR_ARRAYS" class="member-name-link">OPT_FLUX_FOR_ARRAYS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -4825,6 +4909,46 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR" class="member-name-link">OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE" class="member-name-link">OPT_RETRYABLE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE" class="member-name-link">OPT_RETRYABLE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_ATTEMPTS" class="member-name-link">OPT_RETRYABLE_ATTEMPTS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_ATTEMPTS" class="member-name-link">OPT_RETRYABLE_ATTEMPTS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_CAPTURED_EXCEPTION" class="member-name-link">OPT_RETRYABLE_CAPTURED_EXCEPTION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_CAPTURED_EXCEPTION" class="member-name-link">OPT_RETRYABLE_CAPTURED_EXCEPTION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_DELAY" class="member-name-link">OPT_RETRYABLE_DELAY</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_DELAY" class="member-name-link">OPT_RETRYABLE_DELAY</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_EXCLUDES" class="member-name-link">OPT_RETRYABLE_EXCLUDES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_EXCLUDES" class="member-name-link">OPT_RETRYABLE_EXCLUDES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_INCLUDES" class="member-name-link">OPT_RETRYABLE_INCLUDES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_INCLUDES" class="member-name-link">OPT_RETRYABLE_INCLUDES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_JITTER" class="member-name-link">OPT_RETRYABLE_JITTER</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_JITTER" class="member-name-link">OPT_RETRYABLE_JITTER</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_MAX_DELAY" class="member-name-link">OPT_RETRYABLE_MAX_DELAY</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_MAX_DELAY" class="member-name-link">OPT_RETRYABLE_MAX_DELAY</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_MULTIPLIER" class="member-name-link">OPT_RETRYABLE_MULTIPLIER</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_MULTIPLIER" class="member-name-link">OPT_RETRYABLE_MULTIPLIER</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#OPT_RETRYABLE_PREDICATE" class="member-name-link">OPT_RETRYABLE_PREDICATE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#OPT_RETRYABLE_PREDICATE" class="member-name-link">OPT_RETRYABLE_PREDICATE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_SKIP_SORTING_OPERATIONS" class="member-name-link">OPT_SKIP_SORTING_OPERATIONS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_TEST" class="member-name-link">OPT_TEST</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -4869,11 +4993,17 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_USE_SEALED" class="member-name-link">OPT_USE_SEALED</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_USE_SEALED" class="member-name-link">OPT_USE_SEALED</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_USE_TAGS" class="member-name-link">OPT_USE_TAGS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_USE_TAGS" class="member-name-link">OPT_USE_TAGS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.html#OPT_USE_URL_CONNECTION_CACHE" class="member-name-link">OPT_USE_URL_CONNECTION_CACHE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.html" title="class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#OPT_USER_PARAMETER_CLASS" class="member-name-link">OPT_USER_PARAMETER_CLASS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#OPT_USER_PARAMETER_CLASS" class="member-name-link">OPT_USER_PARAMETER_CLASS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#OPT_USER_PARAMETER_MODE" class="member-name-link">OPT_USER_PARAMETER_MODE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -5177,7 +5307,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Converts annotation to model.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html#processOperations(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">processOperations(OpenAPI)</a> - Method in class io.micronaut.openapi.postprocessors.<a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html" title="class in io.micronaut.openapi.postprocessors">OpenApiOperationsPostProcessor</a></dt>
+<dt><a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html#processOperations(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">processOperations(OpenAPI, VisitorContext)</a> - Method in class io.micronaut.openapi.postprocessors.<a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html" title="class in io.micronaut.openapi.postprocessors">OpenApiOperationsPostProcessor</a></dt>
 <dd>
 <div class="block">Process operations, making operation ids unique.</div>
 </dd>
@@ -5197,7 +5327,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultGenerator.html#processPaths(io.swagger.v3.oas.models.Paths)" class="member-name-link">processPaths(Paths)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultGenerator.html" title="class in org.openapitools.codegen">DefaultGenerator</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty(VisitorContext, TypedElement, ClassElement, ClassElement, Schema&lt;?&gt;, Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty(VisitorContext, Element, ClassElement, ClassElement, Schema&lt;?&gt;, Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></dt>
 <dd>
 <div class="block">Processes a schema property.</div>
 </dd>
@@ -5276,6 +5406,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiModelProp.html#PROP_DISCRIMINATOR_PROPERTY" class="member-name-link">PROP_DISCRIMINATOR_PROPERTY</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiModelProp.html#PROP_ENABLED" class="member-name-link">PROP_ENABLED</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiModelProp.html#PROP_ENCODING" class="member-name-link">PROP_ENCODING</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiModelProp.html#PROP_ENUM" class="member-name-link">PROP_ENUM</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></dt>
 <dd>&nbsp;</dd>
@@ -5455,15 +5587,23 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/FileUtils.html#readFile(java.io.BufferedReader)" class="member-name-link">readFile(BufferedReader)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#readIntProperty(java.lang.String,java.util.Map,int)" class="member-name-link">readIntProperty(String, Map&lt;String, Object&gt;, int)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Utils.html#readListOfStringsProperty(java.lang.Object)" class="member-name-link">readListOfStringsProperty(Object)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#readListOfStringsProperty(java.lang.Object,java.util.List)" class="member-name-link">readListOfStringsProperty(Object, List&lt;String&gt;)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Utils.html#readListOfStringsProperty(java.lang.String,java.util.Map)" class="member-name-link">readListOfStringsProperty(String, Map&lt;String, Object&gt;)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#readListOfStringsProperty(java.lang.String,java.util.Map,java.util.List)" class="member-name-link">readListOfStringsProperty(String, Map&lt;String, Object&gt;, List&lt;String&gt;)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html#readOpenApi(java.lang.String,boolean)" class="member-name-link">readOpenApi(String, boolean)</a> - Static method in class io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html" title="class in io.micronaut.openapi.adoc.utils">SwaggerUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#readOpenApiConfigFile(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readOpenApiConfigFile(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html#readOpenApiFromLocation(java.lang.String)" class="member-name-link">readOpenApiFromLocation(String)</a> - Static method in class io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html" title="class in io.micronaut.openapi.adoc.utils">SwaggerUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/Utils.html#readProperty(java.lang.String,java.util.Map,java.lang.String)" class="member-name-link">readProperty(String, Map&lt;String, Object&gt;, String)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html#readPropertySourceList(java.lang.String)" class="member-name-link">readPropertySourceList(String)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a></dt>
 <dd>&nbsp;</dd>
@@ -5576,6 +5716,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#%3Cinit%3E(java.lang.Boolean,boolean,boolean)" class="member-name-link">RequiredMode(Boolean, boolean, boolean)</a> - Constructor for record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Creates an instance of a <code>RequiredMode</code> record class.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#requiredPropertiesInConstructor" class="member-name-link">requiredPropertiesInConstructor</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#reservedWords" class="member-name-link">reservedWords</a> - Variable in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
@@ -5657,6 +5801,50 @@ loadScripts(document, 'script');</script>
 <div class="block">OpenApi introspection configuration for Swagger-model.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/introspections/ResponsesConfiguration.html#%3Cinit%3E()" class="member-name-link">ResponsesConfiguration()</a> - Constructor for class io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ResponsesConfiguration.html" title="class in io.micronaut.openapi.introspections">ResponsesConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryable" class="member-name-link">retryable</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryable" class="member-name-link">retryable</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#RETRYABLE_ANNOTATION" class="member-name-link">RETRYABLE_ANNOTATION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#RETRYABLE_ANNOTATION" class="member-name-link">RETRYABLE_ANNOTATION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableAttempts" class="member-name-link">retryableAttempts</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableAttempts" class="member-name-link">retryableAttempts</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableCapturedException" class="member-name-link">retryableCapturedException</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableCapturedException" class="member-name-link">retryableCapturedException</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableDelay" class="member-name-link">retryableDelay</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableDelay" class="member-name-link">retryableDelay</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableExcludes" class="member-name-link">retryableExcludes</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableExcludes" class="member-name-link">retryableExcludes</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableIncludes" class="member-name-link">retryableIncludes</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableIncludes" class="member-name-link">retryableIncludes</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableJitter" class="member-name-link">retryableJitter</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableJitter" class="member-name-link">retryableJitter</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableMaxDelay" class="member-name-link">retryableMaxDelay</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableMaxDelay" class="member-name-link">retryableMaxDelay</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryableMultiplier" class="member-name-link">retryableMultiplier</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryableMultiplier" class="member-name-link">retryableMultiplier</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#retryablePredicate" class="member-name-link">retryablePredicate</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#retryablePredicate" class="member-name-link">retryablePredicate</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Formatting.html#rightTrim(java.lang.String)" class="member-name-link">rightTrim(String)</a> - Static method in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Formatting.html" title="enum class in io.micronaut.openapi.generator">Formatting</a></dt>
 <dd>
@@ -5759,6 +5947,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Some schema util methods.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a> - Record Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/OpenAPIInclude.html#security()" class="member-name-link">security()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIInclude.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIInclude</a></dt>
 <dd>
 <div class="block">A declaration of which security mechanisms can be used across the API.</div>
@@ -6077,6 +6267,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/management/SpringActuatorProperties.html#setExcludedEndpoints(java.util.List)" class="member-name-link">setExcludedEndpoints(List&lt;String&gt;)</a> - Method in class io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/SpringActuatorProperties.html" title="class in io.micronaut.openapi.visitor.management">SpringActuatorProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setExplicitApi(boolean)" class="member-name-link">setExplicitApi(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/management/EndpointProperties.html#setExtensions(java.util.Map)" class="member-name-link">setExtensions(Map&lt;String, Object&gt;)</a> - Method in class io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/EndpointProperties.html" title="class in io.micronaut.openapi.visitor.management">EndpointProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/management/EndpointsConfig.html#setExtensions(java.util.Map)" class="member-name-link">setExtensions(Map&lt;String, Object&gt;)</a> - Method in class io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/EndpointsConfig.html" title="class in io.micronaut.openapi.visitor.management">EndpointsConfig</a></dt>
@@ -6238,6 +6430,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the method summary.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setModelMutable(boolean)" class="member-name-link">setModelMutable(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setModelNamePrefix(java.lang.String)" class="member-name-link">setModelNamePrefix(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#setModelNamePrefix(java.lang.String)" class="member-name-link">setModelNamePrefix(String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
@@ -6357,6 +6551,46 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#setReservedWordsLowerCase(java.util.List)" class="member-name-link">setReservedWordsLowerCase(List&lt;String&gt;)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryable(boolean)" class="member-name-link">setRetryable(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryable(boolean)" class="member-name-link">setRetryable(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableAttempts(int)" class="member-name-link">setRetryableAttempts(int)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableAttempts(int)" class="member-name-link">setRetryableAttempts(int)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableCapturedException(java.lang.String)" class="member-name-link">setRetryableCapturedException(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableCapturedException(java.lang.String)" class="member-name-link">setRetryableCapturedException(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableDelay(java.lang.String)" class="member-name-link">setRetryableDelay(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableDelay(java.lang.String)" class="member-name-link">setRetryableDelay(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableExcludes(java.util.List)" class="member-name-link">setRetryableExcludes(List&lt;String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableExcludes(java.util.List)" class="member-name-link">setRetryableExcludes(List&lt;String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableIncludes(java.util.List)" class="member-name-link">setRetryableIncludes(List&lt;String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableIncludes(java.util.List)" class="member-name-link">setRetryableIncludes(List&lt;String&gt;)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableJitter(java.lang.String)" class="member-name-link">setRetryableJitter(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableJitter(java.lang.String)" class="member-name-link">setRetryableJitter(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableMaxDelay(java.lang.String)" class="member-name-link">setRetryableMaxDelay(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableMaxDelay(java.lang.String)" class="member-name-link">setRetryableMaxDelay(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryableMultiplier(java.lang.String)" class="member-name-link">setRetryableMultiplier(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryableMultiplier(java.lang.String)" class="member-name-link">setRetryableMultiplier(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html#setRetryablePredicate(java.lang.String)" class="member-name-link">setRetryablePredicate(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#setRetryablePredicate(java.lang.String)" class="member-name-link">setRetryablePredicate(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/javadoc/JavadocDescription.html#setReturnDescription(java.lang.String)" class="member-name-link">setReturnDescription(String)</a> - Method in class io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a></dt>
 <dd>
 <div class="block">Sets the return description.</div>
@@ -6456,11 +6690,17 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setUseOptional(boolean)" class="member-name-link">setUseOptional(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#setUserParameterClass(java.lang.String)" class="member-name-link">setUserParameterClass(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#setUserParameterClass(java.lang.String)" class="member-name-link">setUserParameterClass(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#setUserParameterMode(java.lang.String)" class="member-name-link">setUserParameterMode(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#setUserParameterMode(java.lang.String)" class="member-name-link">setUserParameterMode(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setUseSealed(boolean)" class="member-name-link">setUseSealed(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setUseSealed(boolean)" class="member-name-link">setUseSealed(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setUseTags(boolean)" class="member-name-link">setUseTags(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -6523,6 +6763,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/view/AbstractViewConfig.html#specUrl" class="member-name-link">specUrl</a> - Variable in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#specVersionGreaterThanOrEqualTo310(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">specVersionGreaterThanOrEqualTo310(OpenAPI)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/openapitools/codegen/DefaultCodegen.html#SPLIT_ON_SEMICOLON_OR_NEWLINE_REGEX" class="member-name-link">SPLIT_ON_SEMICOLON_OR_NEWLINE_REGEX</a> - Static variable in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.TestFramework.html#SPOCK" class="member-name-link">SPOCK</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.TestFramework.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.TestFramework</a></dt>
 <dd>&nbsp;</dd>
@@ -6961,6 +7203,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Pair.html#toString()" class="member-name-link">toString()</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html#toString()" class="member-name-link">toString()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></dt>
+<dd>
+<div class="block">Returns a string representation of this record class.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html#toString()" class="member-name-link">toString()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html" title="class in io.micronaut.openapi.visitor">UrlUtils.OpPath</a></dt>
 <dd>
 <div class="block">Returns a string representation of this record class.</div>
@@ -6996,7 +7242,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Return the variable name by removing invalid characters and proper escaping if
  it's a reserved word.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;ServerVariable&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ServerVariableRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/ApiResponsesRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;ApiResponses&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ApiResponsesRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ApiResponsesRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#treeToValue(com.fasterxml.jackson.databind.JsonNode,java.lang.Class,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">treeToValue(JsonNode, Class&lt;T&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>
@@ -7074,6 +7320,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#unaliasSchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">unaliasSchema(Schema)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/StringUtil.html#UNDERSCORE" class="member-name-link">UNDERSCORE</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/StringUtil.html" title="class in io.micronaut.openapi.visitor">StringUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#unwrapComposedSchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">unwrapComposedSchema(Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#updateAllModels(java.util.Map)" class="member-name-link">updateAllModels(Map&lt;String, ModelsMap&gt;)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>
@@ -7217,6 +7465,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/FileUtils.html#userDefinedSpecFile(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">userDefinedSpecFile(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#userParameterClass" class="member-name-link">userParameterClass</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#userParameterMode" class="member-name-link">userParameterMode</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#userParameterMode" class="member-name-link">userParameterMode</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
@@ -7226,6 +7476,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Supported user parameter modes.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#useSealed" class="member-name-link">useSealed</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#useSealed" class="member-name-link">useSealed</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#useTags" class="member-name-link">useTags</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -7744,6 +7996,10 @@ the order they are declared.</div>
 <dd>
 <div class="block">Add the enum name mappings.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withExplicitApi(boolean)" class="member-name-link">withExplicitApi(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Generates code with explicit access modifiers to comply with Kotlin Explicit API Mode.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/view/AbstractViewConfig.html#withFinalUrlPrefixCache" class="member-name-link">withFinalUrlPrefixCache</a> - Variable in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withFluxForArrays(boolean)" class="member-name-link">withFluxForArrays(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
@@ -7918,6 +8174,14 @@ the order they are declared.</div>
 <dd>
 <div class="block">If set to true, generated code will be with lombok annotations.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withModelMutable(boolean)" class="member-name-link">withModelMutable(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated model will be with `var` keywords, otherwise - `val`.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withModelMutable(boolean)" class="member-name-link">withModelMutable(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated model will be with `var` keywords, otherwise - `val`.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withModelNameMapping(java.util.Map)" class="member-name-link">withModelNameMapping(Map&lt;String, String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
 <div class="block">Add the model name mappings.</div>
@@ -7945,6 +8209,14 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html#withNoArgsConstructor(boolean)" class="member-name-link">withNoArgsConstructor(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></dt>
 <dd>
 <div class="block">Generate or not public no-args constructor always.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withNonPublicApi(boolean)" class="member-name-link">withNonPublicApi(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">If true, generated code will be with `internal` modifier.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withNonPublicApi(boolean)" class="member-name-link">withNonPublicApi(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">If true, generated code will be with `internal` modifier.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withOpenapiNormalizer(java.util.Map)" class="member-name-link">withOpenapiNormalizer(Map&lt;String, String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
@@ -8009,6 +8281,86 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings(List&lt;ResponseBodyMapping&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
 <div class="block">Add the response body mappings.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryable(boolean)" class="member-name-link">withRetryable(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Add or not @Retryable annotation to client interface.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryable(boolean)" class="member-name-link">withRetryable(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Add or not @Retryable annotation to client interface.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableAttempts(int)" class="member-name-link">withRetryableAttempts(int)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set attempts parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableAttempts(int)" class="member-name-link">withRetryableAttempts(int)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set attempts parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableCapturedException(java.lang.String)" class="member-name-link">withRetryableCapturedException(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set capturedException parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableCapturedException(java.lang.String)" class="member-name-link">withRetryableCapturedException(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set capturedException parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableDelay(java.lang.String)" class="member-name-link">withRetryableDelay(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set delay parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableDelay(java.lang.String)" class="member-name-link">withRetryableDelay(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set delay parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableExcludes(java.util.List)" class="member-name-link">withRetryableExcludes(List&lt;String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set excludes parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableExcludes(java.util.List)" class="member-name-link">withRetryableExcludes(List&lt;String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set excludes parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableIncludes(java.util.List)" class="member-name-link">withRetryableIncludes(List&lt;String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set includes parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableIncludes(java.util.List)" class="member-name-link">withRetryableIncludes(List&lt;String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set includes parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableJitter(java.lang.String)" class="member-name-link">withRetryableJitter(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set jitter parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableJitter(java.lang.String)" class="member-name-link">withRetryableJitter(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set jitter parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableMaxDelay(java.lang.String)" class="member-name-link">withRetryableMaxDelay(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set maxDelay parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableMaxDelay(java.lang.String)" class="member-name-link">withRetryableMaxDelay(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set maxDelay parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryableMultiplier(java.lang.String)" class="member-name-link">withRetryableMultiplier(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set multiplier parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryableMultiplier(java.lang.String)" class="member-name-link">withRetryableMultiplier(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set multiplier parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withRetryablePredicate(java.lang.String)" class="member-name-link">withRetryablePredicate(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set predicate parameter for Retryable annotation.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withRetryablePredicate(java.lang.String)" class="member-name-link">withRetryablePredicate(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set predicate parameter for Retryable annotation.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withSchemaMapping(java.util.Map)" class="member-name-link">withSchemaMapping(Map&lt;String, String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
@@ -8079,6 +8431,14 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withUseOneOfInterfaces(boolean)" class="member-name-link">withUseOneOfInterfaces(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
 <div class="block">Flag to indicate whether to use the utils.OneOfImplementorAdditionalData related logic.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html#withUserParameterClass(java.lang.String)" class="member-name-link">withUserParameterClass(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">Specifies the class to be used for the user parameter in generated controllers.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withUserParameterClass(java.lang.String)" class="member-name-link">withUserParameterClass(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">Specifies the class to be used for the user parameter in generated controllers.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html#withUserParameterMode(java.lang.String)" class="member-name-link">withUserParameterMode(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></dt>
 <dd>

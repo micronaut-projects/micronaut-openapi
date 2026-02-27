@@ -165,13 +165,28 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelMutable(boolean)" class="member-name-link">withModelMutable</a><wbr>(boolean&nbsp;modelMutable)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If set to true, generated model will be with `var` keywords, otherwise - `val`.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withNonPublicApi(boolean)" class="member-name-link">withNonPublicApi</a><wbr>(boolean&nbsp;nonPublicApi)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If true, generated code will be with `internal` modifier.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withPlural(boolean)" class="member-name-link">withPlural</a><wbr>(boolean&nbsp;plural)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will pluralize parameters and properties for arrays.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUserParameterMode(java.lang.String)" class="member-name-link">withUserParameterMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterMode)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUserParameterClass(java.lang.String)" class="member-name-link">withUserParameterClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterClass)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Specifies the class to be used for the user parameter in generated controllers.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withUserParameterMode(java.lang.String)" class="member-name-link">withUserParameterMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterMode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add or not principal / authentication parameter to controller methods.</div>
 </div>
 </div>
@@ -261,10 +276,25 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
  Available modes:
  NONE
  PRINCIPAL
- AUTHENTICATION</div>
+ AUTHENTICATION
+ CUSTOM</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>userParameterMode</code> - user parameter mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withUserParameterClass(java.lang.String)">
+<h3>withUserParameterClass</h3>
+<div class="member-signature"><span class="return-type"><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withUserParameterClass</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;userParameterClass)</span></div>
+<div class="block">Specifies the class to be used for the user parameter in generated controllers.
+ Usable only in conjuction with <a href="UserParameterMode.html#CUSTOM"><code>UserParameterMode.CUSTOM</code></a> user parameter mode.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>userParameterClass</code> - the fully qualified name of the class to use for the user parameter</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
@@ -395,6 +425,32 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>javaCompatibility</code> - if true, then @JvmField, @JvmStatic and @JvmRepeatable annotations wil be added where it needed to improve java compatibility</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withModelMutable(boolean)">
+<h3>withModelMutable</h3>
+<div class="member-signature"><span class="return-type"><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withModelMutable</span><wbr><span class="parameters">(boolean&nbsp;modelMutable)</span></div>
+<div class="block">If set to true, generated model will be with `var` keywords, otherwise - `val`.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>modelMutable</code> - generate code with mutable / immutable models</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withNonPublicApi(boolean)">
+<h3>withNonPublicApi</h3>
+<div class="member-signature"><span class="return-type"><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withNonPublicApi</span><wbr><span class="parameters">(boolean&nbsp;nonPublicApi)</span></div>
+<div class="block">If true, generated code will be with `internal` modifier.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>nonPublicApi</code> - If true, generated code will be with `internal` modifier.</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

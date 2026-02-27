@@ -1009,6 +1009,13 @@ directory.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>HTML_TO_MD</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.operation.duplicate-resolution</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property to set operation ID duplicate resolution. Available values:<br>
+<code><strong>auto</strong></code> - micronaut-openapi automatically add index suffix to duplicate operation ID.<br>
+<code><strong>error</strong></code> - micronaut-openapi throws an exception when found duplicate operation IDs.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>auto</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.extra.enable</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, you can add some extra schemas to final OpenAPI spec file.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
