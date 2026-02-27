@@ -1,7 +1,7 @@
 [versions]
 managed-swagger = "2.2.39"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.21.2"
+managed-jsoup = "1.22.1"
 # deprecated, use managed-flexmark
 managed-html2md-converter = "0.64.8"
 managed-flexmark = "0.64.8"
