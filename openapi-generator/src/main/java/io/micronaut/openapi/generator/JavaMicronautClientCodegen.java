@@ -36,8 +36,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static io.micronaut.openapi.generator.Utils.normalizeJavaClass;
 import static io.micronaut.openapi.generator.Utils.processMultipartBody;
+import static io.micronaut.openapi.generator.Utils.readBooleanProperty;
+import static io.micronaut.openapi.generator.Utils.readIntProperty;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
+import static io.micronaut.openapi.generator.Utils.readProperty;
 
 /**
  * The generator for creating Micronaut clients.
@@ -62,6 +66,17 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String AUTHORIZATION_FILTER_PATTERN_STYLE = "authorizationFilterPatternStyle";
     public static final String BASE_PATH_SEPARATOR = "basePathSeparator";
     public static final String CLIENT_ID = "clientId";
+    public static final String RETRYABLE_ANNOTATION = "retryableAnnotation";
+    public static final String OPT_RETRYABLE = "retryable";
+    public static final String OPT_RETRYABLE_INCLUDES = "retryableIncludes";
+    public static final String OPT_RETRYABLE_EXCLUDES = "retryableExcludes";
+    public static final String OPT_RETRYABLE_ATTEMPTS = "retryableAttempts";
+    public static final String OPT_RETRYABLE_DELAY = "retryableDelay";
+    public static final String OPT_RETRYABLE_MAX_DELAY = "retryableMaxDelay";
+    public static final String OPT_RETRYABLE_MULTIPLIER = "retryableMultiplier";
+    public static final String OPT_RETRYABLE_JITTER = "retryableJitter";
+    public static final String OPT_RETRYABLE_PREDICATE = "retryablePredicate";
+    public static final String OPT_RETRYABLE_CAPTURED_EXCEPTION = "retryableCapturedException";
 
     public static final String NAME = "java-micronaut-client";
 
@@ -80,6 +95,17 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean useApiKeyAuth = true;
     protected boolean authFilter = true;
     protected boolean generateAuthClasses = true;
+
+    protected boolean retryable;
+    protected List<String> retryableIncludes;
+    protected List<String> retryableExcludes;
+    protected int retryableAttempts;
+    protected String retryableDelay;
+    protected String retryableMaxDelay;
+    protected String retryableMultiplier;
+    protected String retryableJitter;
+    protected String retryablePredicate;
+    protected String retryableCapturedException;
 
     JavaMicronautClientCodegen() {
 
@@ -104,6 +130,18 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newBoolean(OPT_USE_API_KEY_AUTH, "Generate ApiKeyAuthConfig config or not"));
         cliOptions.add(CliOption.newBoolean(OPT_AUTH_FILTER, "Generate AuthorizationFilter or not"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_AUTH_CLASSES, "Generate authorization classes or not"));
+
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE, "Add or not @Retryable annotation to client class"));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_INCLUDES, "Set includes parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_EXCLUDES, "Set excludes parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_ATTEMPTS, "Set attempts parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_DELAY, "Set delay parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_MAX_DELAY, "Set maxDelay parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_MULTIPLIER, "Set multiplier parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_JITTER, "Set jitter parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_PREDICATE, "Set predicate parameter for Retryable annotation."));
+        cliOptions.add(CliOption.newString(OPT_RETRYABLE_CAPTURED_EXCEPTION, "Set capturedException parameter for Retryable annotation."));
+
         GlobalSettings.setProperty(CodegenConstants.API_DOCS, "false");
         GlobalSettings.setProperty(CodegenConstants.MODEL_DOCS, "false");
 
@@ -148,6 +186,10 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     @Override
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
         objs = super.postProcessOperationsWithModels(objs, allModels);
+
+        if (retryable) {
+            objs.getImports().add(Map.of("import", "io.micronaut.retry.annotation.Retryable", "classname", "Retryable"));
+        }
 
         OperationMap operations = objs.getOperations();
         List<CodegenOperation> operationList = operations.getOperation();
@@ -213,33 +255,30 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
 
         final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
+        // Retryable annotation
+        retryable = readBooleanProperty(OPT_RETRYABLE, additionalProperties, retryable);
+        if (retryable) {
+            retryableIncludes = readListOfStringsProperty(OPT_RETRYABLE_INCLUDES, additionalProperties, retryableIncludes);
+            retryableExcludes = readListOfStringsProperty(OPT_RETRYABLE_EXCLUDES, additionalProperties, retryableExcludes);
+            retryableAttempts = readIntProperty(OPT_RETRYABLE_ATTEMPTS, additionalProperties, retryableAttempts);
+            retryableDelay = readProperty(OPT_RETRYABLE_DELAY, additionalProperties, retryableDelay);
+            retryableMaxDelay = readProperty(OPT_RETRYABLE_MAX_DELAY, additionalProperties, retryableMaxDelay);
+            retryableMultiplier = readProperty(OPT_RETRYABLE_MULTIPLIER, additionalProperties, retryableMultiplier);
+            retryableJitter = readProperty(OPT_RETRYABLE_JITTER, additionalProperties, retryableJitter);
+            retryablePredicate = readProperty(OPT_RETRYABLE_PREDICATE, additionalProperties, retryablePredicate);
+            retryableCapturedException = readProperty(OPT_RETRYABLE_CAPTURED_EXCEPTION, additionalProperties, retryableCapturedException);
+
+            writePropertyBack(RETRYABLE_ANNOTATION, calcRetryableAnnotation());
+        }
+
         // Authorization files
         if (configureAuthorization) {
 
-            if (additionalProperties.containsKey(OPT_GENERATE_AUTH_CLASSES)) {
-                generateAuthClasses = convertPropertyToBoolean(OPT_GENERATE_AUTH_CLASSES);
-            }
-            writePropertyBack(OPT_GENERATE_AUTH_CLASSES, generateAuthClasses);
-
-            if (additionalProperties.containsKey(OPT_AUTH_FILTER)) {
-                authFilter = convertPropertyToBoolean(OPT_AUTH_FILTER);
-            }
-            writePropertyBack(OPT_AUTH_FILTER, authFilter);
-
-            if (additionalProperties.containsKey(OPT_USE_OAUTH)) {
-                useOauth = convertPropertyToBoolean(OPT_USE_OAUTH);
-            }
-            writePropertyBack(OPT_USE_OAUTH, useOauth);
-
-            if (additionalProperties.containsKey(OPT_USE_BASIC_AUTH)) {
-                useBasicAuth = convertPropertyToBoolean(OPT_USE_BASIC_AUTH);
-            }
-            writePropertyBack(OPT_USE_BASIC_AUTH, useBasicAuth);
-
-            if (additionalProperties.containsKey(OPT_USE_API_KEY_AUTH)) {
-                useApiKeyAuth = convertPropertyToBoolean(OPT_USE_API_KEY_AUTH);
-            }
-            writePropertyBack(OPT_USE_API_KEY_AUTH, useApiKeyAuth);
+            generateAuthClasses = readBooleanProperty(OPT_GENERATE_AUTH_CLASSES, additionalProperties, generateAuthClasses);
+            authFilter = readBooleanProperty(OPT_AUTH_FILTER, additionalProperties, authFilter);
+            useOauth = readBooleanProperty(OPT_USE_OAUTH, additionalProperties, useOauth);
+            useBasicAuth = readBooleanProperty(OPT_USE_BASIC_AUTH, additionalProperties, useBasicAuth);
+            useApiKeyAuth = readBooleanProperty(OPT_USE_API_KEY_AUTH, additionalProperties, useApiKeyAuth);
 
             if (generateAuthClasses) {
                 final String authFolder = invokerFolder + "/auth";
@@ -351,6 +390,73 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         }
     }
 
+    public String calcRetryableAnnotation() {
+
+        if (!retryable) {
+            return null;
+        }
+
+        var retryable = new StringBuilder("@Retryable");
+        var retryableParams = new StringBuilder();
+        var isFirst = true;
+        if (retryableIncludes != null && !retryableIncludes.isEmpty()) {
+            var normalizedRetryableIncludes = retryableIncludes.stream()
+                .map(Utils::normalizeJavaClass)
+                .toList();
+            retryableParams.append('(');
+            retryableParams.append("\n    includes = {").append(String.join(", ", normalizedRetryableIncludes)).append('}');
+            isFirst = false;
+        }
+        if (retryableExcludes != null && !retryableExcludes.isEmpty()) {
+            var normalizedRetryableExcludes = retryableExcludes.stream()
+                .map(Utils::normalizeJavaClass)
+                .toList();
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    excludes = {").append(String.join(", ", normalizedRetryableExcludes)).append('}');
+            isFirst = false;
+        }
+        if (retryableAttempts > 0) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    attempts = \"").append(retryableAttempts).append('"');
+            isFirst = false;
+        }
+        if (retryableDelay != null && !retryableDelay.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    delay = \"").append(retryableDelay).append('"');
+            isFirst = false;
+        }
+        if (retryableMaxDelay != null && !retryableMaxDelay.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    maxDelay = \"").append(retryableMaxDelay).append('"');
+            isFirst = false;
+        }
+        if (retryableMultiplier != null && !retryableMultiplier.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    multiplier = \"").append(retryableMultiplier).append('"');
+            isFirst = false;
+        }
+        if (retryableJitter != null && !retryableJitter.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    jitter = \"").append(retryableJitter).append('"');
+            isFirst = false;
+        }
+        if (retryablePredicate != null && !retryablePredicate.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    predicate = ").append(normalizeJavaClass(retryablePredicate));
+            isFirst = false;
+        }
+        if (retryableCapturedException != null && !retryableCapturedException.isBlank()) {
+            retryableParams.append(isFirst ? '(' : ',');
+            retryableParams.append("\n    capturedException = ").append(normalizeJavaClass(retryableCapturedException));
+        }
+        if (!retryableParams.isEmpty()) {
+            retryableParams.append("\n)");
+            retryable.append(retryableParams);
+        }
+
+        return retryable.toString();
+    }
+
     @Override
     public boolean isServer() {
         return false;
@@ -428,6 +534,46 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         this.configureAuthorization = configureAuthorization;
     }
 
+    public void setRetryable(boolean retryable) {
+        this.retryable = retryable;
+    }
+
+    public void setRetryableIncludes(List<String> retryableIncludes) {
+        this.retryableIncludes = retryableIncludes;
+    }
+
+    public void setRetryableExcludes(List<String> retryableExcludes) {
+        this.retryableExcludes = retryableExcludes;
+    }
+
+    public void setRetryableAttempts(int retryableAttempts) {
+        this.retryableAttempts = retryableAttempts;
+    }
+
+    public void setRetryableDelay(String retryableDelay) {
+        this.retryableDelay = retryableDelay;
+    }
+
+    public void setRetryableMaxDelay(String retryableMaxDelay) {
+        this.retryableMaxDelay = retryableMaxDelay;
+    }
+
+    public void setRetryableMultiplier(String retryableMultiplier) {
+        this.retryableMultiplier = retryableMultiplier;
+    }
+
+    public void setRetryableJitter(String retryableJitter) {
+        this.retryableJitter = retryableJitter;
+    }
+
+    public void setRetryablePredicate(String retryablePredicate) {
+        this.retryablePredicate = retryablePredicate;
+    }
+
+    public void setRetryableCapturedException(String retryableCapturedException) {
+        this.retryableCapturedException = retryableCapturedException;
+    }
+
     @Override
     public JavaMicronautClientOptionsBuilder optionsBuilder() {
         return new DefaultClientOptionsBuilder();
@@ -455,6 +601,17 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean generatedAnnotation = true;
         private boolean lombok;
         private boolean noArgsConstructor;
+
+        private boolean retryable;
+        private List<String> retryableIncludes;
+        private List<String> retryableExcludes;
+        private int retryableAttempts;
+        private String retryableDelay;
+        private String retryableMaxDelay;
+        private String retryableMultiplier;
+        private String retryableJitter;
+        private String retryablePredicate;
+        private String retryableCapturedException;
 
         @Override
         public JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -576,6 +733,66 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
             return this;
         }
 
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryable(boolean retryable) {
+            this.retryable = retryable;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableIncludes(List<String> retryableIncludes) {
+            this.retryableIncludes = retryableIncludes;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableExcludes(List<String> retryableExcludes) {
+            this.retryableExcludes = retryableExcludes;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableAttempts(int retryableAttempts) {
+            this.retryableAttempts = retryableAttempts;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableDelay(String retryableDelay) {
+            this.retryableDelay = retryableDelay;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableMaxDelay(String retryableMaxDelay) {
+            this.retryableMaxDelay = retryableMaxDelay;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableMultiplier(String retryableMultiplier) {
+            this.retryableMultiplier = retryableMultiplier;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableJitter(String retryableJitter) {
+            this.retryableJitter = retryableJitter;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryablePredicate(String retryablePredicate) {
+            this.retryablePredicate = retryablePredicate;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withRetryableCapturedException(String retryableCapturedException) {
+            this.retryableCapturedException = retryableCapturedException;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
@@ -597,7 +814,17 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
                 fluxForArrays,
                 generatedAnnotation,
                 lombok,
-                noArgsConstructor
+                noArgsConstructor,
+                retryable,
+                retryableIncludes,
+                retryableExcludes,
+                retryableAttempts,
+                retryableDelay,
+                retryableMaxDelay,
+                retryableMultiplier,
+                retryableJitter,
+                retryablePredicate,
+                retryableCapturedException
             );
         }
     }
@@ -622,7 +849,17 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean lombok,
-        boolean noArgsConstructor
+        boolean noArgsConstructor,
+        boolean retryable,
+        List<String> retryableIncludes,
+        List<String> retryableExcludes,
+        int retryableAttempts,
+        String retryableDelay,
+        String retryableMaxDelay,
+        String retryableMultiplier,
+        String retryableJitter,
+        String retryablePredicate,
+        String retryableCapturedException
     ) {
     }
 }

@@ -49,6 +49,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
     public static final String OPT_AOT = "aot";
     public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
+    public static final String OPT_USER_PARAMETER_CLASS = "userParameterClass";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -74,6 +75,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
     protected UserParameterMode userParameterMode = UserParameterMode.NONE;
+    private String userParameterClass;
 
     KotlinMicronautServerCodegen() {
 
@@ -191,9 +193,22 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
         if (additionalProperties.containsKey(OPT_USER_PARAMETER_MODE)) {
             var userModeOpt = (String) additionalProperties.get(OPT_USER_PARAMETER_MODE);
+
             setUserParameterMode(userModeOpt);
+            if (userModeOpt.toUpperCase().equals(UserParameterMode.CUSTOM.name())) {
+                if (!additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS)) {
+                    throw new IllegalArgumentException("User-defined authentication parameter class name option %s is required when %s is set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
+                }
+
+                userParameterClass = (String) additionalProperties.get(OPT_USER_PARAMETER_CLASS);
+                var className = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+                importMapping.put(className, userParameterClass);
+            } else if (additionalProperties.containsKey(OPT_USER_PARAMETER_CLASS) && additionalProperties.get(OPT_USER_PARAMETER_CLASS) != null) {
+                throw new IllegalArgumentException("User-defined authentication parameter class name option %s is not allowed when %s is not set to %s".formatted(OPT_USER_PARAMETER_CLASS, OPT_USER_PARAMETER_MODE, UserParameterMode.CUSTOM.name()));
+            }
         }
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
+        writePropertyBack(OPT_USER_PARAMETER_CLASS, userParameterClass);
 
         // Api file
         apiTemplateFiles.clear();
@@ -276,8 +291,16 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         if (useAuth) {
 
             var alreadyAddedPrincipalImport = false;
-            String importClassFullName = userParameterMode.getClassFullName();
-            String importClassName = userParameterMode.getClassName();
+            final String importClassFullName;
+            final String importClassName;
+
+            if (userParameterClass != null) {
+                importClassFullName = userParameterClass;
+                importClassName = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+            } else {
+                importClassFullName = userParameterMode.getClassFullName();
+                importClassName = userParameterMode.getClassName();
+            }
 
             for (CodegenOperation operation : allOperations) {
 
@@ -313,7 +336,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 if (userParameterMode != UserParameterMode.NONE) {
                     var isAnonymous = roles.contains(ANONYMOUS_ROLE);
                     var isDenyAll = roles.contains(DENY_ALL_ROLE);
-                    addUserParameter(operation, userParameterMode, isAnonymous, isDenyAll);
+                    addUserParameter(operation, userParameterMode, userParameterClass, isAnonymous, isDenyAll);
 
                     if (importClassFullName != null && !alreadyAddedPrincipalImport) {
                         objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
@@ -386,6 +409,10 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         }
     }
 
+    public void setUserParameterClass(String userParameterClass) {
+        this.userParameterClass = userParameterClass;
+    }
+
     static class DefaultServerOptionsBuilder implements KotlinMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -395,6 +422,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean plural = true;
         private boolean useAuth = true;
         private String userParameterMode = UserParameterMode.NONE.name();
+        private String userParameterClass;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
@@ -404,6 +432,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean jvmOverloads;
         private boolean jvmRecord;
         private boolean javaCompatibility = true;
+        private boolean modelMutable = true;
+        private boolean nonPublicApi;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -438,6 +468,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         @Override
         public KotlinMicronautServerOptionsBuilder withUserParameterMode(String userParameterMode) {
             this.userParameterMode = userParameterMode;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withUserParameterClass(String userParameterClass) {
+            this.userParameterClass = userParameterClass;
             return this;
         }
 
@@ -501,6 +537,18 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withModelMutable(boolean modelMutable) {
+            this.modelMutable = modelMutable;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withNonPublicApi(boolean nonPublicApi) {
+            this.nonPublicApi = nonPublicApi;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -509,6 +557,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generateControllerFromExamples,
                 useAuth,
                 userParameterMode,
+                userParameterClass,
                 plural,
                 fluxForArrays,
                 generatedAnnotation,
@@ -518,7 +567,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generateStreamingFileUpload,
                 jvmOverloads,
                 jvmRecord,
-                javaCompatibility
+                javaCompatibility,
+                modelMutable,
+                nonPublicApi
             );
         }
     }
@@ -530,6 +581,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generateControllerFromExamples,
         boolean useAuth,
         String userParameterMode,
+        String userParameterClass,
         boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,
@@ -539,7 +591,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generateStreamingFileUpload,
         boolean jvmOverloads,
         boolean jvmRecord,
-        boolean javaCompatibility
+        boolean javaCompatibility,
+        boolean modelMutable,
+        boolean nonPublicApi
     ) {
     }
 }

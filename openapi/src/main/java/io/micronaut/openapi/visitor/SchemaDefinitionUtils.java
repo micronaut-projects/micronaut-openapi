@@ -37,7 +37,6 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -53,6 +52,7 @@ import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.PropertyElementQuery;
 import io.micronaut.inject.ast.TypedElement;
@@ -156,6 +156,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilCollectionType
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isVoid;
 import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
 import static io.micronaut.openapi.visitor.GeneratorExt.MAX_MESSAGE;
 import static io.micronaut.openapi.visitor.GeneratorExt.MIN_MESSAGE;
@@ -237,6 +238,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isArraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
@@ -1082,6 +1084,8 @@ public final class SchemaDefinitionUtils {
                     if (fieldJavadoc != null) {
                         if (StringUtils.hasText(fieldJavadoc.getMethodDescription())) {
                             schema.setDescription(fieldJavadoc.getMethodDescription());
+                        } else if (StringUtils.hasText(fieldJavadoc.getReturnDescription())) {
+                            schema.setDescription(fieldJavadoc.getReturnDescription());
                         }
                     } else if (classJavadoc != null) {
                         String paramJavadoc = classJavadoc.getParameters().get(definingElement.getName());
@@ -1120,10 +1124,11 @@ public final class SchemaDefinitionUtils {
      * @param schemaToBind The schema to bind
      * @param jsonViewClass Class from JsonView annotation
      * @param withProcessDeprecated Is need to process deprecates annotation
+     * @param isParameter is this element describes endpoint parameter or not
      * @return The bound schema
      */
-    public static Schema<?> bindSchemaForElement(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> schemaToBind,
-                                                 @Nullable ClassElement jsonViewClass, boolean withProcessDeprecated) {
+    public static Schema<?> bindSchemaForElement(VisitorContext context, Element element, ClassElement elementType, Schema<?> schemaToBind,
+                                                 @Nullable ClassElement jsonViewClass, boolean withProcessDeprecated, boolean isParameter) {
         var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaAnn == null) {
             var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
@@ -1190,7 +1195,7 @@ public final class SchemaDefinitionUtils {
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NULLABLE).orElse(null);
         boolean isNullable = (isSchemaNullable == null && isNullable(element) && !isNotNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
-        if (isNullable) {
+        if (isNullable && (!isParameter || defaultValue == null)) {
             SchemaUtils.setNullable(topLevelSchema);
             notOnlyRef = true;
         }
@@ -1623,11 +1628,18 @@ public final class SchemaDefinitionUtils {
      * @param jsonViewClass Class from JsonView annotation
      * @return The bound schema
      */
-    public static Schema<?> bindSchemaAnnotationValue(VisitorContext context, TypedElement element, Schema<?> schemaToBind,
+    public static Schema<?> bindSchemaAnnotationValue(VisitorContext context, Element element, Schema<?> schemaToBind,
                                                       AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                       @Nullable ClassElement jsonViewClass) {
 
-        ClassElement classEl = element.getType();
+        ClassElement classEl;
+        if (element instanceof TypedElement typedEl) {
+            classEl = typedEl.getType();
+        } else if (element instanceof MethodElement methodEl) {
+            classEl = methodEl.getReturnType();
+        } else {
+            return schemaToBind;
+        }
         if (ElementUtils.isContainerType(classEl)) {
             classEl = classEl.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(classEl));
         }
@@ -1698,7 +1710,7 @@ public final class SchemaDefinitionUtils {
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
-    public static void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable ClassElement classEl,
+    public static void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, @Nullable ClassElement classEl,
                                              Schema<?> parentSchema, Schema<?> propertySchema) {
         if (propertySchema == null) {
             return;
@@ -1709,35 +1721,20 @@ public final class SchemaDefinitionUtils {
         } else {
             // check schema required flag
             var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
-            Boolean elementSchemaRequired = null;
-            boolean isAutoRequiredMode = true;
-            boolean isRequiredDefaultValueSet = false;
-            if (schemaAnn != null) {
-                elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
-                isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
-                var requiredMode = schemaAnn.enumValue(PROP_REQUIRED_MODE, io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
-                    .orElse(null);
-                if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
-                    elementSchemaRequired = true;
-                    isAutoRequiredMode = false;
-                } else if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED) {
-                    elementSchemaRequired = false;
-                    isAutoRequiredMode = false;
-                }
-            }
+            var reqMode = getReqMode(schemaAnn);
 
             // check field annotations (@NonNull, @Nullable, etc.)
             boolean isNotNullable = isNotNullable(element);
             // check as mandatory in constructor
             boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classEl, context);
-            boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
+            boolean required = reqMode.elementSchemaRequired() != null ? reqMode.elementSchemaRequired() : isNotNullable || isMandatoryInConstructor;
 
-            if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
+            if (reqMode.isRequiredDefaultValueSet() && reqMode.isAutoRequiredMode() && isNotNullable) {
                 required = true;
             }
 
             // check JsonInclude mode, if swagger schema required mode not set
-            if (elementSchemaRequired == null) {
+            if (reqMode.elementSchemaRequired() == null) {
                 var classJsonIncludeAnn = classEl != null ? getAnnotation(classEl, JsonInclude.class) : null;
                 JsonInclude.Include classIncludeMode = null;
                 if (classJsonIncludeAnn != null) {
@@ -1756,7 +1753,7 @@ public final class SchemaDefinitionUtils {
                 }
             }
 
-            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true);
+            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true, false);
             String propertyName = resolvePropertyName(element, classEl, propertySchema);
             propertyName = normalizePropertyName(propertyName, classEl, elementType);
             propertySchema.setRequired(null);
@@ -1787,19 +1784,19 @@ public final class SchemaDefinitionUtils {
 
     private static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
                                                  List<MediaType> mediaTypes, JavadocDescription classJavadoc, @Nullable ClassElement jsonViewClass) {
-        ClassElement classElement = null;
-        if (type instanceof ClassElement classEl) {
-            classElement = classEl;
+        ClassElement classEl = null;
+        if (type instanceof ClassElement classElem) {
+            classEl = classElem;
         } else if (type instanceof TypedElement typedEl) {
-            classElement = typedEl.getType();
+            classEl = typedEl.getType();
         }
 
-        if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName()) && !isJavaRecordType(classElement) && !isJavaUtilCollectionType(classElement)) {
-            var finalClassElement = classElement;
+        if (classEl != null && !ClassUtils.isJavaLangType(classEl.getName()) && !isJavaRecordType(classEl) && !isJavaUtilCollectionType(classEl)) {
+            var finalClassElement = classEl;
             List<PropertyElement> beanProperties;
             try {
-                beanProperties = classElement.getBeanProperties(
-                        PropertyElementQuery.of(classElement)
+                beanProperties = classEl.getBeanProperties(
+                        PropertyElementQuery.of(classEl)
                             .excludedAnnotations(Set.of(
                                 Hidden.class.getName(),
                                 JsonBackReference.class.getName(),
@@ -1814,11 +1811,11 @@ public final class SchemaDefinitionUtils {
                     )
                     .toList();
             } catch (Exception e) {
-                warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), context, classElement);
+                warn("Error with getting properties for class " + classEl.getName() + ": " + e + "\n" + Utils.printStackTrace(e), context, classEl);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }
-            beanProperties = filterProtobufProperties(classElement, beanProperties);
+            beanProperties = filterProtobufProperties(classEl, beanProperties);
             processPropertyElements(openApi, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc, jsonViewClass);
 
             String visibilityLevelProp = getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
@@ -1833,9 +1830,9 @@ public final class SchemaDefinitionUtils {
 
             var publicFields = new ArrayList<FieldElement>();
             // fix for processing java records with groovy and kotlin processors
-            var isJavaRecord = isJavaRecord(classElement);
+            var isJavaRecord = isJavaRecord(classEl);
 
-            for (FieldElement field : classElement.getFields()) {
+            for (FieldElement field : classEl.getFields()) {
                 if (field.isStatic()) {
                     continue;
                 }
@@ -1865,6 +1862,26 @@ public final class SchemaDefinitionUtils {
             }
 
             processPropertyElements(openApi, context, type, typeArgs, schema, publicFields, mediaTypes, classJavadoc, jsonViewClass);
+
+            // also need to check methods with @JsonProperty annotation
+            for (var methodEl : classEl.getMethods()) {
+                if (!methodEl.hasAnnotation(JsonProperty.class) || isVoid(methodEl.getReturnType())) {
+                    continue;
+                }
+                var methodJavadoc = Utils.getJavadocParser().parse(methodEl.getDocumentation().orElse(null));
+                var methodReturnType = methodEl.getReturnType();
+
+                Schema<?> propertySchema = resolveSchema(openApi, methodEl, methodReturnType, context, mediaTypes, jsonViewClass, methodJavadoc, classJavadoc, null);
+
+                processSchemaProperty(
+                    context,
+                    methodEl,
+                    methodReturnType,
+                    classEl,
+                    schema,
+                    propertySchema
+                );
+            }
         }
     }
 
@@ -3011,13 +3028,20 @@ public final class SchemaDefinitionUtils {
         return schemaToBind;
     }
 
-    private static Schema<?> doBindSchemaAnnotationValue(VisitorContext context, TypedElement element, Schema schemaToBind,
+    private static Schema<?> doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
                                                          Map<CharSequence, Object> annValues, JsonNode schemaJson, String elType, String elFormat,
                                                          AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                          @Nullable ClassElement jsonViewClass) {
 
+        ClassElement typeEl = null;
+        if (element instanceof TypedElement typedEl) {
+            typeEl = typedEl.getType();
+        } else if (element instanceof MethodElement methodEl) {
+            typeEl = methodEl.getReturnType();
+        }
+
         if (schemaAnn != null && schemaAnn.annotationClassValue(PROP_IMPLEMENTATION).isEmpty()) {
-            var resolvedSchema = resolveSchema(element, element != null ? element.getType() : null, context, List.of(), null);
+            var resolvedSchema = resolveSchema(element, typeEl, context, List.of(), null);
             if (resolvedSchema.get$ref() != null && schemaToBind.getEnum() != null) {
                 schemaToBind = appendSchema(schemaToBind, getSchemaByRef(resolvedSchema, resolveOpenApi(context)));
             } else {
@@ -3054,7 +3078,6 @@ public final class SchemaDefinitionUtils {
         }
 
         if (elType == null && element != null) {
-            ClassElement typeEl = element.getType();
             Pair<String, String> typeAndFormat;
             if (typeEl instanceof EnumElement enumEl && isEnum(enumEl)) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
@@ -3300,7 +3323,7 @@ public final class SchemaDefinitionUtils {
         return name;
     }
 
-    private static void handleUnwrapped(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
+    private static void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         var elType = customElementType != null ? customElementType : elementType;

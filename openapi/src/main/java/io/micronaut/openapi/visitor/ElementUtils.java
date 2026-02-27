@@ -157,12 +157,19 @@ public final class ElementUtils {
     /**
      * Checks Nullable annotations / optional type to understand that the element can be null.
      *
-     * @param element typed element
+     * @param element the element
      * @return true if element is nullable, false - otherwise.
      */
-    public static boolean isNullable(TypedElement element) {
+    public static boolean isNullable(Element element) {
 
-        var type = element.getType();
+        ClassElement type;
+        if (element instanceof TypedElement typedEl) {
+            type = typedEl.getType();
+        } else if (element instanceof MethodElement methodEl) {
+            type = methodEl.getReturnType();
+        } else {
+            return false;
+        }
 
         return element.isNullable()
             || type.isOptional()

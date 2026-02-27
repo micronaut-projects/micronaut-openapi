@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Open-Meteo APIs
+  description: 'Open-Meteo offers free weather forecast APIs for open-source developers and non-commercial use. No API key is required.'
+  version: '1.0'
+paths:
+  /v1/forecast/{id}:
+    get:
+      tags:
+      - Weather Forecast APIs
+      summary: 7 day weather forecast for coordinates
+      description: 7 day weather variables in hourly and daily resolution for given WGS84 latitude and longitude coordinates. Available worldwide.
+      parameters:
+      - name: latitude
+        in: query
+        required: true
+        description: "WGS84 coordinate"
+        schema:
+          type: number
+          format: float
+      - name: setLatitude
+        in: query
+        required: true
+        description: "WGS84 coordinate"
+        schema:
+          type: number
+          format: float
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: id
+                  setId:
+                    type: number
+                    description: Set id
+                  name:
+                    type: string
+                    description: name
+                  setName:
+                    type: string
+                    description: Set name

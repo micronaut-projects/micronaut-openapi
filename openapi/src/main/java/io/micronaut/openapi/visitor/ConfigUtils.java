@@ -128,6 +128,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_OPERATION_DUPLICATE_RESOLUTION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_INCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
@@ -365,6 +366,14 @@ public final class ConfigUtils {
 
     public static DuplicateResolution getSchemaDuplicateResolution(VisitorContext context) {
         var value = getConfigProperty(MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION, context);
+        if (StringUtils.isNotEmpty(value) && DuplicateResolution.ERROR.name().equalsIgnoreCase(value)) {
+            return DuplicateResolution.ERROR;
+        }
+        return DuplicateResolution.AUTO;
+    }
+
+    public static DuplicateResolution getOperationDuplicateResolution(VisitorContext context) {
+        var value = getConfigProperty(MICRONAUT_OPENAPI_OPERATION_DUPLICATE_RESOLUTION, context);
         if (StringUtils.isNotEmpty(value) && DuplicateResolution.ERROR.name().equalsIgnoreCase(value)) {
             return DuplicateResolution.ERROR;
         }

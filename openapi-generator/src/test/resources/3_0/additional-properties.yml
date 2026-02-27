@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Sample App API
+  version: 1.0.0
+tags:
+  - name: Invoice
+paths:
+  /patch:
+    post:
+      tags:
+        - Invoice
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+      operationId: patchInvoice
+      summary: Patch Invoice
+      requestBody:
+        description: null
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchDto'
+      responses:
+        200:
+          description: Sales or Currency invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceDto'
+components:
+  schemas:
+    InvoiceDto:
+      type: object
+      required:
+        - docType
+      properties:
+        docType:
+          type: string
+    PatchDto:
+      required:
+        - op
+        - path
+      properties:
+        op:
+          description: 'Patch operation'
+          type: string
+        path:
+          description: 'Path to update'
+          type: string
+        value:
+          description: 'Value to assign'
+          nullable: true
+      type: object
+      example:
+        op: add
+        path: phone
+        value:
+          typeId: 123
+          number: 555-555-5555
+      additionalProperties: true

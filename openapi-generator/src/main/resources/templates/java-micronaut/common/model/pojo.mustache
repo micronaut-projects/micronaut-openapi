@@ -130,7 +130,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
             {{/isXmlAttribute}}
         {{/withXml}}
         {{#generateSwagger2Annotations}}
-    @Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}"{{/description}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}}{{#deprecated}}, deprecated = true{{/deprecated}})
+    @Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}"{{/description}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}}{{#deprecated}}, deprecated = true{{/deprecated}}{{#vendorExtensions.nullable}}, nullable = true{{/vendorExtensions.nullable}})
         {{/generateSwagger2Annotations}}
         {{#vendorExtensions.x-is-jackson-optional-nullable}}
             {{!Unannotated, Jackson would pick this up automatically and add it *in addition* to the _JsonNullable getter field}}
@@ -154,7 +154,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
         {{^vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isContainer}}
-    private {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#required}}{{^requiredPropertiesInConstructor}}{{#vendorExtensions.defaultValueIsNotNull}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{/vendorExtensions.defaultValueIsNotNull}}{{/requiredPropertiesInConstructor}}{{/required}};
+    private {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#required}}{{#vendorExtensions.defaultValueIsNotNull}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{/vendorExtensions.defaultValueIsNotNull}}{{/required}};
             {{/isContainer}}
             {{^isContainer}}
     {{#isDiscriminator}}protected{{/isDiscriminator}}{{^isDiscriminator}}private{{/isDiscriminator}} {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#vendorExtensions.defaultValueIsNotNull}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{/vendorExtensions.defaultValueIsNotNull}};
@@ -343,7 +343,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     {{#deprecated}}
     @Deprecated
     {{/deprecated}}
-    public {{classname}} {{name}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
+    public {{classname}} {{#vendorExtensions.chainableName}}{{{.}}}{{/vendorExtensions.chainableName}}{{^vendorExtensions.chainableName}}{{{name}}}{{/vendorExtensions.chainableName}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{name}});
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -418,7 +418,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{^isReadOnly}}
 
     @Override
-    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
+    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{#vendorExtensions.chainableName}}{{{.}}}{{/vendorExtensions.chainableName}}{{^vendorExtensions.chainableName}}{{{name}}}{{/vendorExtensions.chainableName}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
         super.{{{setter}}}({{name}});
         return this;
     }

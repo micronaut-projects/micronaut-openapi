@@ -410,6 +410,7 @@ public final class Utils {
         testJsonReference = null;
         creatorConstructorsCache = new HashMap<>();
         System.clearProperty(BIND_TYPE_AND_TYPES);
+        OperationUtils.clean();
         SchemaDefinitionUtils.clean();
         OpenApiExtraSchemaVisitor.clean();
         OpenApiExcludeVisitor.clean();

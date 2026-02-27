@@ -834,7 +834,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         normalizeOpenApi(openApi, context);
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
-        new OpenApiOperationsPostProcessor().processOperations(openApi);
+        new OpenApiOperationsPostProcessor().processOperations(openApi, context);
 
         removeUnusedSchemas(openApi);
 
@@ -960,7 +960,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     .collect(Collectors.joining(", ", "files ", StringUtils.EMPTY_STRING));
             }
 
-            warn("Unable to render OpenAPI view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
+            warn("Unable to render OpenAPI view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);
         }
     }
 
@@ -1005,7 +1005,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     AdocModule.convert(openApiInfo, adocProperties, context);
                 }
             } catch (Exception e) {
-                warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
+                warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);
             }
         }
     }

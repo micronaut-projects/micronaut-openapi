@@ -277,4 +277,88 @@ class MyBean {}
         operationInherit.parameters[0].required
     }
 
+    void "test not required query value with RequestBean"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Nullable;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.RequestBean;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.PositiveOrZero;
+
+@Controller
+class PetController {
+
+    @Get("/pet")
+    void getPet(@RequestBean PageDto page) {
+    }
+}
+
+@Serdeable
+record PageDto(
+    @Nullable
+    @PositiveOrZero
+    @QueryValue(value = "page", defaultValue = "0")
+    int page,
+    @PositiveOrZero
+    @QueryValue(defaultValue = "0")
+    int page1,
+    @Parameter(required = true)
+    @PositiveOrZero
+    @QueryValue(defaultValue = "0")
+    int requiredPage,
+    @PositiveOrZero
+    @QueryValue(defaultValue = "0")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    int requiredPage2,
+    @Parameter(schema = @Schema(requiredMode = Schema.RequiredMode.REQUIRED))
+    @PositiveOrZero
+    @QueryValue(defaultValue = "0")
+    int requiredPage3
+) {}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        var op = openAPI.paths."/pet".get
+
+        then:
+
+        op.parameters
+        op.parameters.size() == 5
+        op.parameters[0].name == "page"
+        !op.parameters[0].required
+        op.parameters[0].schema.nullable == null
+        op.parameters[0].schema.default == 0
+
+        op.parameters[1].name == "page1"
+        !op.parameters[1].required
+        op.parameters[1].schema.nullable == null
+        op.parameters[1].schema.default == 0
+
+        op.parameters[2].name == "requiredPage"
+        op.parameters[2].required
+        op.parameters[2].schema.nullable == null
+        op.parameters[2].schema.default == 0
+
+        op.parameters[3].name == "requiredPage2"
+        op.parameters[3].required
+        op.parameters[3].schema.nullable == null
+        op.parameters[3].schema.default == 0
+
+        op.parameters[4].name == "requiredPage3"
+        op.parameters[4].required
+        op.parameters[4].schema.nullable == null
+        op.parameters[4].schema.default == 0
+    }
 }

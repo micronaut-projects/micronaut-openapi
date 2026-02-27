@@ -47,7 +47,7 @@
 @JvmRecord
     {{/jvmRecord}}
 {{/vendorExtensions.isDataClass}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}{{#hasChildren}}{{#useSealed}}sealed {{/useSealed}}{{^useSealed}}open {{/useSealed}}{{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}{{#vendorExtensions.hasDefaultValues}}{{#jvmOverloads}} @JvmOverloads constructor{{/jvmOverloads}}{{/vendorExtensions.hasDefaultValues}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
 {{#formatNoEmptyLines}}
@@ -68,7 +68,7 @@
         {{/deprecated}}
     {{/description}}
 {{>common/model/field_annotations}}
-    {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}{{#jvmRecord}}{{#vendorExtensions.isDataClass}}val{{/vendorExtensions.isDataClass}}{{^vendorExtensions.isDataClass}}var{{/vendorExtensions.isDataClass}}{{/jvmRecord}}{{^jvmRecord}}var{{/jvmRecord}} {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
+    {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}{{#jvmRecord}}val{{/jvmRecord}}{{^jvmRecord}}{{#modelMutable}}var{{/modelMutable}}{{^modelMutable}}val{{/modelMutable}}{{/jvmRecord}} {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
 {{/formatNoEmptyLines}}
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
 {{#hasVars}}){{/hasVars}}{{#parent}} : {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}){{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}{{#-first}} : {{/-first}}{{^-first}}, {{/-first}}{{/parent}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
@@ -124,7 +124,7 @@
     {{/vars}}
 
     {{#vendorExtensions.hasOwnVars}}
-    companion object {
+    {{#nonPublicApi}}internal {{/nonPublicApi}}companion object {
     {{#serializableModel}}
 
         {{#javaCompatibility}}

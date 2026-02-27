@@ -210,4 +210,94 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withLombok(boolean lombok);
+
+    /**
+     * Add or not @Retryable annotation to client interface. Default: false
+     *
+     * @param retryable if true, then @Retryable annotation will be added to client interface
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryable(boolean retryable);
+
+    /**
+     * Set includes parameter for Retryable annotation.
+     *
+     * @param retryableIncludes includes value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableIncludes(List<String> retryableIncludes);
+
+    /**
+     * Set excludes parameter for Retryable annotation.
+     *
+     * @param retryableExcludes excludes value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableExcludes(List<String> retryableExcludes);
+
+    /**
+     * Set attempts parameter for Retryable annotation.
+     *
+     * @param retryableAttempts attempts value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableAttempts(int retryableAttempts);
+
+    /**
+     * Set delay parameter for Retryable annotation.
+     *
+     * @param retryableDelay delay value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableDelay(String retryableDelay);
+
+    /**
+     * Set maxDelay parameter for Retryable annotation.
+     *
+     * @param retryableMaxDelay maxDelay value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableMaxDelay(String retryableMaxDelay);
+
+    /**
+     * Set multiplier parameter for Retryable annotation.
+     *
+     * @param retryableMultiplier multiplier value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableMultiplier(String retryableMultiplier);
+
+    /**
+     * Set jitter parameter for Retryable annotation.
+     *
+     * @param retryableJitter jitter value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableJitter(String retryableJitter);
+
+    /**
+     * Set predicate parameter for Retryable annotation.
+     *
+     * @param retryablePredicate predicate value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryablePredicate(String retryablePredicate);
+
+    /**
+     * Set capturedException parameter for Retryable annotation.
+     *
+     * @param retryableCapturedException capturedException value for Retryable annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withRetryableCapturedException(String retryableCapturedException);
 }

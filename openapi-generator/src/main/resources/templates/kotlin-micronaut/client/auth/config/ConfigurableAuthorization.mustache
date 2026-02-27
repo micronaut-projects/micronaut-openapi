@@ -10,7 +10,7 @@ import {{javaxPackage}}.annotation.Generated
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-interface ConfigurableAuthorization {
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}interface ConfigurableAuthorization {
 
     val name: String
 
