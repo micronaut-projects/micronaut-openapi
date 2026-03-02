@@ -226,6 +226,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             javaCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
+            javaCodeGen.setGenerateHttpResponseOnlyForMultipleStatuses(options.generateHttpResponseOnlyForMultipleStatuses);
             javaCodeGen.setUseOptional(options.optional);
             javaCodeGen.setUseBeanValidation(options.beanValidation);
             javaCodeGen.setUseEnumCaseInsensitive(options.useEnumCaseInsensitive);
@@ -325,6 +326,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
+            kotlinCodeGen.setGenerateHttpResponseOnlyForMultipleStatuses(options.generateHttpResponseOnlyForMultipleStatuses);
             kotlinCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
             kotlinCodeGen.setUseBeanValidation(options.beanValidation);
             kotlinCodeGen.setUseEnumCaseInsensitive(options.useEnumCaseInsensitive);
@@ -690,6 +692,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean generateHttpResponseAlways;
             private boolean generateControllerAsAbstract;
             private boolean generateHttpResponseWhereRequired = true;
+            private boolean generateHttpResponseOnlyForMultipleStatuses;
             private boolean generateSwaggerAnnotations;
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
@@ -897,6 +900,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseOnlyForMultipleStatuses(boolean generateHttpResponseOnlyForMultipleStatuses) {
+                this.generateHttpResponseOnlyForMultipleStatuses = generateHttpResponseOnlyForMultipleStatuses;
+                return this;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withGenerateSwaggerAnnotations(boolean generateSwaggerAnnotations) {
                 this.generateSwaggerAnnotations = generateSwaggerAnnotations;
                 return this;
@@ -1083,6 +1092,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     generateHttpResponseAlways,
                     generateControllerAsAbstract,
                     generateHttpResponseWhereRequired,
+                    generateHttpResponseOnlyForMultipleStatuses,
                     generateSwaggerAnnotations,
                     testFramework,
                     serializationLibraryKind,
@@ -1164,6 +1174,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean generateHttpResponseAlways,
         boolean generateControllerAsAbstract,
         boolean generateHttpResponseWhereRequired,
+        boolean generateHttpResponseOnlyForMultipleStatuses,
         boolean generateSwaggerAnnotations,
         TestFramework testFramework,
         SerializationLibraryKind serializationLibraryKind,

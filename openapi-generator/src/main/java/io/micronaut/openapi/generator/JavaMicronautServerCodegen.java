@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.micronaut.openapi.generator.Extension.EXT_ROLES;
 import static io.micronaut.openapi.generator.Utils.addUserParameter;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
@@ -52,7 +53,6 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
     public static final String OPT_USER_PARAMETER_CLASS = "userParameterClass";
 
-    public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
     public static final String ANONYMOUS_ROLE = "SecurityRule.IS_ANONYMOUS";
     public static final String AUTHORIZED_ROLE_KEY = "isAuthorized()";
@@ -314,7 +314,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
                 List<String> roles = new ArrayList<>();
 
-                if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
+                if (!operation.vendorExtensions.containsKey(EXT_ROLES)) {
                     var authMethods = operation.authMethods;
                     if (authMethods != null && !authMethods.isEmpty()) {
                         var scopes = authMethods.get(0).scopes;
@@ -329,7 +329,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                         roles.add(ANONYMOUS_ROLE);
                     }
                 } else {
-                    roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
+                    roles = (List<String>) operation.vendorExtensions.get(EXT_ROLES);
                     roles = roles.stream()
                         .map(role -> switch (role) {
                             case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
@@ -339,7 +339,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                         }).toList();
                 }
 
-                operation.vendorExtensions.put(EXTENSION_ROLES, roles);
+                operation.vendorExtensions.put(EXT_ROLES, roles);
 
                 if (userParameterMode != UserParameterMode.NONE) {
                     var isAnonymous = roles.contains(ANONYMOUS_ROLE);

@@ -54,6 +54,9 @@ interface {{classname}} {
         {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}
     @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{vendorExtensions.pathNormalized}}}")
+    {{#vendorExtensions.statusAnnotation}}
+    {{{.}}}
+    {{/vendorExtensions.statusAnnotation}}
     {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
     @Produces({{#produces}}"{{{mediaTypeNormalized}}}"{{^-last}}, {{/-last}}{{/produces}})
     {{/vendorExtensions.onlyDefaultProduceOrEmpty}}

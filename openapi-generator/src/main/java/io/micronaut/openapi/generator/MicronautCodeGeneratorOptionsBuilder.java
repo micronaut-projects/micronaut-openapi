@@ -281,6 +281,14 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired);
 
     /**
+     * Wrap the operations response in HttpResponse object where possible multiple HTTP status codes or additional headers are defined.
+     *
+     * @param generateHttpResponseOnlyForMultipleStatuses the wrapping flag
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseOnlyForMultipleStatuses(boolean generateHttpResponseOnlyForMultipleStatuses);
+
+    /**
      * If set to true, controller and client method will be generated with openAPI annotations.
      *
      * @param generateSwaggerAnnotations the generate swagger annotations flag

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
-import java.io.File;
-
 import static io.micronaut.openapi.generator.assertions.TestUtils.assertExtraAnnotationFiles;
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1415,5 +1413,31 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     private Map<String, @NotNull String> myMap = new HashMap<>();
                 """
         );
+    }
+
+    @Test
+    void testNonDefaultResponseStatus() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.generateHttpResponseOnlyForMultipleStatuses = true;
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/ResponseBodyApi.java", """
+                @Operation(
+                    operationId = "getSimpleModelWithNonStandardStatus",
+                    description = "A method to get a simple model as a response",
+                    responses = {
+                        @ApiResponse(responseCode = "201", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleModel.class))),
+                        @ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                    }
+                )
+                @Get("/getSimpleModelWithNonStandardStatus")
+                @Status(HttpStatus.CREATED)
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                Mono<@Valid SimpleModel> getSimpleModelWithNonStandardStatus();
+            """,
+            "import io.micronaut.http.annotation.Status;",
+            "import io.micronaut.http.HttpStatus;");
     }
 }
