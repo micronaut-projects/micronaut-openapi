@@ -2353,6 +2353,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 op.returnProperty.dataType = "Void";
             }
             newReturnType.isNullable = op.returnProperty.isNullable;
+            if (("Mono".equals(typeName) || "Flux".equals(typeName)) && originalReturnType.endsWith("?")) {
+                originalReturnType = originalReturnType.substring(0, originalReturnType.length() - 1);
+            }
+            if ("HttpResponse".equals(typeName) && originalReturnType.endsWith("?")) {
+                originalReturnType = originalReturnType.substring(0, originalReturnType.length() - 1);
+            }
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty;
         }
