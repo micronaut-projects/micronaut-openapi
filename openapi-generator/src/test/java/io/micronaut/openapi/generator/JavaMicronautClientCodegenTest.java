@@ -2556,4 +2556,43 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testHttpResponseWrapperExt() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.generateHttpResponseOnlyForMultipleStatuses = true;
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+        assertFileContains(path + "api/ParametersApi.java",
+            """
+                    @Get("/sendPrimitives/{name}")
+                    Mono<HttpResponse<@Valid SendPrimitivesResponse>> sendPrimitives(
+                        @PathVariable("name") @NotNull String name,
+                        @QueryValue("age") @NotNull BigDecimal age,
+                        @Header("height") @NotNull Float height,
+                        @QueryValue("isPositive") @NotNull Boolean isPositive
+                    );
+                """,
+            """
+                    @Get("/getIgnoredHeader")
+                    @Consumes("text/plain")
+                    Mono<HttpResponse<@NotNull String>> getIgnoredHeader();
+                """
+        );
+
+        assertFileContains(path + "api/ResponseBodyApi.java",
+            """
+                    @Get("/getPaginatedSimpleModel")
+                    Mono<HttpResponse<@NotNull List<@Valid SimpleModel>>> getPaginatedSimpleModel(
+                        @QueryValue(value = "page", defaultValue = "0") @Nullable @Min(0) Integer page
+                    );
+                """,
+            """
+                    @Get("/getSimpleModelWithNonMappedHeader")
+                    Mono<@Valid SimpleModel> getSimpleModelWithNonMappedHeader();
+                """
+        );
+    }
 }
