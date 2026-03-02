@@ -1898,4 +1898,32 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testNonDefaultResponseStatus() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.generateHttpResponseOnlyForMultipleStatuses = true;
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/spec.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+        assertFileContains(path + "api/ResponseBodyApi.kt", """
+                @Operation(
+                    operationId = "getSimpleModelWithNonStandardStatus",
+                    description = "A method to get a simple model as a response",
+                    responses = [
+                        ApiResponse(responseCode = "201", description = "Success", content = [
+                            Content(mediaType = "application/json", schema = Schema(implementation = SimpleModel::class)),
+                        ]),
+                        ApiResponse(responseCode = "default", description = "An unexpected error has occurred"),
+                    ],
+                )
+                @Get("/getSimpleModelWithNonStandardStatus")
+                @Status(HttpStatus.CREATED)
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                fun getSimpleModelWithNonStandardStatus(): Mono<SimpleModel>
+            """,
+            "import io.micronaut.http.annotation.Status",
+            "import io.micronaut.http.HttpStatus");
+    }
 }

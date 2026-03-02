@@ -13,6 +13,8 @@ paths:
       operationId: sendPrimitives
       tags: [ parameters ]
       description: A method to send primitives as request parameters
+      x-http-response-wrapper: true
+      x-not-null: true
       parameters:
         - name: name
           in: path
@@ -42,8 +44,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendPrimitivesResponse'
-        default:
-          $ref: '#/components/responses/Error'
+        404:
+          description: Not found
   /sendValidatedPrimitives:
     get:
       operationId: sendValidatedPrimitives
@@ -85,6 +87,7 @@ paths:
             text/plain:
               schema:
                 type: string
+                nullable: true
         default:
           $ref: '#/components/responses/Error'
   /sendDates:
@@ -152,6 +155,7 @@ paths:
     get:
       operationId: getIgnoredHeader
       tags: [ parameters ]
+      x-not-null: false
       description: |
         A method that returns a header that should be ignored.
         It will be ignored, this behavior is most likely used when it will be set in a filter.
@@ -568,6 +572,7 @@ paths:
   /getPaginatedSimpleModel:
     get:
       operationId: getPaginatedSimpleModel
+      x-not-null: true
       parameters:
         - $ref: '#/components/parameters/PageQueryParam'
       tags: [ responseBody ]
@@ -608,6 +613,7 @@ paths:
   /getSimpleModelWithNonMappedHeader:
     get:
       operationId: getSimpleModelWithNonMappedHeader
+      x-http-response-wrapper: false
       tags: [ responseBody ]
       description: A method to get a simple model as a response
       responses:
@@ -675,6 +681,7 @@ components:
   schemas:
     SendPrimitivesResponse:
       type: object
+      nullable: true
       properties:
         name:
           type: string

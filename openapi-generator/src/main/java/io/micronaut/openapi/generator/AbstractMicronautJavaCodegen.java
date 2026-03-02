@@ -81,6 +81,23 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_CLASS;
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_FIELD;
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_OPERATION;
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_SETTER;
+import static io.micronaut.openapi.generator.Extension.EXT_DEPRECATED;
+import static io.micronaut.openapi.generator.Extension.EXT_DEPRECATED_MESSAGE;
+import static io.micronaut.openapi.generator.Extension.EXT_ENUM_DEPRECATED_MESSAGES;
+import static io.micronaut.openapi.generator.Extension.EXT_ENUM_DESCRIPTIONS;
+import static io.micronaut.openapi.generator.Extension.EXT_ENUM_VAR_NAMES;
+import static io.micronaut.openapi.generator.Extension.EXT_FORMAT;
+import static io.micronaut.openapi.generator.Extension.EXT_HTTP_RESPONSE_WRAPPER;
+import static io.micronaut.openapi.generator.Extension.EXT_TYPE;
+import static io.micronaut.openapi.generator.MicronautUtils.FLUX_CLASS_NAME;
+import static io.micronaut.openapi.generator.MicronautUtils.HTTP_STATUS_CLASS_NAME;
+import static io.micronaut.openapi.generator.MicronautUtils.MONO_CLASS_NAME;
+import static io.micronaut.openapi.generator.MicronautUtils.STATUS_ANNOTATION_CLASS_NAME;
+import static io.micronaut.openapi.generator.MicronautUtils.httpStatusConstName;
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT16;
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT8;
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_LONG;
@@ -95,10 +112,6 @@ import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_LONG;
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_SHORT;
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
 import static io.micronaut.openapi.generator.Utils.DIVIDE_OPERATIONS_BY_CONTENT_TYPE;
-import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
-import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
-import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
-import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.NULL_STRING;
 import static io.micronaut.openapi.generator.Utils.addEnumParamsForConverters;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
@@ -156,6 +169,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
+    public static final String OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES = "generateHttpResponseOnlyForMultipleStatuses";
     public static final String OPT_APPLICATION_NAME = "applicationName";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS = "generateSwaggerAnnotations";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 = "swagger1";
@@ -169,9 +183,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
-
-    private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
-    private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
 
     protected SecureRandom random = new SecureRandom();
     protected String title;
@@ -191,6 +202,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean useEnumCaseInsensitive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
+    protected boolean generateHttpResponseOnlyForMultipleStatuses;
     protected boolean generateControllerAsAbstract;
     protected boolean jsonIncludeAlwaysForRequiredFields;
     protected String appName;
@@ -302,6 +314,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, "If true, then controller interface will be without @Controller annotation", generateControllerAsAbstract));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES, "Wrap the operations response in HttpResponse object where possible multiple HTTP status codes or additional headers are defined", generateHttpResponseOnlyForMultipleStatuses));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
@@ -383,6 +396,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
         this.generateHttpResponseWhereRequired = generateHttpResponseWhereRequired;
+    }
+
+    public void setGenerateHttpResponseOnlyForMultipleStatuses(boolean generateHttpResponseOnlyForMultipleStatuses) {
+        this.generateHttpResponseOnlyForMultipleStatuses = generateHttpResponseOnlyForMultipleStatuses;
     }
 
     public void setReactive(boolean reactive) {
@@ -625,6 +642,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             generateHttpResponseWhereRequired = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED);
         }
         writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, generateHttpResponseWhereRequired);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES)) {
+            generateHttpResponseOnlyForMultipleStatuses = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES);
+        }
+        writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES, generateHttpResponseOnlyForMultipleStatuses);
 
         if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_AS_ABSTRACT)) {
             generateControllerAsAbstract = convertPropertyToBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT);
@@ -1620,7 +1642,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (param.isEnumRef) {
                     param.isEnum = true;
                 }
-                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
+                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
                 if (useBeanValidation && !param.isContainer && param.isModel) {
                     param.vendorExtensions.put("withValid", true);
                 }
@@ -1647,17 +1669,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
             }
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
 
-            var deprecatedMessage = op.vendorExtensions.get("x-deprecated-message");
-            var xDeprecated = op.vendorExtensions.get("x-deprecated");
+            var deprecatedMessage = op.vendorExtensions.get(EXT_DEPRECATED_MESSAGE);
+            var xDeprecated = op.vendorExtensions.get(EXT_DEPRECATED);
             if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
                 deprecatedMessage = xDeprecatedStr;
             }
             if (deprecatedMessage != null) {
-                op.vendorExtensions.put("x-deprecated-message", deprecatedMessage.toString());
+                op.vendorExtensions.put(EXT_DEPRECATED_MESSAGE, deprecatedMessage.toString());
             }
         }
 
@@ -1708,11 +1730,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         var isDouble = model != null ? model.isDouble : param != null ? param.isDouble : prop != null ? prop.isDouble : response.isDouble;
 
         var extensions = schema.getExtensions();
-        var format = extensions != null ? (String) extensions.get("x-format") : null;
+        var format = extensions != null ? (String) extensions.get(EXT_FORMAT) : null;
         if (format == null) {
             format = schema.getFormat() == null ? "object" : schema.getFormat();
         }
-        var schemaType = extensions != null ? (String) extensions.get("x-type") : null;
+        var schemaType = extensions != null ? (String) extensions.get(EXT_TYPE) : null;
         if (schemaType == null) {
             schemaType = schema.getType() == null ? "object" : schema.getType();
         }
@@ -1799,11 +1821,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         if (isEnum) {
-            var enumSchemaType = enumSchema.getExtensions() != null ? (String) enumSchema.getExtensions().get("x-type") : null;
+            var enumSchemaType = enumSchema.getExtensions() != null ? (String) enumSchema.getExtensions().get(EXT_TYPE) : null;
             if (enumSchemaType == null) {
                 enumSchemaType = enumSchema.getType();
             }
-            var enumSchemaFormat = enumSchema.getExtensions() != null ? (String) enumSchema.getExtensions().get("x-format") : null;
+            var enumSchemaFormat = enumSchema.getExtensions() != null ? (String) enumSchema.getExtensions().get(EXT_FORMAT) : null;
             if (enumSchemaFormat == null) {
                 enumSchemaFormat = enumSchema.getFormat();
             }
@@ -2110,7 +2132,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
      * @param isListWrapper Whether the wrapper should be around list items.
      */
     private void wrapOperationReturnType(CodegenOperation op, String wrapperType, boolean isValidated, boolean isListWrapper) {
-        CodegenProperty newReturnType = new CodegenProperty();
+        var newReturnType = new CodegenProperty();
         newReturnType.required = true;
         newReturnType.isModel = isValidated;
 
@@ -2147,12 +2169,29 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     private void processOperationWithResponseWrappers(CodegenOperation op) {
-        boolean hasNon200StatusCodes = op.responses.stream().anyMatch(
-            response -> !"200".equals(response.code) && response.code.startsWith("2")
-        );
+
+        var notDefaultRsCode = false;
+        var successResponsesCount = 0;
+        for (var rs : op.responses) {
+            if (rs.code.startsWith("2")) {
+                if (!"200".equals(rs.code)) {
+                    notDefaultRsCode = true;
+                }
+                successResponsesCount++;
+            }
+        }
+
         boolean hasNonMappedHeaders = !op.responseHeaders.isEmpty();
-        boolean requiresHttpResponse = hasNon200StatusCodes || hasNonMappedHeaders;
-        if (generateHttpResponseAlways || (generateHttpResponseWhereRequired && requiresHttpResponse)) {
+        boolean requiresHttpResponse = (notDefaultRsCode && (!generateHttpResponseOnlyForMultipleStatuses || successResponsesCount > 1))
+            || hasNonMappedHeaders;
+        if (generateHttpResponseOnlyForMultipleStatuses && successResponsesCount == 1 && notDefaultRsCode && !hasNonMappedHeaders) {
+            var httpStatusStr = httpStatusConstName(op.responses.get(0).code);
+            op.vendorExtensions.put("statusAnnotation", "@Status(HttpStatus." + httpStatusStr + ")");
+            makeSureImported(HTTP_STATUS_CLASS_NAME, op.imports);
+            makeSureImported(STATUS_ANNOTATION_CLASS_NAME, op.imports);
+        }
+        var withHttpResponseWrapper = (Boolean) op.vendorExtensions.get(EXT_HTTP_RESPONSE_WRAPPER);
+        if ((withHttpResponseWrapper == null && (generateHttpResponseAlways || generateHttpResponseWhereRequired && requiresHttpResponse)) || (withHttpResponseWrapper != null && withHttpResponseWrapper)) {
             wrapOperationReturnType(op, "io.micronaut.http.HttpResponse", false, false);
         }
 
@@ -2314,13 +2353,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             model.allVars = allVars;
 
-            var deprecatedMessage = model.vendorExtensions.get("x-deprecated-message");
-            var xDeprecated = model.vendorExtensions.get("x-deprecated");
+            var deprecatedMessage = model.vendorExtensions.get(EXT_DEPRECATED_MESSAGE);
+            var xDeprecated = model.vendorExtensions.get(EXT_DEPRECATED);
             if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
                 deprecatedMessage = xDeprecatedStr;
             }
             if (deprecatedMessage != null) {
-                model.vendorExtensions.put("x-deprecated-message", deprecatedMessage.toString());
+                model.vendorExtensions.put(EXT_DEPRECATED_MESSAGE, deprecatedMessage.toString());
             }
 
             model.vendorExtensions.put("requiredVars", requiredVars);
@@ -2417,10 +2456,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             return;
         }
 
-        processEnumExt(enumVars, vendorExtensions, "enumDescription", List.of("x-enum-descriptions", "x-xl4-enum-doc"));
-        processEnumExt(enumVars, vendorExtensions, "enumDeprecatedMessage", List.of("x-enum-deprecated-messages", "x-xl4-enum-deprecated"));
+        processEnumExt(enumVars, vendorExtensions, "enumDescription", List.of(EXT_ENUM_DESCRIPTIONS, "x-xl4-enum-doc"));
+        processEnumExt(enumVars, vendorExtensions, "enumDeprecatedMessage", List.of(EXT_ENUM_DEPRECATED_MESSAGES, "x-xl4-enum-deprecated"));
 
-        var deprecatedExt = vendorExtensions.get("x-deprecated");
+        var deprecatedExt = vendorExtensions.get(EXT_DEPRECATED);
         List<?> xDeprecated = null;
         Map<?, ?> xDeprecatedMap = null;
         if (deprecatedExt instanceof List<?> deprecatedList) {
@@ -2429,7 +2468,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             xDeprecated = new ArrayList<>(deprecatedMap.keySet());
             xDeprecatedMap = deprecatedMap;
         }
-        var deprecatedMessagesExt = vendorExtensions.get("x-enum-deprecated-messages");
+        var deprecatedMessagesExt = vendorExtensions.get(EXT_ENUM_DEPRECATED_MESSAGES);
         if (deprecatedMessagesExt == null) {
             deprecatedMessagesExt = vendorExtensions.get("x-xl4-enum-deprecated");
         }
@@ -2453,7 +2492,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
         }
 
-        processEnumExt(enumVars, vendorExtensions, "name", List.of("x-enum-varnames"));
+        processEnumExt(enumVars, vendorExtensions, "name", List.of(EXT_ENUM_VAR_NAMES));
 
         var baseType = (String) vendorExtensions.get("baseType");
         for (var enumVar : enumVars) {
@@ -2569,18 +2608,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         prop.dataType = discriminator.getPropertyType();
         prop.datatypeWithEnum = discriminator.getPropertyType();
         prop.baseType = discriminator.getPropertyType();
-        processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
+        processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
 
-        var deprecatedMessage = property.vendorExtensions.get("x-deprecated-message");
-        var xDeprecated = property.vendorExtensions.get("x-deprecated");
+        var deprecatedMessage = property.vendorExtensions.get(EXT_DEPRECATED_MESSAGE);
+        var xDeprecated = property.vendorExtensions.get(EXT_DEPRECATED);
         if (deprecatedMessage == null && xDeprecated instanceof String xDeprecatedStr) {
             deprecatedMessage = xDeprecatedStr;
         }
         if (deprecatedMessage != null) {
-            property.vendorExtensions.put("x-deprecated-message", deprecatedMessage.toString());
+            property.vendorExtensions.put(EXT_DEPRECATED_MESSAGE, deprecatedMessage.toString());
         }
 
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
@@ -2607,7 +2646,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             property.maxLength = null;
         }
 
-        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
+        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
 
         normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, false, property.vendorExtensions);
         normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, false, property.vendorExtensions);
@@ -2641,7 +2680,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             var parentVars = new ArrayList<CodegenProperty>();
             for (var v : parent.allVars) {
                 if (notContainsProp(v, model.vars)) {
-                    processGenericAnnotations(v, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false);
+                    processGenericAnnotations(v, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
                     parentVars.add(v);
                 }
             }

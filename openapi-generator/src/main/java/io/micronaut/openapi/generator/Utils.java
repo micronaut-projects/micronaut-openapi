@@ -37,6 +37,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_FIELD;
+import static io.micronaut.openapi.generator.Extension.EXT_ANNOTATIONS_SETTER;
+import static io.micronaut.openapi.generator.Extension.EXT_MAXIMUM_MESSAGE;
+import static io.micronaut.openapi.generator.Extension.EXT_MINIMUM_MESSAGE;
+import static io.micronaut.openapi.generator.Extension.EXT_NOT_NULL_MESSAGE;
+import static io.micronaut.openapi.generator.Extension.EXT_PATTERN_MESSAGE;
+import static io.micronaut.openapi.generator.Extension.EXT_SIZE_MESSAGE;
+
 /**
  * Utilities methods to generators.
  *
@@ -57,11 +65,6 @@ public final class Utils {
     public static final String DIVIDE_OPERATIONS_BY_CONTENT_TYPE = "divideOperationsByContentType";
 
     public static final String DEFAULT_BODY_PARAM_NAME = "requestBody";
-    public static final String EXT_ANNOTATIONS_OPERATION = "x-operation-extra-annotation";
-    public static final String EXT_ANNOTATIONS_CLASS = "x-class-extra-annotation";
-    public static final String EXT_ANNOTATIONS_FIELD = "x-field-extra-annotation";
-    public static final String EXT_ANNOTATIONS_SETTER = "x-setter-extra-annotation";
-
     public static final String NULL_STRING = "null";
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
@@ -114,7 +117,7 @@ public final class Utils {
 
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
-                                                 boolean isKotlin, boolean ksp) {
+                                                 boolean isKotlin, boolean ksp, Boolean isNotNullExt) {
         var ext = parameter.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(parameter.dataType) || isKotlinPrimitiveArray(parameter.dataType));
@@ -122,16 +125,16 @@ public final class Utils {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
-            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
+            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp, isNotNullExt);
 
         if (parameter.items != null) {
-            processGenericAnnotations(parameter.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
+            processGenericAnnotations(parameter.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp, null);
         }
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix,
-                                                 boolean isKotlin, boolean ksp) {
+                                                 boolean isKotlin, boolean ksp, Boolean isNotNullExt) {
         var ext = property.vendorExtensions;
         if (!ext.containsKey("isPrimitiveArray")) {
             ext.put("isPrimitiveArray", isJavaPrimitiveArray(property.dataType) || isKotlinPrimitiveArray(property.dataType));
@@ -139,17 +142,17 @@ public final class Utils {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
+            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp, isNotNullExt);
 
         if (property.items != null) {
-            processGenericAnnotations(property.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp);
+            processGenericAnnotations(property.items, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix, isKotlin, ksp, null);
         }
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
-                                                 boolean withNullablePostfix, boolean isKotlin, boolean ksp) {
+                                                 boolean withNullablePostfix, boolean isKotlin, boolean ksp, Boolean isNotNullExt) {
         String genericAnnotations = null;
         dataType = addAnnotationsToPrimitiveArray(dataType, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         dataTypeWithEnum = addAnnotationsToPrimitiveArray(dataTypeWithEnum, isNullable, isRequired, isReadonly, isGenerateHardNullable);
@@ -157,7 +160,7 @@ public final class Utils {
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
             genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable, isKotlin, ksp);
-            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix, isKotlin, ksp);
+            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix, isKotlin, ksp, null);
             if (isMap) {
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
@@ -167,11 +170,18 @@ public final class Utils {
             }
         }
 
-        var isNullableType = withNullablePostfix && (isNullable || isRequired && isReadonly || (genericAnnotations != null && !genericAnnotations.contains("NotNull") && !isRequired));
+        var isNullableType = false;
+        if (isNotNullExt == null) {
+            isNullableType = withNullablePostfix && (isNullable || isRequired && isReadonly || (genericAnnotations != null && !genericAnnotations.contains("NotNull") && !isRequired));
+        } else {
+            isNullableType = !isNotNullExt;
+        }
         // properties with default value are optional, but it works fine only with KSP
         if (ksp) {
             var hasDefaultValue = (Boolean) ext.get("defaultValueIsNotNull");
-            isNullableType = isNullableType && (hasDefaultValue == null || !hasDefaultValue);
+            if (isNotNullExt == null) {
+                isNullableType = isNullableType && (hasDefaultValue == null || !hasDefaultValue);
+            }
         }
 
         ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations + (isNullableType ? "?" : ""));
@@ -201,7 +211,8 @@ public final class Utils {
             return false;
         }
         return switch (dataType) {
-            case "byte[]", "short[]", "int[]", "long[]", "boolean[]", "char[]", "float[]", "double[]" -> true;
+            case "byte[]", "short[]", "int[]", "long[]", "boolean[]", "char[]", "float[]",
+                 "double[]" -> true;
             default -> false;
         };
     }
@@ -231,11 +242,11 @@ public final class Utils {
             return result.toString();
         }
 
-        var patternMsg = (String) prop.vendorExtensions.get("x-pattern-message");
-        var sizeMsg = (String) prop.vendorExtensions.get("x-size-message");
-        var notNullMsg = (String) prop.vendorExtensions.get("x-not-null-message");
-        var minMsg = (String) prop.vendorExtensions.get("x-minimum-message");
-        var maxMsg = (String) prop.vendorExtensions.get("x-maximum-message");
+        var patternMsg = (String) prop.vendorExtensions.get(EXT_PATTERN_MESSAGE);
+        var sizeMsg = (String) prop.vendorExtensions.get(EXT_SIZE_MESSAGE);
+        var notNullMsg = (String) prop.vendorExtensions.get(EXT_NOT_NULL_MESSAGE);
+        var minMsg = (String) prop.vendorExtensions.get(EXT_MINIMUM_MESSAGE);
+        var maxMsg = (String) prop.vendorExtensions.get(EXT_MAXIMUM_MESSAGE);
         if (isKotlin) {
             patternMsg = normalizeStr(patternMsg);
             sizeMsg = normalizeStr(sizeMsg);
