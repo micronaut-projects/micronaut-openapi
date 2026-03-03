@@ -259,7 +259,7 @@ class MyBean {}
         expect:
         petSchema
         petSchema.properties
-        petSchema.properties.lines.example instanceof List<String>
+        petSchema.properties.lines.example instanceof List
         ((List<String>) petSchema.properties.lines.example)[0] == '123 Main St'
         ((List<String>) petSchema.properties.lines.example)[1] == 'Suite 517'
     }
