@@ -29,6 +29,8 @@ dependencies {
     runtimeOnly(mnLogging.logback.classic)
     runtimeOnly(mn.snakeyaml)
 
+    testAnnotationProcessor(projects.micronautOpenapi)
+
     testCompileOnly(mn.micronaut.inject.groovy.test)
     testCompileOnly(mn.micronaut.inject.java.test)
 
