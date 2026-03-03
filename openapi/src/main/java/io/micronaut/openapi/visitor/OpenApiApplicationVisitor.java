@@ -1037,11 +1037,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (!isAllEnabled || (endpointProps.getEnabled() != null && !endpointProps.getEnabled())) {
                 continue;
             }
-            ClassElement classEl = endpointProps.getElement();
-            if (classEl == null) {
+            String className = endpointProps.getClassName();
+            if (StringUtils.isEmpty(className)) {
+                ClassElement prevEl = endpointProps.getElement();
+                className = prevEl != null ? prevEl.getName() : null;
+                endpointProps.setClassName(className);
+            }
+            if (StringUtils.isEmpty(className)) {
                 continue;
             }
-            if (!canProcessEndpoint(classEl, context)) {
+            if (!canProcessEndpoint(className, context)) {
+                continue;
+            }
+            ClassElement classEl = ContextUtils.getClassElement(className, context);
+            if (classEl == null) {
                 continue;
             }
 
@@ -1086,8 +1095,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private boolean canProcessEndpoint(ClassElement classEl, VisitorContext context) {
-        var classToCheck = SPECIFIC_ENDPOINTS.get(classEl.getName());
+    private boolean canProcessEndpoint(String className, VisitorContext context) {
+        var classToCheck = SPECIFIC_ENDPOINTS.get(className);
         if (classToCheck == null) {
             return true;
         }
