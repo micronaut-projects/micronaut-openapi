@@ -1,7 +1,6 @@
 package io.micronaut.openapi.test.page
 
 import io.micronaut.context.exceptions.ConfigurationException
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.annotation.Order
 import io.micronaut.core.type.Argument
 import io.micronaut.core.type.MutableHeaders
@@ -23,10 +22,10 @@ import java.io.OutputStream
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
 @Order(-1)
-internal class PageBodyWriter<T>(
+internal class PageBodyWriter<T : Any>(
     val registry: MessageBodyHandlerRegistry,
-    val bodyWriter: @Nullable MessageBodyWriter<List<T>>?,
-    val bodyType: @Nullable Argument<List<T>>?
+    val bodyWriter: MessageBodyWriter<List<T>>?,
+    val bodyType: Argument<List<T>>?
 ) : MessageBodyWriter<Page<T>> {
 
     @Inject
@@ -57,7 +56,7 @@ internal class PageBodyWriter<T>(
         bodyWriter.writeTo(bodyType, mediaType, page.content, headers, outputStream)
     }
 
-    override fun isWriteable(type: Argument<Page<T>>, mediaType: MediaType): Boolean {
+    override fun isWriteable(type: Argument<Page<T>>, mediaType: MediaType?): Boolean {
         return bodyType == null || bodyWriter != null && bodyWriter.isWriteable(bodyType, mediaType)
     }
 

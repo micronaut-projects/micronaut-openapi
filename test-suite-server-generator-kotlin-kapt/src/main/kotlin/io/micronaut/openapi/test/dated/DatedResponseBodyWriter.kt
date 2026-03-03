@@ -1,7 +1,6 @@
 package io.micronaut.openapi.test.dated
 
 import io.micronaut.context.exceptions.ConfigurationException
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.annotation.Order
 import io.micronaut.core.type.Argument
 import io.micronaut.core.type.MutableHeaders
@@ -22,10 +21,10 @@ import java.io.OutputStream
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
 @Order(-1)
-internal class DatedResponseBodyWriter<T> private constructor(
+internal class DatedResponseBodyWriter<T : Any> private constructor(
     val registry: MessageBodyHandlerRegistry,
-    val bodyWriter: @Nullable MessageBodyWriter<T>?,
-    val bodyType: @Nullable Argument<T>?
+    val bodyWriter: MessageBodyWriter<T>?,
+    val bodyType: Argument<T>?
 ) : MessageBodyWriter<DatedResponse<T>> {
 
     @Inject
@@ -57,7 +56,7 @@ internal class DatedResponseBodyWriter<T> private constructor(
         bodyWriter.writeTo(bodyType, mediaType, dated.body, headers, outputStream)
     }
 
-    override fun isWriteable(type: Argument<DatedResponse<T>>, mediaType: MediaType): Boolean {
+    override fun isWriteable(type: Argument<DatedResponse<T>>, mediaType: MediaType?): Boolean {
         return bodyType == null || bodyWriter != null && bodyWriter.isWriteable(bodyType, mediaType)
     }
 
