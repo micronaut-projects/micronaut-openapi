@@ -30,6 +30,8 @@ dependencies {
     implementation(mnSerde.micronaut.serde.jackson)
     implementation(mn.snakeyaml)
 
+    testAnnotationProcessor(projects.micronautOpenapi)
+
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mn.micronaut.http.client)
 
