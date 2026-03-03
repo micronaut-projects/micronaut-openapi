@@ -68,7 +68,7 @@ class ResponseBodyControllerTest(
         assertEquals(ResponseBodyController.SIMPLE_MODELS, response.body())
         assertEquals(page, response.header("X-Page-Number"))
         assertEquals(totalCount, response.header("X-Total-Count"))
-        assertEquals(3, response.body().size)
+        assertEquals(3, response.body()!!.size)
         assertEquals(pageSize, response.header("X-Page-Size"))
         assertEquals(pageCount, response.header("X-Page-Count"))
     }
