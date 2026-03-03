@@ -43,6 +43,7 @@ dependencies {
 ksp {
     arg("micronaut.openapi.project.dir", "$projectDir")
     arg("micronaut.openapi.expand.app.version", "myVersion")
+    arg("micronaut.application.name", "test-suite-kotlin-ksp-spring")
 }
 
 tasks.register("removeMnFiles") {
