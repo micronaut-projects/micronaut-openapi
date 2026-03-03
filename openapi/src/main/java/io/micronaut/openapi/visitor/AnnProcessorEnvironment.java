@@ -16,41 +16,30 @@
 package io.micronaut.openapi.visitor;
 
 import io.micronaut.context.ApplicationContextConfiguration;
-import io.micronaut.context.env.ActiveEnvironment;
-import io.micronaut.context.env.Environment;
-import io.micronaut.context.env.PropertySource;
-import io.micronaut.context.env.PropertySourceLoader;
+import io.micronaut.context.env.*;
+import io.micronaut.context.env.yaml.YamlPropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.core.io.file.DefaultFileSystemResourceLoader;
-import io.micronaut.core.naming.NameUtils;
-import io.micronaut.core.naming.conventions.StringConvention;
-import io.micronaut.core.order.OrderUtil;
+import io.micronaut.core.io.file.FileSystemResourceLoader;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.context.env.PropertyPlaceholderResolver;
-import io.micronaut.inject.BeanConfiguration;
 import io.micronaut.inject.visitor.VisitorContext;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
@@ -70,17 +59,10 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  */
 public class AnnProcessorEnvironment implements Environment {
 
-    private final List<String> annotationProcessingConfigLocations = new ArrayList<>();
+    private final Environment delegate;
+    private final List<String> annotationProcessingConfigLocations;
     private String projectResourcesPath;
     private String projectDir = StringUtils.EMPTY_STRING;
-    private final Set<String> activeNames = new HashSet<>();
-    private final Map<String, PropertySource> propertySources = new ConcurrentHashMap<>();
-    private final List<PropertySource> refreshablePropertySources = new ArrayList<>();
-    private final ResourceLoader resourceLoader;
-    private final MutableConversionService conversionService = new io.micronaut.core.convert.DefaultMutableConversionService();
-    private final AtomicBoolean running = new AtomicBoolean(false);
-    private final AtomicBoolean reading = new AtomicBoolean(false);
-    private final Collection<String> packages = new HashSet<>();
 
     /**
      * Construct a new environment for the given configuration.
@@ -89,8 +71,9 @@ public class AnnProcessorEnvironment implements Environment {
      * @param context visitor context
      */
     public AnnProcessorEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
-        this.resourceLoader = configuration.getResourceLoader();
-        activeNames.addAll(configuration.getEnvironments());
+        // create the standard DefaultEnvironment via the Environment factory
+        this.delegate = Environment.create(configuration);
+        this.annotationProcessingConfigLocations = new ArrayList<>();
 
         boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
         if (isEnabled) {
@@ -105,7 +88,9 @@ public class AnnProcessorEnvironment implements Environment {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
                 for (String configFileLocation : configFileLocations.split(COMMA)) {
-                    if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
+                    if (!configFileLocation.startsWith(CLASSPATH_SCHEME) &&
+                        !configFileLocation.startsWith(FILE_SCHEME) &&
+                        !configFileLocation.startsWith(PROJECT_SCHEME)) {
                         throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
                     }
                     if (configFileLocation.startsWith(PROJECT_SCHEME)) {
@@ -115,365 +100,314 @@ public class AnnProcessorEnvironment implements Environment {
                 }
             }
         }
-    }
 
-    @Override
-    public @NonNull Environment start() {
-        if (running.compareAndSet(false, true)) {
-            readProperties();
+        // Load property sources discovered for annotation-processing locations and add them to the delegate
+        if (!annotationProcessingConfigLocations.isEmpty()) {
+            List<PropertySource> propertySources = readPropertySourceList(configuration.getApplicationName());
+            // add loaded property sources to delegate environment
+            for (PropertySource ps : propertySources) {
+                delegate.addPropertySource(ps);
+            }
         }
-        return this;
-    }
 
-    private void readProperties() {
-        if (reading.compareAndSet(false, true)) {
-            loadProperties();
-            reading.set(false);
-        }
-    }
-
-    private void loadProperties() {
-        refreshablePropertySources.clear();
-        List<PropertySource> propertySourcesList = readPropertySourceList("application");
-        addDefaultPropertySources(propertySourcesList);
-
-        String propertySourcesSystemProperty = System.getProperty(Environment.PROPERTY_SOURCES_KEY);
-        if (propertySourcesSystemProperty != null) {
+        String propertySourcesSystemProperty = CachedEnvironment.getProperty(Environment.PROPERTY_SOURCES_KEY);
+        if (propertySourcesSystemProperty != null && !propertySourcesSystemProperty.isBlank()) {
             if (propertySourcesSystemProperty.startsWith(PROJECT_SCHEME)) {
                 propertySourcesSystemProperty = propertySourcesSystemProperty.replaceAll(PROJECT_SCHEME, projectDir);
             }
-            propertySourcesList.addAll(readPropertySourceListFromFiles(propertySourcesSystemProperty));
+            for (PropertySource ps : readPropertySourceListFromFiles(propertySourcesSystemProperty)) {
+                delegate.addPropertySource(ps);
+            }
         }
-        String propertySourcesEnv = System.getenv("MICRONAUT_CONFIG_FILES");
-        if (propertySourcesEnv != null) {
+        String propertySourcesEnv = CachedEnvironment.getenv("MICRONAUT_CONFIG_FILES");
+        if (propertySourcesEnv != null && !propertySourcesEnv.isBlank()) {
             if (propertySourcesEnv.startsWith(PROJECT_SCHEME)) {
                 propertySourcesEnv = propertySourcesEnv.replace(PROJECT_SCHEME, projectDir);
             }
-            propertySourcesList.addAll(readPropertySourceListFromFiles(propertySourcesEnv));
-        }
-        refreshablePropertySources.addAll(propertySourcesList);
-
-        readConstPropertySources("application", propertySourcesList);
-
-        propertySourcesList.addAll(propertySources.values());
-        OrderUtil.sort(propertySourcesList);
-        for (PropertySource ps : propertySourcesList) {
-            processPropertySource(ps);
-        }
-    }
-
-    private void readConstPropertySources(String name, List<PropertySource> propertySourcesList) {
-        var propertySourceNames = new HashSet<String>(activeNames.size() + 1);
-        propertySourceNames.add(name);
-        for (var activeName : activeNames) {
-            propertySourceNames.add(name + '-' + activeName);
-        }
-    }
-
-    private void processPropertySource(PropertySource propertySource) {
-
-    }
-
-    private List<PropertySource> readPropertySourceListFromFiles(String files) {
-        if (files == null || files.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<String> fileList = List.of(files.split(","));
-        List<PropertySource> sources = new ArrayList<>();
-        int order = 100;
-        for (String file : fileList) {
-            Optional<Map<String, Object>> props = loadFromFile(file);
-            if (props.isPresent()) {
-                sources.add(PropertySource.of(file, props.get(), order++));
+            for (PropertySource ps : readPropertySourceListFromFiles(propertySourcesEnv)) {
+                delegate.addPropertySource(ps);
             }
         }
-        return sources;
     }
 
-    private Optional<Map<String, Object>> loadFromFile(String file) {
-        try {
-            Path filePath = Path.of(file);
-            ResourceLoader fileLoader = new DefaultFileSystemResourceLoader(filePath.getParent());
-            io.micronaut.context.env.PropertiesPropertySourceLoader loader = new io.micronaut.context.env.PropertiesPropertySourceLoader();
-            Optional<PropertySource> ps = loader.load(NameUtils.filename(file), fileLoader);
-            if (ps.isPresent()) {
-                return Optional.of(getSourceAsMap(ps.get()));
-            }
-        } catch (Exception e) {
-            // ignore
-        }
-        return Optional.empty();
-    }
-
-    private Map<String, Object> getSourceAsMap(PropertySource source) {
-        Map<String, Object> map = new HashMap<>();
-        for (String key : source) {
-            Object value = source.get(key);
-            if (value != null) {
-                map.put(key, value);
-            }
-        }
-        return map;
-    }
-
-    private void addDefaultPropertySources(List<PropertySource> propertySourcesList) {
-        String sysName = "system-properties";
-        if (propertySources.get(sysName) == null) {
-            PropertySource sysProps = PropertySource.of(sysName, (Map<String, Object>) (Map) System.getProperties());
-            propertySourcesList.add(sysProps);
-        }
-        String envName = "system-environment";
-        if (propertySources.get(envName) == null) {
-            PropertySource envProps = PropertySource.of(envName, (Map<String, Object>) (Map) System.getenv());
-            propertySourcesList.add(envProps);
-        }
-    }
-
-    @Override
-    public @NonNull Map<String, Object> getProperties(@NonNull String name, @NonNull StringConvention convention) {
-        Map<String, Object> result = new HashMap<>();
-        for (PropertySource source : propertySources.values()) {
-            Map<String, Object> props = getSourceAsMap(source);
-            for (Map.Entry<String, Object> entry : props.entrySet()) {
-                String key = entry.getKey();
-                if (key.startsWith(name)) {
-                    result.put(key, entry.getValue());
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public <T> Optional<T> getProperty(@NonNull String name, @NonNull Class<T> requiredType) {
-        for (PropertySource source : propertySources.values()) {
-            Object value = source.get(name);
-            if (value != null) {
-                if (requiredType.isInstance(value)) {
-                    return Optional.of(requiredType.cast(value));
-                } else {
-                    Optional<T> converted = conversionService.convert(value, requiredType);
-                    if (converted.isPresent()) {
-                        return converted;
-                    }
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> context) {
-        Optional<?> value = getProperty(name, Object.class);
-        if (value.isPresent()) {
-            return conversionService.convert(value.get(), context);
-        }
-        return Optional.empty();
-    }
-
-    final @NonNull Map<String, Object> getAllProperties(@Nullable String name, @Nullable StringConvention keyFormat) {
-        Map<String, Object> all = new HashMap<>();
-        for (PropertySource source : propertySources.values()) {
-            all.putAll(getSourceAsMap(source));
-        }
-        return all;
-    }
-
-    @Override
-    public boolean containsProperty(@NonNull String name) {
-        return propertySources.values().stream().anyMatch(ps -> ps.get(name) != null);
-    }
-
-    @Override
-    public boolean containsProperties(@NonNull String name) {
-        return containsProperty(name);
-    }
-
-    @Override
-    public @NonNull Collection<List<String>> getPropertyPathMatches(@NonNull String name) {
-        return Collections.emptyList();
-    }
-
-    private List<PropertySource> readPropertySourceList(String name) {
-        List<PropertySource> sources = new ArrayList<>();
+    // --------------------------
+    // Property source discovery
+    // --------------------------
+    protected List<PropertySource> readPropertySourceList(String name) {
+        var propertySources = new ArrayList<PropertySource>();
         for (String configLocation : annotationProcessingConfigLocations) {
-            ResourceLoader rl;
-            if ("classpath:/".equals(configLocation)) {
-                rl = resourceLoader;
+            ResourceLoader resourceLoader;
+            if (configLocation.equals("classpath:/")) {
+                resourceLoader = (ResourceLoader) delegate;
             } else if (configLocation.startsWith(CLASSPATH_SCHEME)) {
-                rl = resourceLoader.forBase(configLocation);
+                resourceLoader = delegate.forBase(configLocation);
             } else if (configLocation.startsWith(FILE_SCHEME)) {
-                configLocation = configLocation.substring(5);
-                Path path = Path.of(configLocation);
-                if (Files.exists(path) && Files.isDirectory(path) && Files.isReadable(path)) {
-                    rl = new DefaultFileSystemResourceLoader(path);
+                String path = configLocation.substring(FILE_SCHEME.length());
+                Path configLocationPath = Path.of(path);
+                if (Files.exists(configLocationPath) && Files.isDirectory(configLocationPath) && Files.isReadable(configLocationPath)) {
+                    resourceLoader = new DefaultFileSystemResourceLoader(configLocationPath);
                 } else {
                     continue;
                 }
             } else {
                 throw new ConfigurationException("Unsupported config location format: " + configLocation);
             }
-            readPropSourceList(name, rl, sources);
+            readPropSourceList(name, resourceLoader, propertySources);
         }
-        return sources;
+        return propertySources;
     }
 
-    private void readPropSourceList(String name, ResourceLoader rl, List<PropertySource> sources) {
-        io.micronaut.context.env.PropertiesPropertySourceLoader loader = new io.micronaut.context.env.PropertiesPropertySourceLoader();
-        loadPropSourceFromLoader(name, loader, sources, rl);
-        io.micronaut.context.env.yaml.YamlPropertySourceLoader yamlLoader = new io.micronaut.context.env.yaml.YamlPropertySourceLoader();
-        loadPropSourceFromLoader(name, yamlLoader, sources, rl);
+    private void readPropSourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
+        Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
+        if (propertySourceLoaders == null || propertySourceLoaders.isEmpty()) {
+            var propertySourceLoader = new PropertiesPropertySourceLoader(false);
+            loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+        } else {
+            for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
+                loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+            }
+        }
     }
 
-    @Override
-    public @NonNull Collection<PropertySourceLoader> getPropertySourceLoaders() {
-        return Collections.emptyList();
-    }
-
-    private void loadPropSourceFromLoader(String name, PropertySourceLoader loader, List<PropertySource> sources, ResourceLoader rl) {
-        Optional<PropertySource> defaultPs = loader.load(name, rl);
-        defaultPs.ifPresent(sources::add);
+    private void loadPropSourceFromLoader(String name,
+                                          PropertySourceLoader propertySourceLoader,
+                                          List<PropertySource> propertySources,
+                                          ResourceLoader resourceLoader) {
+        Optional<PropertySource> defaultPropertySource = propertySourceLoader.load(name, resourceLoader);
+        defaultPropertySource.ifPresent(propertySources::add);
+        Set<String> activeNames = delegate.getActiveNames();
         int i = 0;
         for (String activeName : activeNames) {
-            Optional<PropertySource> envPs = loader.loadEnv(name, rl, ActiveEnvironment.of(activeName, i++));
-            envPs.ifPresent(sources::add);
+            Optional<PropertySource> propertySource = propertySourceLoader.loadEnv(name, resourceLoader, ActiveEnvironment.of(activeName, i));
+            propertySource.ifPresent(propertySources::add);
+            i++;
         }
     }
 
+    private List<PropertySource> readPropertySourceListFromFiles(String files) {
+        if (files == null || files.isBlank()) {
+            return List.of();
+        }
+        String[] parts = files.split(",");
+        if (parts.length == 0) {
+            return List.of();
+        }
+        List<PropertySource> result = new ArrayList<>();
+        Collection<PropertySourceLoader> loaders = getPropertySourceLoaders();
+        for (String raw : parts) {
+            String filePath = raw.trim();
+            if (filePath.isEmpty()) continue;
+            String extension = io.micronaut.core.naming.NameUtils.extension(filePath);
+            PropertySourceLoader matched = null;
+            for (PropertySourceLoader l : loaders) {
+                if (l.getExtensions().contains(extension)) {
+                    matched = l;
+                    break;
+                }
+            }
+            if (matched == null) {
+                throw new ConfigurationException("Unsupported properties file format while reading " + filePath);
+            }
+            Optional<Map<String, Object>> read = readPropertiesFromLoader(io.micronaut.core.naming.NameUtils.filename(filePath), filePath, matched);
+            read.ifPresent(m -> result.add(PropertySource.of(filePath, m)));
+        }
+        return result;
+    }
+
+    private Optional<Map<String, Object>> readPropertiesFromLoader(String fileName, String filePath, PropertySourceLoader propertySourceLoader) {
+        ResourceLoader loader = new ResourceResolver().getSupportingLoader(filePath)
+            .orElse(FileSystemResourceLoader.defaultLoader());
+        try {
+            Optional<InputStream> inputStream = loader.getResourceAsStream(filePath);
+            if (inputStream.isPresent()) {
+                return Optional.of(propertySourceLoader.read(fileName, inputStream.get()));
+            } else {
+                throw new ConfigurationException("Failed to read configuration file: " + filePath);
+            }
+        } catch (IOException e) {
+            throw new ConfigurationException("Unsupported properties file: " + fileName);
+        }
+    }
+
+    // --------------------------
+    // Delegate Environment API
+    // --------------------------
+
     @Override
-    public @NonNull Environment stop() {
-        running.set(false);
-        reading.set(false);
-        refreshablePropertySources.clear();
-        propertySources.clear();
+    public Set<String> getActiveNames() {
+        return delegate.getActiveNames();
+    }
+
+    @Override
+    public Collection<PropertySource> getPropertySources() {
+        return delegate.getPropertySources();
+    }
+
+    @Override
+    public Environment addPropertySource(PropertySource propertySource) {
+        delegate.addPropertySource(propertySource);
+        return this;
+    }
+
+    @Override
+    public Environment removePropertySource(PropertySource propertySource) {
+        delegate.removePropertySource(propertySource);
+        return this;
+    }
+
+    @Override
+    public Environment addPackage(String pkg) {
+        delegate.addPackage(pkg);
+        return this;
+    }
+
+    @Override
+    public Environment addConfigurationExcludes(String... names) {
+        delegate.addConfigurationExcludes(names);
+        return this;
+    }
+
+    @Override
+    public Environment addConfigurationIncludes(String... names) {
+        delegate.addConfigurationIncludes(names);
+        return this;
+    }
+
+    @Override
+    public Collection<String> getPackages() {
+        return delegate.getPackages();
+    }
+
+    @Override
+    public PropertyPlaceholderResolver getPlaceholderResolver() {
+        return delegate.getPlaceholderResolver();
+    }
+
+    @Override
+    public Map<String, Object> refreshAndDiff() {
+        return delegate.refreshAndDiff();
+    }
+
+    @Override
+    public Environment refresh() {
+        delegate.refresh();
+        return this;
+    }
+
+    @Override
+    public Optional<java.io.InputStream> getResourceAsStream(String path) {
+        return delegate.getResourceAsStream(path);
+    }
+
+    @Override
+    public Optional<URL> getResource(String path) {
+        return delegate.getResource(path);
+    }
+
+    @Override
+    public java.util.stream.Stream<URL> getResources(String path) {
+        return delegate.getResources(path);
+    }
+
+    @Override
+    public boolean supportsPrefix(String path) {
+        return delegate.supportsPrefix(path);
+    }
+
+    @Override
+    public ResourceLoader forBase(String basePath) {
+        return delegate.forBase(basePath);
+    }
+
+    @Override
+    public boolean isPresent(String className) {
+        return delegate.isPresent(className);
+    }
+
+    @Override
+    public java.util.stream.Stream<Class<?>> scan(Class<? extends java.lang.annotation.Annotation> annotation) {
+        return delegate.scan(annotation);
+    }
+
+    @Override
+    public java.util.stream.Stream<Class<?>> scan(Class<? extends java.lang.annotation.Annotation> annotation, String... packages) {
+        return delegate.scan(annotation, packages);
+    }
+
+    @Override
+    public java.lang.ClassLoader getClassLoader() {
+        return delegate.getClassLoader();
+    }
+
+    @Override
+    public boolean isActive(io.micronaut.inject.BeanConfiguration configuration) {
+        return delegate.isActive(configuration);
+    }
+
+    @Override
+    public Environment start() {
+        delegate.start();
         return this;
     }
 
     @Override
     public boolean isRunning() {
-        return running.get();
+        return delegate.isRunning();
     }
 
     @Override
-    public @NonNull Set<String> getActiveNames() {
-        return Collections.unmodifiableSet(activeNames);
+    public Environment stop() {
+        delegate.stop();
+        return this;
     }
 
     @Override
-    public @NonNull Collection<PropertySource> getPropertySources() {
-        return Collections.unmodifiableCollection(propertySources.values());
-    }
-
-    @Override
-    public Optional<InputStream> getResourceAsStream(@NonNull String name) {
-        return resourceLoader.getResourceAsStream(name);
-    }
-
-    @Override
-    public Optional<URL> getResource(@NonNull String name) {
-        return resourceLoader.getResource(name);
-    }
-
-    @Override
-    public Stream<URL> getResources(@NonNull String name) {
-        return resourceLoader.getResources(name);
-    }
-
-    @Override
-    public boolean supportsPrefix(@NonNull String name) {
-        return resourceLoader.supportsPrefix(name);
-    }
-
-    @Override
-    public @NonNull ResourceLoader forBase(@NonNull String name) {
-        return resourceLoader.forBase(name);
-    }
-
-    @Override
-    public Stream<Class<?>> scan(Class<? extends java.lang.annotation.Annotation> annotation) {
-        return Stream.empty();
-    }
-
-    @Override
-    public Stream<Class<?>> scan(Class<? extends java.lang.annotation.Annotation> annotation, String... packages) {
-        return Stream.empty();
-    }
-
-    @Override
-    public void close() {
-        stop();
-    }
-
-    @Override
-    public MutableConversionService getConversionService() {
-        return conversionService;
-    }
-
-    @Override
-    public boolean isActive(BeanConfiguration configuration) {
-        return true;
-    }
-
-    @Override
-    public @NonNull Environment addPropertySource(@NonNull PropertySource propertySource) {
-        propertySources.put(propertySource.getName(), propertySource);
-        if (running.get()) {
-            refreshablePropertySources.add(propertySource);
+    public java.util.Optional<PropertyEntry> getPropertyEntry(String name) {
+        try {
+            return delegate.getPropertyEntry(name);
+        } catch (NoSuchMethodError e) {
+            return Optional.empty();
         }
-        return this;
     }
 
     @Override
-    public @NonNull Environment removePropertySource(@NonNull PropertySource propertySource) {
-        propertySources.remove(propertySource.getName());
-        refreshablePropertySources.remove(propertySource);
-        return this;
+    public java.util.Collection<PropertySourceLoader> getPropertySourceLoaders() {
+        return delegate.getPropertySourceLoaders();
     }
 
     @Override
-    public @NonNull Environment addPackage(@NonNull String pkg) {
-        packages.add(pkg);
-        return this;
+    public io.micronaut.core.convert.MutableConversionService getConversionService() {
+        return delegate.getConversionService();
+    }
+
+
+    @Override
+    public boolean containsProperty(String name) {
+        return delegate.containsProperty(name);
     }
 
     @Override
-    public @NonNull Collection<String> getPackages() {
-        return Collections.unmodifiableCollection(packages);
+    public boolean containsProperties(String name) {
+        return delegate.containsProperties(name);
     }
 
     @Override
-    public @NonNull Environment addConfigurationExcludes(@NonNull String... names) {
-        return this;
+    public <T> Optional<T> getProperty(String name, Class<T> requiredType) {
+        return delegate.getProperty(name, requiredType);
     }
 
     @Override
-    public @NonNull Environment addConfigurationIncludes(@NonNull String... names) {
-        return this;
+    public <T> T getRequiredProperty(String name, Class<T> requiredType) {
+        return delegate.getRequiredProperty(name, requiredType);
     }
 
     @Override
-    public @NonNull Map<String, Object> refreshAndDiff() {
-        return Collections.emptyMap();
+    public <T> Optional<T> getProperty(String name, ArgumentConversionContext<T> conversionContext) {
+        return delegate.getProperty(name, conversionContext);
     }
 
     @Override
-    public @NonNull Environment refresh() {
-        loadProperties();
-        return this;
-    }
-
-    @Override
-    public @NonNull PropertyPlaceholderResolver getPlaceholderResolver() {
-        return new PropertyPlaceholderResolver() {
-            @Override
-            public Optional<String> resolvePlaceholders(String str) {
-                return Optional.of(str); // No resolution for now
-            }
-        };
-    }
-
-    @Override
-    public <T> T getRequiredProperty(@NonNull String name, @NonNull Class<T> requiredType) {
-        return getProperty(name, requiredType).orElseThrow(() -> new ConfigurationException("Required property [" + name + "] not found"));
+    public Collection<List<String>> getPropertyPathMatches(String pathPattern) {
+        return delegate.getPropertyPathMatches(pathPattern);
     }
 }
