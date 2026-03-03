@@ -44,7 +44,10 @@ tasks.withType(JavaCompile::class) {
             "-Xlint:unchecked",
             "-Xlint:deprecation"
     )
-    options.forkOptions.jvmArgs = mutableListOf("-Dapp.version=myVersion")
+    options.forkOptions.jvmArgs = mutableListOf(
+        "-Dapp.version=myVersion",
+        "-Dmicronaut.application.name=test-suite-java-spring"
+    )
 }
 
 tasks.register("removeMnFiles") {
