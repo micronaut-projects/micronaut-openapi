@@ -17,6 +17,7 @@ dependencies {
     testImplementation(mnGroovy.micronaut.runtime.groovy)
     testImplementation(mnValidation.validation)
     testImplementation(mn.reactor)
+    testImplementation(mnTest.junit.platform.suite)
 
     testRuntimeOnly(mnLogging.logback.classic)
 }
@@ -34,3 +35,7 @@ tasks.withType(GroovyCompile::class) {
 }
 
 ext["skipDocumentation"] = true
+
+tasks.withType<Test> {
+    failOnNoDiscoveredTests = false
+}

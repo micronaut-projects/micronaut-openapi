@@ -22,6 +22,7 @@ dependencies {
     testImplementation(mnValidation.validation)
     testImplementation(mn.kotlin.stdlib.asProvider())
     testImplementation(mn.kotlin.reflect)
+    testImplementation(mnTest.junit.platform.suite)
 
     testRuntimeOnly(mnLogging.logback.classic)
 }
@@ -41,3 +42,7 @@ tasks.test {
 }
 
 ext["skipDocumentation"] = true
+
+tasks.withType<Test> {
+    failOnNoDiscoveredTests = false
+}

@@ -36,3 +36,7 @@ tasks.test {
 }
 
 ext["skipDocumentation"] = true
+
+tasks.withType<Test> {
+    failOnNoDiscoveredTests = false
+}
