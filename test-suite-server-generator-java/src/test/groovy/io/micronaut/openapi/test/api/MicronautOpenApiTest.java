@@ -39,17 +39,17 @@ public class MicronautOpenApiTest {
         var swaggerUi = client.retrieve("/swagger-ui", String.class);
 
         assertNotNull(swaggerUi);
-        assertTrue(swaggerUi.contains("link(contextPath + \"/api/swagger-ui/res/swagger-ui.css\""));
+        assertTrue(swaggerUi.contains("link(contextPath + \"/swagger-ui/res/swagger-ui.css\""));
 
         var openApiSpec = client.retrieve("/swagger/openapi-micronaut-1.0.0.yml", String.class);
         assertNotNull(openApiSpec);
         assertTrue(
             openApiSpec.contains(
                 """
-                    openapi: 3.0.1
                     info:
                       title: openapi-micronaut
                       version: 1.0.0
+                    openapi: 3.0.1
                     """
             )
         );

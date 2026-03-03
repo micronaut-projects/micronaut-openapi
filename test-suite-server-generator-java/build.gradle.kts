@@ -92,5 +92,6 @@ tasks.withType(JavaCompile::class) {
     options.forkOptions.jvmArgs = mutableListOf(
         "-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true",
         "-Dmicronaut.openapi.environments=local",
+        "-Dmicronaut.application.name=openapi-micronaut",
     )
 }
