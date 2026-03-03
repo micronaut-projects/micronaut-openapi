@@ -543,7 +543,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         }
     }
 
-    private static class DefaultBuilder implements MicronautCodeGeneratorBuilder {
+     static final class DefaultBuilder implements MicronautCodeGeneratorBuilder {
 
         private static final Consumer<DefaultBuilder> HAS_OUTPUT = b -> Objects.requireNonNull(b.outputDirectory, "Sources directory must not be null");
 
@@ -650,7 +650,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             );
         }
 
-        private static class DefaultOptionsBuilder implements MicronautCodeGeneratorOptionsBuilder {
+         static final class DefaultOptionsBuilder implements MicronautCodeGeneratorOptionsBuilder {
 
             private String apiPackage;
             private String artifactId;

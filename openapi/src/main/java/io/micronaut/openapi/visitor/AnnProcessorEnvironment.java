@@ -18,11 +18,9 @@ package io.micronaut.openapi.visitor;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.ActiveEnvironment;
 import io.micronaut.context.env.Environment;
-import io.micronaut.context.env.MapPropertySource;
 import io.micronaut.context.env.PropertySource;
 import io.micronaut.context.env.PropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
@@ -32,10 +30,8 @@ import io.micronaut.core.io.file.DefaultFileSystemResourceLoader;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.order.OrderUtil;
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
-import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.inject.BeanConfiguration;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -275,7 +271,7 @@ public class AnnProcessorEnvironment implements Environment {
         return Optional.empty();
     }
 
-    public @NonNull Map<String, Object> getAllProperties(@Nullable String name, @Nullable StringConvention keyFormat) {
+    final @NonNull Map<String, Object> getAllProperties(@Nullable String name, @Nullable StringConvention keyFormat) {
         Map<String, Object> all = new HashMap<>();
         for (PropertySource source : propertySources.values()) {
             all.putAll(getSourceAsMap(source));

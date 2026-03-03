@@ -112,7 +112,7 @@ public enum Formatting {
             return text.substring(i);
         }
 
-        private class LineSkippingPredicate implements Predicate<String> {
+        final class LineSkippingPredicate implements Predicate<String> {
             private int emptyLines;
 
             @Override
