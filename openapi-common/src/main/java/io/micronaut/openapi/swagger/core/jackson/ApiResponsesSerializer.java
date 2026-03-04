@@ -42,7 +42,8 @@ public class ApiResponsesSerializer extends ValueSerializer<ApiResponses> {
             if (!value.isEmpty()) {
                 for (Entry<String, ApiResponse> entry : value.entrySet()) {
                     jgen.writeName(entry.getKey());
-                    jgen.writePOJO(entry.getValue());                }
+                    jgen.writePOJO(entry.getValue());
+                }
             }
             for (Entry<String, Object> entry : value.getExtensions().entrySet()) {
                 jgen.writeName(entry.getKey());
