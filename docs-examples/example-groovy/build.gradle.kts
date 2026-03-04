@@ -16,7 +16,6 @@ dependencies {
     implementation(mnGroovy.micronaut.runtime.groovy)
     implementation(mnValidation.validation)
     implementation(mn.reactor)
-    implementation(mnTest.junit.platform.suite)
 
     runtimeOnly(mnLogging.logback.classic)
 }
