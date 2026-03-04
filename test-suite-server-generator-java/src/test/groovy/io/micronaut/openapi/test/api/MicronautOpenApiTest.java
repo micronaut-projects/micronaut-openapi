@@ -46,11 +46,11 @@ public class MicronautOpenApiTest {
         assertTrue(
             openApiSpec.contains(
                 """
-                    info:
-                      title: openapi-micronaut
-                      version: 1.0.0
-                    openapi: 3.0.1
-                    """
+                  openapi: 3.0.1
+                  info:
+                    title: openapi-micronaut
+                    version: 1.0.0
+                  """
             )
         );
 
