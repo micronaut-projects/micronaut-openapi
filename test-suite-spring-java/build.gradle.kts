@@ -46,7 +46,7 @@ tasks.withType(JavaCompile::class) {
     )
     options.forkOptions.jvmArgs = mutableListOf(
         "-Dapp.version=myVersion",
-        "-Dmicronaut.application.name=test-suite-java-spring"
+        "-Dmicronaut.application.name=test-suite-spring-java"
     )
 }
 

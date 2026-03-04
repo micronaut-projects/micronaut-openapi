@@ -46,7 +46,7 @@ kapt {
     arguments {
         arg("micronaut.openapi.project.dir", "$projectDir")
         arg("micronaut.openapi.expand.app.version", "myVersion")
-        arg("micronaut.application.name", "test-suite-kotlin-kapt-spring")
+        arg("micronaut.application.name", "test-suite-spring-kotlin-kapt")
     }
 }
 
