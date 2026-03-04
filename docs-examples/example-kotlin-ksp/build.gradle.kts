@@ -22,8 +22,6 @@ dependencies {
     implementation(mnValidation.validation)
     implementation(mn.kotlin.stdlib.asProvider())
     implementation(mn.kotlin.reflect)
-    implementation(mnTest.junit.platform.suite)
-
 
     runtimeOnly(mnLogging.logback.classic)
 }
