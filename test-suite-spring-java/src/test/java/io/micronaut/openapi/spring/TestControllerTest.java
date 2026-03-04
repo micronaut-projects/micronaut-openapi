@@ -1,6 +1,5 @@
 package io.micronaut.openapi.spring;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -31,7 +30,7 @@ class TestControllerTest {
     RestClient restClient;
 
     @Test
-    void springOpenApiPathTest() throws JsonProcessingException {
+    void springOpenApiPathTest() {
         var result = restClient.get()
             .uri("/swagger/" + APP_NAME + '-' + APP_VERSION + ".yml")
             .retrieve()
