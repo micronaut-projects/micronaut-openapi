@@ -313,7 +313,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
-import com.fasterxml.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
@@ -379,7 +378,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.JacksonException;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
@@ -393,7 +392,7 @@ class MyController {
      }
 
     @io.micronaut.http.annotation.Error
-    public HttpResponse<JsonError> jsonError(HttpRequest<?> request, JsonParseException jsonParseException) {
+    public HttpResponse<JsonError> jsonError(HttpRequest<?> request, JacksonException jsonParseException) {
         JsonError error = new JsonError("Invalid JSON: " + jsonParseException.getMessage())
                 .link(Link.SELF, Link.of(request.getUri()));
 
@@ -1824,7 +1823,7 @@ class HelloWorldController {
     public com.google.common.base.Optional<MyDto> endpoint1(@Body com.google.common.base.Optional<MyDto> body) {
         return null;
     }
-    
+
     @Post("/optInt")
     public OptionalInt optInt(@Body OptionalInt body) {
         return null;
@@ -2422,7 +2421,7 @@ class TestArgumentBinder implements TypedRequestArgumentBinder<FilterProvidedArg
     public Argument<FilterProvidedArgument> argumentType() {
         return Argument.of(FilterProvidedArgument.class);
     }
-    
+
     @Override
     public BindingResult<FilterProvidedArgument> bind(ArgumentConversionContext<FilterProvidedArgument> context, HttpRequest<?> source) {
         return () -> Optional.of(new FilterProvidedArgument("my-id"));
@@ -2799,7 +2798,7 @@ class ConsentsApiImpl implements ConsentsApi {
 
     @Status(HttpStatus.PARTIAL_CONTENT)
     public void rewriteStatus() {
-        
+
     }
 
     @Override
@@ -2816,11 +2815,11 @@ class ConsentsApiImpl implements ConsentsApi {
 
 
 class ConsentResponse {
-    
+
 }
 
 class ConsentRequest {
-    
+
 }
 
 @Singleton
@@ -3183,7 +3182,7 @@ interface MyController {
 
     @Post(uri = "/byteArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
     byte[] byteArrayInParams(@PathVariable byte[] param1, @QueryValue byte[] qv1, @Body byte[] body);
-    
+
     @Post(uri = "/charArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
     char[] charArrayInParams(@PathVariable char[] param1, @QueryValue char[] qv1, @Body char[] body);
 
@@ -3193,7 +3192,7 @@ interface MyController {
 
 @Introspected
 class MyDto {
-    
+
     public byte[] payload;
     public char[] payload2;
 }
