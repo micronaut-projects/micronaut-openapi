@@ -75,7 +75,6 @@ configurations.configureEach {
     exclude(group = "com.github.joschi.jackson", module = "jackson-datatype-threetenbp")
     exclude(group = "com.fasterxml.jackson.datatype", module = "jackson-datatype-guava")
     exclude(group = "com.fasterxml.jackson.datatype", module = "jackson-datatype-joda")
-    exclude(group = "org.mozilla", module = "rhino")
 }
 
 tasks.test {
