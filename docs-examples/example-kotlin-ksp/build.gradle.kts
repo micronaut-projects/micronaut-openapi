@@ -12,20 +12,21 @@ repositories {
 
 dependencies {
 
-    kspTest(mn.micronaut.inject.kotlin)
-    kspTest(mnValidation.micronaut.validation)
-    kspTest(projects.micronautOpenapi)
+    ksp(mn.micronaut.inject.kotlin)
+    ksp(mnValidation.micronaut.validation)
+    ksp(projects.micronautOpenapi)
 
-    testCompileOnly(projects.micronautOpenapiAnnotations)
-    testCompileOnly(mn.micronaut.inject.kotlin)
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.micronaut.inject.kotlin)
 
-    testImplementation(mn.micronaut.http)
-    testImplementation(mn.reactor)
-    testImplementation(mnValidation.validation)
-    testImplementation(mn.kotlin.stdlib.asProvider())
-    testImplementation(mn.kotlin.reflect)
+    implementation(mn.micronaut.http)
+    implementation(mn.reactor)
+    implementation(mnValidation.validation)
+    implementation(mn.kotlin.stdlib.asProvider())
+    implementation(mn.kotlin.reflect)
+    implementation(mnTest.junit.platform.suite)
 
-    testRuntimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnLogging.logback.classic)
 }
 
 ksp {

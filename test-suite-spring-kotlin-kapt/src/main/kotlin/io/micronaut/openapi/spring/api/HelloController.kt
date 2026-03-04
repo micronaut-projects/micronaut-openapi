@@ -17,7 +17,7 @@ class HelloController {
     }
 
     @PostMapping("/file", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun endpoint2(@RequestParam files: MultiValueMap<String?, MultipartFile?>?) {
+    fun endpoint2(@RequestParam files: MultiValueMap<String, MultipartFile?>?) {
         println("endpoint2")
     }
 
