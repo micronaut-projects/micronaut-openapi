@@ -10,21 +10,21 @@ repositories {
 
 dependencies {
 
-    kaptTest(mn.micronaut.inject.kotlin)
-    kaptTest(mnValidation.micronaut.validation)
-    kaptTest(projects.micronautOpenapi)
+    kapt(mn.micronaut.inject.kotlin)
+    kapt(mnValidation.micronaut.validation)
+    kapt(projects.micronautOpenapi)
 
-    testCompileOnly(projects.micronautOpenapiAnnotations)
-    testCompileOnly(mn.micronaut.inject.kotlin)
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.micronaut.inject.kotlin)
 
-    testImplementation(mn.micronaut.http)
-    testImplementation(mn.reactor)
-    testImplementation(mnValidation.validation)
-    testImplementation(mn.kotlin.stdlib.asProvider())
-    testImplementation(mn.kotlin.reflect)
-    testImplementation(mnTest.junit.platform.suite)
+    implementation(mn.micronaut.http)
+    implementation(mn.reactor)
+    implementation(mnValidation.validation)
+    implementation(mn.kotlin.stdlib.asProvider())
+    implementation(mn.kotlin.reflect)
+    implementation(mnTest.junit.platform.suite)
 
-    testRuntimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnLogging.logback.classic)
 }
 
 kapt {
@@ -42,7 +42,3 @@ tasks.test {
 }
 
 ext["skipDocumentation"] = true
-
-tasks.withType<Test> {
-    failOnNoDiscoveredTests = false
-}

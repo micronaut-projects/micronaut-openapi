@@ -9,18 +9,17 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor(mn.micronaut.inject.java)
+    annotationProcessor(projects.micronautOpenapi)
 
-    testAnnotationProcessor(mn.micronaut.inject.java)
-    testAnnotationProcessor(projects.micronautOpenapi)
+    compileOnly(mn.micronaut.inject.java)
+    compileOnly(projects.micronautOpenapiAnnotations)
 
-    testCompileOnly(mn.micronaut.inject.java)
-    testCompileOnly(projects.micronautOpenapiAnnotations)
+    implementation(mn.micronaut.http)
+    implementation(mn.reactor)
+    implementation(mnValidation.validation)
 
-    testImplementation(mn.micronaut.http)
-    testImplementation(mn.reactor)
-    testImplementation(mnValidation.validation)
-
-    testRuntimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnLogging.logback.classic)
 }
 
 tasks.withType(JavaCompile::class) {
@@ -36,7 +35,3 @@ tasks.test {
 }
 
 ext["skipDocumentation"] = true
-
-tasks.withType<Test> {
-    failOnNoDiscoveredTests = false
-}
