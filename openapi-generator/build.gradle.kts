@@ -15,6 +15,7 @@ dependencies {
     api(libs.guava)
     api(mnLogging.slf4j.ext)
     api(mn.snakeyaml)
+    api(libs.rhino)
 
     testImplementation(mnTest.micronaut.test.junit5)
     testImplementation(mnTest.junit.jupiter.params)
