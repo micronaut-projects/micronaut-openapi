@@ -136,8 +136,8 @@ public class ObjectMapperFactory {
     private static ObjectMapper create(Object factory, boolean openapi31) {
         MapperBuilder<?, ?> builder;
 
-        if (factory instanceof YAMLFactory) {
-            builder = YAMLMapper.builder((YAMLFactory) factory);
+        if (factory instanceof YAMLFactory yamlFactory) {
+            builder = YAMLMapper.builder(yamlFactory);
         } else {
             builder = JsonMapper.builder();
         }
