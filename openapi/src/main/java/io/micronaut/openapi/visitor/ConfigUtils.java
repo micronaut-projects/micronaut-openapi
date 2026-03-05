@@ -289,16 +289,34 @@ public final class ConfigUtils {
                 String targetClassName = (String) entry.getValue();
                 readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
             }
-            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
-                String configuredClassName = entry.getKey();
 
-                // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
-                String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
-                if (isMicronautProperty(prop)) {
-                    continue;
+            // Use getFlatProperties to correctly handle dotted class-name keys from YAML.
+            if (environment instanceof AnnProcessorEnvironment annEnv) {
+                Map<String, String> flatMappingProps = annEnv.getFlatProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING);
+                for (Entry<String, String> entry : flatMappingProps.entrySet()) {
+                    String configuredClassName = entry.getKey();
+                    String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
+                    if (isMicronautProperty(prop)) {
+                        continue;
+                    }
+                    readCustomSchema(configuredClassName, entry.getValue(), customSchemas, context);
                 }
-                String targetClassName = (String) entry.getValue();
-                readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+            } else {
+                // Fallback for non-AnnProcessor environments
+                Map<String, Object> mappingProps = environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, null);
+                if (CollectionUtils.isNotEmpty(mappingProps)) {
+                    readFlattenedMappingProps(EMPTY_STRING, mappingProps, customSchemas, context);
+                } else {
+                    for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
+                        String configuredClassName = entry.getKey();
+                        String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
+                        if (isMicronautProperty(prop)) {
+                            continue;
+                        }
+                        String targetClassName = (String) entry.getValue();
+                        readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+                    }
+                }
             }
         }
 
@@ -1151,6 +1169,31 @@ public final class ConfigUtils {
         customSchemas.put(className, new CustomSchema(configuredTypeArgs, targetClassElement));
     }
 
+    private static void readFlattenedMappingProps(String keyPrefix,
+                                                  Map<String, Object> mappingProps,
+                                                  Map<String, CustomSchema> customSchemas,
+                                                  VisitorContext context) {
+        for (Entry<String, Object> entry : mappingProps.entrySet()) {
+            String key = StringUtils.isEmpty(keyPrefix) ? entry.getKey() : keyPrefix + DOT + entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Map<?, ?> nested) {
+                //noinspection unchecked
+                readFlattenedMappingProps(key, (Map<String, Object>) nested, customSchemas, context);
+            } else if (value instanceof CharSequence) {
+                String configuredClassName = key;
+
+                // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
+                String prop = MICRONAUT_OPENAPI_SCHEMA + DOT + configuredClassName;
+                if (isMicronautProperty(prop)) {
+                    continue;
+                }
+
+                String targetClassName = value.toString();
+                readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+            }
+        }
+    }
+
     @Nullable
     public static Path getProjectPath(VisitorContext context) {
 
@@ -1414,11 +1457,27 @@ public final class ConfigUtils {
             return Collections.emptyList();
         }
 
-        String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        // Support both the OpenAPI-specific environments and the standard Micronaut environments property.
+        // Tests (and user apps) often configure environments via `micronaut.environments`.
+        String openApiEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS,
+            readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        String micronautEnvStr = System.getProperty(Environment.ENVIRONMENTS_PROPERTY);
+
         var activeEnvs = new ArrayList<String>();
-        if (StringUtils.isNotEmpty(activeEnvStr)) {
-            for (var activeEnv : activeEnvStr.split(COMMA)) {
-                activeEnvs.add(activeEnv.strip());
+        if (StringUtils.isNotEmpty(micronautEnvStr)) {
+            for (var activeEnv : micronautEnvStr.split(COMMA)) {
+                var trimmed = activeEnv.strip();
+                if (StringUtils.isNotEmpty(trimmed) && !activeEnvs.contains(trimmed)) {
+                    activeEnvs.add(trimmed);
+                }
+            }
+        }
+        if (StringUtils.isNotEmpty(openApiEnvStr)) {
+            for (var activeEnv : openApiEnvStr.split(COMMA)) {
+                var trimmed = activeEnv.strip();
+                if (StringUtils.isNotEmpty(trimmed) && !activeEnvs.contains(trimmed)) {
+                    activeEnvs.add(trimmed);
+                }
             }
         }
         return activeEnvs;

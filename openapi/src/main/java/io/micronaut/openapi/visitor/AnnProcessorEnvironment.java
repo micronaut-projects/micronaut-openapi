@@ -33,13 +33,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
@@ -75,15 +69,29 @@ public class AnnProcessorEnvironment implements Environment {
         this.delegate = Environment.create(configuration);
         this.annotationProcessingConfigLocations = new ArrayList<>();
 
-        boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
+        boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, true, context);
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
                 projectDir = FILE_SCHEME + normalizePath(projectPath.toString());
                 projectResourcesPath = projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/main/resources/";
+                if (Utils.isTestMode()) {
+                    annotationProcessingConfigLocations.add(projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/test/resources/");
+                }
             }
 
+            // Support both annotation-processor options and system properties (tests frequently use System.setProperty).
+            //
+            // IMPORTANT: do NOT call ConfigUtils.getConfigProperty(...) here because it may call ConfigUtils.getEnv(...)
+            // which constructs another AnnProcessorEnvironment -> recursion during visitor startup.
             String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            if (StringUtils.isEmpty(configFileLocations)) {
+                configFileLocations = CachedEnvironment.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            }
+            if (StringUtils.isEmpty(configFileLocations)) {
+                configFileLocations = System.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            }
+
             if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
@@ -103,7 +111,10 @@ public class AnnProcessorEnvironment implements Environment {
 
         // Load property sources discovered for annotation-processing locations and add them to the delegate
         if (!annotationProcessingConfigLocations.isEmpty()) {
-            List<PropertySource> propertySources = readPropertySourceList(configuration.getApplicationName());
+            // Micronaut convention: configuration base name is "application".
+            // ApplicationContextConfiguration#getApplicationName can be null/blank during annotation processing,
+            // which would make config loading non-deterministic.
+            List<PropertySource> propertySources = readPropertySourceList("application");
             // add loaded property sources to delegate environment
             for (PropertySource ps : propertySources) {
                 delegate.addPropertySource(ps);
@@ -160,11 +171,18 @@ public class AnnProcessorEnvironment implements Environment {
     private void readPropSourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders == null || propertySourceLoaders.isEmpty()) {
-            var propertySourceLoader = new PropertiesPropertySourceLoader(false);
-            loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+            loadPropSourceFromLoader(name, new PropertiesPropertySourceLoader(false), propertySources, resourceLoader);
+            loadPropSourceFromLoader(name, new YamlPropertySourceLoader(), propertySources, resourceLoader);
         } else {
+            boolean hasYaml = false;
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
                 loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+                if (propertySourceLoader instanceof YamlPropertySourceLoader) {
+                    hasYaml = true;
+                }
+            }
+            if (!hasYaml) {
+                loadPropSourceFromLoader(name, new YamlPropertySourceLoader(), propertySources, resourceLoader);
             }
         }
     }
@@ -409,5 +427,27 @@ public class AnnProcessorEnvironment implements Environment {
     @Override
     public Collection<List<String>> getPropertyPathMatches(String pathPattern) {
         return delegate.getPropertyPathMatches(pathPattern);
+    }
+
+    /**
+     * Returns all property key-value pairs whose key starts with the given prefix,
+     * reconstructing dotted class-name keys that YAML nesting would otherwise obscure.
+     * This is needed because Micronaut treats dots in YAML map keys as nesting separators,
+     * so keys like "io.micronaut.Foo" become nested maps rather than flat string keys.
+     */
+    public Map<String, String> getFlatProperties(String prefix) {
+        String dotPrefix = prefix + ".";
+        var result = new HashMap<String, String>();
+        for (PropertySource ps : delegate.getPropertySources()) {
+            for (String key : ps) {
+                if (key.startsWith(dotPrefix)) {
+                    Object value = ps.get(key);
+                    if (value != null) {
+                        result.put(key.substring(dotPrefix.length()), value.toString());
+                    }
+                }
+            }
+        }
+        return result;
     }
 }
