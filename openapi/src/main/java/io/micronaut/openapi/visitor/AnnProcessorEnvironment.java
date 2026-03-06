@@ -20,13 +20,11 @@ import io.micronaut.context.env.*;
 import io.micronaut.context.env.yaml.YamlPropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.core.io.file.DefaultFileSystemResourceLoader;
 import io.micronaut.core.io.file.FileSystemResourceLoader;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
-import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -35,9 +33,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.ArrayList;
 
-import static io.micronaut.context.BeanResolutionTraceMode.LOG;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
@@ -113,9 +116,6 @@ public class AnnProcessorEnvironment implements Environment {
 
         // Load property sources discovered for annotation-processing locations and add them to the delegate
         if (!annotationProcessingConfigLocations.isEmpty()) {
-            // Micronaut convention: configuration base name is "application".
-            // ApplicationContextConfiguration#getApplicationName can be null/blank during annotation processing,
-            // which would make config loading non-deterministic.
             List<PropertySource> propertySources = readPropertySourceList("application");
             // add loaded property sources to delegate environment
             for (PropertySource ps : propertySources) {
