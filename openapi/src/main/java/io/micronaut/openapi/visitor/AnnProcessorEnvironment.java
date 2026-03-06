@@ -20,11 +20,13 @@ import io.micronaut.context.env.*;
 import io.micronaut.context.env.yaml.YamlPropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.convert.ArgumentConversionContext;
+import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.core.io.file.DefaultFileSystemResourceLoader;
 import io.micronaut.core.io.file.FileSystemResourceLoader;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
+import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -35,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static io.micronaut.context.BeanResolutionTraceMode.LOG;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
@@ -58,6 +61,7 @@ public class AnnProcessorEnvironment implements Environment {
     private String projectResourcesPath;
     private String projectDir = StringUtils.EMPTY_STRING;
 
+
     /**
      * Construct a new environment for the given configuration.
      *
@@ -69,7 +73,7 @@ public class AnnProcessorEnvironment implements Environment {
         this.delegate = Environment.create(configuration);
         this.annotationProcessingConfigLocations = new ArrayList<>();
 
-        boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, true, context);
+        boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
@@ -96,9 +100,7 @@ public class AnnProcessorEnvironment implements Environment {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
                 for (String configFileLocation : configFileLocations.split(COMMA)) {
-                    if (!configFileLocation.startsWith(CLASSPATH_SCHEME) &&
-                        !configFileLocation.startsWith(FILE_SCHEME) &&
-                        !configFileLocation.startsWith(PROJECT_SCHEME)) {
+                    if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
                         throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
                     }
                     if (configFileLocation.startsWith(PROJECT_SCHEME)) {
@@ -149,12 +151,16 @@ public class AnnProcessorEnvironment implements Environment {
         for (String configLocation : annotationProcessingConfigLocations) {
             ResourceLoader resourceLoader;
             if (configLocation.equals("classpath:/")) {
-                resourceLoader = (ResourceLoader) delegate;
+                resourceLoader = this;
             } else if (configLocation.startsWith(CLASSPATH_SCHEME)) {
-                resourceLoader = delegate.forBase(configLocation);
+                if (delegate instanceof DefaultClassPathResourceLoader defClassPathResourceLoader) {
+                    resourceLoader = defClassPathResourceLoader.forBase(configLocation, false);
+                } else {
+                    resourceLoader = forBase(configLocation);
+                }
             } else if (configLocation.startsWith(FILE_SCHEME)) {
-                String path = configLocation.substring(FILE_SCHEME.length());
-                Path configLocationPath = Path.of(path);
+                configLocation = configLocation.substring(5);
+                Path configLocationPath = Path.of(configLocation);
                 if (Files.exists(configLocationPath) && Files.isDirectory(configLocationPath) && Files.isReadable(configLocationPath)) {
                     resourceLoader = new DefaultFileSystemResourceLoader(configLocationPath);
                 } else {
@@ -171,29 +177,19 @@ public class AnnProcessorEnvironment implements Environment {
     private void readPropSourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders == null || propertySourceLoaders.isEmpty()) {
-            loadPropSourceFromLoader(name, new PropertiesPropertySourceLoader(false), propertySources, resourceLoader);
-            loadPropSourceFromLoader(name, new YamlPropertySourceLoader(), propertySources, resourceLoader);
+            var propertySourceLoader = new PropertiesPropertySourceLoader(false);
+            loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
         } else {
-            boolean hasYaml = false;
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
                 loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
-                if (propertySourceLoader instanceof YamlPropertySourceLoader) {
-                    hasYaml = true;
-                }
-            }
-            if (!hasYaml) {
-                loadPropSourceFromLoader(name, new YamlPropertySourceLoader(), propertySources, resourceLoader);
             }
         }
     }
 
-    private void loadPropSourceFromLoader(String name,
-                                          PropertySourceLoader propertySourceLoader,
-                                          List<PropertySource> propertySources,
-                                          ResourceLoader resourceLoader) {
+    private void loadPropSourceFromLoader(String name, PropertySourceLoader propertySourceLoader, List<PropertySource> propertySources, ResourceLoader resourceLoader) {
         Optional<PropertySource> defaultPropertySource = propertySourceLoader.load(name, resourceLoader);
         defaultPropertySource.ifPresent(propertySources::add);
-        Set<String> activeNames = delegate.getActiveNames();
+        Set<String> activeNames = getActiveNames();
         int i = 0;
         for (String activeName : activeNames) {
             Optional<PropertySource> propertySource = propertySourceLoader.loadEnv(name, resourceLoader, ActiveEnvironment.of(activeName, i));
@@ -245,6 +241,11 @@ public class AnnProcessorEnvironment implements Environment {
         } catch (IOException e) {
             throw new ConfigurationException("Unsupported properties file: " + fileName);
         }
+    }
+
+
+    private void internalProcessPropertySource(PropertySource propertySource) {
+        delegate.addPropertySource(propertySource);
     }
 
     // --------------------------
@@ -389,8 +390,11 @@ public class AnnProcessorEnvironment implements Environment {
     }
 
     @Override
-    public java.util.Collection<PropertySourceLoader> getPropertySourceLoaders() {
-        return delegate.getPropertySourceLoaders();
+    public Collection<PropertySourceLoader> getPropertySourceLoaders() {
+        var loaders = new ArrayList<PropertySourceLoader>(2);
+        loaders.add(new YamlPropertySourceLoader(false));
+        loaders.add(new PropertiesPropertySourceLoader(false));
+        return loaders;
     }
 
     @Override
