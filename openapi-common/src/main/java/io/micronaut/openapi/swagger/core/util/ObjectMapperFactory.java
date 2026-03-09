@@ -81,6 +81,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationConfig;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.cfg.MapperBuilder;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
@@ -135,7 +136,6 @@ public class ObjectMapperFactory {
     @SuppressWarnings("deprecation")
     private static ObjectMapper create(Object factory, boolean openapi31) {
         MapperBuilder<?, ?> builder;
-
         if (factory instanceof YAMLFactory yamlFactory) {
             builder = YAMLMapper.builder(yamlFactory);
         } else {
@@ -243,13 +243,13 @@ public class ObjectMapperFactory {
             sourceMixins.put(Discriminator.class, Discriminator31Mixin.class);
         }
 
-        builder.addMixIn(ApiResponses.class, sourceMixins.get(ApiResponses.class));
         for (Map.Entry<Class<?>, Class<?>> entry : sourceMixins.entrySet()) {
             builder.addMixIn(entry.getKey(), entry.getValue());
         }
 
         builder.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         builder.configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        builder.configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true);
         builder.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         builder.configure(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN, true);
         builder.changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(Include.NON_NULL));
