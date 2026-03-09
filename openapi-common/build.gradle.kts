@@ -17,9 +17,3 @@ configurations.configureEach {
     exclude(group = "io.micronaut", module = "micronaut-inject")
     exclude(group = "io.micronaut", module = "micronaut-core-bom")
 }
-
-micronautBuild {
-    descriptor {
-        parentModuleId = "io.micronaut.openapi:micronaut-openapi-common"
-    }
-}
