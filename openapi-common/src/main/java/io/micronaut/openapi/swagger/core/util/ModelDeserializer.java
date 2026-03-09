@@ -189,7 +189,7 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
                 schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
             } else if (type instanceof ArrayNode arrayNode) {
                 Set<String> types = new LinkedHashSet<>();
-                arrayNode.elements().forEach(n -> types.add(n.asString()));
+                arrayNode.elements().forEach(n -> types.add(n.textValue()));
                 schema.types(types);
             }
             if (additionalProperties != null) {
