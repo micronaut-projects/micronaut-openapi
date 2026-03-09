@@ -9,16 +9,15 @@ repositories {
 }
 
 dependencies {
+    compileOnly(mn.micronaut.inject.groovy)
+    compileOnly(projects.micronautOpenapi)
 
-    testCompileOnly(mn.micronaut.inject.groovy)
-    testCompileOnly(projects.micronautOpenapi)
+    implementation(mn.micronaut.http)
+    implementation(mnGroovy.micronaut.runtime.groovy)
+    implementation(mnValidation.validation)
+    implementation(mn.reactor)
 
-    testImplementation(mn.micronaut.http)
-    testImplementation(mnGroovy.micronaut.runtime.groovy)
-    testImplementation(mnValidation.validation)
-    testImplementation(mn.reactor)
-
-    testRuntimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnLogging.logback.classic)
 }
 
 tasks.test {

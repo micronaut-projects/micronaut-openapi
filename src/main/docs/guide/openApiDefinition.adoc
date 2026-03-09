@@ -1,7 +1,7 @@
 You can add a `@OpenAPIDefinition` annotation to your `Application` class or another class to describe global components (security schemas, servers etc.) and common information, like license, contact, version etc.:
 
 .Example @OpenAPIDefinition usage
-snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,clazz", project-base="docs-examples/example"]
+snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,clazz", project-base="docs-examples/example", source="main"]
 
 With that in place, you compile your project and a OpenAPI YAML file will be generated to the `META-INF/swagger` directory of your project's class output. For example, the above configuration generates:
 
