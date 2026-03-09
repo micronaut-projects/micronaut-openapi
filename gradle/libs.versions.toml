@@ -43,7 +43,7 @@ micronaut-logging = "2.0.0-M2"
 micronaut-session = "5.0.0-M1"
 micronaut-test = "5.0.0-M6"
 micronaut-grpc = "5.0.0-M1"
-micronaut-spring = "5.12.1"
+micronaut-spring = "6.0.0-M1"
 micronaut-shared-settings = "8.0.0-M17"
 
 # javascript libraries
