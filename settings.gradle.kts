@@ -28,7 +28,7 @@ include(
 //    "openapi-adoc",
 //    "openapi-annotations",
 //    "openapi-bom",
-//    "openapi-common",
+    "openapi-common",
 //    "openapi-generator",
 //    "test-suite-client-generator-java",
 //    "test-suite-client-generator-kotlin-kapt",

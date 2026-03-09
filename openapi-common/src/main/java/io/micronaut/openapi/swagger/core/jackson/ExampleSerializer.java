@@ -15,43 +15,41 @@
  */
 package io.micronaut.openapi.swagger.core.jackson;
 
-import java.io.IOException;
-
 import io.swagger.v3.oas.models.examples.Example;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.DatabindException;
-import tools.jackson.databind.JsonSerializer;
-import tools.jackson.databind.SerializerProvider;
-import tools.jackson.databind.ser.ResolvableSerializer;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 5.0.0
  */
-public class ExampleSerializer extends JsonSerializer<Example> implements ResolvableSerializer {
+public class ExampleSerializer extends ValueSerializer<Example> {
 
-    private final JsonSerializer<Object> defaultSerializer;
+    private final ValueSerializer<Object> defaultSerializer;
 
-    public ExampleSerializer(JsonSerializer<Object> serializer) {
+    public ExampleSerializer(ValueSerializer<Object> serializer) {
         defaultSerializer = serializer;
     }
 
     @Override
-    public void resolve(SerializerProvider serializerProvider) throws DatabindException {
-        if (defaultSerializer instanceof ResolvableSerializer resolvableSerializer) {
+    public void resolve(SerializationContext serializerProvider) throws DatabindException {
+        if (defaultSerializer instanceof ValueSerializer resolvableSerializer) {
             resolvableSerializer.resolve(serializerProvider);
         }
     }
 
     @Override
-    public void serialize(Example example, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Example example, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 
         if (example.getValueSetFlag() && example.getValue() == null) {
             jgen.writeStartObject();
             defaultSerializer.unwrappingSerializer(null).serialize(example, jgen, provider);
-            jgen.writeNullField("value");
+            jgen.writeNullProperty("value");
             jgen.writeEndObject();
         } else {
             defaultSerializer.serialize(example, jgen, provider);

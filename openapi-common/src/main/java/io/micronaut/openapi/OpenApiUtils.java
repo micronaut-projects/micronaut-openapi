@@ -15,10 +15,12 @@
  */
 package io.micronaut.openapi;
 
-import tools.jackson.core.JsonParser;
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
 import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 
 /**
@@ -34,27 +36,39 @@ public final class OpenApiUtils {
      * The JSON mapper.
      */
     public static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
+        .rebuild()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
+        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+        .build();
+
     /**
      * The JSON 3.1 mapper.
      */
     public static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
+        .rebuild()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
+        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+        .build();
+
     /**
      * The JSON mapper for security scheme.
      */
     public static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
-        .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-        .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .rebuild()
+        .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+        .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+        .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING, DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)  // ← moved from DeserializationFeature
+        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+        .build();
+
     /**
      * The YAML mapper.
      */
     public static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
+
     /**
      * The YAML 3.1 mapper.
      */

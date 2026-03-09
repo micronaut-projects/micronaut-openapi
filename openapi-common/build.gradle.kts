@@ -6,8 +6,9 @@ plugins {
 dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
+    implementation("io.micronaut:micronaut-module-info:5.0.0-M16")
+    testImplementation(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {
@@ -15,4 +16,10 @@ configurations.configureEach {
     exclude(group = "io.micronaut", module = "micronaut-inject-java")
     exclude(group = "io.micronaut", module = "micronaut-inject")
     exclude(group = "io.micronaut", module = "micronaut-core-bom")
+}
+
+micronautBuild {
+    descriptor {
+        parentModuleId = "io.micronaut.openapi:micronaut-openapi-common"
+    }
 }

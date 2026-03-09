@@ -525,7 +525,7 @@ public enum PrimitiveType {
     }
 
     public static PrimitiveType fromTypeAndFormat(Type type, String format) {
-        final Class<?> raw = TypeFactory.defaultInstance().constructType(type).getRawClass();
+        final Class<?> raw = TypeFactory.createDefaultInstance().constructType(type).getRawClass();
         final Collection<PrimitiveType> keys = MULTI_KEY_CLASSES.get(raw);
         if (keys == null || keys.isEmpty() || format == null || format.isBlank()) {
             return fromType(type);
@@ -539,7 +539,7 @@ public enum PrimitiveType {
     }
 
     public static PrimitiveType fromType(Type type) {
-        final Class<?> raw = TypeFactory.defaultInstance().constructType(type).getRawClass();
+        final Class<?> raw = TypeFactory.createDefaultInstance().constructType(type).getRawClass();
         final PrimitiveType key = KEY_CLASSES.get(raw);
         if (key != null && !customExcludedClasses.contains(raw.getName())) {
             return key;

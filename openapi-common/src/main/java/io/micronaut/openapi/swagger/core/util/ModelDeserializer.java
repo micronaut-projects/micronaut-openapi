@@ -18,11 +18,11 @@ package io.micronaut.openapi.swagger.core.util;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonDeserializer;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
-import tools.jackson.databind.node.TextNode;
+import tools.jackson.databind.node.StringNode;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.media.ArbitrarySchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -41,7 +41,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,7 +52,7 @@ import java.util.Set;
  *
  * @since 4.6.0
  */
-public class ModelDeserializer extends JsonDeserializer<Schema> {
+public class ModelDeserializer extends ValueDeserializer<Schema> {
 
     static Boolean useArbitrarySchema = false;
 
@@ -68,8 +67,8 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
     protected boolean openapi31 = false;
 
     @Override
-    public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        JsonNode node = jp.getCodec().readTree(jp);
+    public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonException {
+        JsonNode node = ctxt.readTree(jp);
 
         Schema schema = null;
 
@@ -163,7 +162,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         if (schema != null) {
             try {
                 schema.jsonSchema(OpenApiUtils.getJsonMapper31().readValue(OpenApiUtils.getJsonMapper31().writeValueAsString(node), Map.class));
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 System.err.println("Exception converting jsonSchema to Map " + e.getMessage());
             }
         }
@@ -186,11 +185,11 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 ((ObjectNode) node).remove("additionalProperties");
             }
             schema = OpenApiUtils.getJsonMapper31().convertValue(node, JsonSchema.class);
-            if (type instanceof TextNode) {
+            if (type instanceof StringNode) {
                 schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
-            } else if (type instanceof ArrayNode) {
+            } else if (type instanceof ArrayNode arrayNode) {
                 Set<String> types = new LinkedHashSet<>();
-                type.elements().forEachRemaining(n -> types.add(n.textValue()));
+                arrayNode.elements().forEach(n -> types.add(n.asString()));
                 schema.types(types);
             }
             if (additionalProperties != null) {

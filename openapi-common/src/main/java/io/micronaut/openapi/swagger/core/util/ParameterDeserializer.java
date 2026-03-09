@@ -24,29 +24,26 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.JsonDeserializer;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.EnumFeature;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class ParameterDeserializer extends JsonDeserializer<Parameter> {
+public class ParameterDeserializer extends ValueDeserializer<Parameter> {
 
     protected boolean openapi31;
 
     @Override
     public Parameter deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+        throws JacksonException {
         Parameter result = null;
 
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = ctxt.readTree(jp);
         JsonNode sub = node.get("$ref");
         JsonNode inNode = node.get("in");
         JsonNode desc = node.get("description");
@@ -78,7 +75,7 @@ public class ParameterDeserializer extends JsonDeserializer<Parameter> {
                 reader = mapper.readerFor(CookieParameter.class);
             }
             if (reader != null) {
-                result = reader.with(DeserializationFeature.READ_ENUMS_USING_TO_STRING).readValue(node);
+                result = reader.with(EnumFeature.READ_ENUMS_USING_TO_STRING).readValue(node);
             }
         }
 

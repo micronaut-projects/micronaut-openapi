@@ -15,40 +15,40 @@
  */
 package io.micronaut.openapi.swagger.core.jackson;
 
-import java.io.IOException;
 import java.util.Map.Entry;
 
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.JsonSerializer;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class ApiResponsesSerializer extends JsonSerializer<ApiResponses> {
+public class ApiResponsesSerializer extends ValueSerializer<ApiResponses> {
 
     @Override
-    public void serialize(ApiResponses value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(ApiResponses value, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();
 
             if (!value.isEmpty()) {
                 for (Entry<String, ApiResponse> entry : value.entrySet()) {
-                    jgen.writeObjectField(entry.getKey(), entry.getValue());
+                    jgen.writePOJOProperty(entry.getKey(), entry.getValue());
                 }
             }
             for (Entry<String, Object> entry : value.getExtensions().entrySet()) {
-                jgen.writeObjectField(entry.getKey(), entry.getValue());
+                jgen.writePOJOProperty(entry.getKey(), entry.getValue());
             }
             jgen.writeEndObject();
         } else {
-            provider.defaultSerializeValue(value, jgen);
+            provider.writeValue(jgen, value);
         }
     }
 }
