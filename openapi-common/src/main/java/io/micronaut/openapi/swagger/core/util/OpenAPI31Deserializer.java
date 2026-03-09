@@ -43,6 +43,6 @@ public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> {
 
     @Override
     public void resolve(DeserializationContext ctxt) throws DatabindException {
-        ( defaultDeserializer).resolve(ctxt);
+        defaultDeserializer.resolve(ctxt);
     }
 }
