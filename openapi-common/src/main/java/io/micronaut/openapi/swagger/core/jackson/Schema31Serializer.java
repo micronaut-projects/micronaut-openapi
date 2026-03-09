@@ -19,11 +19,11 @@ import java.io.IOException;
 
 import io.swagger.v3.oas.models.media.Schema;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.JsonSerializer;
+import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.ser.ResolvableSerializer;
 
 /**
  * This class is copied from swagger-core library.
@@ -39,7 +39,7 @@ public class Schema31Serializer extends JsonSerializer<Schema> implements Resolv
     }
 
     @Override
-    public void resolve(SerializerProvider serializerProvider) throws JsonMappingException {
+    public void resolve(SerializerProvider serializerProvider) throws DatabindException {
         if (defaultSerializer instanceof ResolvableSerializer resolvableSerializer) {
             resolvableSerializer.resolve(serializerProvider);
         }

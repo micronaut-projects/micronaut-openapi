@@ -21,9 +21,9 @@ import java.util.Map.Entry;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonSerializer;
+import tools.jackson.databind.SerializerProvider;
 
 /**
  * This class is copied from swagger-core library.

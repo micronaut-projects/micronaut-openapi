@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.models.headers.Header;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonDeserializer;
+import tools.jackson.databind.JsonNode;
 
 /**
  * This class is copied from swagger-core library.

@@ -1,6 +1,6 @@
 package io.micronaut.openapi.spring
 
-import com.fasterxml.jackson.core.JsonProcessingException
+import tools.jackson.core.JacksonException
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.parameters.Parameter
@@ -27,7 +27,7 @@ class TestControllerTest {
     lateinit var restClient: RestClient
 
     @Test
-    @Throws(JsonProcessingException::class)
+    @Throws(JacksonException::class)
     fun springOpenApiPathTest() {
         val result = restClient.get()
             .uri("/swagger/" + TestConfig.APP_NAME + '-' + TestConfig.APP_VERSION + ".yml")

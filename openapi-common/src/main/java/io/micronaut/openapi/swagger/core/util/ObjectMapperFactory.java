@@ -74,20 +74,20 @@ import io.swagger.v3.oas.models.tags.Tag;
 import org.yaml.snakeyaml.LoaderOptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonSerializer;
+import tools.jackson.databind.Module;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.BeanSerializerModifier;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLFactoryBuilder;
+import tools.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import tools.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * This class is copied from swagger-core library.

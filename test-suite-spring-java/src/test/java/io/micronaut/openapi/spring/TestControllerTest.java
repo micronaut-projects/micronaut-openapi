@@ -1,6 +1,6 @@
 package io.micronaut.openapi.spring;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;

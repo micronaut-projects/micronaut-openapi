@@ -20,12 +20,12 @@ import java.io.IOException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonDeserializer;
+import tools.jackson.databind.deser.ResolvableDeserializer;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> implements ResolvableDeserializer {
 
@@ -44,7 +44,7 @@ public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> implements R
     }
 
     @Override
-    public void resolve(DeserializationContext ctxt) throws JsonMappingException {
+    public void resolve(DeserializationContext ctxt) throws DatabindException {
         ((ResolvableDeserializer) defaultDeserializer).resolve(ctxt);
     }
 }
