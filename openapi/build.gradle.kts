@@ -40,7 +40,6 @@ dependencies {
     testImplementation(mn.snakeyaml)
     testImplementation(mnSecurity.micronaut.security)
     testImplementation(mnSerde.micronaut.serde.jackson)
-    testImplementation(mnRxjava2.micronaut.rxjava2)
     testImplementation(mnRxjava3.micronaut.rxjava3)
     testImplementation(mnData.micronaut.data.model)
     testImplementation(mnValidation.validation)

@@ -31,7 +31,6 @@ micronaut-jaxrs = "5.0.0-M1"
 micronaut-views = "6.0.0-M1"
 micronaut-security = "5.0.0-M1"
 micronaut-serde = "3.0.0-M2"
-micronaut-rxjava2 = "2.9.0"
 micronaut-rxjava3 = "4.0.0-M1"
 micronaut-reactor = "4.0.0-M1"
 micronaut-gradle-plugin = "4.6.2"
@@ -78,7 +77,6 @@ micronaut-jaxrs = { module = "io.micronaut.jaxrs:micronaut-jaxrs-bom", version.r
 micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
-micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
 micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
 micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor-bom", version.ref = "micronaut-reactor" }
 micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
