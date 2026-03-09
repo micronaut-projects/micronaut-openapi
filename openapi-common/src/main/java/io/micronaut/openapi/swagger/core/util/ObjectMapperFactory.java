@@ -102,45 +102,36 @@ public class ObjectMapperFactory {
     }
 
     public static ObjectMapper createJson() {
-        return create(null, false);
+        return create(JsonMapper.builder(), false);
     }
 
-    public static ObjectMapper createYaml(boolean openapi31) {
+    public static ObjectMapper createJson31() {
+        return create(JsonMapper.builder(), true);
+    }
+
+    public static ObjectMapper createYaml() {
+        return create(YAMLMapper.builder(buildYamlFactory()), false);
+    }
+
+    public static ObjectMapper createYaml31() {
+        return create(YAMLMapper.builder(buildYamlFactory()), true);
+    }
+
+    private static YAMLFactory buildYamlFactory() {
         LoadSettings loadSettings = LoadSettings.builder()
             .setAllowDuplicateKeys(false)
             .build();
-
-        YAMLFactory factory = YAMLFactory.builder()
+        return YAMLFactory.builder()
             .loadSettings(loadSettings)
             .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
             .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
             .enable(YAMLWriteFeature.SPLIT_LINES)
             .enable(YAMLWriteFeature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
             .build();
-
-        return create(factory, openapi31);
-    }
-
-    public static ObjectMapper createYaml() {
-        return createYaml(false);
-    }
-
-    public static ObjectMapper createJson31() {
-        return create(null, true);
-    }
-
-    public static ObjectMapper createYaml31() {
-        return createYaml(true);
     }
 
     @SuppressWarnings("deprecation")
-    private static ObjectMapper create(Object factory, boolean openapi31) {
-        MapperBuilder<?, ?> builder;
-        if (factory instanceof YAMLFactory yamlFactory) {
-            builder = YAMLMapper.builder(yamlFactory);
-        } else {
-            builder = JsonMapper.builder();
-        }
+    private static ObjectMapper create(MapperBuilder<?, ?> builder, boolean openapi31) {
 
         SimpleModule serializerModule;
         if (!openapi31) {
@@ -187,12 +178,7 @@ public class ObjectMapperFactory {
             };
         }
 
-        SimpleModule deserializerModule;
-        if (!openapi31) {
-            deserializerModule = new DeserializationModule();
-        } else {
-            deserializerModule = new DeserializationModule31();
-        }
+        SimpleModule deserializerModule = openapi31 ? new DeserializationModule31() : new DeserializationModule();
 
         builder.addModule(serializerModule);
         builder.addModule(deserializerModule);
