@@ -262,6 +262,7 @@ public class ObjectMapperFactory {
         return JsonMapper.builder()
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
             .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(Include.NON_NULL))
