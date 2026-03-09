@@ -7,7 +7,6 @@ dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
     api(libs.managed.swagger.models)
-    implementation("io.micronaut:micronaut-module-info:5.0.0-M16")
     testImplementation(mnTest.junit.platform.launcher)
 }
 
