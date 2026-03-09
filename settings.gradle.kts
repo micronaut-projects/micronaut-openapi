@@ -49,7 +49,6 @@ micronautBuild {
     importMicronautCatalog("micronaut-security")
     importMicronautCatalog("micronaut-views")
     importMicronautCatalog("micronaut-serde")
-    importMicronautCatalog("micronaut-rxjava2")
     importMicronautCatalog("micronaut-rxjava3")
     importMicronautCatalog("micronaut-reactor")
     importMicronautCatalog("micronaut-groovy")
