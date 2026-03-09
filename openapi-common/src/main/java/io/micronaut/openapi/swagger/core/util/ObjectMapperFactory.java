@@ -243,7 +243,6 @@ public class ObjectMapperFactory {
             sourceMixins.put(Discriminator.class, Discriminator31Mixin.class);
         }
 
-        builder.addMixIn(ApiResponses.class, sourceMixins.get(ApiResponses.class));
         for (Map.Entry<Class<?>, Class<?>> entry : sourceMixins.entrySet()) {
             builder.addMixIn(entry.getKey(), entry.getValue());
         }
