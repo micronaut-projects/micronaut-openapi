@@ -238,8 +238,10 @@ public class ObjectMapperFactory {
         builder.configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true);
         builder.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         builder.configure(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN, true);
-        builder.changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(Include.NON_NULL));
-
+        builder.changeDefaultPropertyInclusion(incl -> incl
+            .withValueInclusion(Include.NON_NULL)
+            .withContentInclusion(Include.NON_NULL)
+        );
         return builder.build();
     }
 
@@ -251,7 +253,9 @@ public class ObjectMapperFactory {
             .configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
-            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(Include.NON_NULL))
-            .build();
+            .changeDefaultPropertyInclusion(incl -> incl
+                .withValueInclusion(Include.NON_NULL)
+                .withContentInclusion(Include.NON_NULL)
+            )            .build();
     }
 }
