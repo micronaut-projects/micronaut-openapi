@@ -1,6 +1,6 @@
 package io.micronaut.openapi.test.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
