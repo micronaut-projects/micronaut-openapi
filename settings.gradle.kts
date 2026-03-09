@@ -26,7 +26,7 @@ include(
 //    "docs-examples:example-kotlin-ksp",
 //    "openapi",
 //    "openapi-adoc",
-//    "openapi-annotations",
+    "openapi-annotations",
 //    "openapi-bom",
 //    "openapi-common",
 //    "openapi-generator",
