@@ -38,11 +38,8 @@ public class SchemaSerializer extends ValueSerializer<Schema> {
 
     @Override
     public void resolve(SerializationContext serializerProvider) throws DatabindException {
-        if (defaultSerializer instanceof ValueSerializer resolvableSerializer) {
-            resolvableSerializer.resolve(serializerProvider);
-        }
+        defaultSerializer.resolve(serializerProvider);
     }
-
     @Override
     public void serialize(Schema value, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 
