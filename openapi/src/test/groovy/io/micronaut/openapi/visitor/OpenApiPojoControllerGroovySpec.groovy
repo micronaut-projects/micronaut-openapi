@@ -401,7 +401,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 
 @Controller
 class ExecutionController {
-    
+
     @Get(uri="/execution/{id}/output")
     @Operation(
         summary="Execution Output",
@@ -459,7 +459,9 @@ public class MyBean {}
 
         content.size() == 2
         content."application/json".schema.type == "object"
-        content."application/json".examples instanceof Map<String, Example>
+        content."application/json".examples instanceof Map
+        ((Map) content."application/json".examples).keySet().every { it instanceof String }
+        ((Map) content."application/json".examples).values().every { it instanceof Example }
 
         def examplesMap = (Map<String, Example>) content."application/json".examples
         examplesMap."log-output-compacted"
@@ -467,7 +469,10 @@ public class MyBean {}
         examplesMap."log-output-compacted".value.id == 1
 
         content."text/plain".schema.type == "string"
-        content."text/plain".examples instanceof Map<String, Example>
+
+        content."text/plain".examples instanceof Map
+        ((Map) content."text/plain".examples).keySet().every { it instanceof String }
+        ((Map) content."text/plain".examples).values().every { it instanceof Example }
 
         def examplesMap2 = (Map<String, Example>) content."text/plain".examples
         examplesMap2."log-output-text"
