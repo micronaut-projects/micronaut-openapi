@@ -5,7 +5,6 @@ import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.parameters.Parameter
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -27,7 +26,6 @@ class TestControllerTest {
     @Autowired
     lateinit var restClient: RestClient
 
-    @Disabled
     @Test
     @Throws(JacksonException::class)
     fun springOpenApiPathTest() {
