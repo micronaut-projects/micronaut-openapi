@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.util.NamingStrategyImpls;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
@@ -1202,20 +1201,19 @@ public final class ConfigUtils {
         if (namingStrategy == null) {
             return null;
         }
-        try {
-            return (PropertyNamingStrategies.NamingBase) switch (NamingStrategyImpls.valueOf(namingStrategy.toUpperCase(Locale.ENGLISH))) {
-                case LOWER_CAMEL_CASE -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
-                case UPPER_CAMEL_CASE -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
-                case SNAKE_CASE -> PropertyNamingStrategies.SNAKE_CASE;
-                case UPPER_SNAKE_CASE -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
-                case LOWER_CASE -> PropertyNamingStrategies.LOWER_CASE;
-                case KEBAB_CASE -> PropertyNamingStrategies.KEBAB_CASE;
-                case LOWER_DOT_CASE -> PropertyNamingStrategies.LOWER_DOT_CASE;
-            };
-        } catch (Exception e) {
-            warn("Unknown naming strategy value: " + namingStrategy, context);
-            return null;
-        }
+        return switch (namingStrategy.toUpperCase(Locale.ENGLISH)) {
+            case "LOWER_CAMEL_CASE" -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
+            case "UPPER_CAMEL_CASE" -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE" -> PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE" -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE" -> PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE" -> PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE" -> PropertyNamingStrategies.LOWER_DOT_CASE;
+            default -> {
+                warn("Unknown naming strategy value: " + namingStrategy, context);
+                yield null;
+            }
+        };
     }
 
     public static JsonInclude.Include getJacksonIncludeMode(VisitorContext context) {

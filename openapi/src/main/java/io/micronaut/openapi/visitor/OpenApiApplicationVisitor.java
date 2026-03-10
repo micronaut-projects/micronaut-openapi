@@ -18,8 +18,8 @@ package io.micronaut.openapi.visitor;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
-import tools.jackson.databind.node.TextNode;
 import io.micronaut.context.env.Environment;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
@@ -445,7 +445,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (properties != null) {
                 var newProps = new LinkedHashMap<String, Schema>(properties.size());
                 for (var entry : properties.entrySet()) {
-                    newProps.put(propertyNamingStrategy.translate(entry.getKey()), entry.getValue());
+                    newProps.put(propertyNamingStrategy.nameForField(null, null, entry.getKey()), entry.getValue());
                 }
                 schema.setProperties(newProps);
             }
@@ -453,7 +453,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(required)) {
                 var newRequired = new ArrayList<String>(required.size());
                 for (var req : required) {
-                    newRequired.add(propertyNamingStrategy.translate(req));
+                    newRequired.add(propertyNamingStrategy.nameForField(null, null, req));
                 }
                 schema.setRequired(newRequired);
             }
@@ -507,7 +507,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return node;
             }
             final String newText = propertyExpander.apply(text);
-            return text.equals(newText) ? node : TextNode.valueOf(newText);
+            return text.equals(newText) ? node : JsonNodeFactory.instance.stringNode(newText);
         } else if (node.isArray()) {
             return resolvePlaceholders((ArrayNode) node, propertyExpander);
         } else if (node.isObject()) {
@@ -704,7 +704,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (endpointGroupInfo != null) {
                     addExtensions(opCopy, endpointGroupInfo.getExtensions());
                 }
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
             }
             setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), opCopy != null ? opCopy : endpointInfo.getOperation());
@@ -759,7 +759,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             OpenAPI openApiCopy;
             try {
                 openApiCopy = Utils.getJsonMapper().treeToValue(Utils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
                 return null;
             }
@@ -911,7 +911,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemas.remove(schemaName);
             }
             openApi.getComponents().setSchemas(schemas);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             // do nothing
         }
         return removed;
