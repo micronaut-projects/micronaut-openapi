@@ -16,7 +16,7 @@ class Response<T> {
     }
 }
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")

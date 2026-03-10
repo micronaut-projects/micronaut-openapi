@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller("/test1")
 class TestController {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -24,7 +24,7 @@ class TestController {
 
 @Controller("/test2")
 class TestController2 {
-    @Get("/")
+    @Get
     String otherIndex() {
         return "Hello World";
     }
@@ -55,7 +55,7 @@ import java.util.List;
 
 @Controller("/test1")
 class TestController {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -63,7 +63,7 @@ class TestController {
 
 @Controller("/test2")
 class TestController2 {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -95,7 +95,7 @@ import java.util.List;
 
 @Controller("/test1")
 class TestController {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -103,7 +103,7 @@ class TestController {
 
 @Controller("/test2")
 class TestController2 {
-    @Get("/")
+    @Get
     @Operation(operationId = "custom-operationId")
     String index() {
         return "Hello World";
@@ -136,7 +136,7 @@ import java.util.List;
 
 @Controller("/test1")
 class TestController {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -144,7 +144,7 @@ class TestController {
 
 @Controller("/test2")
 class TestController2 {
-    @Get("/")
+    @Get
     @Operation(operationId = "indexGet1")
     String index() {
         return "Hello World";
@@ -153,7 +153,7 @@ class TestController2 {
 
 @Controller("/test3")
 class TestController3 {
-    @Get("/")
+    @Get
     String index() {
         return "Hello World";
     }
@@ -188,7 +188,7 @@ import java.util.List;
 
 @Controller("/test1")
 class TestController {
-    @Get("/")
+    @Get
     @Operation(operationId = "myIndex")
     String index() {
         return "Hello World";
@@ -197,7 +197,7 @@ class TestController {
 
 @Controller("/test2")
 class TestController2 {
-    @Get("/")
+    @Get
     @Operation(operationId = "myIndex")
     String otherIndex() {
         return "Hello World";

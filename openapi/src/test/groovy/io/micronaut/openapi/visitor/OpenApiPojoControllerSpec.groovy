@@ -206,7 +206,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -435,7 +435,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -689,7 +689,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -822,7 +822,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     Single<List<T>> list();
 
     /**
@@ -1014,7 +1014,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     Single<List<T>> list();
 
     /**
@@ -1600,7 +1600,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
-@Controller("/")
+@Controller
 interface PetOperations<T extends Pet> {
 
     /**
@@ -1914,7 +1914,7 @@ import java.util.List;
 @Controller("/example")
 class ExampleController {
 
-    @Get("/")
+    @Get
     ExampleData getExampleData() {
         return new ExampleData("name", true, new ExampleAdditionalData("hello"), 2, 0.456f, 1.2F);
     }
@@ -2134,7 +2134,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Controller("/")
+@Controller
 class UuidController {
 
     @Post("/uuid")
@@ -2224,7 +2224,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Controller("/")
+@Controller
 class UuidController {
 
     @Post("/big-decimal")

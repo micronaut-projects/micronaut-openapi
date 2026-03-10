@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Singleton;
 
 @Singleton
-@Controller("/")
+@Controller
 @Tag(name = "UploadOpenApi")
 class UploadOpenApiController {
 
@@ -246,7 +246,7 @@ import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
 
 @Singleton
-@Controller("/")
+@Controller
 class UploadOpenApiController {
 
     @Post(value = "/receive-multipart-body", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)

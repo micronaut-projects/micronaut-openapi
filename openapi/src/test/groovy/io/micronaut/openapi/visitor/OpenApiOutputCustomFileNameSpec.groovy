@@ -33,7 +33,7 @@ class Application {
 }
 @Controller("/endpoint3")
 class ThirdEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> path() {
         return null;
     }
@@ -48,7 +48,7 @@ class ThirdEndpointController {
 }
 @Controller("/endpoint1")
 class FirstEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> getPath() {
         return null;
     }
@@ -71,7 +71,7 @@ class SecondEndpointController {
     public HttpResponse<Person1> path1() {
         return null;
     }
-    @Get("/")
+    @Get
     public HttpResponse<Person3> path() {
         return null;
     }
@@ -157,7 +157,7 @@ class Application {
 }
 @Controller("/endpoint3")
 class ThirdEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> path() {
         return null;
     }
@@ -172,7 +172,7 @@ class ThirdEndpointController {
 }
 @Controller("/endpoint1")
 class FirstEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> getPath() {
         return null;
     }
@@ -195,7 +195,7 @@ class SecondEndpointController {
     public HttpResponse<Person1> path1() {
         return null;
     }
-    @Get("/")
+    @Get
     public HttpResponse<Person3> path() {
         return null;
     }
@@ -282,7 +282,7 @@ class Application {
 }
 @Controller("/endpoint3")
 class ThirdEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> path() {
         return null;
     }
@@ -297,7 +297,7 @@ class ThirdEndpointController {
 }
 @Controller("/endpoint1")
 class FirstEndpointController {
-    @Get("/")
+    @Get
     public HttpResponse<String> getPath() {
         return null;
     }
@@ -320,7 +320,7 @@ class SecondEndpointController {
     public HttpResponse<Person1> path1() {
         return null;
     }
-    @Get("/")
+    @Get
     public HttpResponse<Person3> path() {
         return null;
     }

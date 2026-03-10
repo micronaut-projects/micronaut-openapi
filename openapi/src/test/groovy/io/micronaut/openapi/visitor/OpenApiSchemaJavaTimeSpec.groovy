@@ -23,7 +23,7 @@ import io.micronaut.http.annotation.*;
 import java.time.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -100,7 +100,7 @@ import io.micronaut.http.annotation.*;
 import java.time.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")

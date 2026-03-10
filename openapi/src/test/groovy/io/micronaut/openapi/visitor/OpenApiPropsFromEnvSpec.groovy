@@ -158,7 +158,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+ @Get
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -262,7 +262,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+ @Get
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -365,7 +365,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+ @Get
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")

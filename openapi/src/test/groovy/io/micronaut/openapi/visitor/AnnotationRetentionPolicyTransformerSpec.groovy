@@ -61,7 +61,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
-    @Get("/")
+    @Get
     @Produces(MediaType.TEXT_PLAIN)
     @Tag(name = "Article Operations")
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")

@@ -256,7 +256,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
   @Put
@@ -324,7 +324,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
   @Put
@@ -390,7 +390,7 @@ import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put

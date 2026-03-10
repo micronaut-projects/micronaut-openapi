@@ -163,10 +163,10 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import java.time.Instant;
 
-@Controller("/")
+@Controller
 class MyController {
 
-    @Get("/")
+    @Get
     public MyDtoImpl doSomeStuff() {
         return new MyDtoImpl();
     }
@@ -241,7 +241,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -301,7 +301,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -363,7 +363,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -426,7 +426,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")

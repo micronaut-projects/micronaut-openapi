@@ -384,7 +384,7 @@ import io.micronaut.http.hateoas.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -715,7 +715,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -764,7 +764,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -809,7 +809,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -853,7 +853,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -897,7 +897,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -938,7 +938,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.micronaut.core.annotation.Nullable;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
@@ -1027,7 +1027,7 @@ import io.micronaut.http.annotation.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get(uris = {"/subscription/{subscriptionId}", "/subs/{subscriptionId}"})
