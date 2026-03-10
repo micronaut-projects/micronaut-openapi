@@ -49,7 +49,7 @@ public final class SwaggerUtils {
                 openApi = mapper.readValue(swaggerFileContent, OpenAPI.class);
             }
             return openApi;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Can't parse swagger file", e);
         }
     }
