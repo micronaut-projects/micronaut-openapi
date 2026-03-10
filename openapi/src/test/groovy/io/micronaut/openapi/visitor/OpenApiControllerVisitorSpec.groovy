@@ -313,7 +313,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
@@ -379,7 +379,8 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
+import tools.jackson.core.exc.StreamReadException;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
 import jakarta.validation.constraints.*;
@@ -393,7 +394,7 @@ class MyController {
      }
 
     @io.micronaut.http.annotation.Error
-    public HttpResponse<JsonError> jsonError(HttpRequest<?> request, JsonParseException jsonParseException) {
+    public HttpResponse<JsonError> jsonError(HttpRequest<?> request, StreamReadException jsonParseException) {
         JsonError error = new JsonError("Invalid JSON: " + jsonParseException.getMessage())
                 .link(Link.SELF, Link.of(request.getUri()));
 
