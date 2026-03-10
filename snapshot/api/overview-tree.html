@@ -57,10 +57,20 @@ loadScripts(document, 'script');</script>
 <li><a href="io/micronaut/openapi/adoc/md/package-tree.html">io.micronaut.openapi.adoc.md</a>, </li>
 <li><a href="io/micronaut/openapi/adoc/utils/package-tree.html">io.micronaut.openapi.adoc.utils</a>, </li>
 <li><a href="io/micronaut/openapi/annotation/package-tree.html">io.micronaut.openapi.annotation</a>, </li>
+<li><a href="io/micronaut/openapi/annotation/mappers/package-tree.html">io.micronaut.openapi.annotation.mappers</a>, </li>
+<li><a href="io/micronaut/openapi/annotation/transformers/package-tree.html">io.micronaut.openapi.annotation.transformers</a>, </li>
 <li><a href="io/micronaut/openapi/info/package-tree.html">io.micronaut.openapi.info</a>, </li>
+<li><a href="io/micronaut/openapi/introspections/package-tree.html">io.micronaut.openapi.introspections</a>, </li>
+<li><a href="io/micronaut/openapi/javadoc/package-tree.html">io.micronaut.openapi.javadoc</a>, </li>
+<li><a href="io/micronaut/openapi/postprocessors/package-tree.html">io.micronaut.openapi.postprocessors</a>, </li>
 <li><a href="io/micronaut/openapi/swagger/core/jackson/package-tree.html">io.micronaut.openapi.swagger.core.jackson</a>, </li>
 <li><a href="io/micronaut/openapi/swagger/core/jackson/mixin/package-tree.html">io.micronaut.openapi.swagger.core.jackson.mixin</a>, </li>
-<li><a href="io/micronaut/openapi/swagger/core/util/package-tree.html">io.micronaut.openapi.swagger.core.util</a></li>
+<li><a href="io/micronaut/openapi/swagger/core/util/package-tree.html">io.micronaut.openapi.swagger.core.util</a>, </li>
+<li><a href="io/micronaut/openapi/view/package-tree.html">io.micronaut.openapi.view</a>, </li>
+<li><a href="io/micronaut/openapi/visitor/package-tree.html">io.micronaut.openapi.visitor</a>, </li>
+<li><a href="io/micronaut/openapi/visitor/group/package-tree.html">io.micronaut.openapi.visitor.group</a>, </li>
+<li><a href="io/micronaut/openapi/visitor/management/package-tree.html">io.micronaut.openapi.visitor.management</a>, </li>
+<li><a href="io/micronaut/openapi/visitor/security/package-tree.html">io.micronaut.openapi.visitor.security</a></li>
 </ul>
 <section class="hierarchy">
 <h2 title="Class Hierarchy">Class Hierarchy</h2>
@@ -72,19 +82,81 @@ loadScripts(document, 'script');</script>
 <li class="circle">io.micronaut.openapi.info.<a href="io/micronaut/openapi/info/MicronautOpenapiAdocModuleInfo.html" class="type-name-link" title="class in io.micronaut.openapi.info">MicronautOpenapiAdocModuleInfo</a></li>
 <li class="circle">io.micronaut.openapi.info.<a href="io/micronaut/openapi/info/MicronautOpenapiAnnotationsModuleInfo.html" class="type-name-link" title="class in io.micronaut.openapi.info">MicronautOpenapiAnnotationsModuleInfo</a></li>
 <li class="circle">io.micronaut.openapi.info.<a href="io/micronaut/openapi/info/MicronautOpenapiCommonModuleInfo.html" class="type-name-link" title="class in io.micronaut.openapi.info">MicronautOpenapiCommonModuleInfo</a></li>
+<li class="circle">io.micronaut.openapi.info.<a href="io/micronaut/openapi/info/MicronautOpenapiModuleInfo.html" class="type-name-link" title="class in io.micronaut.openapi.info">MicronautOpenapiModuleInfo</a></li>
 </ul>
 </li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a>
+<ul>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiControllerVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+</ul>
+</li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">AbstractViewConfig</a> (implements io.micronaut.core.util.Toggleable)
+<ul>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiExplorerConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">OpenApiExplorerConfig</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/RapidocConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">RapidocConfig</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/RapiPDFConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">RapiPDFConfig</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/RedocConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">RedocConfig</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/ScalarConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">ScalarConfig</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/SwaggerUIConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">SwaggerUIConfig</a></li>
+</ul>
+</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AdocModule.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">AdocModule</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ApiResponseRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ApiResponseRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ApiResponsesRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ApiResponsesRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ArraySchemaRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ArraySchemaRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/CallbackConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">CallbackConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/CallbackRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">CallbackRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/CallbacksRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">CallbacksRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/CollectionUtils.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.utils">CollectionUtils</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Components31Mixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Components31Mixin</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/ComponentsMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">ComponentsMixin</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.SchemaDecorator.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils.SchemaDecorator</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ContactRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ContactRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ContentRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ContentRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ContextUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/DateSchemaMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">DateSchemaMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentRequiredMapRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">DependentRequiredMapRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentRequiredRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">DependentRequiredRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentSchemaRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">DependentSchemaRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DependentSchemasRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">DependentSchemasRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Discriminator31Mixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Discriminator31Mixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/DiscriminatorMappingRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">DiscriminatorMappingRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/DiscriminatorMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">DiscriminatorMixin</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ElementUtils</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/EncodingRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">EncodingRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">EndpointGroupInfo</a></li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointInfo.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">EndpointInfo</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/EndpointProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">EndpointProperties</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/EndpointsConfig.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">EndpointsConfig</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/EndpointUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">EndpointUtils</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ExampleConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">ExampleConfiguration</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/ExampleMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">ExampleMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExampleObjectMappingRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ExampleObjectMappingRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExtensionPropertyRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ExtensionPropertyRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExtensionRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ExtensionRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/ExtensionsMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">ExtensionsMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExtensionsRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ExtensionsRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExternalDocumentationRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ExternalDocumentationRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/FileUtils.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.utils">FileUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">FileUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">GeneratorUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">GroupProperties</a></li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.PackageProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">GroupProperties.PackageProperties</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GroupUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">GroupUtils</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/HeaderConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">HeaderConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/HeaderRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">HeaderRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/HiddenRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">HiddenRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/IncludeExcludeProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">IncludeExcludeProperties</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Info31Mixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Info31Mixin</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/InfoConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">InfoConfiguration</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/InfoMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">InfoMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/InfoRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">InfoRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/InterceptUrlMapConverter.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.security">InterceptUrlMapConverter</a> (implements io.micronaut.core.convert.TypeConverter&lt;S,<wbr>T&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/InterceptUrlMapPattern.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.security">InterceptUrlMapPattern</a></li>
+<li class="circle">io.micronaut.openapi.postprocessors.<a href="io/micronaut/openapi/postprocessors/JacksonDiscriminatorPostProcessor.html" class="type-name-link" title="class in io.micronaut.openapi.postprocessors">JacksonDiscriminatorPostProcessor</a></li>
 <li class="circle">tools.jackson.databind.JacksonModule (implements tools.jackson.core.Versioned)
 <ul>
 <li class="circle">tools.jackson.databind.module.SimpleModule (implements java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
@@ -95,15 +167,51 @@ loadScripts(document, 'script');</script>
 </li>
 </ul>
 </li>
+<li class="circle">io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocDescription.html" class="type-name-link" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a></li>
+<li class="circle">io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocParser.html" class="type-name-link" title="class in io.micronaut.openapi.javadoc">JavadocParser</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/LicenseMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">LicenseMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/LicenseRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">LicenseRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/LinkParameterRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">LinkParameterRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/LinkRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">LinkRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/LinksConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">LinksConfiguration</a></li>
 <li class="circle">io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/MdToAdocConverter.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.md">MdToAdocConverter</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/MediaConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">MediaConfiguration</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/MediaTypeMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">MediaTypeMixin</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ModelConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">ModelConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/NumberUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">NumberUtils</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OAuthFlowRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">OAuthFlowRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OAuthFlowsRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">OAuthFlowsRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OAuthScopeRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">OAuthScopeRetentionPolicyAnnotationTransformer</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/ObjectMapperFactory.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.util">ObjectMapperFactory</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPI31Mixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OpenAPI31Mixin</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OpenAPIDefinitionRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">OpenAPIDefinitionRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiExcludeVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiExcludeVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiExtraSchemaVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiExtraSchemaVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiGroupInfoVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiIncludeVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiIncludeVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">OpenApiInfo</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiJacksonVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPIManagementAnnotationMapper.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.mappers">OpenAPIManagementAnnotationMapper</a> (implements io.micronaut.inject.annotation.TypedAnnotationMapper&lt;T&gt;)</li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPIMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OpenAPIMixin</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></li>
+<li class="circle">io.micronaut.openapi.postprocessors.<a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html" class="type-name-link" title="class in io.micronaut.openapi.postprocessors">OpenApiOperationsPostProcessor</a></li>
+<li class="circle">io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.mappers">OpenAPISecurityAnnotationMapper</a> (implements io.micronaut.inject.annotation.TypedAnnotationMapper&lt;T&gt;)</li>
 <li class="circle">io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/OpenApiToAdocConverter.html" class="type-name-link" title="class in io.micronaut.openapi.adoc">OpenApiToAdocConverter</a></li>
 <li class="circle">io.micronaut.openapi.<a href="io/micronaut/openapi/OpenApiUtils.html" class="type-name-link" title="class in io.micronaut.openapi">OpenApiUtils</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.html" class="type-name-link" title="class in io.micronaut.openapi.view">OpenApiViewConfig</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OperationMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OperationMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OperationRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">OperationRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OperationUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OperationUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Pair.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;S,<wbr>T&gt;</li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ParameterRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ParameterRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ParametersConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">ParametersConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ParametersRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ParametersRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ParamUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ParamUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/RequestBodyRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">RequestBodyRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ResponsesConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">ResponsesConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/RouterVersioningProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">RouterVersioningProperties</a></li>
 <li class="circle">io.swagger.v3.oas.models.media.Schema&lt;T&gt;
 <ul>
 <li class="circle">io.micronaut.openapi.<a href="io/micronaut/openapi/SimpleSchema.html" class="type-name-link" title="class in io.micronaut.openapi">SimpleSchema</a></li>
@@ -111,10 +219,34 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/Schema31Mixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">Schema31Mixin</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaConverterMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">SchemaConverterMixin</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaDefinitionUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">SchemaDefinitionUtils</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">SchemaMixin</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/SchemaRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">SchemaRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/SecurityConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">SecurityConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/SecurityProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.security">SecurityProperties</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/SecurityRequirementRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">SecurityRequirementRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/SecurityRequirementsRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">SecurityRequirementsRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/SecuritySchemeRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">SecuritySchemeRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/SecuritySchemesRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">SecuritySchemesRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SecurityUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">SecurityUtils</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/ServerConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">ServerConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ServerRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServersRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ServersRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ServerVariableRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">ServerVariableRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/SpringActuatorConfigUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">SpringActuatorConfigUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/SpringActuatorProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">SpringActuatorProperties</a></li>
+<li class="circle">io.micronaut.openapi.visitor.management.<a href="io/micronaut/openapi/visitor/management/SpringActuatorUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.management">SpringActuatorUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/StringUtil.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">StringUtil</a></li>
 <li class="circle">io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.utils">SwaggerUtils</a></li>
 <li class="circle">io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/TableToAsciiDoc.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.md">TableToAsciiDoc</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/TagRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">TagRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.introspections.<a href="io/micronaut/openapi/introspections/TagsConfiguration.html" class="type-name-link" title="class in io.micronaut.openapi.introspections">TagsConfiguration</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/TagsRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">TagsRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/TagUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">TagUtils</a></li>
 <li class="circle">io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" class="type-name-link" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a> (implements org.pegdown.ast.Visitor)</li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">UrlUtils</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">Utils</a></li>
 <li class="circle">tools.jackson.databind.ValueDeserializer&lt;T&gt; (implements tools.jackson.databind.deser.NullValueProvider)
 <ul>
 <li class="circle">io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/ApiResponsesDeserializer.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.util">ApiResponsesDeserializer</a>
@@ -169,6 +301,8 @@ loadScripts(document, 'script');</script>
 <li class="circle">io.micronaut.openapi.swagger.core.jackson.<a href="io/micronaut/openapi/swagger/core/jackson/SchemaSerializer.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson">SchemaSerializer</a></li>
 </ul>
 </li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/WebhookRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">WebhookRetentionPolicyAnnotationTransformer</a></li>
+<li class="circle">io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/WebhooksRetentionPolicyAnnotationTransformer.html" class="type-name-link" title="class in io.micronaut.openapi.annotation.transformers">WebhooksRetentionPolicyAnnotationTransformer</a></li>
 </ul>
 </li>
 </ul>
@@ -176,7 +310,13 @@ loadScripts(document, 'script');</script>
 <section class="hierarchy">
 <h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextProperty.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor">ContextProperty</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorExt.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor">GeneratorExt</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/InternalExt.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor">InternalExt</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiModelProp.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor">OpenApiModelProp</a></li>
 <li class="circle">io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/OpenApiToAdocConfigProperty.html" class="type-name-link" title="interface in io.micronaut.openapi.adoc">OpenApiToAdocConfigProperty</a></li>
+<li class="circle">io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/SecurityRule.html" class="type-name-link" title="interface in io.micronaut.openapi.visitor.security">SecurityRule</a></li>
 <li class="circle">io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/TemplatePaths.html" class="type-name-link" title="interface in io.micronaut.openapi.adoc">TemplatePaths</a></li>
 </ul>
 </section>
@@ -206,7 +346,33 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.DuplicateResolution.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.DuplicateResolution</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.MergeMode.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.MergeMode</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.PatternStyle.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.PatternStyle</a></li>
+<li class="circle">io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/DocsFormat.html" class="type-name-link" title="enum class in io.micronaut.openapi.javadoc">DocsFormat</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/MnParamFormat.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">MnParamFormat</a></li>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.RendererType.html" class="type-name-link" title="enum class in io.micronaut.openapi.view">OpenApiViewConfig.RendererType</a></li>
 <li class="circle">io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" class="type-name-link" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/VisibilityLevel.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">VisibilityLevel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Record Class Hierarchy">Record Class Hierarchy</h2>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Record.html" class="type-name-link external-link" title="class or interface in java.lang">Record</a>
+<ul>
+<li class="circle">io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.OpenApiUrl.html" class="type-name-link" title="class in io.micronaut.openapi.view">AbstractViewConfig.OpenApiUrl</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.AdditionalFilesProperties.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils.AdditionalFilesProperties</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils.CustomSchema</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.RequiredMode.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">SchemaUtils.RequiredMode</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.OpPath.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">UrlUtils.OpPath</a></li>
+<li class="circle">io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">UrlUtils.Segment</a></li>
 </ul>
 </li>
 </ul>
