@@ -38,7 +38,7 @@ include(
 //    "test-suite-server-generator-java",
 //    "test-suite-server-generator-kotlin-kapt",
 //    "test-suite-server-generator-kotlin-ksp",
-//    "test-suite-spring-java",
+    "test-suite-spring-java",
 //    "test-suite-spring-kotlin-kapt",
 //    "test-suite-spring-kotlin-ksp",
 )
