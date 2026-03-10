@@ -24,9 +24,9 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.PropertyNamingStrategy;
+import tools.jackson.databind.annotation.JsonNaming;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -683,7 +683,7 @@ public final class SchemaDefinitionUtils {
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schema.getType(), schema.getFormat(), context));
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ":\n" + Utils.printStackTrace(e), context, element);
                     if (!TYPE_STRING.equals(schema.getType())) {
                         info("Changing enum type from " + type.getName() + " to " + TYPE_STRING, context, element);
@@ -1356,7 +1356,7 @@ public final class SchemaDefinitionUtils {
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
-                                            } catch (JsonProcessingException e) {
+                                            } catch (JacksonException e) {
                                                 // do nothing
                                             }
                                         }
@@ -1676,7 +1676,7 @@ public final class SchemaDefinitionUtils {
         JsonNode node = toJson(annotationName, values, context, jsonViewClass);
         try {
             return ConvertUtils.treeToValue(node, type, context);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return null;
@@ -3316,8 +3316,8 @@ public final class SchemaDefinitionUtils {
                     throw new RuntimeException("Cannot instantiate: " + clazz);
                 }
             });
-            if (strategy instanceof PropertyNamingStrategies.NamingBase namingBase) {
-                return namingBase.translate(name);
+            if (strategy instanceof PropertyNamingStrategies.NamingBase) {
+                return strategy.nameForField(null, null, name);
             }
         }
         return name;

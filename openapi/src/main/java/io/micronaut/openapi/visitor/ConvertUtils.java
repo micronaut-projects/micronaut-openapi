@@ -16,10 +16,10 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
@@ -58,7 +58,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -275,7 +274,7 @@ public final class ConvertUtils {
         if (object instanceof String string) {
             try {
                 return CONVERT_JSON_MAPPER.readValue(string, MAP_TYPE_REFERENCE);
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 return null;
             }
         }
@@ -283,7 +282,7 @@ public final class ConvertUtils {
     }
 
     /**
- * Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JacksonException', adds extensions if present.
+     * Converts Json node into a class' instance or throws {@link JacksonException}, adds extensions if present.
      *
      * @param jn The json node
      * @param clazz The output class instance
@@ -348,7 +347,7 @@ public final class ConvertUtils {
                 }
                 try {
                     allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType, elFormat, context));
-                } catch (IOException e) {
+                } catch (JacksonException e) {
                     allowableValues.add(allowableValueNode.textValue());
                 }
             }
