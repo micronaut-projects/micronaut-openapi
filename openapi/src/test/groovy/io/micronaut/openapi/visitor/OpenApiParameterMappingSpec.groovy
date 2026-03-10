@@ -432,7 +432,7 @@ import io.swagger.v3.oas.annotations.enums.*;
  * @author graemerocher
  * @since 1.0
  */
-@Controller("/")
+@Controller
 interface Test {
 
     @Get("/test1")
@@ -614,9 +614,9 @@ import io.swagger.v3.oas.annotations.enums.*;
  * @author graemerocher
  * @since 1.0
  */
-@Controller("/")
+@Controller
 interface Test {
-    
+
     @Get("/hello{/pathVar1,pathVar2}/world/{reqVar}/test{/optVar}")
     String test8(String pathVar1, String pathVar2, String queryVar, @Nullable String name);
 
@@ -718,7 +718,7 @@ package test;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;import io.micronaut.http.annotation.PathVariable;
 
-@Controller("/")
+@Controller
 interface Test {
 
     @Get("/hello/{pathVar2}${placeholder}/tete:test4")
@@ -890,7 +890,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 
 import java.lang.annotation.*;
 
-@Controller("/")
+@Controller
 class ParameterController {
 
     @Get("/page-params")
@@ -968,7 +968,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 
 import java.lang.annotation.*;
 
-@Controller("/")
+@Controller
 class ParameterController {
 
     @Get("/{apiVersion}")

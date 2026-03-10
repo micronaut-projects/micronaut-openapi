@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Singleton;
 
 @Singleton
-@Controller("/")
+@Controller
 @Tag(name = "Upload")
 class UploadController {
 

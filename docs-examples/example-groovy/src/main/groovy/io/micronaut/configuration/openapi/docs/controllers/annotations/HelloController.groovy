@@ -17,7 +17,7 @@ import jakarta.validation.constraints.NotBlank
 
 // end::imports
 // tag::clazz[]
-@Controller("/")
+@Controller
 class HelloController {
 
     /**

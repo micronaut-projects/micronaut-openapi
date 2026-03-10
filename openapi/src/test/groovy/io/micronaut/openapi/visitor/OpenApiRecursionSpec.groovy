@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
 import io.reactivex.Maybe;
 
-@Controller("/")
+@Controller
 class MyController {
     @Get
     public Maybe<TestInterface> hey() {
@@ -80,7 +80,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
 
-@Controller("/")
+@Controller
 class MyController {
     @Get
     public TestRecursion hey() {
@@ -126,7 +126,7 @@ import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
 import io.reactivex.Maybe;
 
-@Controller("/")
+@Controller
 class MyController {
     @Get
     public Maybe<TestInterface> hey() {
@@ -196,7 +196,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
 import io.reactivex.Maybe;
 
-@Controller("/")
+@Controller
 class MyController {
     @Get
     public Maybe<TestInterface> hey() {

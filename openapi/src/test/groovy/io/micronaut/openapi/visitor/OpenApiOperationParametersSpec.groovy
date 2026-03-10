@@ -22,10 +22,10 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
-    @Get("/")
+    @Get
     @Operation(description = "Lists the Pets.",
                parameters = {
                    @Parameter(name = "petType", in = ParameterIn.HEADER, required = true, description = "A pet type", example = "[\\"dog\\", \\"cat\\"]", schema = @Schema(description = "A  _Pet_'s type", type = "string",  allowableValues = {"dog", "cat", "snake"}, defaultValue = "dog"))
@@ -83,10 +83,10 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
-    @Get("/")
+    @Get
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",

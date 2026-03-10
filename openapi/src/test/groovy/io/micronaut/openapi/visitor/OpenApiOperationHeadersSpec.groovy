@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -78,7 +78,7 @@ package test;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Post("/create2")
@@ -122,7 +122,7 @@ import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @ApiResponse(headers = {
