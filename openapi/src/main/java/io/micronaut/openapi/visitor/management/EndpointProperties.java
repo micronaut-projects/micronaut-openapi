@@ -57,6 +57,8 @@ public final class EndpointProperties {
      * ClassElement of the endpoint.
      */
     private ClassElement element;
+
+    private String className;
     /**
      * Description to add to the Endpoint entry in the spec file.
      */
@@ -124,6 +126,15 @@ public final class EndpointProperties {
 
     public void setElement(ClassElement element) {
         this.element = element;
+        this.className = element != null ? element.getName() : null;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public ClassElement getElement() {
