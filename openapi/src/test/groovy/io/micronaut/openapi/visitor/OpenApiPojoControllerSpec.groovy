@@ -206,7 +206,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -435,7 +435,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -689,7 +689,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     List<T> list();
 
     @Get("/random")
@@ -822,7 +822,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     Single<List<T>> list();
 
     /**
@@ -1014,7 +1014,7 @@ interface PetOperations<T extends Pet> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get
     Single<List<T>> list();
 
     /**
@@ -1914,7 +1914,7 @@ import java.util.List;
 @Controller("/example")
 class ExampleController {
 
-    @Get("/")
+    @Get
     ExampleData getExampleData() {
         return new ExampleData("name", true, new ExampleAdditionalData("hello"), 2, 0.456f, 1.2F);
     }

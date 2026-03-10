@@ -166,7 +166,7 @@ import java.time.Instant;
 @Controller
 class MyController {
 
-    @Get("/")
+    @Get
     public MyDtoImpl doSomeStuff() {
         return new MyDtoImpl();
     }

@@ -561,7 +561,7 @@ class StringDto {
 @OpenAPIGroup("demogroup")
 class DemoController {
 
-    @Get("/")
+    @Get
     @Produces(MediaType.TEXT_PLAIN)
     StringDto index() {
         return new StringDto("Hello World");
@@ -572,7 +572,7 @@ class DemoController {
 @OpenAPIGroup("somegroup")
 class SomeController {
 
-    @Get("/")
+    @Get
     @Produces(MediaType.TEXT_PLAIN)
     SomeDto index() {
         return new SomeDto(List.of(new SomeDto(), new SomeDto()));

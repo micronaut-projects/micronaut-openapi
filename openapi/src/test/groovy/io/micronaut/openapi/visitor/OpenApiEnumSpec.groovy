@@ -1295,7 +1295,7 @@ import java.util.stream.Stream;
 @Controller("/hello")
 class HelloController {
 
-    @Get("/")
+    @Get
     public COSEAlgorithmIdentifier index() {
         return COSEAlgorithmIdentifier.EdDSA;
     }
