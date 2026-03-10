@@ -40,10 +40,6 @@ dependencies {
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_25
-}
-
 ksp {
     arg("micronaut.openapi.project.dir", "$projectDir")
     arg("micronaut.openapi.expand.app.version", "myVersion")
