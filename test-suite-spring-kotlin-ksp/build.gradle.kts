@@ -45,11 +45,13 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
 }
 
 kotlin {
-    jvmToolchain(21)
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
+    }
 }
 
 ksp {

@@ -17,7 +17,6 @@ dependencies {
     api(projects.micronautOpenapiCommon)
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
     api(libs.managed.flexmark.html2md.converter) {
@@ -50,6 +49,7 @@ dependencies {
     testImplementation(libs.spotbugs.annotations)
     testImplementation(libs.guava)
     testImplementation(mn.kotlinx.coroutines.reactor)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 
 // uncomment it, if you want to test micronaut-openapi with spring-boot actuator locally
 //    testAnnotationProcessor(mnSpring.micronaut.spring.annotation)

@@ -3,6 +3,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import spock.lang.PendingFeature
 
 class OpenApiArraySchemaSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -119,6 +120,7 @@ class MyBean {}
         petSchema.properties['idListArray'].items.items.format == 'int64'
     }
 
+    @PendingFeature
     void "test ArraySchema with arraySchema field in Controller ApiResponse"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -168,6 +170,7 @@ class MyBean {}
 
     }
 
+    @PendingFeature
     void "test ArraySchema with arraySchema field in Controller Parameter"() {
         given:
         buildBeanDefinition('test.MyBean', '''

@@ -314,7 +314,7 @@ public final class OpenApiNormalizeUtils {
                 String serializedDefaultValue;
                 try {
                     serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     return null;
                 }
                 schema.setDefault(null);
@@ -325,7 +325,7 @@ public final class OpenApiNormalizeUtils {
                 String serializedAllOfDefaultValue;
                 try {
                     serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     return null;
                 }
                 boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);

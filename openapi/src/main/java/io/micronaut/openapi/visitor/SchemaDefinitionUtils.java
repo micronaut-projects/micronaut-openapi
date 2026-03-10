@@ -88,7 +88,6 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -3058,7 +3057,7 @@ public final class SchemaDefinitionUtils {
             } else {
                 warn("Error reading Swagger Schema for element [" + element + "]: " + schemaJson, context, element);
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
         // fix for example = "null"
@@ -3399,7 +3398,7 @@ public final class SchemaDefinitionUtils {
                     propertySchema.setName(propertyName);
                 }
                 addProperty(parentSchema, propertyName, propertySchema, isRequired);
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 warn("Exception cloning property " + e.getMessage(), context);
             }
         }

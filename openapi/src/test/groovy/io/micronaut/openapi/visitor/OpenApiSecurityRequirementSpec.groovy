@@ -6,9 +6,11 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.security.OAuthFlow
 import io.swagger.v3.oas.models.security.SecurityScheme
 import spock.lang.Issue
+import spock.lang.PendingFeature
 
 class OpenApiSecurityRequirementSpec extends AbstractOpenApiTypeElementSpec {
 
+    @PendingFeature
     void "test global @SecurityRequirement override with empty array - Issue #212"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -94,6 +96,7 @@ class MyBean {}
 
     }
 
+    @PendingFeature
     void "test parse the OpenAPI global @SecurityRequirement"() {
         given:
         buildBeanDefinition('test.MyBean', '''

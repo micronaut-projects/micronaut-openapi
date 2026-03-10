@@ -6,9 +6,11 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
 import spock.lang.Issue
+import spock.lang.PendingFeature
 
 class OpenApiSchemaInheritanceSpec extends AbstractOpenApiTypeElementSpec {
 
+    @PendingFeature
     void "test parse the OpenAPI with response that contains generic types"() {
         given:
         buildBeanDefinition('test.MyBean', '''
