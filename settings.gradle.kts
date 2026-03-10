@@ -24,7 +24,7 @@ include(
 //    "docs-examples:example-java",
 //    "docs-examples:example-kotlin-kapt",
 //    "docs-examples:example-kotlin-ksp",
-//    "openapi",
+    "openapi",
     "openapi-adoc",
     "openapi-annotations",
 //    "openapi-bom",
