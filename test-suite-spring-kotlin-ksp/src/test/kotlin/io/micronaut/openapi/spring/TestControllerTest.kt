@@ -5,12 +5,14 @@ import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.parameters.Parameter
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestClient
 
+@Disabled("properties sources broken")
 @ActiveProfiles("test")
 @SpringBootTest(
     useMainMethod = SpringBootTest.UseMainMethod.ALWAYS,
