@@ -48,6 +48,7 @@ import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import tools.jackson.databind.PropertyNamingStrategy;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -444,7 +445,7 @@ public final class ConfigUtils {
         }
     }
 
-    public static PropertyNamingStrategies.NamingBase getTagGenerationNamingStrategy(VisitorContext context) {
+    public static PropertyNamingStrategy getTagGenerationNamingStrategy(VisitorContext context) {
         var value = getConfigProperty(MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY, context);
         if (value == null) {
             return null;
@@ -534,7 +535,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = (AnnProcessorEnvironment) getEnv(context);
+        var env = getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -601,7 +602,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = (AnnProcessorEnvironment) getEnv(context);
+        var env = getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -1189,7 +1190,7 @@ public final class ConfigUtils {
         return projectPath;
     }
 
-    public static PropertyNamingStrategies.NamingBase getPropertyNamingStrategy(VisitorContext context) {
+    public static PropertyNamingStrategy getPropertyNamingStrategy(VisitorContext context) {
         var value = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
         if (value == null) {
             return null;
@@ -1197,7 +1198,7 @@ public final class ConfigUtils {
         return toJacksonStrategy(value.toUpperCase(Locale.ENGLISH), context);
     }
 
-    private static PropertyNamingStrategies.NamingBase toJacksonStrategy(String namingStrategy, VisitorContext context) {
+    private static PropertyNamingStrategy toJacksonStrategy(String namingStrategy, VisitorContext context) {
         if (namingStrategy == null) {
             return null;
         }

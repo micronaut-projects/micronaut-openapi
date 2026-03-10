@@ -365,10 +365,9 @@ public final class ConvertUtils {
         }
         ((ObjectNode) jn).remove(name);
 
-        var iter = mapNode.fieldNames();
+
         var result = new HashMap<String, T>();
-        while (iter.hasNext()) {
-            var entryKey = iter.next();
+        for (var entryKey : mapNode.propertyNames()) {
             var objectNode = mapNode.get(entryKey);
             var object = CONVERT_JSON_MAPPER.treeToValue(objectNode, clazz);
             result.put(entryKey, object);
@@ -425,7 +424,7 @@ public final class ConvertUtils {
             // otherwise, we have multiple content objects
             // we don't need to fix anything for multiple objects
             var contentFieldNames = new ArrayList<String>();
-            contentNode.fieldNames().forEachRemaining(contentFieldNames::add);
+            contentNode.propertyNames().forEach(contentFieldNames::add);
             if (!contentFieldNames.stream().anyMatch(CONTENT_PROPS::contains)) {
                 return CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
             }
