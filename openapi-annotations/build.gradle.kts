@@ -18,6 +18,7 @@ dependencies {
         exclude(group = "io.micronaut")
         exclude(group = "org.slf4j")
     }
+    testImplementation(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {

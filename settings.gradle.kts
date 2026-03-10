@@ -3,7 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
-    includeBuild("build-logic")
 }
 
 dependencyResolutionManagement {
@@ -22,8 +21,8 @@ rootProject.name = "openapi-parent"
 include(
     "docs-examples:example-groovy",
     "docs-examples:example-java",
-    //"docs-examples:example-kotlin-kapt",
-    //"docs-examples:example-kotlin-ksp",
+    "docs-examples:example-kotlin-kapt",
+    "docs-examples:example-kotlin-ksp",
     "openapi",
     "openapi-adoc",
     "openapi-annotations",
@@ -39,8 +38,8 @@ include(
 //    "test-suite-server-generator-kotlin-kapt",
 //    "test-suite-server-generator-kotlin-ksp",
     "test-suite-spring-java",
-//    "test-suite-spring-kotlin-kapt",
-//    "test-suite-spring-kotlin-ksp",
+    "test-suite-spring-kotlin-kapt",
+    "test-suite-spring-kotlin-ksp",
 )
 
 micronautBuild {

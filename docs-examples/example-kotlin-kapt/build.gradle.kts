@@ -1,9 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 plugins {
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.allopen)
-    alias(mn.plugins.kotlin.kapt)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 repositories {
@@ -42,7 +40,4 @@ tasks.test {
     failFast = true
 }
 
-kotlin {
-    jvmToolchain(21)
-}
 ext["skipDocumentation"] = true

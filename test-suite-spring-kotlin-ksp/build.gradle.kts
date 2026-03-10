@@ -1,10 +1,6 @@
-import com.google.devtools.ksp.gradle.KspTask
-
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.allopen)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 sourceSets {
@@ -46,12 +42,6 @@ dependencies {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
-    }
 }
 
 ksp {
@@ -97,8 +87,8 @@ tasks.compileTestKotlin {
     dependsOn(tasks.named("removeMnTestFiles"))
 }
 
-tasks.withType(KspTask::class) {
-    if (name == "kspTestKotlin") {
+afterEvaluate {
+    tasks.named("kspTestKotlin") {
         enabled = false
     }
 }
