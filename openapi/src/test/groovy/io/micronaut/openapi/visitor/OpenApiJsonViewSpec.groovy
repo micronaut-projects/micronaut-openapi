@@ -4,11 +4,9 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiJsonViewSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI with JsonView"() {
 
         setup:
@@ -230,7 +228,6 @@ class MyBean {}
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
     }
 
-    @PendingFeature
     void "test build OpenAPI with changed JsonView default inclusion"() {
 
         setup:

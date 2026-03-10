@@ -7,15 +7,12 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
-import spock.lang.PendingFeature
-
 import java.time.OffsetDateTime
 import spock.lang.Issue
 import spock.util.environment.RestoreSystemProperties
 
 class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test @PositiveOrZero and @NegativeOrZero correctly results in minimum 0 and maximum 0"() {
 
         when:
@@ -151,7 +148,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     void "test schema with fluent accessors"() {
 
         when:
@@ -289,7 +285,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     void "test @Pattern in Schema"() {
 
         when:
@@ -408,7 +403,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     @RestoreSystemProperties
     void "test render OpenApiView specification with custom property naming strategy"() {
         given:
@@ -548,7 +542,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     @RestoreSystemProperties
     void "test render OpenApiView specification with LOWER_CAMEL_CASE property naming strategy - Issue #241"() {
         given:
@@ -688,7 +681,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     @RestoreSystemProperties
     void "test render OpenApiView specification with custom property naming strategy and required properties - Issue #240"() {
         given:
@@ -846,7 +838,6 @@ public class MyBean {}
         personSchema.required.contains("total_goals")
     }
 
-    @PendingFeature
     void "test READ_ONLY accessMode correctly results in setting readOnly to true"() {
 
         when:
@@ -1006,7 +997,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
-    @PendingFeature
     void "test WRITE_ONLY accessMode correctly results in setting writeOnly to true"() {
         when:
         buildBeanDefinition("test.MyBean", '''

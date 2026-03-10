@@ -5,9 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
-import spock.lang.Ignore
 
-@Ignore
 class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
 
     def setup() {

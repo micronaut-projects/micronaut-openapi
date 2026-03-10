@@ -8,11 +8,9 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
-import spock.lang.PendingFeature
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI for List"() {
         given: "An API definition"
         when:
@@ -1587,7 +1585,6 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
-    @PendingFeature
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:
@@ -2569,7 +2566,6 @@ class MyBean {}
         root.get.responses['500'].content == null
     }
 
-    @PendingFeature
     void "@ApiResponse set mediaType"() {
         given:
         when:

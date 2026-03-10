@@ -2,8 +2,6 @@ package io.micronaut.openapi.view
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.micronaut.openapi.visitor.Utils
-import spock.lang.Ignore
-import spock.lang.PendingFeature
 import spock.util.environment.RestoreSystemProperties
 
 import java.nio.file.Files
@@ -21,7 +19,6 @@ class OpenApiViewSpec extends AbstractOpenApiTypeElementSpec {
         outputDir.deleteDir()
     }
 
-    @Ignore
     @RestoreSystemProperties
     void "test disable generation spec and enabled views"() {
 
