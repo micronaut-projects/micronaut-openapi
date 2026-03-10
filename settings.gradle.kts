@@ -34,7 +34,7 @@ include(
 //    "test-suite-client-generator-kotlin-kapt",
 //    "test-suite-client-generator-kotlin-ksp",
 //    "test-suite-generator-util",
-//    "test-suite-jaxrs-java",
+    "test-suite-jaxrs-java",
 //    "test-suite-server-generator-java",
 //    "test-suite-server-generator-kotlin-kapt",
 //    "test-suite-server-generator-kotlin-ksp",
