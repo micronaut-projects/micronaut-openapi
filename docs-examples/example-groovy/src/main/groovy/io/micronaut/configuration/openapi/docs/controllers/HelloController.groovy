@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 
 // end::imports[]
 // tag::clazz[]
-@Controller("/")
+@Controller
 class HelloController {
 
     /**

@@ -23,7 +23,7 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.RequestBean;
 import io.swagger.v3.oas.annotations.Parameter;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/{pV}")
@@ -122,7 +122,7 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.openapi.annotation.OpenAPIRequest;
 import io.swagger.v3.oas.annotations.Parameter;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/{pV}")

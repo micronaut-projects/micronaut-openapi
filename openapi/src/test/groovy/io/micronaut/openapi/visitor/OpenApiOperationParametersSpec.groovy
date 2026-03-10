@@ -22,7 +22,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/")
@@ -83,7 +83,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Get("/")

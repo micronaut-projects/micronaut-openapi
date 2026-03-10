@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")

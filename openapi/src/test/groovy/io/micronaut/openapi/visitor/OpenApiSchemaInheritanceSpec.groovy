@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
@@ -134,7 +134,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Post("/")
@@ -210,7 +210,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Post("/")
@@ -282,7 +282,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Post("/")
@@ -358,7 +358,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Post("/")

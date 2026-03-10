@@ -1600,7 +1600,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
-@Controller("/")
+@Controller
 interface PetOperations<T extends Pet> {
 
     /**
@@ -2134,7 +2134,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Controller("/")
+@Controller
 class UuidController {
 
     @Post("/uuid")
@@ -2224,7 +2224,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Controller("/")
+@Controller
 class UuidController {
 
     @Post("/big-decimal")

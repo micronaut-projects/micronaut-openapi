@@ -202,7 +202,7 @@ import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
-@Controller("/")
+@Controller
 @SecurityScheme(name = "myOauth2Security",
         type = SecuritySchemeType.APIKEY,
         in = SecuritySchemeIn.HEADER
@@ -594,10 +594,10 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
     }
 )
 class Application {
-    
+
 }
 
-@Controller("/")
+@Controller
 class MyController {
 
     @Put("/")
