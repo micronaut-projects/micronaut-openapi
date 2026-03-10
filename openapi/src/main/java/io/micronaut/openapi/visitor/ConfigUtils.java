@@ -1398,7 +1398,7 @@ public final class ConfigUtils {
 
         Environment environment = null;
         try {
-            environment = new AnnProcessorEnvironment(configuration, context);
+            environment = Environment.create(configuration);
             environment.start();
             return environment;
         } catch (Exception e) {
