@@ -275,7 +275,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     OpenAPI parsedOpenApi = null;
                     try {
                         parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(openapiFile, OpenAPI.class);
-                    } catch (IOException e) {
+                    } catch (JacksonException e) {
                         warn("Unable to read file " + additionalSwaggerFile + ": " + e.getMessage(), context);
                     }
                     copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
@@ -381,7 +381,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         OpenAPI parsedOpenApi = null;
         try {
             parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context);
         }
         copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);

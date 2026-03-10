@@ -1020,7 +1020,7 @@ public final class ConfigUtils {
         }
         try {
             return OpenApiUtils.getConvertJsonMapper().readValue(value, TYPE_EXTENSIONS);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Fail to parse " + TYPE_EXTENSIONS.getType().toString() + ": " + value + " - " + e.getMessage(), context);
         }
         return Collections.emptyMap();
@@ -1040,7 +1040,7 @@ public final class ConfigUtils {
         }
         try {
             return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
         }
         return Collections.emptyList();

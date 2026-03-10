@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import tools.jackson.core.JacksonException;
 import com.fasterxml.jackson.annotation.JsonView;
 import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -83,7 +84,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1226,7 +1226,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     }
-                } catch (IOException e) {
+                } catch (JacksonException e) {
                     warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }
             }
