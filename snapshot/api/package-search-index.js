@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"io.micronaut.openapi.annotation"},{"l":"io.micronaut.openapi.info"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"io.micronaut.openapi"},{"l":"io.micronaut.openapi.annotation"},{"l":"io.micronaut.openapi.info"},{"l":"io.micronaut.openapi.swagger.core.jackson"},{"l":"io.micronaut.openapi.swagger.core.jackson.mixin"},{"l":"io.micronaut.openapi.swagger.core.util"}];updateSearchResults();

@@ -1,2 +1,6 @@
+io.micronaut.openapi
 io.micronaut.openapi.annotation
 io.micronaut.openapi.info
+io.micronaut.openapi.swagger.core.jackson
+io.micronaut.openapi.swagger.core.jackson.mixin
+io.micronaut.openapi.swagger.core.util
