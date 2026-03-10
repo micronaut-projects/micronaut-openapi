@@ -22,8 +22,8 @@ rootProject.name = "openapi-parent"
 include(
     "docs-examples:example-groovy",
     "docs-examples:example-java",
-    "docs-examples:example-kotlin-kapt",
-    "docs-examples:example-kotlin-ksp",
+    //"docs-examples:example-kotlin-kapt",
+    //"docs-examples:example-kotlin-ksp",
     "openapi",
     "openapi-adoc",
     "openapi-annotations",
