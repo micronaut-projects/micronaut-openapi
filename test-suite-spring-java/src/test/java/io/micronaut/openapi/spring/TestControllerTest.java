@@ -33,7 +33,7 @@ class TestControllerTest {
 
     @Disabled
     @Test
-    void springOpenApiPathTest() throws JsonProcessingException {
+    void springOpenApiPathTest() {
         var result = restClient.get()
             .uri("/swagger/" + APP_NAME + '-' + APP_VERSION + ".yml")
             .retrieve()
