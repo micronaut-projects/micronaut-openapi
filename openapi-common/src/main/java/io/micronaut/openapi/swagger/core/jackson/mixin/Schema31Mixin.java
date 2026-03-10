@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
@@ -27,9 +26,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.JsonSerializer;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -83,10 +83,10 @@ public abstract class Schema31Mixin {
     @JsonIgnore
     public abstract Boolean getBooleanSchemaValue();
 
-    public static class TypeSerializer extends JsonSerializer<Set<String>> {
+    public static class TypeSerializer extends ValueSerializer<Set<String>> {
 
         @Override
-        public void serialize(Set<String> types, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        public void serialize(Set<String> types, JsonGenerator jsonGenerator, SerializationContext serializerProvider) throws JacksonException {
             if (types != null && types.size() == 1) {
                 jsonGenerator.writeString((String) types.toArray()[0]);
             } else if (types != null && types.size() > 1) {

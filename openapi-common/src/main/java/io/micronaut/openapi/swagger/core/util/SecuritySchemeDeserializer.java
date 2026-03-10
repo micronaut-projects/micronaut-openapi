@@ -15,9 +15,7 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.security.OAuthFlows;
@@ -25,23 +23,24 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonDeserializer;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme> {
+public class SecuritySchemeDeserializer extends ValueDeserializer<SecurityScheme> {
 
     protected boolean openapi31;
 
     @Override
     public SecurityScheme deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+        throws JacksonException {
         ObjectMapper mapper;
         if (openapi31) {
             mapper = OpenApiUtils.getJsonMapper31();
@@ -50,7 +49,7 @@ public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme>
         }
         SecurityScheme result = null;
 
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = ctxt.readTree(jp);
 
         JsonNode inNode = node.get("type");
 
@@ -58,7 +57,7 @@ public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme>
             String type = inNode.asText();
             if (Arrays.stream(SecurityScheme.Type.values()).noneMatch(t -> t.toString().equals(type))) {
                 // wrong type, throw exception
-                throw new JacksonException(jp, String.format("SecurityScheme type %s not allowed", type));
+                throw new StreamReadException(jp, String.format("SecurityScheme type %s not allowed", type));
             }
             result = new SecurityScheme()
                 .description(getFieldText("description", node));
@@ -85,9 +84,7 @@ public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme>
                 result
                     .type(SecurityScheme.Type.MUTUALTLS);
             }
-            final Iterator<String> fieldNames = node.fieldNames();
-            while (fieldNames.hasNext()) {
-                final String fieldName = fieldNames.next();
+            for (String fieldName : node.propertyNames()) {
                 if (fieldName.startsWith("x-")) {
                     final JsonNode fieldValue = node.get(fieldName);
                     final Object value = OpenApiUtils.getJsonMapper().treeToValue(fieldValue, Object.class);

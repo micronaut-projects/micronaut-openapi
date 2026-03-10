@@ -15,25 +15,25 @@
  */
 package io.micronaut.openapi.swagger.core.jackson;
 
-import java.io.IOException;
 import java.util.Map.Entry;
 
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.JsonSerializer;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class CallbackSerializer extends JsonSerializer<Callback> {
+public class CallbackSerializer extends ValueSerializer<Callback> {
 
     @Override
-    public void serialize(Callback value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Callback value, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 
         // has extensions
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
@@ -44,22 +44,22 @@ public class CallbackSerializer extends JsonSerializer<Callback> {
                 if (!value.isEmpty()) {
                     // write map
                     for (Entry<String, PathItem> entry : value.entrySet()) {
-                        jgen.writeObjectField(entry.getKey(), entry.getValue());
+                        jgen.writePOJOProperty(entry.getKey(), entry.getValue());
                     }
                 }
             } else { // handle ref schema serialization skipping all other props ...
-                jgen.writeStringField("$ref", value.get$ref());
+                jgen.writeStringProperty("$ref", value.get$ref());
             }
             for (String ext : value.getExtensions().keySet()) {
-                jgen.writeObjectField(ext, value.getExtensions().get(ext));
+                jgen.writePOJOProperty(ext, value.getExtensions().get(ext));
             }
             jgen.writeEndObject();
         } else {
             if (value == null || value.get$ref() == null || value.get$ref().isBlank()) {
-                provider.defaultSerializeValue(value, jgen);
+                provider.writeValue(jgen, value);
             } else { // handle ref schema serialization skipping all other props
                 jgen.writeStartObject();
-                jgen.writeStringField("$ref", value.get$ref());
+                jgen.writeStringProperty("$ref", value.get$ref());
                 jgen.writeEndObject();
             }
         }

@@ -6,8 +6,8 @@ plugins {
 dependencies {
     api(mn.jackson.databind)
     api(mn.jackson.dataformat.yaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
+    testImplementation(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {

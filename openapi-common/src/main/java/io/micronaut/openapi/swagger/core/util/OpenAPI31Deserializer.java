@@ -15,29 +15,27 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonDeserializer;
-import tools.jackson.databind.deser.ResolvableDeserializer;
+import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.deser.std.StdDeserializer;
 
-public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> implements ResolvableDeserializer {
+public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> {
 
-    private final JsonDeserializer<?> defaultDeserializer;
+    private final ValueDeserializer<?> defaultDeserializer;
 
-    public OpenAPI31Deserializer(JsonDeserializer<?> defaultDeserializer) {
+    public OpenAPI31Deserializer(ValueDeserializer<?> defaultDeserializer) {
         super(OpenAPI.class);
         this.defaultDeserializer = defaultDeserializer;
     }
 
     @Override
-    public OpenAPI deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public OpenAPI deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonException {
         OpenAPI openAPI = (OpenAPI) defaultDeserializer.deserialize(jp, ctxt);
         openAPI.setSpecVersion(SpecVersion.V31);
         return openAPI;
@@ -45,6 +43,6 @@ public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> implements R
 
     @Override
     public void resolve(DeserializationContext ctxt) throws DatabindException {
-        ((ResolvableDeserializer) defaultDeserializer).resolve(ctxt);
+        defaultDeserializer.resolve(ctxt);
     }
 }

@@ -15,45 +15,40 @@
  */
 package io.micronaut.openapi.swagger.core.jackson;
 
-import java.io.IOException;
-
 import io.swagger.v3.oas.models.media.Schema;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.DatabindException;
-import tools.jackson.databind.JsonSerializer;
-import tools.jackson.databind.SerializerProvider;
-import tools.jackson.databind.ser.ResolvableSerializer;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-public class SchemaSerializer extends JsonSerializer<Schema> implements ResolvableSerializer {
+public class SchemaSerializer extends ValueSerializer<Schema> {
 
-    private final JsonSerializer<Object> defaultSerializer;
+    private final ValueSerializer<Object> defaultSerializer;
 
-    public SchemaSerializer(JsonSerializer<Object> serializer) {
+    public SchemaSerializer(ValueSerializer<Object> serializer) {
         defaultSerializer = serializer;
     }
 
     @Override
-    public void resolve(SerializerProvider serializerProvider) throws DatabindException {
-        if (defaultSerializer instanceof ResolvableSerializer resolvableSerializer) {
-            resolvableSerializer.resolve(serializerProvider);
-        }
+    public void resolve(SerializationContext serializerProvider) throws DatabindException {
+        defaultSerializer.resolve(serializerProvider);
     }
-
     @Override
-    public void serialize(Schema value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Schema value, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 
         if (value.get$ref() == null || value.get$ref().isBlank()) {
 
             if (value.getExampleSetFlag() && value.getExample() == null) {
                 jgen.writeStartObject();
                 defaultSerializer.unwrappingSerializer(null).serialize(value, jgen, provider);
-                jgen.writeNullField("example");
+                jgen.writeNullProperty("example");
                 jgen.writeEndObject();
             } else {
                 defaultSerializer.serialize(value, jgen, provider);
@@ -62,7 +57,7 @@ public class SchemaSerializer extends JsonSerializer<Schema> implements Resolvab
         } else {
             // handle ref schema serialization skipping all other props
             jgen.writeStartObject();
-            jgen.writeStringField("$ref", value.get$ref());
+            jgen.writeStringProperty("$ref", value.get$ref());
             jgen.writeEndObject();
         }
     }

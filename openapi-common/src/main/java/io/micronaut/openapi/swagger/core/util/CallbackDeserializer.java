@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,11 +23,12 @@ import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonDeserializer;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -36,13 +36,13 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * @since 4.6.0
  */
-public class CallbackDeserializer extends JsonDeserializer<Callback> {
+public class CallbackDeserializer extends ValueDeserializer<Callback> {
 
     protected boolean openapi31;
 
     @Override
     public Callback deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+        throws JacksonException {
 
         final ObjectMapper mapper;
         if (openapi31) {
@@ -51,11 +51,10 @@ public class CallbackDeserializer extends JsonDeserializer<Callback> {
             mapper = OpenApiUtils.getJsonMapper();
         }
         Callback result = new Callback();
-        JsonNode node = jp.getCodec().readTree(jp);
+        JsonNode node = ctxt.readTree(jp);
         ObjectNode objectNode = (ObjectNode) node;
         Map<String, Object> extensions = new LinkedHashMap<>();
-        for (Iterator<String> it = objectNode.fieldNames(); it.hasNext(); ) {
-            String childName = it.next();
+        for (String childName : objectNode.propertyNames()) {
             JsonNode child = objectNode.get(childName);
             // if name start with `x-` consider it an extension
             if (childName.startsWith("x-")) {
