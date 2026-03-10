@@ -24,6 +24,8 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.http.multipart.StreamingFileUpload;
 import org.jspecify.annotations.NonNull;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.CollectionUtils;
@@ -38,7 +40,6 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.RequestAttribute;
 import io.micronaut.http.annotation.RequestBean;
-import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
@@ -196,7 +197,8 @@ public final class ElementUtils {
             }
         }
         String typeName = type.getName();
-        return type.isAssignable(FileUpload.class)
+        return type.isAssignable(StreamingFileUpload.class)
+            || type.isAssignable(CompletedFileUpload.class)
             || "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
             || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
             || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
