@@ -260,7 +260,7 @@ class MyBean {}
         petSchema
         petSchema.properties
         petSchema.properties.lines.example instanceof List
-        ((List) petSchema.properties.lines.example instanceof List).every { it instanceof String }
+        ((List) petSchema.properties.lines.example).every { it instanceof String }
         ((List<String>) petSchema.properties.lines.example)[0] == '123 Main St'
         ((List<String>) petSchema.properties.lines.example)[1] == 'Suite 517'
     }
