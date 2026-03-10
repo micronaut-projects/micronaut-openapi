@@ -27,7 +27,7 @@ include(
     "openapi",
     "openapi-adoc",
     "openapi-annotations",
-//    "openapi-bom",
+    "openapi-bom",
     "openapi-common",
 //    "openapi-generator",
 //    "test-suite-client-generator-java",

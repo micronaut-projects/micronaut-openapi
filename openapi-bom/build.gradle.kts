@@ -13,5 +13,7 @@ micronautBom {
 
         acceptedVersionRegressions.add("jakarta-validation-api")
         acceptedLibraryRegressions.add("jakarta-validation-api")
+        acceptedLibraryRegressions.add("micronaut-openapi-generator")
+
     }
 }
