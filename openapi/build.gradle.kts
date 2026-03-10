@@ -49,6 +49,7 @@ dependencies {
     testImplementation(libs.spotbugs.annotations)
     testImplementation(libs.guava)
     testImplementation(mn.kotlinx.coroutines.reactor)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 
 // uncomment it, if you want to test micronaut-openapi with spring-boot actuator locally
 //    testAnnotationProcessor(mnSpring.micronaut.spring.annotation)
