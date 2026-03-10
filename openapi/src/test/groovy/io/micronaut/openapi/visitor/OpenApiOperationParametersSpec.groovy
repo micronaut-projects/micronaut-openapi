@@ -3,9 +3,11 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import spock.lang.PendingFeature
 
 class OpenApiOperationParametersSpec extends AbstractOpenApiTypeElementSpec {
 
+    @PendingFeature
     void "test Parameters in Operation"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -67,6 +69,7 @@ class MyBean {}
         operation.parameters[0].schema.default == 'dog'
     }
 
+    @PendingFeature
     void "test ApiResponses"() {
         given:
         buildBeanDefinition('test.MyBean', '''

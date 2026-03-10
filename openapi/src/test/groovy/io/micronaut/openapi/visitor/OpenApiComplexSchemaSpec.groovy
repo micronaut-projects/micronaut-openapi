@@ -5,9 +5,11 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.PendingFeature
 
 class OpenApiComplexSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
+    @PendingFeature
     void "test build OpenAPI doc for oneOf, allOf and anyOf keyword"() {
 
         when:

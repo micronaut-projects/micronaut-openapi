@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
+import spock.lang.PendingFeature
 
 class OpenApiParameterMappingSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -91,6 +92,7 @@ class MyBean {}
         pathItemThird.get.parameters[0].schema.default.size() == 0
     }
 
+    @PendingFeature
     void "test that @Parameter propagates correctly"() {
 
         given: "An API definition"

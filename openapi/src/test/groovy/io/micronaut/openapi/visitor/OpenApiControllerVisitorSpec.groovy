@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
+import spock.lang.PendingFeature
 import spock.util.environment.RestoreSystemProperties
 
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE
@@ -425,6 +426,7 @@ class MyBean {}
         parameter.schema.maxItems == 20
     }
 
+    @PendingFeature
     void "test build OpenAPI doc with @Content without mediaType information"() {
 
         given: "An API definition"

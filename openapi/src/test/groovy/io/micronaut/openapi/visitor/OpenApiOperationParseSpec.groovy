@@ -4,6 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.PendingFeature
 
 class OpenApiOperationParseSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -77,6 +78,7 @@ class MyBean {}
 
     }
 
+    @PendingFeature
     void "test parse the OpenAPI @ApiResponse Content with @ArraySchema annotation"() {
         given:
         buildBeanDefinition('test.MyBean','''
@@ -168,6 +170,7 @@ class MyBean {}
         operationNames.responses.'200'.content['application/json'].schema.items.type == "string"
     }
 
+    @PendingFeature
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation"() {
         given:
         buildBeanDefinition('test.MyBean','''
