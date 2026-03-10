@@ -3,11 +3,9 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiJsonUnwrappedSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test JsonUnwrapped annotation"() {
 
         given: "An API definition"
@@ -277,7 +275,6 @@ class MyBean {}
         schema.properties.field1.type == "string"
     }
 
-    @PendingFeature
     void "test JsonUnwrapped annotation and schema allOf annotation"() {
         given: "An API definition"
         when:

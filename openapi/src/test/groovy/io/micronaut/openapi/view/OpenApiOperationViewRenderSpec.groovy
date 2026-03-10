@@ -5,8 +5,6 @@ import io.micronaut.openapi.visitor.Pair
 import io.micronaut.openapi.visitor.group.OpenApiInfo
 import io.swagger.v3.oas.models.OpenAPI
 import org.apache.groovy.util.Maps
-import spock.lang.Ignore
-import spock.lang.PendingFeature
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -167,7 +165,6 @@ class OpenApiOperationViewRenderSpec extends Specification {
         content.contains(cfg.getSpecURL(cfg.scalarConfig, null))
     }
 
-    @Ignore
     void "test render OpenApiView specification with custom swagger js and css urls"() {
         given:
         String spec = "swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,swagger-ui.copy-theme=false,swagger-ui.theme.url=https://flattop.com/theme.css,swagger-ui.copy-resources=false,swagger-ui.js.url=https://unpkg.com/swagger-ui-dist/"

@@ -1,6 +1,5 @@
 package io.micronaut.openapi.spring;
 
-import org.junit.jupiter.api.Disabled;
 import tools.jackson.core.JacksonException;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -31,7 +30,6 @@ class TestControllerTest {
     @Autowired
     RestClient restClient;
 
-    @Disabled
     @Test
     void springOpenApiPathTest() {
         var result = restClient.get()

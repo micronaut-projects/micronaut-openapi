@@ -3,7 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
-import spock.lang.PendingFeature
 
 class OpenApiDuplicateElementsSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -102,7 +101,6 @@ components:
         openApi.paths.'/pets'.post.security.size() == 1
     }
 
-    @PendingFeature
     void "test date enum default value"() {
 
         when:
