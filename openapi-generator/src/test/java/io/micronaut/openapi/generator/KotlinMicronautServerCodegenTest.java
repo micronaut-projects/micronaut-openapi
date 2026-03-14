@@ -1486,8 +1486,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
                 class CustomUserParameter
                 """,
-                true,
-                false
+                true
             )
         );
 

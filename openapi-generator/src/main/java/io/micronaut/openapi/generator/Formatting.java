@@ -32,6 +32,7 @@ public enum Formatting {
 
     /**
      * Remove whitespace on the right of the line.
+     *
      * @param line The line to be trimmed.
      * @return The trimmed line.
      */
@@ -48,6 +49,7 @@ public enum Formatting {
 
     /**
      * Remove whitespace from both sides of the line.
+     *
      * @param line The line to be trimmed.
      * @return The trimmed line.
      */
@@ -112,7 +114,8 @@ public enum Formatting {
             return text.substring(i);
         }
 
-        private class LineSkippingPredicate implements Predicate<String> {
+        private final class LineSkippingPredicate implements Predicate<String> {
+
             private int emptyLines;
 
             @Override
@@ -146,7 +149,7 @@ public enum Formatting {
     /**
      * A lambda that allows indenting its contents.
      */
-    public static class IndentFormatter implements Mustache.Lambda {
+    public static final class IndentFormatter implements Mustache.Lambda {
 
         private final String indent;
 
@@ -167,7 +170,7 @@ public enum Formatting {
     /**
      * Replace dot to underscore.
      */
-    public static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
+    public static final class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
 
         @Override
         public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
