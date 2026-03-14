@@ -16,14 +16,9 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.PropertyNamingStrategies;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
@@ -48,6 +43,11 @@ import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.PropertyNamingStrategy;
 
 import java.io.IOException;
@@ -535,7 +535,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = getEnv(context);
+        var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -602,7 +602,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = getEnv(context);
+        var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -1398,7 +1398,7 @@ public final class ConfigUtils {
 
         Environment environment = null;
         try {
-            environment = Environment.create(configuration);
+            environment = new AnnProcessorEnvironment(configuration, context);
             environment.start();
             return environment;
         } catch (Exception e) {

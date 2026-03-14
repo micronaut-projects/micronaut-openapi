@@ -1,5 +1,6 @@
 package io.micronaut.openapi.test.filter;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  *
  * @param conditions The filtering conditions
  */
-public record MyFilter (
+public record MyFilter(
     List<Condition> conditions
 ) {
 
@@ -44,7 +45,7 @@ public record MyFilter (
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return conditions.stream()
             .map(Object::toString)
             .collect(Collectors.joining(","));
@@ -62,6 +63,7 @@ public record MyFilter (
         ConditionComparator comparator,
         Object value
     ) {
+
         /**
          * Parse the condition from a string representation.
          *
@@ -82,7 +84,7 @@ public record MyFilter (
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return propertyName + comparator + value;
         }
     }
@@ -127,6 +129,7 @@ public record MyFilter (
      * A custom exception for failed parsing
      */
     public static class ParseException extends RuntimeException {
+
         private ParseException(String message) {
             super(message);
         }

@@ -15,14 +15,9 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -30,6 +25,9 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.node.ObjectNode;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * This class is copied from swagger-core library.

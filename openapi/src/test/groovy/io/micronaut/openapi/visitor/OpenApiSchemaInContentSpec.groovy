@@ -3,20 +3,14 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import spock.lang.PendingFeature
 
 class OpenApiSchemaInContentSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test schema inside response content"() {
         when:
         buildBeanDefinition('test.MyBean', '''
 
 package test;
-
-import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -29,6 +23,9 @@ import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 @Controller("/path")
 class OpenApiController {
@@ -100,16 +97,11 @@ class MyBean {}
         operation.responses."300".content.'*/*'.schema.$ref == '#/components/schemas/myCustomSchema'
     }
 
-    @PendingFeature
     void "test schema inside response content2"() {
         when:
         buildBeanDefinition('test.MyBean', '''
 
 package test;
-
-import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -123,6 +115,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 @Controller("/path")
 class OpenApiController {

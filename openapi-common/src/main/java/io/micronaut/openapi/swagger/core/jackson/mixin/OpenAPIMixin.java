@@ -15,17 +15,16 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.util.Map;
-
-import io.micronaut.openapi.swagger.core.jackson.PathsSerializer;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.Paths;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.openapi.swagger.core.jackson.PathsSerializer;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import tools.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Map;
 
 /**
  * This class is copied from swagger-core library.

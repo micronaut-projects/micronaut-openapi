@@ -16,7 +16,6 @@
 package io.micronaut.openapi.swagger.core.jackson;
 
 import io.swagger.v3.oas.models.examples.Example;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.DatabindException;
@@ -38,7 +37,7 @@ public class ExampleSerializer extends ValueSerializer<Example> {
 
     @Override
     public void resolve(SerializationContext serializerProvider) throws DatabindException {
-            defaultSerializer.resolve(serializerProvider);
+        defaultSerializer.resolve(serializerProvider);
     }
 
     @Override

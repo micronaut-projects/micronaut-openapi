@@ -11,6 +11,8 @@ repositories {
     mavenCentral()
 }
 
+val libs = versionCatalogs.named("libs")
+
 val openapiGenerator = configurations.create("openapiGenerator") {
     isCanBeResolved = true
     isCanBeConsumed = false
@@ -18,6 +20,9 @@ val openapiGenerator = configurations.create("openapiGenerator") {
 
 dependencies {
     openapiGenerator(project(":test-suite-generator-util"))
+    constraints {
+        implementation("io.micronaut:micronaut-http-client:${libs.findVersion("micronaut").get()}")
+    }
 }
 
 val openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask::class) {
@@ -46,18 +51,10 @@ sourceSets {
     }
 }
 
-val libs = versionCatalogs.named("libs")
-
 micronaut {
     version = libs.findVersion("micronaut-platform").get().toString()
     runtime = MicronautRuntime.NETTY
     testRuntime = MicronautTestRuntime.JUNIT_5
-}
-
-dependencies {
-    constraints {
-        implementation("io.micronaut:micronaut-http-client:${libs.findVersion("micronaut").get()}")
-    }
 }
 
 tasks.test {

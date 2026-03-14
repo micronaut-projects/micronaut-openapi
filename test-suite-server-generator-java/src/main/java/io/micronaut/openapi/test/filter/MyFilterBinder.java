@@ -1,15 +1,15 @@
 package io.micronaut.openapi.test.filter;
 
-import java.util.Optional;
-
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.bind.binders.TypedRequestArgumentBinder;
 import io.micronaut.http.exceptions.HttpStatusException;
-
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
+
+import java.util.Optional;
 
 /**
  * A custom parameter binder for MyFilter parameter type.
@@ -20,13 +20,13 @@ final class MyFilterBinder implements TypedRequestArgumentBinder<MyFilter> {
     public static final String HEADER_NAME = "Filter";
 
     @Override
-    public Argument<MyFilter> argumentType() {
+    public @NonNull Argument<MyFilter> argumentType() {
         return Argument.of(MyFilter.class);
     }
 
     @Override
-    public BindingResult<MyFilter> bind(
-        ArgumentConversionContext<MyFilter> context,
+    public @NonNull BindingResult<MyFilter> bind(
+        @NonNull ArgumentConversionContext<MyFilter> context,
         HttpRequest<?> source
     ) {
         String filter = source.getHeaders().get(HEADER_NAME);

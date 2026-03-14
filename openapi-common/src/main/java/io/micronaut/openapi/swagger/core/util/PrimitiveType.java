@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import tools.jackson.databind.type.TypeFactory;
 import io.swagger.v3.oas.models.media.BinarySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ByteArraySchema;
@@ -28,6 +27,7 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
+import tools.jackson.databind.type.TypeFactory;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -648,6 +648,7 @@ public enum PrimitiveType {
     }
 
     private static class DateStub {
+
         private DateStub() {
         }
     }

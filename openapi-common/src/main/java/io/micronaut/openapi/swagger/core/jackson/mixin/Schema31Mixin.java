@@ -15,10 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +27,10 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.annotation.JsonSerialize;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is copied from swagger-core library.

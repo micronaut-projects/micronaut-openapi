@@ -15,13 +15,13 @@
  */
 package io.micronaut.openapi;
 
+import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.cfg.EnumFeature;
-import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 
 /**
  * Convert utilities methods.
@@ -40,7 +40,6 @@ public final class OpenApiUtils {
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
         .build();
-
     /**
      * The JSON 3.1 mapper.
      */
@@ -49,26 +48,23 @@ public final class OpenApiUtils {
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
         .build();
-
     /**
      * The JSON mapper for security scheme.
      */
     public static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
         .rebuild()
-        .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-        .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
+        .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)  // ← moved from DeserializationFeature
         .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
         .build();
-
     /**
      * The YAML mapper.
      */
     public static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
-
     /**
      * The YAML 3.1 mapper.
      */

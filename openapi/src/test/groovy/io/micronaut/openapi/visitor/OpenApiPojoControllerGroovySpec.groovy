@@ -5,7 +5,6 @@ import io.micronaut.http.MediaType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.examples.Example
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
@@ -28,10 +27,10 @@ class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
         buildBeanDefinition('test.MyBean', '''
 package test
 
-import io.reactivex.*
-import io.micronaut.core.annotation.*
-import io.micronaut.http.annotation.*
-import io.swagger.v3.oas.annotations.media.*
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.swagger.v3.oas.annotations.media.Schema
 
 @Controller("/example")
 class ExampleController {
@@ -176,9 +175,7 @@ class MyBean {}
     void "test empty default value for Map body type groovy"() {
         when:
         buildBeanDefinition("test.MyBean", '''
-package test;
-
-import java.util.Map
+package test
 
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller

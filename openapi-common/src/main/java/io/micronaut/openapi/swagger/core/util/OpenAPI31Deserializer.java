@@ -17,7 +17,6 @@ package io.micronaut.openapi.swagger.core.util;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DatabindException;
@@ -36,7 +35,7 @@ public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> {
 
     @Override
     public OpenAPI deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonException {
-        OpenAPI openAPI = (OpenAPI) defaultDeserializer.deserialize(jp, ctxt);
+        var openAPI = (OpenAPI) defaultDeserializer.deserialize(jp, ctxt);
         openAPI.setSpecVersion(SpecVersion.V31);
         return openAPI;
     }

@@ -8,11 +8,9 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
-import spock.lang.PendingFeature
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI for List"() {
         given: "An API definition"
         when:
@@ -1587,7 +1585,6 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
-    @PendingFeature
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:
@@ -2128,14 +2125,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.util.UUID;
-
-import jakarta.validation.Valid;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+
+import java.util.UUID;
 
 @Controller
 class UuidController {
@@ -2374,13 +2370,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import jakarta.validation.Valid;
-
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Status;
+import jakarta.validation.Valid;
 
 @Controller("/v1/customers")
 class CustomersController {
@@ -2454,10 +2449,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.*;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.responses.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import java.net.URI;
 
 @Controller
@@ -2569,7 +2567,6 @@ class MyBean {}
         root.get.responses['500'].content == null
     }
 
-    @PendingFeature
     void "@ApiResponse set mediaType"() {
         given:
         when:
