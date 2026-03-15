@@ -19,9 +19,6 @@ import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.cfg.DateTimeFeature;
-import tools.jackson.databind.cfg.EnumFeature;
 
 /**
  * Convert utilities methods.
@@ -49,18 +46,13 @@ public final class OpenApiUtils {
         .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
         .build();
     /**
-     * The JSON mapper for security scheme.
+     * The JSON mapper for conversions.
      */
-    public static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
-        .rebuild()
-        .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-        .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
-        .enable(EnumFeature.READ_ENUMS_USING_TO_STRING)
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-        .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-        .build();
+    public static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.createConvertObjectMapper();
+    /**
+     * The JSON mapper for conversions (OpenAPI 3.1).
+     */
+    public static final ObjectMapper CONVERT_JSON_MAPPER_31 = ObjectMapperFactory.createConvertObjectMapper31();
     /**
      * The YAML mapper.
      */
@@ -83,6 +75,10 @@ public final class OpenApiUtils {
 
     public static ObjectMapper getConvertJsonMapper() {
         return CONVERT_JSON_MAPPER;
+    }
+
+    public static ObjectMapper getConvertJsonMapper31() {
+        return CONVERT_JSON_MAPPER_31;
     }
 
     public static ObjectMapper getYamlMapper() {

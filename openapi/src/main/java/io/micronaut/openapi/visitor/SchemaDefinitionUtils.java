@@ -179,6 +179,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ARRAY_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTAINS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_SET_FLAG;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
@@ -218,6 +219,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_PROPERTIES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SPEC_VERSION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TITLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
@@ -3177,13 +3179,14 @@ public final class SchemaDefinitionUtils {
             if (value == null) {
                 continue;
             }
-            if (entry.getKey().equals("specVersion")) {
+            var key = entry.getKey();
+            if (key.equals(PROP_SPEC_VERSION)) {
                 continue;
             }
-            if (entry.getKey().equals(PROP_EXAMPLE_SET_FLAG) && StringUtils.FALSE.equals(value.toString())) {
+            if ((key.equals(PROP_EXAMPLE_SET_FLAG) || key.equals(PROP_DEFAULT_SET_FLAG)) && StringUtils.FALSE.equals(value.toString())) {
                 continue;
             }
-            valueMap.put(entry.getKey(), value);
+            valueMap.put(key, value);
         }
         if (schema.get$ref() != null) {
             valueMap.put(PROP_REF_DOLLAR, schema.get$ref());

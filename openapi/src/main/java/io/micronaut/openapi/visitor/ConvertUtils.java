@@ -79,7 +79,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
@@ -116,6 +115,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
+import static io.micronaut.openapi.visitor.Utils.getConvertMapper;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 
 /**
@@ -141,7 +141,6 @@ public final class ConvertUtils {
      * @param values The values
      * @param context The visitor context
      * @param type The class
-     *
      * @return The converted instance
      */
     public static <T> T toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type) {
@@ -159,7 +158,6 @@ public final class ConvertUtils {
      *
      * @param values The values
      * @param context The visitor context
-     *
      * @return The node
      */
     public static JsonNode toJson(Map<CharSequence, Object> values, VisitorContext context) {
@@ -273,7 +271,7 @@ public final class ConvertUtils {
     public static Map<String, Object> parseJsonString(Object object) {
         if (object instanceof String string) {
             try {
-                return CONVERT_JSON_MAPPER.readValue(string, MAP_TYPE_REFERENCE);
+                return getConvertMapper().readValue(string, MAP_TYPE_REFERENCE);
             } catch (JacksonException e) {
                 return null;
             }
@@ -282,15 +280,13 @@ public final class ConvertUtils {
     }
 
     /**
-     * Converts Json node into a class' instance or throws {@link JacksonException}, adds extensions if present.
+     * Converts JSON node into a class' instance or throws {@link JacksonException}, adds extensions if present.
      *
-     * @param jn The json node
+     * @param jn The JSON node
      * @param clazz The output class instance
      * @param <T> The output class type
      * @param context visitor context
-     *
      * @return The converted instance
-     *
      * @throws JacksonException if error
      */
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JacksonException {
@@ -298,7 +294,7 @@ public final class ConvertUtils {
         var fixed = false;
         T value;
         try {
-            value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+            value = getConvertMapper().treeToValue(jn, clazz);
         } catch (Exception e) {
             // maybe exception with groovy
             if (context.getLanguage() == VisitorContext.Language.GROOVY) {
@@ -368,7 +364,7 @@ public final class ConvertUtils {
         var result = new HashMap<String, T>();
         for (var entryKey : mapNode.propertyNames()) {
             var objectNode = mapNode.get(entryKey);
-            var object = CONVERT_JSON_MAPPER.treeToValue(objectNode, clazz);
+            var object = getConvertMapper().treeToValue(objectNode, clazz);
             result.put(entryKey, object);
         }
         return !result.isEmpty() ? result : null;
@@ -382,7 +378,7 @@ public final class ConvertUtils {
 
             var requestBodyNode = jn.get("requestBody");
             ((ObjectNode) jn).remove("requestBody");
-            T value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+            T value = getConvertMapper().treeToValue(jn, clazz);
             var requestBody = fixContentForGroovy(requestBodyNode, RequestBody.class);
             ((Operation) value).setRequestBody(requestBody);
 
@@ -403,7 +399,7 @@ public final class ConvertUtils {
             || clazz == RequestBody.class) {
             return fixContentForGroovy(jn, clazz);
         } else {
-            return CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+            return getConvertMapper().treeToValue(jn, clazz);
         }
     }
 
@@ -424,7 +420,7 @@ public final class ConvertUtils {
             // we don't need to fix anything for multiple objects
             var contentFieldNames = new ArrayList<>(contentNode.propertyNames());
             if (contentFieldNames.stream().noneMatch(CONTENT_PROPS::contains)) {
-                return CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
+                return getConvertMapper().treeToValue(parentNode, clazz);
             }
 
             examples = deserMap(PROP_EXAMPLES, contentNode, Example.class);
@@ -432,13 +428,13 @@ public final class ConvertUtils {
             extensions = deserMap(PROP_EXTENSIONS, contentNode, Object.class);
             var schemaNode = contentNode.get(PROP_SCHEMA);
             if (schemaNode != null) {
-                schema = CONVERT_JSON_MAPPER.treeToValue(schemaNode, Schema.class);
+                schema = getConvertMapper().treeToValue(schemaNode, Schema.class);
             }
 
             mediaTypeNode = contentNode.get(PROP_MEDIA_TYPE);
             ((ObjectNode) contentNode).remove(PROP_MEDIA_TYPE);
         }
-        var value = CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
+        var value = getConvertMapper().treeToValue(parentNode, clazz);
         Content content = null;
         if (value instanceof ApiResponse apiResponse) {
             content = apiResponse.getContent();
@@ -471,7 +467,7 @@ public final class ConvertUtils {
 
     private static void processMediaType(Content result, JsonNode content) throws JacksonException {
         var mediaType = content.has(PROP_MEDIA_TYPE) ? content.get(PROP_MEDIA_TYPE).asString() : io.micronaut.http.MediaType.APPLICATION_JSON;
-        var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
+        var mediaTypeObj = getConvertMapper().treeToValue(content, MediaType.class);
         result.addMediaType(mediaType, mediaTypeObj);
     }
 
@@ -484,7 +480,7 @@ public final class ConvertUtils {
             return null;
         }
         if (type == null || type.equals(TYPE_OBJECT)) {
-            return CONVERT_JSON_MAPPER.readValue(valueStr, Map.class);
+            return getConvertMapper().readValue(valueStr, Map.class);
         }
         return parseByTypeAndFormat(valueStr, type, format, context, isMicronautFormat);
     }
@@ -493,7 +489,7 @@ public final class ConvertUtils {
         try {
             JsonNode extensionsNode = jn.get(PROP_EXTENSIONS);
             if (extensionsNode != null) {
-                return CONVERT_JSON_MAPPER.convertValue(extensionsNode, MAP_TYPE_REFERENCE);
+                return getConvertMapper().convertValue(extensionsNode, MAP_TYPE_REFERENCE);
             }
         } catch (IllegalArgumentException e) {
             // Ignore
@@ -586,7 +582,6 @@ public final class ConvertUtils {
      * - custom_scope2
      *
      * @param r The value of {@link SecurityRequirement}.
-     *
      * @return converted object.
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
@@ -670,7 +665,6 @@ public final class ConvertUtils {
      * @param type enum element
      * @param schemaType type from swagger Schema annotation
      * @param schemaFormat format from swagger Schema annotation
-     *
      * @return pair with openapi type and format
      */
     @NonNull
@@ -713,7 +707,6 @@ public final class ConvertUtils {
      * @param className java class name
      * @param isArray is it array
      * @param classEl class element
-     *
      * @return pair with openapi type and format
      */
     public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray, @Nullable ClassElement classEl) {
@@ -792,7 +785,6 @@ public final class ConvertUtils {
      * @param format openapi value
      * @param context visitor context
      * @param isMicronautFormat is it micronaut format for arrays
-     *
      * @return parsed value
      */
     public static Object parseByTypeAndFormat(String valueStr, String type, String format, VisitorContext context, boolean isMicronautFormat) {

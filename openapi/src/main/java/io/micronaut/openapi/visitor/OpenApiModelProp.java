@@ -48,7 +48,9 @@ public interface OpenApiModelProp {
     String PROP_REF_DOLLAR = "$ref";
     String PROP_HIDDEN = "hidden";
     String PROP_EXAMPLE = "example";
+    String PROP_SPEC_VERSION = "specVersion";
     String PROP_EXAMPLE_SET_FLAG = "exampleSetFlag";
+    String PROP_DEFAULT_SET_FLAG = "defaultSetFlag";
     String PROP_ENCODING = "encoding";
     String PROP_EXAMPLES = "examples";
     String PROP_NOT = "not";

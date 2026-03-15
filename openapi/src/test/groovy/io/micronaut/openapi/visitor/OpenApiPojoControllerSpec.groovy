@@ -124,9 +124,9 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema petSchema = openAPI.components.schemas['Pet']
-        Schema petInnerBeanSchema = openAPI.components.schemas['Pet.InnerBean']
+        OpenAPI openApi = Utils.testReference
+        Schema petSchema = openApi.components.schemas['Pet']
+        Schema petInnerBeanSchema = openApi.components.schemas['Pet.InnerBean']
 
         then: "the components are valid"
         petInnerBeanSchema
@@ -138,8 +138,8 @@ class MyBean {}
         ((ArraySchema) petSchema.properties["tags"]).items.type == "string"
 
         when:
-        PathItem xyz1 = openAPI.paths.get("/pets/xyz1")
-        PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
+        PathItem xyz1 = openApi.paths.get("/pets/xyz1")
+        PathItem xyz2 = openApi.paths.get("/pets/xyz2")
 
         then:
         xyz1.post.operationId == 'xyzPost'
