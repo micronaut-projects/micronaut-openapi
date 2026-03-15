@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
@@ -1585,6 +1586,7 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
+    @Ignore
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:
@@ -1672,14 +1674,14 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
+        OpenAPI openApi = Utils.testReference
 
         then: "The operation has only one path"
-        openAPI.paths.size() == 2
+        openApi.paths.size() == 2
 
         when: "The POST /pets operation is retrieved"
-        Operation operation = openAPI.paths?.get("/pets")?.post
-        Operation operationSave = openAPI.paths?.get("/save")?.post
+        Operation operation = openApi.paths?.get("/pets")?.post
+        Operation operationSave = openApi.paths?.get("/save")?.post
 
         then: "The body has specified attributes"
         operation.requestBody

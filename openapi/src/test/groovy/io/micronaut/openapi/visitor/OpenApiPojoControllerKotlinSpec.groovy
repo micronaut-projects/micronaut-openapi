@@ -373,42 +373,42 @@ open class MyEntity2Controller {
     ): String? {
         return null
     }
-    
+
     @Serdeable
     enum class MyEnum(
         @get:JsonValue val value: String
     ) {
-    
+
         @JsonProperty("v1")
         V1("v1"),
-    
+
         @JsonProperty("v2")
         V2("v2"),
-    
+
         @JsonProperty("v3")
         V3("v3"),
-    
+
         @JsonProperty("v4")
         V4("v4"),
-    
+
         @JsonProperty("v5")
         V5("v5"),
-    
+
         @JsonProperty("v6")
         V6("v6"),
-    
+
         @JsonProperty("v7")
         V7("v7");
-    
+
         override fun toString(): String {
             return value
         }
-    
+
         companion object {
-    
+
             @JvmField
             val VALUE_MAPPING = entries.associateBy { it.value }
-    
+
             /**
              * Create this enum from a value.
              *

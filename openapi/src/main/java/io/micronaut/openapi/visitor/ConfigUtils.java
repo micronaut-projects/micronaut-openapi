@@ -31,6 +31,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.env.AnnProcessorEnvironment;
 import io.micronaut.openapi.javadoc.DocsFormat;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -1482,6 +1483,7 @@ public final class ConfigUtils {
         List<String> typeArgs,
         ClassElement classElement
     ) {
+
     }
 
     /**
@@ -1528,6 +1530,7 @@ public final class ConfigUtils {
         List<String> excludePatterns,
         PatternStyle excludePatternStyle
     ) {
+
     }
 
     /**

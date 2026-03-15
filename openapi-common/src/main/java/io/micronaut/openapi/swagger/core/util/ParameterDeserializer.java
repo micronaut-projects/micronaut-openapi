@@ -28,7 +28,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.cfg.EnumFeature;
 
 /**
  * This class is copied from swagger-core library.
@@ -76,7 +75,7 @@ public class ParameterDeserializer extends ValueDeserializer<Parameter> {
                 reader = mapper.readerFor(CookieParameter.class);
             }
             if (reader != null) {
-                result = reader.with(EnumFeature.READ_ENUMS_USING_TO_STRING).readValue(node);
+                result = reader.readValue(node);
             }
         }
 

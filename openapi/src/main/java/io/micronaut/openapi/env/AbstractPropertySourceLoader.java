@@ -78,7 +78,7 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
         if (isEnabled()) {
             Set<String> extensions = getExtensions();
             for (String ext : extensions) {
-                String fileExt = fileName +  "." + ext;
+                String fileExt = fileName + "." + ext;
                 Map<String, Object> finalMap = loadProperties(resourceLoader, fileName, fileExt);
 
                 if (!finalMap.isEmpty()) {
@@ -95,7 +95,7 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
     /**
      *
      * @param name The name of the property source
-     * @param map  The map
+     * @param map The map
      * @param order The order of the property source
      * @param origin The origin
      * @return property source
@@ -118,7 +118,7 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
     /**
      *
      * @param name The name of the property source
-     * @param map  The map
+     * @param map The map
      * @param order The order of the property source
      * @return property source
      * @deprecated Use {@link #createPropertySource(String, Map, int, PropertySource.Origin)}
@@ -126,11 +126,11 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
     @Deprecated(forRemoval = true)
     protected MapPropertySource createPropertySource(String name, Map<String, Object> map, int order) {
         return new MapPropertySource(name, map) {
-                            @Override
-                            public int getOrder() {
-                                return order;
-                            }
-                        };
+            @Override
+            public int getOrder() {
+                return order;
+            }
+        };
     }
 
     private Map<String, Object> loadProperties(ResourceLoader resourceLoader, String qualifiedName, String fileName) {
@@ -157,7 +157,7 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
 
     /**
      * @param resourceLoader The resource loader
-     * @param fileName       The file name
+     * @param fileName The file name
      * @return An input stream wrapped inside an {@link Optional}
      */
     protected Optional<InputStream> readInput(ResourceLoader resourceLoader, String fileName) {
@@ -165,8 +165,8 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
     }
 
     /**
-     * @param name     The name
-     * @param input    The input stream
+     * @param name The name
+     * @param input The input stream
      * @param finalMap The map with all the properties processed
      * @throws IOException If the input stream doesn't exist
      */
@@ -174,8 +174,8 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
 
     /**
      * @param finalMap The map with all the properties processed
-     * @param map      The map to process
-     * @param prefix   The prefix for the keys
+     * @param map The map to process
+     * @param prefix The prefix for the keys
      */
     protected void processMap(Map<String, Object> finalMap, Map map, String prefix) {
         for (Object o : map.entrySet()) {
@@ -194,9 +194,8 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
      * Return logEnabled value.
      *
      * @return is log enabled
-     * @deprecated don't need to have this method
-     *
      * @since 3.9.0
+     * @deprecated don't need to have this method
      */
     @Deprecated
     public boolean isLogEnabled() {
@@ -207,10 +206,8 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
      * Setter for logEnabled.
      *
      * @param logEnabled is log enabled
-     *
-     * @deprecated set logEnabled value by constructor
-     *
      * @since 3.9.0
+     * @deprecated set logEnabled value by constructor
      */
     @Deprecated
     public void setLogEnabled(boolean logEnabled) {

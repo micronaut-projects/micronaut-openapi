@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.openapi.visitor;
+package io.micronaut.openapi.env;
 
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.PropertiesPropertySourceLoader;
@@ -22,7 +22,7 @@ import io.micronaut.context.env.yaml.YamlPropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.env.DefaultEnvironment;
+import io.micronaut.openapi.visitor.ContextUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;

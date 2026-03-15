@@ -88,4 +88,5 @@ public final class OpenApiUtils {
     public static ObjectMapper getYamlMapper31() {
         return YAML_MAPPER_31;
     }
+
 }
