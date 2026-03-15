@@ -22,7 +22,6 @@ class TestController {
      * {@summary Create post op summary.} Operation post description.
      *
      * @param user User request body
-     *
      * @return created post user
      */
     @PostMapping(value = "/create",

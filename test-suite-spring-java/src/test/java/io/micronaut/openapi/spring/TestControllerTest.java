@@ -1,10 +1,9 @@
 package io.micronaut.openapi.spring;
 
-import org.junit.jupiter.api.Disabled;
-import tools.jackson.core.JacksonException;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
 @SpringBootTest(useMainMethod = SpringBootTest.UseMainMethod.ALWAYS, classes = {
-    WebConfig.class,
     TestConfig.class,
     Application.class,
 }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
