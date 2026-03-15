@@ -1744,7 +1744,7 @@ public final class SchemaUtils {
             return schema;
         }
         if (composedSchema.getAllOf() != null && composedSchema.getAllOf().size() == 1) {
-            return unwrapComposedSchema(composedSchema.getAllOf().get(0));
+            return unwrapComposedSchema(composedSchema.getAllOf().getFirst());
         }
         return schema;
     }

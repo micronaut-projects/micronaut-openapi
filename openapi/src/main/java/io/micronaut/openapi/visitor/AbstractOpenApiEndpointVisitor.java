@@ -15,11 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.core.JacksonException;
 import com.fasterxml.jackson.annotation.JsonView;
-import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.format.Format;
@@ -83,6 +80,9 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1194,7 +1194,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (newParameter == null) {
                                 newParameter = new Parameter();
                             }
-                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asText()));
+                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asString()));
                         }
                     }
                 } catch (Exception e) {

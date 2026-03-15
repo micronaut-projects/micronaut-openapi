@@ -142,7 +142,7 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH = "micronaut.openapi.server.context.path";
     /**
-     * System property for naming strategy. One jackson PropertyNamingStrategy.
+     * System property for naming strategy. One Jackson PropertyNamingStrategy.
      */
     String MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY = "micronaut.openapi.property.naming.strategy";
     /**
@@ -431,7 +431,7 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH = "micronaut.openapi.tag.generation.description.max.length";
     /**
-     * Naming strategy for generated tags. One jackson PropertyNamingStrategy.
+     * Naming strategy for generated tags. One Jackson PropertyNamingStrategy.
      */
     String MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY = "micronaut.openapi.tag.generation.naming.strategy";
     /**
@@ -450,7 +450,7 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX = "micronaut.openapi.adoc.templates.";
     /**
-     * Is conversion to Asciidoc enabled.
+     * Is conversion to AsciiDoc enabled.
      */
     String MICRONAUT_OPENAPI_ADOC_ENABLED = "micronaut.openapi.adoc.enabled";
     /**

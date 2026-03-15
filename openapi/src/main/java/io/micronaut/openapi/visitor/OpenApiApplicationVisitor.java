@@ -15,13 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
 import io.micronaut.context.env.Environment;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -53,6 +47,13 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -160,17 +161,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private int visitedElements = -1;
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
     @Override
-    public Set<String> getSupportedOptions() {
+    public @NonNull Set<String> getSupportedOptions() {
         return ALL;
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         try {
             if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
                 return;
@@ -501,8 +502,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
-        if (node.isTextual()) {
-            final String text = node.textValue();
+        if (node.isString()) {
+            final String text = node.stringValue();
             if (text == null || text.isBlank()) {
                 return node;
             }
@@ -567,7 +568,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     @Override
-    public void finish(VisitorContext context) {
+    public void finish(@NonNull VisitorContext context) {
         try {
             if (!isOpenApiEnabled(context)) {
                 return;

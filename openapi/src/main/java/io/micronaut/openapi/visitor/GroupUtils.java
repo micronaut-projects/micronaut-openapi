@@ -115,7 +115,7 @@ public final class GroupUtils {
 
             List<AnnotationValue<Version>> versionAnns = methodEl.getAnnotationValuesByType(Version.class);
             if (CollectionUtils.isNotEmpty(versionAnns)) {
-                version = versionAnns.get(0).stringValue().orElse(null);
+                version = versionAnns.getFirst().stringValue().orElse(null);
             }
             if (version != null) {
                 Utils.getAllKnownVersions().add(version);

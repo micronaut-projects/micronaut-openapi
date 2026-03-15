@@ -21,6 +21,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIExclude;
 import io.micronaut.openapi.annotation.OpenAPIExcludes;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.processing.SupportedOptions;
 import java.util.ArrayList;
@@ -56,12 +57,12 @@ public class OpenApiExcludeVisitor implements TypeElementVisitor<OpenAPIExcludes
     }
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }

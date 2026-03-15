@@ -322,15 +322,15 @@ public final class ConvertUtils {
         if (exts != null) {
             BeanMap.of(finalValue).put(PROP_EXTENSIONS, exts);
         }
-        String elType = jn.has(PROP_TYPE) ? jn.get(PROP_TYPE).textValue() : null;
-        String elFormat = jn.has(PROP_ONE_FORMAT) ? jn.get(PROP_ONE_FORMAT).textValue() : null;
+        String elType = jn.has(PROP_TYPE) ? jn.get(PROP_TYPE).stringValue() : null;
+        String elFormat = jn.has(PROP_ONE_FORMAT) ? jn.get(PROP_ONE_FORMAT).stringValue() : null;
         JsonNode defaultValueNode = jn.get(PROP_DEFAULT_VALUE);
         // fix for default value
         Object defaultValue;
         try {
-            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType, elFormat, context);
+            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.stringValue() : null, elType, elFormat, context);
         } catch (JacksonException e) {
-            defaultValue = defaultValueNode != null ? defaultValueNode.textValue() : null;
+            defaultValue = defaultValueNode != null ? defaultValueNode.stringValue() : null;
         }
 
         BeanMap<T> beanMap = BeanMap.of(value);
@@ -346,9 +346,9 @@ public final class ConvertUtils {
                     continue;
                 }
                 try {
-                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType, elFormat, context));
+                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.stringValue(), elType, elFormat, context));
                 } catch (JacksonException e) {
-                    allowableValues.add(allowableValueNode.textValue());
+                    allowableValues.add(allowableValueNode.stringValue());
                 }
             }
             beanMap.put(PROP_ALLOWABLE_VALUES, allowableValues);
@@ -422,9 +422,8 @@ public final class ConvertUtils {
             // if content object has "mediaType" property, then that object is single Content-object
             // otherwise, we have multiple content objects
             // we don't need to fix anything for multiple objects
-            var contentFieldNames = new ArrayList<String>();
-            contentNode.propertyNames().forEach(contentFieldNames::add);
-            if (!contentFieldNames.stream().anyMatch(CONTENT_PROPS::contains)) {
+            var contentFieldNames = new ArrayList<>(contentNode.propertyNames());
+            if (contentFieldNames.stream().noneMatch(CONTENT_PROPS::contains)) {
                 return CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
             }
 
@@ -457,7 +456,7 @@ public final class ConvertUtils {
             if (mediaType == null) {
                 mediaType = new MediaType();
             }
-            var contentType = mediaTypeNode != null ? mediaTypeNode.textValue() : io.micronaut.http.MediaType.APPLICATION_JSON;
+            var contentType = mediaTypeNode != null ? mediaTypeNode.stringValue() : io.micronaut.http.MediaType.APPLICATION_JSON;
             content.put(contentType, mediaType);
             mediaType.setExamples(examples);
             mediaType.setEncoding(encoding);
@@ -471,7 +470,7 @@ public final class ConvertUtils {
     }
 
     private static void processMediaType(Content result, JsonNode content) throws JacksonException {
-        var mediaType = content.has(PROP_MEDIA_TYPE) ? content.get(PROP_MEDIA_TYPE).asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
+        var mediaType = content.has(PROP_MEDIA_TYPE) ? content.get(PROP_MEDIA_TYPE).asString() : io.micronaut.http.MediaType.APPLICATION_JSON;
         var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
         result.addMediaType(mediaType, mediaTypeObj);
     }
@@ -627,7 +626,7 @@ public final class ConvertUtils {
         // check JsonValue field
         var fields = enumEl.getEnclosedElements(ElementQuery.ALL_FIELDS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
         if (CollectionUtils.isNotEmpty(fields)) {
-            var firstField = fields.get(0);
+            var firstField = fields.getFirst();
             ClassElement fieldType = firstField.getType();
             if (isEnum(fieldType)) {
                 return findJsonValueType((EnumElement) fieldType, context);
@@ -643,7 +642,7 @@ public final class ConvertUtils {
         // check JsonValue method
         List<MethodElement> methods = type.getEnclosedElements(ElementQuery.ALL_METHODS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
         if (CollectionUtils.isNotEmpty(methods)) {
-            firstMethod = methods.get(0);
+            firstMethod = methods.getFirst();
             if (methods.size() > 1) {
                 warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, context, type);
             }
@@ -654,7 +653,7 @@ public final class ConvertUtils {
                 if (methods.isEmpty()) {
                     continue;
                 }
-                firstMethod = methods.get(0);
+                firstMethod = methods.getFirst();
                 if (methods.size() > 1) {
                     warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, context, type);
                 }
@@ -694,7 +693,7 @@ public final class ConvertUtils {
             // check JsonValue field
             var fields = type.getEnclosedElements(ElementQuery.ALL_FIELDS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
             if (CollectionUtils.isNotEmpty(fields)) {
-                var firstField = fields.get(0);
+                var firstField = fields.getFirst();
                 ClassElement fieldType = firstField.getType();
                 if (isEnum(fieldType)) {
                     return checkEnumJsonValueType(context, (EnumElement) fieldType, null, null);
@@ -745,13 +744,10 @@ public final class ConvertUtils {
         } else if (Double.class.getName().equals(className)
             || double.class.getName().equals(className)) {
             return Pair.of(TYPE_NUMBER, "double");
-        } else if (isArray && (Byte.class.getName().equals(className)
-            || byte.class.getName().equals(className))) {
-            return Pair.of(TYPE_STRING, "byte");
             // swagger doesn't support type byte
         } else if (Byte.class.getName().equals(className)
             || byte.class.getName().equals(className)) {
-            return Pair.of(TYPE_INTEGER, "int32");
+            return isArray ? Pair.of(TYPE_STRING, "byte") : Pair.of(TYPE_INTEGER, "int32");
         } else if (BigDecimal.class.getName().equals(className)) {
             return Pair.of(TYPE_NUMBER, null);
         } else if (URI.class.getName().equals(className)) {

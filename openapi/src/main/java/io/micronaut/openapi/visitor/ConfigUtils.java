@@ -1368,14 +1368,14 @@ public final class ConfigUtils {
 
         var configuration = new ApplicationContextConfiguration() {
             @Override
-            public Optional<MutableConversionService> getConversionService() {
+            public @NonNull Optional<MutableConversionService> getConversionService() {
                 var conversionService = new DefaultMutableConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
                 return Optional.of(conversionService);
             }
 
             @Override
-            public ClassPathResourceLoader getResourceLoader() {
+            public @NonNull ClassPathResourceLoader getResourceLoader() {
                 var classLoader = ApplicationContextConfiguration.class.getClassLoader();
                 if (classLoader == null) {
                     classLoader = Thread.currentThread().getContextClassLoader();
