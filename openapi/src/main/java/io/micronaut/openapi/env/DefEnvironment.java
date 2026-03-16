@@ -56,9 +56,9 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyCatalog;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.inject.BeanConfiguration;
+import io.micronaut.inject.visitor.VisitorContext;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -86,6 +86,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static io.micronaut.openapi.visitor.ContextUtils.info;
+
 /**
  * <p>The default implementation of the {@link Environment} interface. Configures a named environment.</p>
  *
@@ -94,9 +96,8 @@ import java.util.stream.Stream;
  * @since 1.0
  */
 @Internal
-public class DefaultEnvironment implements Environment, PropertyResolverDelegate {
+public class DefEnvironment implements Environment, PropertyResolverDelegate {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultEnvironment.class);
     private static final String FILE_SEPARATOR = ",";
     private static final List<String> DEFAULT_CONFIG_LOCATIONS = Arrays.asList("classpath:/", "file:config/");
     private static final String ENV_PROPERTY_SOURCES_KEY = "MICRONAUT_CONFIG_FILES";
@@ -130,6 +131,7 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
 
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final AtomicBoolean reading = new AtomicBoolean(false);
+    private VisitorContext context;
 
     // For configuration maps, sets with low access - it's enough to use Collections.synchronized
 
@@ -137,14 +139,12 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
      * Construct a new environment for the given configuration.
      *
      * @param configuration The configuration
-     * @param logEnabled flag to enable or disable logger
+     * @param context Visitor context
      */
-    public DefaultEnvironment(ApplicationContextConfiguration configuration, boolean logEnabled) {
+    public DefEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
         MutableConversionService conversionService = configuration.getConversionService().orElseGet(MutableConversionService::create);
-        this.propertyPlaceholderResolver = new PropertySourcePropertyResolver(
-            conversionService,
-            logEnabled
-        );
+        this.context = context;
+        this.propertyPlaceholderResolver = new PropertySourcePropertyResolver(conversionService);
         this.applicationName = configuration.getApplicationName();
         if (applicationName.isBlank()) {
             throw new ConfigurationException("Application name cannot be blank");
@@ -155,7 +155,7 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
         this.resourceLoader = configuration.getResourceLoader();
         this.classLoader = configuration.getClassLoader();
         this.annotationScanner = new BeanIntrospectionScanner();
-        var deducer = new DefaultEnvironmentAndPackageDeducer(LOG, configuration);
+        var deducer = new DefaultEnvironmentAndPackageDeducer(configuration);
         EnvironmentNamesDeducer environmentNamesDeducer = configuration.getEnvironmentNamesDeducer();
         if (environmentNamesDeducer == null) {
             environmentNamesDeducer = deducer;
@@ -166,19 +166,17 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
         }
         this.names = environmentNamesDeducer.deduceEnvironmentNames();
         if (!names.isEmpty()) {
-            LOG.info("Established active environments: {}", names);
+            info("Established active environments: " + names, context);
         }
         this.packages.addAll(packagesDeducer.deducePackages());
-        List<String> configLocations = configuration.getOverrideConfigLocations() == null
-            ? new ArrayList<>(DEFAULT_CONFIG_LOCATIONS)
-            : new ArrayList<>(configuration.getOverrideConfigLocations());
+        var configLocations = new ArrayList<>(configuration.getOverrideConfigLocations() == null ? DEFAULT_CONFIG_LOCATIONS : configuration.getOverrideConfigLocations());
         // Search config locations in reverse order
         Collections.reverse(configLocations);
         this.configLocations = configLocations;
     }
 
     @Override
-    public PropertyResolver delegate() {
+    public @NonNull PropertyResolver delegate() {
         return propertyResolver;
     }
 
@@ -214,7 +212,7 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
     }
 
     @Override
-    public DefaultEnvironment addPropertySource(PropertySource propertySource) {
+    public DefEnvironment addPropertySource(PropertySource propertySource) {
         internalAddPropertySource(propertySource);
         if (isRunning() && !reading.get()) {
             propertyPlaceholderResolver.resetCaches();
@@ -274,7 +272,6 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
     @Override
     public Environment start() {
         if (running.compareAndSet(false, true)) {
-            LOG.debug("Starting environment {} for active names {}", this, getActiveNames());
             readProperties();
         }
         return this;
@@ -398,7 +395,6 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
     }
 
     private void internalProcessPropertySource(PropertySource propertySource) {
-        LOG.debug("Processing property source: {} convention: {}", propertySource.getName(), propertySource.getConvention());
         propertyPlaceholderResolver.processPropertySource(propertySource, propertySource.getConvention());
     }
 
@@ -424,7 +420,6 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
             String fileName = NameUtils.filename(filePath);
             PropertySourceLoader propertySourceLoader = loaderByFormatMap.get(extension);
             if (propertySourceLoader != null) {
-                LOG.debug("Reading property sources from loader: {}", propertySourceLoader);
                 Optional<Map<String, Object>> properties = readPropertiesFromLoader(fileName, filePath, propertySourceLoader);
                 if (properties.isPresent()) {
                     propertySources.add(PropertySource.of(filePath, properties.get(), order));
@@ -471,7 +466,6 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
             loadPropertySourceFromLoader(name, new PropertiesPropertySourceLoader(), propertySources, resourceLoader);
         } else {
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
-                LOG.debug("Reading property sources from loader: {}", propertySourceLoader);
                 loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
             }
         }
@@ -499,7 +493,7 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
 
     @Override
     public Optional<PropertyEntry> getPropertyEntry(String name) {
-        for (PropertyCatalog propertyCatalog : PropertyCatalog.values()) {
+        for (var propertyCatalog : PropertyCatalog.values()) {
             Map<String, DefaultPropertyEntry> entries = propertyPlaceholderResolver.resolveEntriesForKey(name, false, propertyCatalog);
             if (entries != null) {
                 DefaultPropertyEntry entry = entries.get(name);
@@ -672,9 +666,7 @@ public class DefaultEnvironment implements Environment, PropertyResolverDelegate
                     orderedUrls = orderByArtifactPatterns(urls, strategy.mergeOrder());
                 }
 
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Merging configuration resources '{}' in order: {}", fileExt, orderedUrls);
-                }
+                info("Merging configuration resources '" + fileExt + "' in order: " + orderedUrls, context);
 
                 Map<String, Object> mergedMap = new LinkedHashMap<>(64);
                 for (URL url : orderedUrls) {

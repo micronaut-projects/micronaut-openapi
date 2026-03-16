@@ -49,7 +49,6 @@ import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
 import io.micronaut.openapi.annotation.OpenAPIRequest;
 import io.micronaut.openapi.javadoc.JavadocDescription;
@@ -1203,29 +1202,27 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             } else {
                 try {
                     Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
+                    Map<CharSequence, Object> target = Utils.getConvertMapper().convertValue(newParameter, MAP_TYPE);
                     if (v == null) {
-                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                         for (CharSequence name : paramValues.keySet()) {
                             Object o = paramValues.get(name.toString());
                             if (o != null) {
                                 target.put(name.toString(), o);
                             }
                         }
-                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     } else {
                         // horrible hack because Swagger
                         // ParameterDeserializer breaks updating
                         // existing objects
-                        BeanMap<Parameter> beanMap = BeanMap.of(v);
-                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                        var beanMap = BeanMap.of(v);
                         for (CharSequence name : beanMap.keySet()) {
                             Object o = beanMap.get(name.toString());
                             if (o != null) {
                                 target.put(name.toString(), o);
                             }
                         }
-                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     }
+                    newParameter = Utils.getConvertMapper().convertValue(target, Parameter.class);
                 } catch (JacksonException e) {
                     warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }

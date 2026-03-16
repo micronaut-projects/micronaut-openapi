@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Encoding
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 
 class OpenApiEncodingSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -169,7 +168,6 @@ class MyBean {}
         operation.requestBody.content."multipart/form-data".encoding."template".contentType == "application/octet-stream"
     }
 
-    @Ignore
     void "test build OpenAPI complex encoding block"() {
 
         when:

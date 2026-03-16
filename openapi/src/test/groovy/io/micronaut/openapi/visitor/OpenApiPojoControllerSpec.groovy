@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
@@ -7,7 +8,6 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
@@ -1586,7 +1586,6 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
-    @Ignore
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:

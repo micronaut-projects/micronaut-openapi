@@ -37,9 +37,6 @@ import io.micronaut.core.value.PropertyCatalog;
 import io.micronaut.core.value.PropertyResolver;
 import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.NOPLogger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,8 +89,6 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
     private final @Nullable Map<String, DefaultPropertyEntry>[] rawCatalog = new Map[58];
     private final @Nullable Map<String, DefaultPropertyEntry>[] nonGenerated = new Map[58];
 
-    private final Logger log;
-
     private final Map<String, Boolean> containsCache = new ConcurrentHashMap<>(20);
     /**
      * Cache for values <i>before</i> conversion. This avoids recomputing placeholders, which keeps
@@ -110,21 +105,10 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
      * Creates a new, initially empty, {@link PropertySourcePropertyResolver} for the given {@link ConversionService}.
      *
      * @param conversionService The {@link ConversionService}
-     * @param logEnabled flag to enable or disable logger
-     */
-    public PropertySourcePropertyResolver(ConversionService conversionService, boolean logEnabled) {
-        this.log = logEnabled ? LoggerFactory.getLogger(getClass()) : NOPLogger.NOP_LOGGER;
-        this.conversionService = conversionService;
-        this.propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(this, conversionService);
-    }
-
-    /**
-     * Creates a new, initially empty, {@link PropertySourcePropertyResolver} for the given {@link ConversionService}.
-     *
-     * @param conversionService The {@link ConversionService}
      */
     public PropertySourcePropertyResolver(ConversionService conversionService) {
-        this(conversionService, true);
+        this.conversionService = conversionService;
+        this.propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(this, conversionService);
     }
 
     /**
@@ -173,7 +157,7 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
     }
 
     private Map<String, Object> diffCatalog(@Nullable Map<String, DefaultPropertyEntry>[] original, @Nullable Map<String, DefaultPropertyEntry>[] newCatalog) {
-        Map<String, Object> changes = new LinkedHashMap<>();
+        var changes = new LinkedHashMap<String, Object>();
         for (int i = 0; i < original.length; i++) {
             Map<String, DefaultPropertyEntry> map = original[i];
             Map<String, DefaultPropertyEntry> newMap = newCatalog[i];
@@ -190,7 +174,7 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
             }
         }
         if (!changes.isEmpty()) {
-            Map<String, Object> placeholdersAltered = new LinkedHashMap<>();
+            var placeholdersAltered = new LinkedHashMap<String, Object>();
             for (Map<String, DefaultPropertyEntry> map :
                 newCatalog) {
                 if (map != null) {
@@ -214,7 +198,7 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
         Map<String, DefaultPropertyEntry> map,
         Map<String, DefaultPropertyEntry> newMap,
         Map<String, Object> changes) {
-        Map<String, DefaultPropertyEntry> remainingMap = new LinkedHashMap<>(map);
+        var remainingMap = new LinkedHashMap<String, DefaultPropertyEntry>(map);
         for (Map.Entry<String, DefaultPropertyEntry> entry : newMap.entrySet()) {
             String key = entry.getKey();
             Object newValue = entry.getValue().value();
@@ -516,14 +500,6 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
                     converted = conversionService.convert(value, conversionContext);
                 }
 
-                if (log.isTraceEnabled()) {
-                    if (converted.isPresent()) {
-                        log.trace("Resolved value [{}] for property: {}", converted.get(), name);
-                    } else {
-                        log.trace("Resolved value [{}] cannot be converted to type [{}] for property: {}", value, conversionContext.getArgument(), name);
-                    }
-                }
-
                 if (cacheableType) {
                     resolvedValueCache.put(cacheKey, converted.orElse((T) NO_VALUE));
                 }
@@ -546,8 +522,6 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
                 return Optional.of((T) new MapPropertyResolver(subMap, conversionService));
             }
         }
-
-        log.trace("No value found for property: {}", name);
 
         if (Properties.class.isAssignableFrom(requiredType)) {
             return Optional.of((T) new Properties());
@@ -707,8 +681,6 @@ public class PropertySourcePropertyResolver implements PropertyResolver, AutoClo
     protected void processPropertySource(PropertySource properties, PropertySource.PropertyConvention convention) {
         synchronized (catalog) {
             for (String property : properties) {
-
-                log.trace("Processing property key {}", property);
 
                 Object value = properties.get(property);
 

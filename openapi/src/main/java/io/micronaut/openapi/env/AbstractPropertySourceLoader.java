@@ -24,9 +24,7 @@ import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.order.Ordered;
 import io.micronaut.core.util.Toggleable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.NOPLogger;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,16 +46,6 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
      * Default position for the property source loader.
      */
     public static final int DEFAULT_POSITION = EnvironmentPropertySource.POSITION - 100;
-
-    protected Logger log;
-
-    protected AbstractPropertySourceLoader() {
-        this(true);
-    }
-
-    protected AbstractPropertySourceLoader(boolean logEnabled) {
-        log = logEnabled ? LoggerFactory.getLogger(getClass()) : NOPLogger.NOP_LOGGER;
-    }
 
     @Override
     public int getOrder() {
@@ -108,7 +96,7 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
             }
 
             @Override
-            public Origin getOrigin() {
+            public @NonNull Origin getOrigin() {
                 return origin != null ? origin : super.getOrigin();
             }
         };
@@ -136,14 +124,11 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
     private Map<String, Object> loadProperties(ResourceLoader resourceLoader, String qualifiedName, String fileName) {
         Optional<InputStream> config = readInput(resourceLoader, fileName);
         if (config.isPresent()) {
-            log.debug("Found PropertySource for file name: {}", fileName);
             try (InputStream input = config.get()) {
                 return read(qualifiedName, input);
             } catch (IOException e) {
                 throw new ConfigurationException("I/O exception occurred reading [" + fileName + "]: " + e.getMessage(), e);
             }
-        } else {
-            log.debug("No PropertySource found for file name: {}", fileName);
         }
         return Collections.emptyMap();
     }
@@ -189,33 +174,4 @@ public abstract class AbstractPropertySourceLoader implements PropertySourceLoad
             }
         }
     }
-
-    /**
-     * Return logEnabled value.
-     *
-     * @return is log enabled
-     * @since 3.9.0
-     * @deprecated don't need to have this method
-     */
-    @Deprecated
-    public boolean isLogEnabled() {
-        return !(log instanceof NOPLogger);
-    }
-
-    /**
-     * Setter for logEnabled.
-     *
-     * @param logEnabled is log enabled
-     * @since 3.9.0
-     * @deprecated set logEnabled value by constructor
-     */
-    @Deprecated
-    public void setLogEnabled(boolean logEnabled) {
-        if (logEnabled) {
-            log = LoggerFactory.getLogger(getClass());
-        } else {
-            log = NOPLogger.NOP_LOGGER;
-        }
-    }
-
 }

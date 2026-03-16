@@ -32,6 +32,7 @@ dependencies {
     testImplementation(projects.micronautOpenapiAdoc)
     testImplementation(mnSession.micronaut.session)
     testImplementation(mn.micronaut.management)
+    testImplementation(mn.micronaut.inject.kotlin)
     testImplementation(mn.micronaut.inject.kotlin.test)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java.test)

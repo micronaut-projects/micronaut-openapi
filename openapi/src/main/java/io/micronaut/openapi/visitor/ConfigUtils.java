@@ -30,7 +30,6 @@ import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.env.AnnProcessorEnvironment;
 import io.micronaut.openapi.javadoc.DocsFormat;
 import io.micronaut.openapi.visitor.group.GroupProperties;
@@ -1021,7 +1020,7 @@ public final class ConfigUtils {
             return Collections.emptyMap();
         }
         try {
-            return OpenApiUtils.getConvertJsonMapper().readValue(value, TYPE_EXTENSIONS);
+            return Utils.getConvertMapper().readValue(value, TYPE_EXTENSIONS);
         } catch (JacksonException e) {
             warn("Fail to parse " + TYPE_EXTENSIONS.getType().toString() + ": " + value + " - " + e.getMessage(), context);
         }
@@ -1041,7 +1040,7 @@ public final class ConfigUtils {
             return Collections.emptyList();
         }
         try {
-            return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
+            return Utils.getConvertMapper().readValue(s, typeReference);
         } catch (JacksonException e) {
             warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
         }

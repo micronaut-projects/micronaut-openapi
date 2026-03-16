@@ -26,8 +26,8 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -92,7 +92,6 @@ final class DefaultEnvironmentAndPackageDeducer implements EnvironmentNamesDeduc
     private static final String ORACLE_CLOUD_WINDOWS_ASSET_TAG_CMD = "wmic systemenclosure get smbiosassettag";
     private static final String DO_SYS_VENDOR_FILE = "/sys/devices/virtual/dmi/id/sys_vendor";
 
-    private final Logger log;
     private final ApplicationContextConfiguration configuration;
     @Nullable
     private final Boolean deduceEnvironments;
@@ -101,27 +100,26 @@ final class DefaultEnvironmentAndPackageDeducer implements EnvironmentNamesDeduc
     @Nullable
     private String packageName;
 
-    public DefaultEnvironmentAndPackageDeducer(Logger log, ApplicationContextConfiguration configuration) {
-        this.log = log;
+    public DefaultEnvironmentAndPackageDeducer(ApplicationContextConfiguration configuration) {
         this.configuration = configuration;
         this.deduceEnvironments = configuration.getDeduceEnvironments().orElse(null);
     }
 
     @Override
-    public Set<String> deduceEnvironmentNames() {
+    public @NonNull Set<String> deduceEnvironmentNames() {
         deduce();
         return Objects.requireNonNull(environments);
     }
 
     @Override
-    public List<String> deducePackages() {
+    public @NonNull List<String> deducePackages() {
         deduce();
         return packageName == null ? List.of() : List.of(packageName);
     }
 
     private synchronized void deduce() {
         if (environments == null) {
-            List<String> envEnvironments = new ArrayList<>();
+            var envEnvironments = new ArrayList<String>();
             for (String values : Arrays.asList(CachedEnvironment.getProperty(ENVIRONMENTS_PROPERTY), CachedEnvironment.getenv(ENVIRONMENTS_ENV))) {
                 if (StringUtils.isNotEmpty(values)) {
                     for (String string : StringUtils.splitOmitEmptyStrings(values, ',')) {
@@ -162,7 +160,6 @@ final class DefaultEnvironmentAndPackageDeducer implements EnvironmentNamesDeduc
      */
     private boolean shouldDeduceEnvironments() {
         if (deduceEnvironments != null) {
-            log.debug("Environment deduction was set explicitly via builder to: {}", deduceEnvironments);
             return deduceEnvironments;
         }
         if (configuration.isEnableDefaultPropertySources()) {
@@ -170,17 +167,11 @@ final class DefaultEnvironmentAndPackageDeducer implements EnvironmentNamesDeduc
             String deduceEnv = CachedEnvironment.getenv(Environment.DEDUCE_ENVIRONMENT_ENV);
 
             if (StringUtils.isNotEmpty(deduceEnv)) {
-                boolean deduce = Boolean.parseBoolean(deduceEnv);
-                log.debug("Environment deduction was set via environment variable to: {}", deduce);
-                return deduce;
+                return Boolean.parseBoolean(deduceEnv);
             } else if (StringUtils.isNotEmpty(deduceProperty)) {
-                boolean deduce = Boolean.parseBoolean(deduceProperty);
-                log.debug("Environment deduction was set via system property to: {}", deduce);
-                return deduce;
+                return Boolean.parseBoolean(deduceProperty);
             }
-            boolean deduceDefault = DEDUCE_ENVIRONMENT_DEFAULT;
-            log.debug("Environment deduction is using the default of: {}", deduceDefault);
-            return deduceDefault;
+            return DEDUCE_ENVIRONMENT_DEFAULT;
         }
         return false;
     }
@@ -191,15 +182,11 @@ final class DefaultEnvironmentAndPackageDeducer implements EnvironmentNamesDeduc
     private boolean shouldDeduceCloudEnvironment() {
         String deduceEnv = CachedEnvironment.getenv(Environment.DEDUCE_CLOUD_ENVIRONMENT_ENV);
         if (StringUtils.isNotEmpty(deduceEnv)) {
-            boolean deduce = Boolean.parseBoolean(deduceEnv);
-            log.debug("Cloud environment deduction was set via environment variable to: {}", deduce);
-            return deduce;
+            return Boolean.parseBoolean(deduceEnv);
         }
         String deduceProperty = CachedEnvironment.getProperty(Environment.DEDUCE_CLOUD_ENVIRONMENT_PROPERTY);
         if (StringUtils.isNotEmpty(deduceProperty)) {
-            boolean deduce = Boolean.parseBoolean(deduceProperty);
-            log.debug("Cloud environment deduction was set via system property to: {}", deduce);
-            return deduce;
+            return Boolean.parseBoolean(deduceProperty);
         }
         return configuration.isDeduceCloudEnvironment();
     }

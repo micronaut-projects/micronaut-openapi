@@ -46,7 +46,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @since 4.5.0
  */
-public class AnnProcessorEnvironment extends DefaultEnvironment {
+public class AnnProcessorEnvironment extends DefEnvironment {
 
     private final List<String> annotationProcessingConfigLocations;
     private String projectResourcesPath;
@@ -59,7 +59,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
      * @param context visitor context
      */
     public AnnProcessorEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
-        super(configuration, false);
+        super(configuration, context);
 
         annotationProcessingConfigLocations = new ArrayList<>();
 

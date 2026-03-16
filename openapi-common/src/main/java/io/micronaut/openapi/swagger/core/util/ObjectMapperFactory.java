@@ -79,6 +79,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationConfig;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.cfg.MapperBuilder;
+import tools.jackson.databind.introspect.DefaultAccessorNamingStrategy;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.ser.ValueSerializerModifier;
@@ -227,6 +228,8 @@ public class ObjectMapperFactory {
             .enable(MapperFeature.USE_GETTERS_AS_SETTERS)
             .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .accessorNaming(new DefaultAccessorNamingStrategy.Provider()
+                .withFirstCharAcceptance(true, true))
             .changeDefaultPropertyInclusion(incl -> incl
                 .withValueInclusion(Include.NON_NULL)
                 .withContentInclusion(Include.NON_NULL)
@@ -256,6 +259,8 @@ public class ObjectMapperFactory {
             .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
             .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            .accessorNaming(new DefaultAccessorNamingStrategy.Provider()
+                .withFirstCharAcceptance(true, true))
             .changeDefaultPropertyInclusion(incl -> incl
                 .withValueInclusion(Include.NON_NULL)
                 .withContentInclusion(Include.NON_NULL)

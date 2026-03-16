@@ -52,7 +52,6 @@ import io.micronaut.inject.ast.PropertyElementQuery;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -1354,7 +1353,7 @@ public final class SchemaDefinitionUtils {
                                                         type = SchemaUtils.getType(type, new HashSet<>(Arrays.asList((String[]) headerSchema.get(PROP_ONE_TYPES))));
                                                     }
                                                 }
-                                                var headerExampleStr = OpenApiUtils.getConvertJsonMapper().writeValueAsString(headerExample);
+                                                var headerExampleStr = Utils.getConvertMapper().writeValueAsString(headerExample);
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));

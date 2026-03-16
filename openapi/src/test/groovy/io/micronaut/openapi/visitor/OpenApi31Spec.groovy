@@ -4,10 +4,8 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 import spock.util.environment.RestoreSystemProperties
 
-@Ignore
 class OpenApi31Spec extends AbstractOpenApiTypeElementSpec {
 
     @RestoreSystemProperties

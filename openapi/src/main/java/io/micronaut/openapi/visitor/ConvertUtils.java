@@ -29,7 +29,6 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
@@ -834,7 +833,7 @@ public final class ConvertUtils {
                 }
             } else if (TYPE_OBJECT.equals(type) || type == null) {
                 try {
-                    return OpenApiUtils.getConvertJsonMapper().readValue(valueStr, Map.class);
+                    return Utils.getConvertMapper().readValue(valueStr, Map.class);
                 } catch (Exception e) {
                     // do nothing
                 }

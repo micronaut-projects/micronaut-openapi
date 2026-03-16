@@ -19,6 +19,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
+import tools.jackson.databind.BeanProperty;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ValueDeserializer;
@@ -43,5 +44,10 @@ public class OpenAPI31Deserializer extends StdDeserializer<OpenAPI> {
     @Override
     public void resolve(DeserializationContext ctxt) throws DatabindException {
         defaultDeserializer.resolve(ctxt);
+    }
+
+    @Override
+    public ValueDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
+        return defaultDeserializer.createContextual(ctxt, property);
     }
 }
