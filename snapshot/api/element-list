@@ -5,6 +5,7 @@ io.micronaut.openapi.adoc.utils
 io.micronaut.openapi.annotation
 io.micronaut.openapi.annotation.mappers
 io.micronaut.openapi.annotation.transformers
+io.micronaut.openapi.generator
 io.micronaut.openapi.info
 io.micronaut.openapi.introspections
 io.micronaut.openapi.javadoc
@@ -17,3 +18,4 @@ io.micronaut.openapi.visitor
 io.micronaut.openapi.visitor.group
 io.micronaut.openapi.visitor.management
 io.micronaut.openapi.visitor.security
+org.openapitools.codegen
