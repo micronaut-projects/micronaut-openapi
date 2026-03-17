@@ -1300,8 +1300,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 public class CustomUserParameter {
                 }
                 """,
-                true,
-                false
+                true
             )
         );
 

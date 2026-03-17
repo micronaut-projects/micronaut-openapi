@@ -163,7 +163,7 @@ public abstract class AbstractMicronautCodegenTest {
             var pathStr = p.toString();
             return bfa.isRegularFile() && (pathStr.endsWith(".java") || pathStr.endsWith(".kt"));
         })) {
-            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile(), false)));
+            files.forEach(path -> sourceFiles.add(SourceFile.Companion.fromPath(path.toFile())));
         } catch (IOException e) {
             fail(e.getMessage(), e);
         }

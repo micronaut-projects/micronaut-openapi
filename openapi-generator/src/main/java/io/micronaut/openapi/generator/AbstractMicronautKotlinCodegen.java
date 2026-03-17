@@ -15,8 +15,8 @@
  */
 package io.micronaut.openapi.generator;
 
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
@@ -112,6 +112,7 @@ import static io.micronaut.openapi.generator.Extension.EXT_TYPE;
 import static io.micronaut.openapi.generator.MicronautUtils.FLUX_CLASS_NAME;
 import static io.micronaut.openapi.generator.MicronautUtils.HTTP_STATUS_CLASS_NAME;
 import static io.micronaut.openapi.generator.MicronautUtils.MONO_CLASS_NAME;
+import static io.micronaut.openapi.generator.MicronautUtils.NON_NULLABLE_WRAPPER_TYPES;
 import static io.micronaut.openapi.generator.MicronautUtils.STATUS_ANNOTATION_CLASS_NAME;
 import static io.micronaut.openapi.generator.MicronautUtils.httpStatusConstName;
 import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT16;
@@ -2342,8 +2343,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 op.vendorExtensions.put("isReturnFlux", true);
             }
             originalReturnType = op.returnBaseType;
+            if (NON_NULLABLE_WRAPPER_TYPES.contains(typeName) && originalReturnType.endsWith("?")) {
+                originalReturnType = originalReturnType.substring(0, originalReturnType.length() - 1);
+            }
             newReturnType.isNullable = op.returnProperty.isNullable;
-            newReturnType.dataType = typeName + '<' + op.returnBaseType + '>';
+            newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty.items;
         } else {
             originalReturnType = op.returnType;
@@ -2351,6 +2355,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 originalReturnType = "Void";
                 op.returnProperty = new CodegenProperty();
                 op.returnProperty.dataType = "Void";
+            }
+            if (NON_NULLABLE_WRAPPER_TYPES.contains(typeName) && originalReturnType.endsWith("?")) {
+                originalReturnType = originalReturnType.substring(0, originalReturnType.length() - 1);
             }
             newReturnType.isNullable = op.returnProperty.isNullable;
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';

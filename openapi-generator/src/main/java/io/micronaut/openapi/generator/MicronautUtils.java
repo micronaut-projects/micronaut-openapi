@@ -17,6 +17,8 @@ package io.micronaut.openapi.generator;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.Set;
+
 /**
  * Utilities methods for micronaut generator.
  *
@@ -28,6 +30,8 @@ public final class MicronautUtils {
     public static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
     public static final String HTTP_STATUS_CLASS_NAME = "io.micronaut.http.HttpStatus";
     public static final String STATUS_ANNOTATION_CLASS_NAME = "io.micronaut.http.annotation.Status";
+
+    public static final Set<String> NON_NULLABLE_WRAPPER_TYPES = Set.of("Mono", "Flux", "HttpResponse");
 
     @Nullable
     public static String httpStatusConstName(String code) {

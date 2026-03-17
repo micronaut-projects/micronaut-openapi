@@ -3,7 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
-    includeBuild("build-logic")
 }
 
 dependencyResolutionManagement {
@@ -29,7 +28,7 @@ include(
     "openapi-annotations",
     "openapi-bom",
     "openapi-common",
-//    "openapi-generator",
+    "openapi-generator",
 //    "test-suite-client-generator-java",
 //    "test-suite-client-generator-kotlin-kapt",
 //    "test-suite-client-generator-kotlin-ksp",
