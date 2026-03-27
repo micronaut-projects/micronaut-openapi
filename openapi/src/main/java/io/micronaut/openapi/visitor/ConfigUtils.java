@@ -921,6 +921,7 @@ public final class ConfigUtils {
             if (className == null) {
                 continue;
             }
+            endpointProperties.setClassName(className);
             var classEl = ContextUtils.getClassElement(className, context);
             endpointProperties.setElement(classEl);
         }
@@ -1007,6 +1008,7 @@ public final class ConfigUtils {
                 break;
             case "class":
                 if (endpointProperties.getElement() == null) {
+                    endpointProperties.setClassName(valueStr);
                     endpointProperties.setElement(ContextUtils.getClassElement(valueStr, context));
                 }
                 break;

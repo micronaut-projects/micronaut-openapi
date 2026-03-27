@@ -54,6 +54,10 @@ public final class EndpointProperties {
      */
     private String contextPath;
     /**
+     * Fully qualified class name of the endpoint.
+     */
+    private String className;
+    /**
      * ClassElement of the endpoint.
      */
     private ClassElement element;
@@ -120,6 +124,14 @@ public final class EndpointProperties {
 
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public void setElement(ClassElement element) {
