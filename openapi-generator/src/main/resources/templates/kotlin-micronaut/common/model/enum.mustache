@@ -53,21 +53,21 @@
             {{#deprecated}}
     @Deprecated("{{#enumDeprecatedMessageNormalized}}{{{.}}}{{/enumDeprecatedMessageNormalized}}")
             {{/deprecated}}
-    @JsonProperty({{{strValueNormalized}}})
+    {{#isUnknownDefaultCase}}@JsonEnumDefaultValue{{/isUnknownDefaultCase}}{{^isUnknownDefaultCase}}@JsonProperty({{{strValueNormalized}}}){{/isUnknownDefaultCase}}
     {{{name}}}({{{valueNormalized}}}),{{#-last}}
     ;{{/-last}}
         {{/formatNoEmptyLines}}
         {{/enumVars}}
     {{/allowableValues}}
 
-    override fun toString(): String = {{#isString}}value{{/isString}}{{^isString}}"$value"{{/isString}}
+    override fun toString(): String = {{#isString}}value{{/isString}}{{^isString}}value.toString(){{/isString}}
 
     companion object {
 
     {{#javaCompatibility}}
         @JvmField
     {{/javaCompatibility}}
-        val VALUE_MAPPING = entries.associateBy { it.value{{#isString}}{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}}{{/isString}} }
+        val VALUE_MAPPING = entries{{#enumUnknownDefaultCase}}.filter { it != {{{enumUnknownDefaultCaseEnumName}}} }{{/enumUnknownDefaultCase}}.associateBy { it.value{{#isString}}{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}}{{/isString}} }
 
         /**
          * Create this enum from a value.
@@ -84,20 +84,8 @@
             {{#isString}}{{#useEnumCaseInsensitive}}
             val key = value.lowercase()
             {{/useEnumCaseInsensitive}}{{/isString}}
-            {{^isNullable}}
-                {{#isString}}
-                    {{#useEnumCaseInsensitive}}
-            require(VALUE_MAPPING.containsKey(key)) { "Unexpected value '$key'" }
-                    {{/useEnumCaseInsensitive}}
-                    {{^useEnumCaseInsensitive}}
-            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
-                    {{/useEnumCaseInsensitive}}
-                {{/isString}}
-                {{^isString}}
-            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
-                {{/isString}}
-            {{/isNullable}}
-            return VALUE_MAPPING[{{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}}]{{^isNullable}}!!{{/isNullable}}
+            return VALUE_MAPPING[{{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}}]{{^isNullable}}
+                ?: {{#enumUnknownDefaultCase}}{{{enumUnknownDefaultCaseEnumName}}}{{/enumUnknownDefaultCase}}{{^enumUnknownDefaultCase}}throw IllegalArgumentException("Unexpected value '{{#isString}}{{#useEnumCaseInsensitive}}$key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}$value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}$value{{/isString}}'"){{/enumUnknownDefaultCase}}{{/isNullable}}
         }
 {{/formatNoEmptyLines}}
     }

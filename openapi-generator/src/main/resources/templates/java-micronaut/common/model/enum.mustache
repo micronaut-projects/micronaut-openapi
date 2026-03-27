@@ -52,7 +52,7 @@
             {{#deprecated}}
     @Deprecated
             {{/deprecated}}
-    @JsonProperty({{{strValue}}})
+    {{#isUnknownDefaultCase}}@JsonEnumDefaultValue{{/isUnknownDefaultCase}}{{^isUnknownDefaultCase}}@JsonProperty({{{strValue}}}){{/isUnknownDefaultCase}}
     {{{name}}}({{{value}}}),{{#-last}}
     ;{{/-last}}
         {{/formatNoEmptyLines}}
@@ -60,6 +60,7 @@
     {{/allowableValues}}
 
     {{#formatSingleLine}}public static final Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Map.copyOf(Arrays.stream(values()){{/formatSingleLine}}
+        {{#enumUnknownDefaultCase}}.filter(v -> v != {{{enumUnknownDefaultCaseEnumName}}}){{/enumUnknownDefaultCase}}
         .collect(Collectors.toMap(v -> v.value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, Function.identity())));
 
     private final {{{vendorExtensions.baseType}}} value;
@@ -100,23 +101,14 @@
         var key = value.toLowerCase();
         {{/useEnumCaseInsensitive}}{{/isString}}
         {{^isNullable}}
-            {{#isString}}
-                {{#useEnumCaseInsensitive}}
-        if (!VALUE_MAPPING.containsKey(key)) {
-            throw new IllegalArgumentException("Unexpected value '" + key + "'");
+        if (!VALUE_MAPPING.containsKey({{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}})) {
+            {{#enumUnknownDefaultCase}}
+            return {{{enumUnknownDefaultCaseEnumName}}};
+            {{/enumUnknownDefaultCase}}
+            {{^enumUnknownDefaultCase}}
+            throw new IllegalArgumentException("Unexpected value '" + {{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}} + "'");
+            {{/enumUnknownDefaultCase}}
         }
-                {{/useEnumCaseInsensitive}}
-                {{^useEnumCaseInsensitive}}
-        if (!VALUE_MAPPING.containsKey(value)) {
-            throw new IllegalArgumentException("Unexpected value '" + value + "'");
-        }
-                {{/useEnumCaseInsensitive}}
-            {{/isString}}
-            {{^isString}}
-        if (!VALUE_MAPPING.containsKey(value)) {
-            throw new IllegalArgumentException("Unexpected value '" + value + "'");
-        }
-            {{/isString}}
         {{/isNullable}}
         return VALUE_MAPPING.get({{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}});
 {{/formatNoEmptyLines}}
