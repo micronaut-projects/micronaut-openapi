@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor.management;
 
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.inject.ast.ClassElement;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -57,10 +56,6 @@ public final class EndpointProperties {
      * Fully qualified class name of the endpoint.
      */
     private String className;
-    /**
-     * ClassElement of the endpoint.
-     */
-    private ClassElement element;
     /**
      * Description to add to the Endpoint entry in the spec file.
      */
@@ -134,15 +129,7 @@ public final class EndpointProperties {
         this.className = className;
     }
 
-    public void setElement(ClassElement element) {
-        this.element = element;
-    }
-
-    public ClassElement getElement() {
-        return element;
-    }
-
-    public String getDescription() {
+public String getDescription() {
         return description;
     }
 
@@ -189,7 +176,7 @@ public final class EndpointProperties {
             ", enabled=" + enabled +
             ", sensitive=" + sensitive +
             ", path='" + path + '\'' +
-            ", element=" + element +
+            ", className='" + className + '\'' +
             ", description='" + description + '\'' +
             ", extensions=" + extensions +
             ", tags=" + tags +

@@ -914,7 +914,7 @@ public final class ConfigUtils {
                 endpointProperties = new EndpointProperties(endpointName);
                 endpointPropertiesMap.put(endpointName, endpointProperties);
             }
-            if (endpointProperties.getElement() != null) {
+            if (endpointProperties.getClassName() != null) {
                 continue;
             }
             var className = entry.getValue();
@@ -922,8 +922,6 @@ public final class ConfigUtils {
                 continue;
             }
             endpointProperties.setClassName(className);
-            var classEl = ContextUtils.getClassElement(className, context);
-            endpointProperties.setElement(classEl);
         }
 
         return endpointPropertiesMap;
@@ -1007,9 +1005,8 @@ public final class ConfigUtils {
                 endpointProperties.getTags().addAll(parseTags(valueStr));
                 break;
             case "class":
-                if (endpointProperties.getElement() == null) {
+                if (endpointProperties.getClassName() == null) {
                     endpointProperties.setClassName(valueStr);
-                    endpointProperties.setElement(ContextUtils.getClassElement(valueStr, context));
                 }
                 break;
             default:
