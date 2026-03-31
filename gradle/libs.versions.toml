@@ -2,8 +2,6 @@
 managed-swagger = "2.2.50"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.22.2"
-# deprecated, use managed-flexmark
-managed-html2md-converter = "0.64.8"
 managed-flexmark = "0.64.8"
 managed-parboiled = "1.4.1"
 managed-pegdown = "1.6.0"
@@ -60,8 +58,6 @@ managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
 
 managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "managed-javadoc-parser" }
-# deprecated, use managed-flexmark-html2md-converter
-managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
 managed-flexmark-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-flexmark" }
 managed-flexmark-profile-pegdown = { module = "com.vladsch.flexmark:flexmark-profile-pegdown", version.ref = "managed-flexmark" }
 
