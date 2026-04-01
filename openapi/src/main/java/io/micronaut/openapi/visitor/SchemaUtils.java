@@ -1723,7 +1723,6 @@ public final class SchemaUtils {
     @Nullable
     public static RequiredMode getReqMode(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         Boolean elementSchemaRequired = null;
-        boolean isAutoRequiredMode = true;
         boolean isRequiredDefaultValueSet = false;
         if (schemaAnn != null) {
             elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
@@ -1736,7 +1735,7 @@ public final class SchemaUtils {
                 return new RequiredMode(false, false, isRequiredDefaultValueSet);
             }
         }
-        return new RequiredMode(elementSchemaRequired, isAutoRequiredMode, isRequiredDefaultValueSet);
+        return new RequiredMode(elementSchemaRequired, true, isRequiredDefaultValueSet);
     }
 
     public static Schema<?> unwrapComposedSchema(Schema<?> schema) {
@@ -1749,6 +1748,13 @@ public final class SchemaUtils {
         return schema;
     }
 
+    /**
+     * Object helper to understand the required mode for schema properties.
+     *
+     * @param elementSchemaRequired value from annotation
+     * @param isAutoRequiredMode is auto-required mode
+     * @param isRequiredDefaultValueSet is required and the default value set
+     */
     public record RequiredMode(
         Boolean elementSchemaRequired,
         boolean isAutoRequiredMode,

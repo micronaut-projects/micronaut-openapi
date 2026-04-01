@@ -67,6 +67,7 @@ public interface OpenApiModelProp {
     String PROP_REQUIRED = "required";
     String PROP_REQUIRED_PROPERTIES = "requiredProperties";
     String PROP_ADDITIONAL_PROPERTIES = "additionalProperties";
+    String PROP_ADDITIONAL_PROPERTIES_SCHEMA = "additionalPropertiesSchema";
     String PROP_DISCRIMINATOR_PROPERTY = "discriminatorProperty";
     String PROP_DISCRIMINATOR_MAPPING = "discriminatorMapping";
     String PROP_DEPRECATED = "deprecated";
