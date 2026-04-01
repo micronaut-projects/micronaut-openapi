@@ -14,5 +14,5 @@ micronautBuild {
     }
 }
 dependencies {
-    implementation("io.micronaut:micronaut-module-info:5.0.0-M18")
+    implementation("io.micronaut:micronaut-module-info:5.0.0-M19")
 }
