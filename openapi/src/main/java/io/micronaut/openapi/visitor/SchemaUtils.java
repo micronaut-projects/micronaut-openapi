@@ -1749,6 +1749,13 @@ public final class SchemaUtils {
         return schema;
     }
 
+    /**
+     * Object helper to understand the required mode for schema properties.
+     *
+     * @param elementSchemaRequired value from annotation
+     * @param isAutoRequiredMode is auto-required mode
+     * @param isRequiredDefaultValueSet is required and the default value set
+     */
     public record RequiredMode(
         Boolean elementSchemaRequired,
         boolean isAutoRequiredMode,

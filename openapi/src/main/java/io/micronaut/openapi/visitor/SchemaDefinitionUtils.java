@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -2939,6 +2940,12 @@ public final class SchemaDefinitionUtils {
             if (isHiddenElement(publicField)) {
                 continue;
             }
+            if (isAnyGetterSetter(publicField)) {
+                if (schema.getAdditionalProperties() == null) {
+                    schema.setAdditionalProperties(true);
+                }
+                continue;
+            }
 
             var isGetterOverridden = false;
             JavadocDescription fieldJavadoc = null;
@@ -2965,7 +2972,10 @@ public final class SchemaDefinitionUtils {
                 }
             }
 
-            if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
+            if (
+                (publicField instanceof PropertyElement propEl && (propEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden))
+                    || (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden))
+            ) {
 
                 if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
@@ -2986,15 +2996,20 @@ public final class SchemaDefinitionUtils {
         }
     }
 
+    private static boolean isAnyGetterSetter(TypedElement elementType) {
+        var jsonAnyGetterAnn = getAnnotation(elementType, JsonAnyGetter.class);
+        var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
+        return (jsonAnyGetterAnn != null && jsonAnyGetterAnn.booleanValue(PROP_ENABLED).orElse(true))
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true));
+    }
+
     private static boolean isHiddenElement(TypedElement elementType) {
         boolean isHidden = getAnnotationMetadata(elementType)
             .booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_HIDDEN).orElse(false);
-        var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
         return elementType.getType().isAssignable(Class.class)
             || isAnnotationPresent(elementType, JsonIgnore.class)
             || isAnnotationPresent(elementType, JsonBackReference.class)
             || isAnnotationPresent(elementType, Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true))
             || isHidden;
     }
 
