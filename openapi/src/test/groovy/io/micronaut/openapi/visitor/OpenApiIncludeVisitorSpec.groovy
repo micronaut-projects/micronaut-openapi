@@ -82,14 +82,14 @@ class MyBean {}
         Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReference
+        var openApi = Utils.testReference
 
         then:
-        openAPI.info != null
+        openApi.info != null
         when:
 
-        PathItem helloPathItem = openAPI.paths.get("/hello")
-        PathItem loginPathItem = openAPI.paths.get("/login")
+        PathItem helloPathItem = openApi.paths.get("/hello")
+        PathItem loginPathItem = openApi.paths.get("/login")
 
         then:
         helloPathItem
@@ -105,10 +105,10 @@ class MyBean {}
         loginPathItem.post.requestBody.content['application/json'].schema
         loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
         loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
-        openAPI.components.schemas['UsernamePasswordCredentials']
-        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
-        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
-        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+        openApi.components.schemas['UsernamePasswordCredentials']
+        openApi.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openApi.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openApi.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
     void "test build OpenAPI doc for security Login controller with custom uris"() {

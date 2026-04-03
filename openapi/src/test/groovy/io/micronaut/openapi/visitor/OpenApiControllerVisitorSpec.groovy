@@ -1856,43 +1856,43 @@ class MyDto {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
+        var openApi = Utils.testReference
 
         then:
 
         // collection
         for (def i = 1; i < 8; i++) {
-            def operation = openAPI.paths.get("/endpoint1" + i).post
+            def operation = openApi.paths.get("/endpoint1" + i).post
             assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
         }
 
         // single
         for (def i = 1; i < 11; i++) {
-            def operation = openAPI.paths.get("/endpoint2" + i).post
+            def operation = openApi.paths.get("/endpoint2" + i).post
             assert operation.requestBody.content."application/json".schema.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
         }
 
         // optional primitives
 
-        def optInt = openAPI.paths."/optInt".post
+        def optInt = openApi.paths."/optInt".post
         optInt.requestBody.content."application/json".schema.type == 'integer'
         optInt.responses."200".content."application/json".schema.type == 'integer'
 
-        def optLong = openAPI.paths."/optLong".post
+        def optLong = openApi.paths."/optLong".post
         optLong.requestBody.content."application/json".schema.type == 'integer'
         optLong.requestBody.content."application/json".schema.format == 'int64'
         optLong.responses."200".content."application/json".schema.type == 'integer'
         optLong.responses."200".content."application/json".schema.format == 'int64'
 
-        def optDouble = openAPI.paths."/optDouble".post
+        def optDouble = openApi.paths."/optDouble".post
         optDouble.requestBody.content."application/json".schema.type == 'number'
         optDouble.requestBody.content."application/json".schema.format == 'double'
         optDouble.responses."200".content."application/json".schema.type == 'number'
         optDouble.responses."200".content."application/json".schema.format == 'double'
 
-        def myDto = openAPI.components.schemas.MyDto
+        def myDto = openApi.components.schemas.MyDto
         myDto.properties
         myDto.properties.field
         myDto.properties.field.type == 'string'
@@ -1946,8 +1946,8 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI?.paths?."/api/model"?.post
+        var openApi = Utils.testReference
+        Operation operation = openApi?.paths?."/api/model"?.post
 
         then:
         operation
@@ -1988,8 +1988,8 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI?.paths?."/api/model"?.post
+        var openApi = Utils.testReference
+        Operation operation = openApi?.paths?."/api/model"?.post
 
         then:
         operation
@@ -3736,5 +3736,99 @@ class MyBean {}
 
         deletedParam.schema.default instanceof Boolean
         deletedParam.schema.default == false
+    }
+
+    void "test controller interpretation - async and status codes java"() {
+        given:
+        buildBeanDefinition('test.AsyncController', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.*;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.concurrent.CompletableFuture;
+import io.micronaut.core.annotation.Introspected;
+import reactor.core.publisher.Flux;
+
+@Controller("/async")
+class AsyncController {
+
+    // 1. Reactive Single with custom success status (201 Created)
+    @Post("/single")
+    @Status(HttpStatus.CREATED)
+    public Single<SimpleDto> createSingle(@Body String name) {
+        return null;
+    }
+
+    // 2. CompletableFuture with explicit @ApiResponse and HttpResponse wrapper
+    @Get("/future/{id}")
+    @ApiResponse(responseCode = "200", description = "Success from Future")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    public CompletableFuture<HttpResponse<SimpleDto>> getFuture(String id) {
+        return null;
+    }
+
+    // 2. CompletableFuture with explicit @ApiResponse and HttpResponse wrapper
+    @Get("/future2/{id}")
+    @ApiResponse(responseCode = "200", description = "Success from Future")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    public Flux<SimpleDto> getFuture2(String id) {
+        return null;
+    }
+
+    // 3. Void return with No Content status (204)
+    @Delete("/empty")
+    @Status(HttpStatus.NO_CONTENT)
+    public void deleteEmpty() {
+    }
+}
+
+@Introspected
+class SimpleDto {
+    private String msg;
+    public String getMsg() { return msg; }
+    public void setMsg(String msg) { this.msg = msg; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Reactive Unwrapping (Single<SimpleDto>) ---
+        var singleOp = openApi.paths['/async/single'].post
+        // Status 201 from @Status(HttpStatus.CREATED)
+        singleOp.responses.containsKey('201')
+        var singleResponseSchema = singleOp.responses['201'].content['application/json'].schema
+        // Should unwrap Single and point directly to SimpleDto
+        singleResponseSchema.$ref == '#/components/schemas/SimpleDto'
+
+        // --- 2. Verify CompletableFuture & Path Parameters ---
+        var futureOp = openApi.paths['/async/future/{id}'].get
+        // In Java, path variables are always required in OpenAPI
+        var idParam = futureOp.parameters.find { it.name == 'id' }
+        idParam.in == 'path'
+        idParam.required == true
+
+        // Check @ApiResponse metadata
+        futureOp.responses.containsKey('200')
+        futureOp.responses['200'].description == "Success from Future"
+        futureOp.responses.containsKey('404')
+
+        // Response schema check (Unwrapping Future -> HttpResponse -> SimpleDto)
+        var futureResponseSchema = futureOp.responses['200'].content['application/json'].schema
+        futureResponseSchema.$ref == '#/components/schemas/SimpleDto'
+
+        // --- 3. Verify Void/No Content (204) ---
+        var deleteOp = openApi.paths['/async/empty'].delete
+        deleteOp.responses.containsKey('204')
+        // 204 No Content should have no content/schema defined
+        deleteOp.responses['204'].content == null
     }
 }
