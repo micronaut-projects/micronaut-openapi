@@ -3629,4 +3629,112 @@ class MyBean {}
         openApi.components.schemas.containsKey('SmsAuth')
         openApi.components.schemas.containsKey('PasswordAuth')
     }
+
+    @RestoreSystemProperties
+    void "test controller interpretation - java pojo query parameters and validation"() {
+        given:
+        // Set the naming strategy using the correct constant
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
+
+        buildBeanDefinition('test.SearchController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import jakarta.validation.constraints.*;
+
+@Introspected
+class SearchFilter {
+
+    @NotBlank
+    private String query;
+
+    /**
+     * Explicitly setting defaultValue in the annotation 
+     * so the processor can see it during compilation.
+     */
+    @Min(1)
+    @Max(100)
+    @QueryValue(defaultValue = "20")
+    private Integer pageSize;
+
+    /**
+     * Boolean defaultValue must be provided as a String "false".
+     * The processor must convert it to a Boolean instance.
+     */
+    @QueryValue(defaultValue = "false")
+    private boolean includeDeleted;
+
+    public String getQuery() { 
+        return query; 
+    }
+    public void setQuery(String query) { 
+        this.query = query; 
+    }
+
+    public Integer getPageSize() { 
+        return pageSize; 
+    }
+    public void setPageSize(Integer pageSize) { 
+        this.pageSize = pageSize; 
+    }
+
+    public boolean isIncludeDeleted() { 
+        return includeDeleted; 
+    }
+    public void setIncludeDeleted(boolean includeDeleted) { 
+        this.includeDeleted = includeDeleted; 
+    }
+}
+
+@Controller("/search")
+class SearchController {
+
+    /**
+     * POJO Aggregator: Micronaut will flatten this because 
+     * there's no explicit name in @QueryValue.
+     */
+    @Get("/list")
+    public String list(@QueryValue SearchFilter filter) {
+        return "searching...";
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // Back to idiomatic Groovy/Spock property access
+        var operation = openApi.paths['/search/list'].get
+        var parameters = operation.parameters
+
+        // 1. Verify Flattening (Aggregation)
+        parameters.size() == 3
+        parameters.every { it.in == 'query' }
+
+        // 2. Verify Naming Strategy (SNAKE_CASE)
+        var qParam = parameters.find { it.name == 'query' }
+        var sizeParam = parameters.find { it.name == 'page_size' }
+        var deletedParam = parameters.find { it.name == 'include_deleted' }
+
+        qParam != null
+        sizeParam != null
+        deletedParam != null
+
+        // 3. Verify Constraints
+        qParam.required == true
+        sizeParam.schema.minimum == 1
+        sizeParam.schema.maximum == 100
+
+        // 4. Verify Typed Default Values (Result of your convertDefaultValue logic)
+        sizeParam.schema.default instanceof Integer
+        sizeParam.schema.default == 20
+
+        deletedParam.schema.default instanceof Boolean
+        deletedParam.schema.default == false
+    }
 }

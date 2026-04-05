@@ -24,6 +24,7 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.CollectionUtils;
@@ -57,14 +58,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.time.temporal.Temporal;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
@@ -704,5 +712,58 @@ public final class ElementUtils {
             isExcluded = true;
         }
         return isExcluded;
+    }
+
+    /**
+     * Determines if the given parameter should be treated as an implicit query aggregator (POJO).
+     * Aggregators are complex @Introspected objects without an explicit name in @QueryValue.
+     * Scalar types (URI, URL, UUID, Dates, Numbers) and collections are strictly excluded.
+     *
+     * @param parameter The element to check (method parameter).
+     *
+     * @return true if the parameter is a single Introspected POJO to be flattened, false otherwise.
+     */
+    public static boolean isImplicitQueryAggregator(TypedElement parameter) {
+        if (!parameter.isAnnotationPresent(QueryValue.class)) {
+            return false;
+        }
+
+        // Explicit name in @QueryValue("name") means it's a single param, not an aggregator.
+        var explicitName = parameter.stringValue(QueryValue.class).orElse(null);
+        if (StringUtils.isNotEmpty(explicitName)) {
+            return false;
+        }
+
+        var type = parameter.getType();
+
+        // 1. Exclude fundamental types and their descendants
+        if (type.isPrimitive()
+            || type.isEnum()
+            || type.isAssignable(CharSequence.class)
+            || type.isAssignable(Character.class)) {
+            return false;
+        }
+
+        // 2. Exclude collections, arrays, and maps
+        if (type.isArray()
+            || type.isAssignable(Iterable.class)
+            || type.isAssignable(Map.class)) {
+            return false;
+        }
+
+        // 3. Exclude complex scalars that Micronaut binds from a single string
+        if (type.isAssignable(Number.class)
+            || type.isAssignable(Temporal.class)
+            || type.isAssignable(Date.class)
+            || type.isAssignable(UUID.class)
+            || type.isAssignable(URI.class)
+            || type.isAssignable(URL.class)
+            || type.isAssignable(Locale.class)
+            || type.isAssignable(TimeZone.class)) {
+            return false;
+        }
+
+        // 4. Aggregators must be annotated with @Introspected for compile-time access
+        return type.hasAnnotation(Introspected.class);
     }
 }

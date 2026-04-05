@@ -116,6 +116,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
+import static io.micronaut.openapi.visitor.ElementUtils.isImplicitQueryAggregator;
 import static io.micronaut.openapi.visitor.ElementUtils.isIterableOfMultipartFiles;
 import static io.micronaut.openapi.visitor.ElementUtils.isMapOfListOfMultipartFiles;
 import static io.micronaut.openapi.visitor.ElementUtils.isMapOfMultipartFiles;
@@ -908,6 +909,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
+        // Check if this @QueryValue is actually an implicit aggregator (POJO without name)
+        if (isImplicitQueryAggregator(parameter)) {
+            // We treat it exactly like a RequestBean, but specifically for Query parameters
+            processImplicitQueryAggregator(context, openApi, swaggerOperation, javadocDescription, consumesMediaTypes, swaggerParameters, parameter);
+            return;
+        }
+
         Parameter newParameter = processMethodParameterAnnotation(context, swaggerOperation, permitsRequestBody,
             pathVariables, queryParams, parameter, extraBodyParameters, httpMethod, matchTemplates);
         if (newParameter == null) {
@@ -1017,6 +1025,62 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     newParameter.getSchema().setPattern(paramPattern);
                 }
             }
+        }
+    }
+
+    /**
+     * Processes a POJO aggregator by iterating through its properties and adding each
+     * as an individual Swagger QueryParameter.
+     *
+     * @param context           The visitor context for logging and scanning.
+     * @param openApi           The root OpenAPI object to store schemas and components.
+     * @param swaggerOperation  The current Swagger Operation being processed.
+     * @param javadocDescription The parsed Javadoc for the controller method.
+     * @param consumesMediaTypes The list of supported media types.
+     * @param swaggerParameters  The list of existing parameters for the operation.
+     * @param parameter          The original method parameter (the POJO).
+     */
+    private void processImplicitQueryAggregator(VisitorContext context, OpenAPI openApi,
+                                                Operation swaggerOperation, JavadocDescription javadocDescription,
+                                                List<MediaType> consumesMediaTypes, List<Parameter> swaggerParameters,
+                                                TypedElement parameter) {
+        var parameterType = parameter.getType();
+        var properties = parameterType.getBeanProperties();
+
+        for (var property : properties) {
+            // Skip properties ignored by Jackson or Swagger annotations.
+            if (isIgnoredParameter(property)) {
+                continue;
+            }
+
+            var queryParam = new QueryParameter();
+
+            // Resolve name using the shared naming strategy.
+            // In Micronaut, it's consistent to use Jackson's naming for Query parameters.
+            String propertyName = resolveParameterName(property, context);
+            queryParam.setName(propertyName);
+
+            // Resolve and bind schema for the specific property type.
+            Schema<?> schema = resolveSchema(openApi, property, property.getType(), context, consumesMediaTypes, null, null, null, null);
+            if (schema != null) {
+                schema = bindSchemaForElement(context, property, property.getType(), schema, null, false, true);
+                queryParam.setSchema(schema);
+            }
+
+            // Set required flag based on nullability constraints (e.g., @NotNull or Kotlin non-null).
+            if (!isNullable(property) || isNotNullable(property)) {
+                queryParam.setRequired(true);
+            }
+
+            // Inherit description from Javadoc if property name matches.
+            if (javadocDescription != null && StringUtils.isEmpty(queryParam.getDescription())) {
+                CharSequence desc = javadocDescription.getParameters().get(property.getName());
+                if (desc != null) {
+                    queryParam.setDescription(desc.toString());
+                }
+            }
+
+            addSwaggerParameter(queryParam, swaggerParameters);
         }
     }
 
@@ -2029,5 +2093,37 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         UriMatchVariable var,
         String pattern
     ) {
+    }
+
+    /**
+     * Resolves the name of a parameter or property, taking into account naming strategies
+     * and explicit annotation overrides.
+     *
+     * @param element The element whose name is being resolved (field or property).
+     * @param context The visitor context to access global configuration properties.
+     *
+     * @return The resolved name as a String.
+     */
+    private String resolveParameterName(TypedElement element, VisitorContext context) {
+        // 1. Explicit name in @QueryValue has the highest priority
+        String explicitName = element.stringValue(QueryValue.class).orElse(null);
+        if (StringUtils.isNotEmpty(explicitName)) {
+            return explicitName;
+        }
+
+        // 2. Fallback to @Parameter(name = ...) if present
+        String parameterAnnName = element.stringValue(io.swagger.v3.oas.annotations.Parameter.class, "name").orElse(null);
+        if (StringUtils.isNotEmpty(parameterAnnName)) {
+            return parameterAnnName;
+        }
+
+        // 3. Apply global naming strategy retrieved via getPropertyNamingStrategy.
+        // This is the correct strategy for mapping POJO properties to Query parameters.
+        var namingStrategy = ConfigUtils.getPropertyNamingStrategy(context);
+        if (namingStrategy != null) {
+            return namingStrategy.translate(element.getName());
+        }
+
+        return element.getName();
     }
 }
