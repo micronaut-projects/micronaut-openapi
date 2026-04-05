@@ -40,7 +40,6 @@ import io.micronaut.http.annotation.RequestAttribute;
 import io.micronaut.http.annotation.RequestBean;
 import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -49,6 +48,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIRequest;
+import io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor.VarMetadata;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -233,8 +233,8 @@ public final class ElementUtils {
 
     public static boolean isExtraBodyParameter(@NonNull TypedElement parameter, boolean permitsRequestBody,
                                                List<UriMatchTemplate> matchTemplates,
-                                               Map<String, UriMatchVariable> pathVariables,
-                                               Map<String, UriMatchVariable> queryParams) {
+                                               Map<String, VarMetadata> pathVariables,
+                                               Map<String, VarMetadata> queryParams) {
 
         if (isWrappedBodyParameter(parameter)) {
             return false;

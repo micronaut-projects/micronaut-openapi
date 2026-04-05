@@ -3135,24 +3135,24 @@ class MyBean {}
 
         then:
         op1
-        var paramA = op1.parameters.find {it.name == 'a' }
+        var paramA = op1.parameters.find { it.name == 'a' }
         paramA
         paramA.name == 'a'
         paramA.schema.type == 'array'
         paramA.schema.items.type == 'string'
 
-        var paramB = op1.parameters.find {it.name == 'b' }
+        var paramB = op1.parameters.find { it.name == 'b' }
         paramB.name == 'b'
         paramB.schema.type == 'array'
         paramB.schema.items.type == 'string'
 
         op2
-        var paramArg1 = op2.parameters.find {it.name == 'arg1' }
+        var paramArg1 = op2.parameters.find { it.name == 'arg1' }
         paramArg1
         paramArg1.name == 'arg1'
         paramArg1.schema.type == 'string'
 
-        var paramArg2 = op2.parameters.find {it.name == 'arg2' }
+        var paramArg2 = op2.parameters.find { it.name == 'arg2' }
         paramArg2
         paramArg2.name == 'arg2'
         paramArg2.schema.type == 'integer'
@@ -3245,5 +3245,137 @@ class MyBean {}
         openApi.components.schemas.MyDto.properties.payload.format == "byte"
         openApi.components.schemas.MyDto.properties.payload2.type == "string"
         !openApi.components.schemas.MyDto.properties.payload2.format
+    }
+
+    void "test controller interpretation - inline parameter validation"() {
+        given:
+        buildBeanDefinition('test.ValidationController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import jakarta.validation.constraints.*;
+import jakarta.inject.Singleton;
+
+@Controller("/validation")
+class ValidationController {
+
+    /**
+     * Testing numeric constraints on query parameters.
+     */
+    @Get("/limit")
+    public String checkLimit(
+        @QueryValue @Min(1) @Max(100) int limit,
+        @QueryValue(defaultValue = "10") int offset
+    ) {
+        return "ok";
+    }
+
+    /**
+     * Testing string constraints and regex extraction from path variable.
+     */
+    @Get("/user/{username:[a-z]+}")
+    public String getUser(
+        @PathVariable @Size(min = 3, max = 20) String username
+    ) {
+        return username;
+    }
+
+    /**
+     * Testing format mapping for email and required status for NotBlank.
+     */
+    @Post("/subscribe")
+    public String subscribe(
+        @QueryValue @Email @NotBlank String email
+    ) {
+        return email;
+    }
+}
+''')
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Numeric Constraints ---
+        var limitOp = openApi.paths."/validation/limit".get
+        var limitParam = limitOp.parameters.find { it.name == 'limit' }
+
+        limitParam.schema.minimum == 1
+        limitParam.schema.maximum == 100
+        limitParam.required == true
+
+        var offsetParam = limitOp.parameters.find { it.name == 'offset' }
+        // The processor should convert "10" string to Integer
+        offsetParam.schema.default instanceof Integer
+        offsetParam.schema.default == 10
+        offsetParam.required != true
+
+        // --- 2. Verify String Constraints & Path Regex ---
+        var userOp = openApi.paths."/validation/user/{username}".get
+        var userParam = userOp.parameters.find { it.name == 'username' }
+
+        userParam.in == 'path'
+        userParam.required == true
+        userParam.schema.minLength == 3
+        userParam.schema.maxLength == 20
+        // The regex from path template {username:[a-z]+} must be extracted to 'pattern'
+        userParam.schema.pattern == "[a-z]+"
+
+        // --- 3. Verify Email Format ---
+        var subOp = openApi.paths."/validation/subscribe".post
+        var emailParam = subOp.parameters.find { it.name == 'email' }
+
+        emailParam.required == true
+        emailParam.schema.format == 'email'
+    }
+
+    void "test controller interpretation - path templates and greedy variables"() {
+        given:
+        buildBeanDefinition('test.PathController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import jakarta.inject.Singleton;
+
+@Controller("/path")
+class PathController {
+
+    /**
+     * Testing multiple variables in a single path segment with a hyphen.
+     */
+    @Get("/archive/{year}-{month}")
+    public String getArchive(@PathVariable int year, @PathVariable String month) {
+        return year + "/" + month;
+    }
+
+    /**
+     * Testing greedy path variable interpretation (*path).
+     */
+    @Get("/files/{*path}")
+    public String getFile(@PathVariable String path) {
+        return path;
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Multi-Variable Segment ---
+        // Path segment with hyphens: /path/archive/{year}-{month}
+        var archiveOp = openApi.paths['/path/archive/{year}-{month}'].get
+        archiveOp.parameters.any { it.name == 'year' && it.in == 'path' }
+        archiveOp.parameters.any { it.name == 'month' && it.in == 'path' }
+
+        // --- 2. Verify Greedy Path ({*path}) ---
+        // Micronaut's {*path} should be normalized to {path} in OpenAPI path key
+        var fileOp = openApi.paths['/path/files/{path}'].get
+        var pathParam = fileOp.parameters.find { it.name == 'path' }
+
+        pathParam != null
+        pathParam.in == 'path'
     }
 }

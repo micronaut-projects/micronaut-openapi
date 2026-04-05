@@ -95,6 +95,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -548,14 +549,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 setOperationOnPathItem(operationEntry.getKey(), httpMethod, swaggerOperation);
 
-                var queryParams = new HashMap<String, UriMatchVariable>();
-                var pathVariables = new HashMap<String, UriMatchVariable>();
+                var queryParams = new HashMap<String, VarMetadata>();
+                var pathVariables = new HashMap<String, VarMetadata>();
                 for (UriMatchTemplate matchTemplate : matchTemplates) {
-                    for (Map.Entry<String, UriMatchVariable> varEntry : uriVariables(matchTemplate).entrySet()) {
+                    for (Map.Entry<String, VarMetadata> varEntry : uriVariables(matchTemplate).entrySet()) {
                         if (pathItemEntry.getKey().contains(OPEN_BRACE + varEntry.getKey() + CLOSE_BRACE)) {
                             pathVariables.put(varEntry.getKey(), varEntry.getValue());
                         }
-                        if (varEntry.getValue().isQuery()) {
+                        if (varEntry.getValue().var.isQuery()) {
                             queryParams.put(varEntry.getKey(), varEntry.getValue());
                         }
                     }
@@ -579,15 +580,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void addParamsByUriTemplate(String path, Map<String, UriMatchVariable> pathVariables,
-                                        Map<String, UriMatchVariable> queryParams,
+    private void addParamsByUriTemplate(String path, Map<String, VarMetadata> pathVariables,
+                                        Map<String, VarMetadata> queryParams,
                                         Operation operation) {
 
         // check path variables in URL template which do not map to method parameters
         for (var entry : pathVariables.entrySet()) {
             var varName = entry.getKey();
             var pathVar = entry.getValue();
-            if (pathVar.isExploded()
+            if (pathVar.var.isExploded()
                 || !path.contains(OPEN_BRACE + varName + CLOSE_BRACE)
                 // skip placeholders
                 || path.contains(DOLLAR + OPEN_BRACE + varName + CLOSE_BRACE)
@@ -605,7 +606,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         for (var entry : queryParams.entrySet()) {
             var varName = entry.getKey();
             var pathVar = entry.getValue();
-            if (pathVar.isExploded() || isAlreadyAdded(varName, operation)) {
+            if (pathVar.var.isExploded() || isAlreadyAdded(varName, operation)) {
                 continue;
             }
 
@@ -720,8 +721,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processParameters(MethodElement element, VisitorContext context, OpenAPI openApi,
                                    Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
-                                   Map<String, UriMatchVariable> pathVariables,
-                                   Map<String, UriMatchVariable> queryParams,
+                                   Map<String, VarMetadata> pathVariables,
+                                   Map<String, VarMetadata> queryParams,
                                    List<MediaType> consumesMediaTypes,
                                    List<TypedElement> extraBodyParameters,
                                    HttpMethod httpMethod,
@@ -782,7 +783,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                     UriMatchTemplate matchTemplate,
                                                     HttpMethod httpMethod,
                                                     Operation operation,
-                                                    Map<String, UriMatchVariable> pathVariables,
+                                                    Map<String, VarMetadata> pathVariables,
                                                     VisitorContext context) {
 
         var parameterAnns = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
@@ -824,7 +825,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     } else if (paramEl.isAnnotationPresent(Header.class)) {
                         parameter.setIn(ParameterIn.HEADER.toString());
                     } else {
-                        UriMatchVariable pathVariable = pathVariables.get(parameter.getName());
+                        VarMetadata pathVariable = pathVariables.get(parameter.getName());
                         // check if this parameter is optional path variable
                         if (pathVariable == null) {
                             for (UriMatchVariable variable : matchTemplate.getVariables()) {
@@ -833,7 +834,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 }
                             }
                         }
-                        if (pathVariable != null && !pathVariable.isOptional() && !pathVariable.isQuery() && !pathVariable.isExploded()) {
+                        if (pathVariable != null && !pathVariable.var.isOptional() && !pathVariable.var.isQuery() && !pathVariable.var.isExploded()) {
                             parameter.setIn(ParameterIn.PATH.toString());
                         }
 
@@ -858,8 +859,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processParameter(VisitorContext context, OpenAPI openApi,
                                   Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody,
-                                  Map<String, UriMatchVariable> pathVariables,
-                                  Map<String, UriMatchVariable> queryParams,
+                                  Map<String, VarMetadata> pathVariables,
+                                  Map<String, VarMetadata> queryParams,
                                   List<MediaType> consumesMediaTypes,
                                   List<Parameter> swaggerParameters, TypedElement parameter,
                                   List<TypedElement> extraBodyParameters,
@@ -931,6 +932,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setName(parameter.getName());
             }
 
+            var urlVar = pathVariables.get(newParameter.getName());
+            if (urlVar == null) {
+                urlVar = queryParams.get(newParameter.getName());
+            }
+            var paramPattern = urlVar != null ? urlVar.pattern() : null;
+
+
             if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
                 // exception for spring actuator prometheus endpoint
                 if (!get(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, Boolean.class, false, context)
@@ -973,6 +981,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             newParameter.setRequired(null);
                         }
                     }
+                }
+            }
+            if (paramPattern != null) {
+                if (newParameter.getSchema() == null) {
+                    newParameter.setSchema(createSchema()
+                        .type(TYPE_STRING)
+                        .pattern(paramPattern));
+                } else if (StringUtils.isEmpty(newParameter.getSchema().getPattern())) {
+                    newParameter.getSchema().setPattern(paramPattern);
                 }
             }
         }
@@ -1021,8 +1038,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, Operation swaggerOperation,
                                                        boolean permitsRequestBody,
-                                                       Map<String, UriMatchVariable> pathVariables,
-                                                       Map<String, UriMatchVariable> queryParams,
+                                                       Map<String, VarMetadata> pathVariables,
+                                                       Map<String, VarMetadata> queryParams,
                                                        TypedElement parameter,
                                                        List<TypedElement> extraBodyParameters,
                                                        HttpMethod httpMethod,
@@ -1032,10 +1049,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
-            UriMatchVariable urlVar = pathVariables.get(parameterName);
-            newParameter = urlVar.isQuery() ? new QueryParameter() : new PathParameter();
+            VarMetadata urlVar = pathVariables.get(parameterName);
+            newParameter = urlVar.var.isQuery() ? new QueryParameter() : new PathParameter();
             newParameter.setName(parameterName);
-            final boolean exploded = urlVar.isExploded();
+            final boolean exploded = urlVar.var.isExploded();
             if (exploded) {
                 newParameter.setExplode(exploded);
             }
@@ -1044,7 +1061,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (paramName.isEmpty()) {
                 paramName = parameterName;
             }
-            UriMatchVariable variable = pathVariables.get(paramName);
+            VarMetadata variable = pathVariables.get(paramName);
             if (variable == null) {
                 if (!isNullable(parameter)) {
                     warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), context, parameter);
@@ -1053,7 +1070,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
             newParameter = new PathParameter();
             newParameter.setName(paramName);
-            final boolean exploded = variable.isExploded();
+            final boolean exploded = variable.var.isExploded();
             if (exploded) {
                 newParameter.setExplode(true);
             }
@@ -1121,7 +1138,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     isBodyParameter = true;
                 } else {
 
-                    UriMatchVariable pathVariable = pathVariables.get(parameterName);
+                    var pathVariable = pathVariables.get(parameterName);
                     boolean isExploded = false;
                     // check if this parameter is optional path variable
                     if (pathVariable == null) {
@@ -1137,10 +1154,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             }
                         }
                     }
-                    if (pathVariable != null && !pathVariable.isOptional() && !pathVariable.isQuery()) {
+                    if (pathVariable != null && !pathVariable.var.isOptional() && !pathVariable.var.isQuery()) {
                         newParameter = new PathParameter();
                         newParameter.setName(parameterName);
-                        if (pathVariable.isExploded()) {
+                        if (pathVariable.var.isExploded()) {
                             newParameter.setExplode(true);
                         }
                     }
@@ -1371,8 +1388,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processRequestBean(VisitorContext context, OpenAPI openApi,
                                     Operation swaggerOperation, JavadocDescription javadocDescription,
                                     boolean permitsRequestBody,
-                                    Map<String, UriMatchVariable> pathVariables,
-                                    Map<String, UriMatchVariable> queryParams,
+                                    Map<String, VarMetadata> pathVariables,
+                                    Map<String, VarMetadata> queryParams,
                                     List<MediaType> consumesMediaTypes,
                                     List<Parameter> swaggerParameters, TypedElement parameter,
                                     List<TypedElement> extraBodyParameters,
@@ -1486,13 +1503,35 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return returnType;
     }
 
-    private Map<String, UriMatchVariable> uriVariables(UriMatchTemplate matchTemplate) {
-        List<UriMatchVariable> pv = matchTemplate.getVariables();
-        var pathVariables = new LinkedHashMap<String, UriMatchVariable>(pv.size());
-        for (UriMatchVariable variable : pv) {
-            pathVariables.put(variable.getName(), variable);
+    private Map<String, VarMetadata> uriVariables(UriMatchTemplate matchTemplate) {
+        var pv = matchTemplate.getVariables();
+        var rawTemplate = matchTemplate.toString();
+
+        var variablesMetadata = new LinkedHashMap<String, VarMetadata>(pv.size());
+        for (var variable : pv) {
+            var rawName = variable.getName();
+            String extractedPattern = null;
+
+            // Micronaut bug/feature: name might contain RFC 6570 operators like '*' or '+'
+            // We must clean it for OpenAPI compliance
+            var cleanName = rawName;
+            if (cleanName.startsWith("*") || cleanName.startsWith("+") || cleanName.startsWith("/")) {
+                cleanName = cleanName.substring(1);
+            }
+            // 1. Extract pattern
+            var p = Pattern.compile("\\{" + Pattern.quote(rawName) + ":(.+?)}");
+            var m = p.matcher(rawTemplate);
+            if (m.find()) {
+                extractedPattern = m.group(1);
+            }
+
+            // 2. Map properties from UriMatchVariable
+            variablesMetadata.put(cleanName, new VarMetadata(
+                variable,
+                extractedPattern
+            ));
         }
-        return pathVariables;
+        return variablesMetadata;
     }
 
     private JavadocDescription getMethodDescription(MethodElement element, Operation swaggerOperation, VisitorContext context) {
@@ -1908,5 +1947,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             content.addMediaType(mediaType.toString(), mt);
         }
         return content;
+    }
+
+    /**
+     * Metadata for a URI variable, including its Micronaut variable definition and regex pattern.
+     *
+     * @param var The Micronaut {@link UriMatchVariable} definition
+     * @param pattern The extracted regex pattern from the URI template (e.g., "[a-z]+")
+     */
+    public record VarMetadata(
+        UriMatchVariable var,
+        String pattern
+    ) {
     }
 }
