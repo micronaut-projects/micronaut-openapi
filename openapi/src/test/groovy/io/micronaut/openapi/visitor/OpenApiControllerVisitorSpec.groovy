@@ -3378,4 +3378,95 @@ class MyBean {}
         pathParam != null
         pathParam.in == 'path'
     }
+
+    void "test controller interpretation - content types and headers"() {
+        given:
+        buildBeanDefinition('test.ContentController', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import java.io.InputStream;
+
+/**
+ * Interface with shared headers.
+ */
+@Header(name = "X-Base-Header", value = "base-val")
+interface BaseApi {}
+/**
+ * DTO for testing JSON serialization in responses.
+ */
+@Introspected
+record Info(String version) {}
+
+/**
+ * Controller for testing content types, binary streams, and header inheritance.
+ */
+@Header(name = "X-Service-Id", value = "service-v1")
+@Controller("/content")
+class ContentController implements BaseApi {
+
+    /**
+     * Testing multiple media types for a single response.
+     */
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @Get("/report")
+    public HttpResponse<Info> getReport() {
+        return HttpResponse.ok(new Info("1.0"));
+    }
+
+    /**
+     * Testing binary stream interpretation. 
+     * InputStream must be mapped to string/binary in OpenAPI.
+     */
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Get("/raw")
+    public InputStream getRaw() {
+        return null;
+    }
+
+    /**
+     * Testing header parameters and inheritance from class-level @Header.
+     */
+    @Post("/send")
+    public HttpResponse<Void> sendData(@Header("X-Trace-Id") String traceId, @Body String data) {
+        return HttpResponse.noContent();
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Multiple Media Types ---
+        var reportOp = openApi.paths['/content/report'].get
+        var reportResponse = reportOp.responses['200']
+        reportResponse.content.containsKey('application/json')
+        reportResponse.content.containsKey('text/plain')
+        reportResponse.content['application/json'].schema.$ref == '#/components/schemas/Info'
+
+        // --- 2. Verify Binary Stream Interpretation ---
+        var rawOp = openApi.paths['/content/raw'].get
+        var rawSchema = rawOp.responses['200'].content['application/octet-stream'].schema
+        rawSchema.type == 'string'
+        rawSchema.format == 'binary'
+
+        // --- 3. Verify Header Inheritance & Params ---
+        var sendOp = openApi.paths['/content/send'].post
+        // 1. From parameter
+        sendOp.parameters.any { it.name == 'X-Trace-Id' && it.in == 'header' && it.required == true }
+        // 2. Inherited from Controller class
+        sendOp.parameters.any { it.name == 'X-Service-Id' && it.in == 'header' }
+        // 3. Inherited from Interface (BaseApi)
+        sendOp.parameters.any { it.name == 'X-Base-Header' && it.in == 'header' }
+
+        // --- 4. Verify Response Code ---
+        sendOp.responses.containsKey('200')
+    }
 }

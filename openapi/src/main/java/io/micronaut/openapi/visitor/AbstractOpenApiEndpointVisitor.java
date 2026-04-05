@@ -163,6 +163,7 @@ import static io.micronaut.openapi.visitor.ParamUtils.calcIn;
 import static io.micronaut.openapi.visitor.ParamUtils.getHeaderName;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyle;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyleByFormat;
+import static io.micronaut.openapi.visitor.ParamUtils.readClassHeaders;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
@@ -468,6 +469,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             resolveWebhooks(openApi).put(webhookPair.getFirst(), webhookPair.getSecond());
         }
 
+        // Collect Class-Level Headers
+        var classHeaders = readClassHeaders(element.getOwningType());
+
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
 
@@ -576,6 +580,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (webhookPair != null) {
                     SchemaUtils.mergeOperations(getOperationOnPathItem(webhookPair.getSecond(), httpMethod), swaggerOperation);
                 }
+                addHeadersToOperation(swaggerOperation, classHeaders);
             }
         }
     }
@@ -1947,6 +1952,37 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             content.addMediaType(mediaType.toString(), mt);
         }
         return content;
+    }
+
+    /**
+     * Adds class-level headers to the operation if they are not already present
+     * in the method parameters.
+     *
+     * @param swaggerOperation The OpenAPI operation to update
+     * @param classHeaders The list of headers extracted from the class
+     */
+    private void addHeadersToOperation(Operation swaggerOperation, List<Parameter> classHeaders) {
+        if (CollectionUtils.isEmpty(classHeaders)) {
+            return;
+        }
+
+        var currentParameters = swaggerOperation.getParameters();
+        for (var classHeader : classHeaders) {
+            var exists = false;
+            if (currentParameters != null) {
+                for (var p : currentParameters) {
+                    if (ParameterIn.HEADER.toString().equalsIgnoreCase(p.getIn())
+                        && classHeader.getName().equalsIgnoreCase(p.getName())) {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!exists) {
+                swaggerOperation.addParametersItem(classHeader);
+            }
+        }
     }
 
     /**
