@@ -107,6 +107,9 @@ public final class SchemaUtils {
     public static final String TYPE_NUMBER = "number";
     public static final String TYPE_BOOLEAN = "boolean";
 
+    public static final String FORMAT_BINARY = "binary";
+    public static final String FORMAT_BYTE = "byte";
+
     public static final Schema<?> EMPTY_SCHEMA = new Schema<>();
     public static final Schema<?> EMPTY_ARBITRARY_SCHEMA = new ArbitrarySchema();
     public static final Schema<?> EMPTY_ARRAY_SCHEMA = new ArraySchema();

@@ -3212,11 +3212,11 @@ class MyBean {}
         then:
         op1
         op1.responses."200".content."application/octet-stream".schema.type == "string"
-        op1.responses."200".content."application/octet-stream".schema.format == "byte"
+        op1.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op2
         op2.responses."200".content."application/octet-stream".schema.type == "string"
-        op2.responses."200".content."application/octet-stream".schema.format == "byte"
+        op2.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op3
         op3.parameters[0].schema.type == "string"
@@ -3224,10 +3224,10 @@ class MyBean {}
         op3.parameters[1].schema.type == "string"
         op3.parameters[1].schema.format == "byte"
         op3.requestBody.content."application/json".schema.type == "string"
-        op3.requestBody.content."application/json".schema.format == "byte"
+        op3.requestBody.content."application/json".schema.format == "binary"
 
         op3.responses."200".content."application/octet-stream".schema.type == "string"
-        op3.responses."200".content."application/octet-stream".schema.format == "byte"
+        op3.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op4
         op4.parameters[0].schema.type == "string"
@@ -3242,7 +3242,7 @@ class MyBean {}
 
         op5
         openApi.components.schemas.MyDto.properties.payload.type == "string"
-        openApi.components.schemas.MyDto.properties.payload.format == "byte"
+        openApi.components.schemas.MyDto.properties.payload.format == "binary"
         openApi.components.schemas.MyDto.properties.payload2.type == "string"
         !openApi.components.schemas.MyDto.properties.payload2.format
     }
@@ -3468,5 +3468,63 @@ class MyBean {}
 
         // --- 4. Verify Response Code ---
         sendOp.responses.containsKey('200')
+    }
+
+    void "test controller interpretation - raw bodies and media types"() {
+        given:
+        buildBeanDefinition('test.RawBodyController', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
+
+@Controller("/raw")
+class RawBodyController {
+
+    @Post(value = "/text", consumes = MediaType.TEXT_PLAIN)
+    public String sendText(@Body String text) {
+        return text;
+    }
+
+    @Post(value = "/image", consumes = MediaType.IMAGE_PNG)
+    public String uploadImage(@Body byte[] data) {
+        return "ok";
+    }
+
+    @Post(value = "/json", consumes = MediaType.APPLICATION_JSON)
+    public Map<String, Object> sendJson(@Body Map<String, Object> data) {
+        return data;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Text Body ---
+        var textOp = openApi.paths['/raw/text'].post
+        var textSchema = textOp.requestBody.content['text/plain'].schema
+        textSchema.type == 'string'
+        textSchema.format == null
+
+        // --- 2. Verify Binary Body (byte[]) ---
+        var imageOp = openApi.paths['/raw/image'].post
+        var imageSchema = imageOp.requestBody.content['image/png'].schema
+        // byte[] must be translated to type: string, format: binary
+        imageSchema.type == 'string'
+        imageSchema.format == 'binary'
+
+        // --- 3. Verify Dynamic JSON (Map) ---
+        var jsonOp = openApi.paths['/raw/json'].post
+        var jsonSchema = jsonOp.requestBody.content['application/json'].schema
+        jsonSchema.type == 'object'
+        // Map<String, Object> should result in additionalProperties (free-form object)
+        jsonSchema.additionalProperties != null
     }
 }

@@ -784,7 +784,7 @@ public final class SchemaDefinitionUtils {
             componentSchemaAnn = arraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
                 .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class)
                     .orElse(typeArraySchemaAnnValue != null ? typeArraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
-                        .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null)) : null));
+                                                              .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null)) : null));
             if (componentSchemaAnn != null) {
                 String componentImpl = componentSchemaAnn.stringValue(PROP_IMPLEMENTATION).orElse(null);
                 if (StringUtils.isNotEmpty(componentImpl)) {
@@ -972,7 +972,7 @@ public final class SchemaDefinitionUtils {
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(type, typeName, context);
                 } else if (isArray && type.isAssignable(byte.class)) {
-                    schema = PrimitiveType.BYTE.createProperty();
+                    schema = PrimitiveType.BINARY.createProperty();
                 } else if (isArray && type.isAssignable(char.class)) {
                     schema = PrimitiveType.STRING.createProperty();
                 } else if (!isArray && primitiveType != null) {
@@ -1041,7 +1041,7 @@ public final class SchemaDefinitionUtils {
                 } else if (type.isAssignable(Boolean.class) || type.isAssignable(boolean.class)) {
                     schema = PrimitiveType.BOOLEAN.createProperty(openapi31);
                 } else if (type.isAssignable(Byte.class) || type.isAssignable(byte.class)) {
-                    schema = PrimitiveType.BYTE.createProperty(openapi31);
+                    schema = PrimitiveType.BINARY.createProperty(openapi31);
                 } else if (type.isAssignable(UUID.class)) {
                     schema = PrimitiveType.UUID.createProperty(openapi31);
                 } else if (type.isAssignable(URL.class)) {
@@ -1510,7 +1510,7 @@ public final class SchemaDefinitionUtils {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, false);
                     } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                         var additionalPropsSchemaClass = values.get(PROP_ADDITIONAL_PROPERTIES_SCHEMA);
-                        if (additionalPropsSchemaClass!= null) {
+                        if (additionalPropsSchemaClass != null) {
                             String additionalPropsSchemaClassName;
                             if (additionalPropsSchemaClass instanceof AnnotationClassValue<?> acv) {
                                 additionalPropsSchemaClassName = acv.getName();

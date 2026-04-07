@@ -161,6 +161,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static io.micronaut.openapi.visitor.ParamUtils.calcIn;
 import static io.micronaut.openapi.visitor.ParamUtils.getHeaderName;
+import static io.micronaut.openapi.visitor.ParamUtils.isTextualIn;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyle;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyleByFormat;
 import static io.micronaut.openapi.visitor.ParamUtils.readClassHeaders;
@@ -171,6 +172,8 @@ import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.resolveSchema;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
+import static io.micronaut.openapi.visitor.SchemaUtils.FORMAT_BINARY;
+import static io.micronaut.openapi.visitor.SchemaUtils.FORMAT_BYTE;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
@@ -943,7 +946,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
             var paramPattern = urlVar != null ? urlVar.pattern() : null;
 
-
             if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
                 // exception for spring actuator prometheus endpoint
                 if (!get(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, Boolean.class, false, context)
@@ -976,6 +978,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (schemaAnn == null) {
                     schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                 }
+                // Fix for byte array types: when used in textual transports (path, query, header, cookie),
+                // the format should be "byte" (Base64) to ensure compatibility with OpenAPI spec,
+                // unless a specific format is already explicitly provided via annotations.
+                if (parameterType.isArray() && parameterType.isAssignable(byte.class)
+                    && isTextualIn(newParameter.getIn())
+                    && (StringUtils.isEmpty(schema.getType()) || TYPE_STRING.equals(schema.getType()))
+                    && (StringUtils.isEmpty(schema.getFormat()) || FORMAT_BINARY.equals(schema.getFormat()))) {
+
+                    // Fix for byte array types: when used in textual transports (path, query, header, cookie),
+                    // the format should be "byte" (Base64) to ensure compatibility with OpenAPI spec,
+                    // unless a specific format is already explicitly provided via annotations.
+                    schema.setType(TYPE_STRING);
+                    schema.setFormat(FORMAT_BYTE);
+                }
 
                 var isParamRequired = parameterAnn != null ? parameterAnn.get(PROP_REQUIRED, Boolean.class).orElse(false) : false;
                 if (!isParamRequired) {
@@ -987,6 +1003,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                     }
                 }
+
             }
             if (paramPattern != null) {
                 if (newParameter.getSchema() == null) {
