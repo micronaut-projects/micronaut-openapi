@@ -179,7 +179,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
-import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
+import static io.micronaut.openapi.visitor.SecurityUtils.readMethodSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
@@ -510,7 +510,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openApi);
 
-                readSecurityRequirements(element, httpMethod, pathItemEntry.getKey(), swaggerOperation, methodSecurityRequirements(element, context), context);
+                readMethodSecurityRequirements(element, httpMethod, pathItemEntry.getKey(), swaggerOperation, methodSecurityRequirements(element, context), context);
 
                 readApiResponses(element, context, swaggerOperation, jsonViewClass);
 

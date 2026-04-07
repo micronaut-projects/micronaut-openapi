@@ -623,4 +623,69 @@ class MyBean {}
         openAPI.security[0].bearerAuth.size() == 0
         openAPI.security[1].isEmpty()
     }
+
+    void "test controller interpretation - security and binary streams"() {
+        given:
+        buildBeanDefinition('test.SecureController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.MediaType;
+import io.micronaut.security.authentication.Authentication;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.io.InputStream;
+
+@SecurityRequirement(name = "JWT")
+@Controller("/secure")
+class SecureController {
+
+    @Get("/me")
+    public String getMe(Authentication auth) {
+        return "Hello " + auth.getName();
+    }
+
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Get("/download")
+    public InputStream download() {
+        return null;
+    }
+
+    @SecurityRequirement(name = "AdminToken")
+    @Post("/admin/clear")
+    public String clearCache() {
+        return "done";
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Security Inheritance ---
+        var meOp = openApi.paths['/secure/me'].get
+        meOp.security != null
+        meOp.security.any { it.containsKey('JWT') }
+
+        // --- 2. Verify System Parameter Exclusion ---
+        // Parameter of type Authentication must be ignored by the processor
+        meOp.parameters == null || !meOp.parameters.any { it.name == 'auth' }
+
+        // --- 3. Verify Binary Stream Interpretation ---
+        var downloadOp = openApi.paths['/secure/download'].get
+        var responseContent = downloadOp.responses['200'].content['application/octet-stream']
+        // InputStream must map to type: string, format: binary
+        responseContent.schema.type == 'string'
+        responseContent.schema.format == 'binary'
+
+        // --- 4. Verify Security Override ---
+        var adminOp = openApi.paths['/secure/admin/clear'].post
+        // Should contain only the method-level requirement
+        adminOp.security.any { it.containsKey('AdminToken') }
+        // Class-level "JWT" should be replaced by "AdminToken"
+        !adminOp.security.any { it.containsKey('JWT') }
+    }
 }
