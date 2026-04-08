@@ -53,17 +53,46 @@ public final class SecurityUtils {
     private SecurityUtils() {
     }
 
-    public static void readSecurityRequirements(MethodElement element, HttpMethod httpMethod, String path, Operation operation, List<SecurityRequirement> securityRequirements, VisitorContext context) {
-        if (CollectionUtils.isNotEmpty(securityRequirements)) {
-            for (SecurityRequirement securityItem : securityRequirements) {
-                operation.addSecurityItem(securityItem);
-            }
+    /**
+     * Reads security requirements from the element.
+     * Method-level requirements must completely replace class-level requirements.
+     *
+     * @param element The method element
+     * @param httpMethod The HTTP method
+     * @param path The endpoint path
+     * @param operation The OpenAPI operation to update
+     * @param methodSecurityRequirements Pre-read security requirements on method level (already prioritized by visitor)
+     * @param context The visitor context
+     */
+    public static void readMethodSecurityRequirements(MethodElement element, HttpMethod httpMethod, String path, Operation operation,
+                                                      List<SecurityRequirement> methodSecurityRequirements, VisitorContext context) {
+        // 1. If we have security requirements (already resolved with priority: Method > Class),
+        // we must SET them, not just add to existing ones to ensure correct override.
+        if (CollectionUtils.isNotEmpty(methodSecurityRequirements)) {
+            // Clear any existing requirements (e.g. accidentally added defaults)
+            operation.setSecurity(new ArrayList<>(methodSecurityRequirements));
             return;
         }
 
+        // 2. If no annotations are found, fallback to Micronaut Security configuration logic
         processMicronautSecurityConfig(element, httpMethod, path, operation, context);
     }
 
+    /**
+     * Processes Micronaut Security configuration from {@code intercept-url-map}
+     * defined in the application configuration files (e.g., application.yml).
+     * <p>
+     * This method matches the current endpoint path and HTTP method against
+     * the configured patterns and merges any found security rules into the
+     * existing OpenAPI {@link Operation} security requirements.
+     * </p>
+     *
+     * @param element The method element being visited
+     * @param httpMethod The HTTP method of the current endpoint (GET, POST, etc.)
+     * @param path The normalized URI path of the endpoint
+     * @param operation The OpenAPI {@link Operation} object to be updated with security rules
+     * @param context The current {@link VisitorContext} for accessing security properties
+     */
     private static void processMicronautSecurityConfig(MethodElement element, HttpMethod httpMethod, String path, Operation operation, VisitorContext context) {
 
         SecurityProperties securityProperties = getSecurityProperties(context);
@@ -80,6 +109,7 @@ public final class SecurityUtils {
         OpenAPI openApi = Utils.resolveOpenApi(context);
         Components components = openApi.getComponents();
 
+        // 1. Resolve or create the Security Scheme in Components
         String securitySchemeName;
         if (components != null && CollectionUtils.isNotEmpty(components.getSecuritySchemes())) {
             securitySchemeName = components.getSecuritySchemes().keySet().iterator().next();
@@ -116,6 +146,7 @@ public final class SecurityUtils {
             }
         }
 
+        // 2. Resolve Annotation Priority: Method-level @Secured overrides Class-level
         var classLevelSecuredAnn = element.getOwningType().getAnnotation("io.micronaut.security.annotation.Secured");
         var methodLevelSecuredAnn = element.getAnnotation("io.micronaut.security.annotation.Secured");
         List<String> access = Collections.emptyList();
@@ -124,14 +155,17 @@ public final class SecurityUtils {
         } else if (classLevelSecuredAnn != null) {
             access = classLevelSecuredAnn.getValue(Argument.LIST_OF_STRING).orElse(null);
         }
+        // Add roles from the "winning" annotation
         processSecurityAccess(securitySchemeName, access, operation);
 
+        // 3. Merge with Configuration: intercept-url-map from YAML
         List<InterceptUrlMapPattern> securityRules = securityProperties.getInterceptUrlMapPatterns();
         if (CollectionUtils.isNotEmpty(securityRules)) {
-            for (InterceptUrlMapPattern securityRule : securityRules) {
+            for (var securityRule : securityRules) {
                 if (PathMatcher.ANT.matches(securityRule.getPattern(), path)
                     && (httpMethod == null || securityRule.getHttpMethod() == null || httpMethod == securityRule.getHttpMethod())) {
 
+                    // Configuration rules complement the annotation-based rules
                     processSecurityAccess(securitySchemeName, securityRule.getAccess(), operation);
                 }
             }
@@ -179,14 +213,23 @@ public final class SecurityUtils {
     }
 
     /**
-     * Reads the security requirements annotation of the specified element.
+     * Reads {@link io.swagger.v3.oas.annotations.security.SecurityRequirement} annotations from the element.
+     * Method-level requirements take precedence and completely replace class-level requirements.
      *
-     * @param element The Element to process.
-     *
-     * @return A list of SecurityRequirement
+     * @param element The element to inspect (method or class)
+     * @return A list of resolved {@link SecurityRequirement} objects
      */
     public static List<SecurityRequirement> readSecurityRequirements(Element element) {
-        return readSecurityRequirements(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class));
+        // 1. Try to get annotations declared specifically on this element (e.g., the method)
+        // This ensures that method-level security overrides class-level security instead of merging
+        var methodAnnotations = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+
+        if (!methodAnnotations.isEmpty()) {
+            return readSecurityRequirements(methodAnnotations);
+        }
+        // 2. If no annotations are declared on the method, look for inherited ones (from the class)
+        var inheritedAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+        return readSecurityRequirements(inheritedAnnotations);
     }
 
     public static List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
