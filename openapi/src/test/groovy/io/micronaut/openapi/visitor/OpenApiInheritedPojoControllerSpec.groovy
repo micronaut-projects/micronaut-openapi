@@ -306,10 +306,10 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema petSchema = openAPI.components.schemas['Pet']
-        Schema catSchema = openAPI.components.schemas['Cat']
-        Schema dogSchema = openAPI.components.schemas['Dog']
+        var openApi = Utils.testReference
+        Schema petSchema = openApi.components.schemas['Pet']
+        Schema catSchema = openApi.components.schemas['Cat']
+        Schema dogSchema = openApi.components.schemas['Dog']
 
         then: "the components are valid"
         petSchema != null
@@ -327,7 +327,7 @@ class MyBean {}
         petSchema.oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
-        Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
+        Operation operation = openApi.paths.get("/pet/cat/claw/{size}").get
 
         then:
         operation
