@@ -59,6 +59,22 @@ public final class ParamUtils {
     private ParamUtils() {
     }
 
+    /**
+     * Determines if the parameter is transported as part of the URL or HTTP headers.
+     * In these locations, binary data (like byte arrays) must be represented as a
+     * Base64-encoded string (format: "byte") to comply with the OpenAPI specification,
+     * as raw binary data (format: "binary") is not supported in these textual contexts.
+     *
+     * @param in the parameter location (e.g., "path", "query", "header", "cookie")
+     * @return true if the parameter location requires textual encoding (Base64) for binary data
+     */
+    public static boolean isTextualIn(String in) {
+        return ParameterIn.PATH.toString().equalsIgnoreCase(in)
+            || ParameterIn.QUERY.toString().equalsIgnoreCase(in)
+            || ParameterIn.HEADER.toString().equalsIgnoreCase(in)
+            || ParameterIn.COOKIE.toString().equalsIgnoreCase(in);
+    }
+
     public static String calcIn(String path, HttpMethod httpMethod, ParameterElement methodParam) {
         String paramName = methodParam.getName();
         Set<String> paramAnnNames = methodParam.getAnnotationNames();
