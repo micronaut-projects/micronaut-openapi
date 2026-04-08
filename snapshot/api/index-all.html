@@ -354,7 +354,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html" title="class in io.micronaut.openapi.annotation.mappers">OpenAPISecurityAnnotationMapper</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/TagsRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/TagsRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">TagsRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/CallbacksRetentionPolicyAnnotationTransformer.html#annotationType()" class="member-name-link">annotationType()</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/CallbacksRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">CallbacksRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
@@ -5665,10 +5665,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Utils.html#readListOfStringsProperty(java.lang.String,java.util.Map,java.util.List)" class="member-name-link">readListOfStringsProperty(String, Map&lt;String, Object&gt;, List&lt;String&gt;)</a> - Static method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Utils.html" title="class in io.micronaut.openapi.generator">Utils</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/SecurityUtils.html#readMethodSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readMethodSecurityRequirements(MethodElement, HttpMethod, String, Operation, List&lt;SecurityRequirement&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SecurityUtils.html" title="class in io.micronaut.openapi.visitor">SecurityUtils</a></dt>
-<dd>
-<div class="block">Reads security requirements from the element.</div>
-</dd>
 <dt><a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html#readOpenApi(java.lang.String,boolean)" class="member-name-link">readOpenApi(String, boolean)</a> - Static method in class io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/SwaggerUtils.html" title="class in io.micronaut.openapi.adoc.utils">SwaggerUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#readOpenApiConfigFile(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readOpenApiConfigFile(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
@@ -5687,8 +5683,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/SecurityUtils.html#readSecurityRequirements(io.micronaut.inject.ast.Element)" class="member-name-link">readSecurityRequirements(Element)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SecurityUtils.html" title="class in io.micronaut.openapi.visitor">SecurityUtils</a></dt>
 <dd>
-<div class="block">Reads <code>SecurityRequirement</code> annotations from the element.</div>
+<div class="block">Reads the security requirements annotation of the specified element.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/SecurityUtils.html#readSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readSecurityRequirements(MethodElement, HttpMethod, String, Operation, List&lt;SecurityRequirement&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SecurityUtils.html" title="class in io.micronaut.openapi.visitor">SecurityUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SecurityUtils.html#readSecurityRequirements(java.util.List)" class="member-name-link">readSecurityRequirements(List&lt;AnnotationValue&lt;SecurityRequirement&gt;&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SecurityUtils.html" title="class in io.micronaut.openapi.visitor">SecurityUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/TagUtils.html#readTags(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readTags(ClassElement, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/TagUtils.html" title="class in io.micronaut.openapi.visitor">TagUtils</a></dt>
@@ -7322,7 +7320,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Return the variable name by removing invalid characters and proper escaping if
  it's a reserved word.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/annotation/transformers/TagsRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;Tags&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/TagsRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">TagsRetentionPolicyAnnotationTransformer</a></dt>
+<dt><a href="io/micronaut/openapi/annotation/transformers/CallbacksRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;Callbacks&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/CallbacksRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">CallbacksRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#treeToValue(com.fasterxml.jackson.databind.JsonNode,java.lang.Class,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">treeToValue(JsonNode, Class&lt;T&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>
