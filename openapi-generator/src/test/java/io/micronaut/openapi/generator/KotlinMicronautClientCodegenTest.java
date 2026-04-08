@@ -461,8 +461,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "val VALUE_MAPPING = entries.associateBy { it.value }",
             """
                     fun fromValue(value: String): StringEnum {
-                        require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
-                        return VALUE_MAPPING[value]!!
+                        return VALUE_MAPPING[value]
+                            ?: throw IllegalArgumentException("Unexpected value '$value'")
                     }
                 """);
         assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "NUMBER_1(1),");
@@ -826,8 +826,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                     fun fromValue(value: String): StringEnum {
                         val key = value.lowercase()
-                        require(VALUE_MAPPING.containsKey(key)) { "Unexpected value '$key'" }
-                        return VALUE_MAPPING[key]!!
+                        return VALUE_MAPPING[key]
+                            ?: throw IllegalArgumentException("Unexpected value '$key'")
                     }
                 """);
 
@@ -835,8 +835,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "val VALUE_MAPPING = entries.associateBy { it.value }",
             """
                     fun fromValue(value: BigDecimal): DecimalEnum {
-                        require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
-                        return VALUE_MAPPING[value]!!
+                        return VALUE_MAPPING[value]
+                            ?: throw IllegalArgumentException("Unexpected value '$value'")
                     }
                 """);
     }
@@ -3327,5 +3327,116 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     ): String?
                 """
         );
+    }
+
+    @Test
+    void testEnumUnknownDefaultCase() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setEnumUnknownDefaultCase(true);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/ByteEnum.kt",
+            "val VALUE_MAPPING = entries.filter { it != UNKNOWN_DEFAULT_OPEN_API }.associateBy { it.value }",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(-127),
+                """,
+            """
+                        return VALUE_MAPPING[value]
+                            ?: UNKNOWN_DEFAULT_OPEN_API
+                """
+        );
+
+        assertFileContains(path + "model/CharPrimitiveEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API((-1).toChar()),
+                """);
+
+        assertFileContains(path + "model/DoubleEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809.0),
+                """);
+        assertFileContains(path + "model/FloatEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809F),
+                """);
+        assertFileContains(path + "model/IntEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809),
+                """);
+        assertFileContains(path + "model/LongEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809L),
+                """);
+
+        assertFileContains(path + "model/StringEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api"),
+                """);
+    }
+
+    @Test
+    void testEnumUnknownDefaultCaseWithCustomName() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setEnumUnknownDefaultCase(true);
+        codegen.setEnumUnknownDefaultCaseName("my_default");
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
+
+        String path = outputPathApi + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/ByteEnum.kt",
+            "val VALUE_MAPPING = entries.filter { it != MY_DEFAULT }.associateBy { it.value }",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(-127),
+                """,
+            """
+                        return VALUE_MAPPING[value]
+                            ?: MY_DEFAULT
+                """
+        );
+
+        assertFileContains(path + "model/CharPrimitiveEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT((-1).toChar()),
+                """);
+
+        assertFileContains(path + "model/DoubleEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809.0),
+                """);
+        assertFileContains(path + "model/FloatEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809F),
+                """);
+        assertFileContains(path + "model/IntEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809),
+                """);
+        assertFileContains(path + "model/LongEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809L),
+                """);
+
+        assertFileContains(path + "model/StringEnum.kt",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT("my_default"),
+                """);
     }
 }

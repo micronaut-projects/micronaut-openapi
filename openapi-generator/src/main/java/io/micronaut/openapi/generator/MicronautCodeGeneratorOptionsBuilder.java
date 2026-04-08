@@ -494,18 +494,41 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withPrependFormOrBodyParameters(boolean prependFormOrBodyParameters);
 
     /**
+     * If the server adds new enum cases that are unknown by an old spec/client, the client will fail to parse the network response.
+     * With this option enabled, each enum will have a new case, 'unknown_default_open_api', so that when the server sends
+     * an enum case not known by the client/spec, they can safely fall back to this case.
+     * <p>
+     * Default: false
+     *
+     * @param enumUnknownDefaultCase Add or not the default case to enum.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withEnumUnknownDefaultCase(boolean enumUnknownDefaultCase);
+
+    /**
+     * Add form or body parameters to the beginning of the parameter list.
+     * <p>
+     * Default: unknown_default_open_api
+     *
+     * @param enumUnknownDefaultCaseName Name of enum constant for the unknown default case.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withEnumUnknownDefaultCaseName(String enumUnknownDefaultCaseName);
+
+    /**
      * The possible date-time formatting configurations.
      */
     enum DateTimeFormat {
         OFFSET_DATETIME,
         ZONED_DATETIME,
-        LOCAL_DATETIME
+        LOCAL_DATETIME,
     }
 
     /**
      * The possible languages for generator.
      */
     enum GeneratorLanguage {
-        JAVA, KOTLIN,
+        JAVA,
+        KOTLIN,
     }
 }

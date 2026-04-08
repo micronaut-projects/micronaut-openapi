@@ -147,6 +147,7 @@ import static io.swagger.v3.parser.util.SchemaTypeUtil.FLOAT_FORMAT;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER64_FORMAT;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.ENUM_UNKNOWN_DEFAULT_CASE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.NON_PUBLIC_API;
@@ -200,6 +201,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_KSP = "ksp";
     public static final String OPT_USE_TAGS = "useTags";
+    public static final String OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME = "enumUnknownDefaultCaseName";
     public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS = "additionalOneOfTypeAnnotations";
     public static final String ADDITIONAL_ENUM_TYPE_ANNOTATIONS = "additionalEnumTypeAnnotations";
@@ -813,6 +815,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name().equals(serializationLibrary)) {
             additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
         }
+
+        additionalProperties.put(serializationLibrary.toLowerCase(Locale.ENGLISH), true);
+        if (SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name().equals(serializationLibrary)) {
+            additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.ENGLISH), true);
+        }
+
+        if (additionalProperties.containsKey(ENUM_UNKNOWN_DEFAULT_CASE)) {
+            enumUnknownDefaultCase = convertPropertyToBoolean(ENUM_UNKNOWN_DEFAULT_CASE);
+        }
+        writePropertyBack(ENUM_UNKNOWN_DEFAULT_CASE, enumUnknownDefaultCase);
+
+        if (additionalProperties.containsKey(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME)) {
+            enumUnknownDefaultCaseName = (String) additionalProperties.get(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME);
+        }
+        writePropertyBack(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME, enumUnknownDefaultCaseName);
 
         // Use the default java time
         switch (dateLibrary) {
@@ -2179,6 +2196,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             modified = "EMPTY";
             return normalizeKotlinSpecificNames(modified);
         }
+        if (enumUnknownDefaultCase && value.equals(enumUnknownDefaultCaseName)) {
+            return value;
+        }
 
         String varName = value;
 
@@ -2194,9 +2214,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 || "BigDecimal".equals(datatype)
         ) {
             varName = "NUMBER_" + varName;
-            varName = varName.replaceAll("-", "MINUS_");
-            varName = varName.replaceAll("\\+", "PLUS_");
-            varName = varName.replaceAll("\\.", "_DOT_");
+            varName = varName.replace("-", "MINUS_")
+                .replaceAll("\\+", "PLUS_")
+                .replaceAll("\\.", "_DOT_");
         }
         varName = varName.replaceAll("[^a-zA-Z0-9_]", "_");
 
@@ -2708,13 +2728,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 enumVar.put("valueNormalized", normalizeStr(value));
                 continue;
             }
+            var isUnknownDefault = enumUnknownDefaultCase && (Boolean) enumVar.getOrDefault("isUnknownDefaultCase", false);
             value = value.replace("\"", "");
-            if ("char".equals(baseType) && !value.startsWith("'")) {
-                enumVar.put("value", "'" + value + "'");
+            if ("char".equals(baseType)) {
+                enumVar.put("value", isUnknownDefault
+                    ? "(-1).toChar()"
+                    : !value.startsWith("'") ? "'" + value.charAt(0) + "'" : Character.toString(value.charAt(0)));
             } else if ("short".equalsIgnoreCase(baseType)) {
-                enumVar.put("value", value);
+                enumVar.put("value", isUnknownDefault ? value + ".toShort()" : value);
+            } else if ("double".equalsIgnoreCase(baseType)) {
+                enumVar.put("value", isUnknownDefault ? value + ".0" : value);
             } else if ("byte".equalsIgnoreCase(baseType)) {
-                enumVar.put("value", value);
+                enumVar.put("value", isUnknownDefault ? "-127" : value);
             }
             enumVar.put("valueNormalized", enumVar.get("value"));
         }
@@ -3571,6 +3596,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setAdditionalEnumTypeAnnotations(List<String> additionalEnumTypeAnnotations) {
         this.additionalEnumTypeAnnotations = additionalEnumTypeAnnotations;
+    }
+
+    public void setEnumUnknownDefaultCaseName(String enumUnknownDefaultCaseName) {
+        this.enumUnknownDefaultCaseName = enumUnknownDefaultCaseName;
     }
 
     @Override
