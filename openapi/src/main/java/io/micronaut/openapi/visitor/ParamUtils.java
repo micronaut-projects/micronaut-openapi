@@ -18,11 +18,13 @@ package io.micronaut.openapi.visitor;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
@@ -31,11 +33,14 @@ import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.parameters.Parameter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
+import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
@@ -163,5 +168,39 @@ public final class ParamUtils {
 
             swaggerOperation.addParametersItem(parameter);
         }
+    }
+
+    /**
+     * Reads {@link io.micronaut.http.annotation.Header} annotations from the class element
+     * and converts them to OpenAPI parameters.
+     *
+     * @param classEl The class element (controller) to inspect
+     * @return A list of {@link Parameter} objects with "header" location
+     */
+    public static List<Parameter> readClassHeaders(ClassElement classEl) {
+        var headerAnnotations = classEl.getAnnotationValuesByType(io.micronaut.http.annotation.Header.class);
+        if (headerAnnotations.isEmpty()) {
+            return List.of();
+        }
+
+        var parameters = new ArrayList<Parameter>(headerAnnotations.size());
+        for (var ann : headerAnnotations) {
+            var name = ann.stringValue(PROP_NAME).orElse(ann.stringValue().orElse(null));
+            var defaultValue = ann.stringValue().orElse(null);
+            if (StringUtils.isEmpty(name)) {
+                continue;
+            }
+            var parameter = new Parameter()
+                .name(name)
+                .in(ParameterIn.HEADER.toString())
+                .schema(createSchema()
+                    .type(TYPE_STRING));
+
+            if (defaultValue != null) {
+                parameter.getSchema().setDefault(defaultValue);
+            }
+            parameters.add(parameter);
+        }
+        return parameters;
     }
 }
