@@ -3527,4 +3527,106 @@ class MyBean {}
         // Map<String, Object> should result in additionalProperties (free-form object)
         jsonSchema.additionalProperties != null
     }
+
+    void "test controller interpretation - java request composition and anyOf"() {
+        given:
+        buildBeanDefinition('test.ComposeController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.inject.Singleton;
+
+@Introspected
+class SmsAuth {
+    private String phoneNumber;
+    private String code;
+    
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+}
+
+@Introspected
+class PasswordAuth {
+    private String username;
+    private String password;
+    
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+@Introspected
+class NotificationRequest {
+    private String id;
+    
+    @Schema(oneOf = {SmsAuth.class, PasswordAuth.class})
+    private Object payload;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public Object getPayload() { return payload; }
+    public void setPayload(Object payload) { this.payload = payload; }
+}
+
+@Controller("/auth")
+class ComposeController {
+
+    /**
+     * Using @Schema(anyOf = ...) directly on the @Body parameter.
+     */
+    @Post("/login")
+    public String login(
+        @Body 
+        @Schema(anyOf = {SmsAuth.class, PasswordAuth.class}) 
+        Object credentials
+    ) {
+        return "logged in";
+    }
+
+    /**
+     * Testing composition inside a wrapper POJO.
+     */
+    @Post("/notify")
+    public String notify(@Body NotificationRequest request) {
+        return "sent";
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Request Body Composition (Direct anyOf) ---
+        var loginOp = openApi.paths['/auth/login'].post
+        var loginSchema = loginOp.requestBody.content['application/json'].schema
+
+        // Must contain anyOf with correct references
+        loginSchema.anyOf.size() == 2
+        loginSchema.anyOf.any { it.$ref == '#/components/schemas/SmsAuth' }
+        loginSchema.anyOf.any { it.$ref == '#/components/schemas/PasswordAuth' }
+
+        // --- 2. Verify Nested Composition (oneOf in POJO) ---
+        var notifyOp = openApi.paths['/auth/notify'].post
+        var requestRef = notifyOp.requestBody.content['application/json'].schema.$ref
+        var requestSchema = openApi.components.schemas[requestRef.split('/').last()]
+
+        var payloadSchema = requestSchema.properties['payload']
+        // Must use oneOf as specified in the Java field annotation
+        payloadSchema.oneOf.size() == 2
+        payloadSchema.oneOf.any { it.$ref == '#/components/schemas/SmsAuth' }
+        payloadSchema.oneOf.any { it.$ref == '#/components/schemas/PasswordAuth' }
+
+        // --- 3. Verify Components Presence ---
+        openApi.components.schemas.containsKey('SmsAuth')
+        openApi.components.schemas.containsKey('PasswordAuth')
+    }
 }
