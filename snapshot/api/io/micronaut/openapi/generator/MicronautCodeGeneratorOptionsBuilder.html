@@ -177,6 +177,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Add the enum name mappings.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withEnumUnknownDefaultCase(boolean)" class="member-name-link">withEnumUnknownDefaultCase</a><wbr>(boolean&nbsp;enumUnknownDefaultCase)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If the server adds new enum cases that are unknown by an old spec/client, the client will fail to parse the network response.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withEnumUnknownDefaultCaseName(java.lang.String)" class="member-name-link">withEnumUnknownDefaultCaseName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;enumUnknownDefaultCaseName)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add form or body parameters to the beginning of the parameter list.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateControllerAsAbstract(boolean)" class="member-name-link">withGenerateControllerAsAbstract</a><wbr>(boolean&nbsp;generateControllerAsAbstract)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If true, the generated controller interface will be without `@Controller` annotation.</div>
@@ -1135,6 +1145,38 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>prependFormOrBodyParameters</code> - Add form or body parameters to the beginning of the parameter list.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withEnumUnknownDefaultCase(boolean)">
+<h3>withEnumUnknownDefaultCase</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withEnumUnknownDefaultCase</span><wbr><span class="parameters">(boolean&nbsp;enumUnknownDefaultCase)</span></div>
+<div class="block">If the server adds new enum cases that are unknown by an old spec/client, the client will fail to parse the network response.
+ With this option enabled, each enum will have a new case, 'unknown_default_open_api', so that when the server sends
+ an enum case not known by the client/spec, they can safely fall back to this case.
+ <p>
+ Default: false</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>enumUnknownDefaultCase</code> - Add or not the default case to enum.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withEnumUnknownDefaultCaseName(java.lang.String)">
+<h3>withEnumUnknownDefaultCaseName</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withEnumUnknownDefaultCaseName</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;enumUnknownDefaultCaseName)</span></div>
+<div class="block">Add form or body parameters to the beginning of the parameter list.
+ <p>
+ Default: unknown_default_open_api</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>enumUnknownDefaultCaseName</code> - Name of enum constant for the unknown default case.</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

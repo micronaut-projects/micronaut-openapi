@@ -105,19 +105,21 @@ loadScripts(document, 'script');</script>
 <div class="block">Processes <code>SecurityScheme</code>
  annotations.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readSecurityRequirements(io.micronaut.inject.ast.Element)" class="member-name-link">readSecurityRequirements</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Reads the security requirements annotation of the specified element.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readSecurityRequirements</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readMethodSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">readMethodSecurityRequirements</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
  io.micronaut.http.HttpMethod&nbsp;httpMethod,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;path,
  io.swagger.v3.oas.models.Operation&nbsp;operation,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;&nbsp;securityRequirements,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;&nbsp;methodSecurityRequirements,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Reads security requirements from the element.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readSecurityRequirements(io.micronaut.inject.ast.Element)" class="member-name-link">readSecurityRequirements</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Reads <code>SecurityRequirement</code> annotations from the element.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readSecurityRequirements(java.util.List)" class="member-name-link">readSecurityRequirements</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.security.SecurityRequirement&gt;&gt;&nbsp;annotations)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
@@ -139,26 +141,38 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="readSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)">
-<h3>readSecurityRequirements</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">readSecurityRequirements</span><wbr><span class="parameters">(io.micronaut.inject.ast.MethodElement&nbsp;element,
+<section class="detail" id="readMethodSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.http.HttpMethod,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List,io.micronaut.inject.visitor.VisitorContext)">
+<h3>readMethodSecurityRequirements</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">readMethodSecurityRequirements</span><wbr><span class="parameters">(io.micronaut.inject.ast.MethodElement&nbsp;element,
  io.micronaut.http.HttpMethod&nbsp;httpMethod,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;path,
  io.swagger.v3.oas.models.Operation&nbsp;operation,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;&nbsp;securityRequirements,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;&nbsp;methodSecurityRequirements,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="block">Reads security requirements from the element.
+ Method-level requirements must completely replace class-level requirements.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>element</code> - The method element</dd>
+<dd><code>httpMethod</code> - The HTTP method</dd>
+<dd><code>path</code> - The endpoint path</dd>
+<dd><code>operation</code> - The OpenAPI operation to update</dd>
+<dd><code>methodSecurityRequirements</code> - Pre-read security requirements on method level (already prioritized by visitor)</dd>
+<dd><code>context</code> - The visitor context</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="readSecurityRequirements(io.micronaut.inject.ast.Element)">
 <h3>readSecurityRequirements</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</span>&nbsp;<span class="element-name">readSecurityRequirements</span><wbr><span class="parameters">(io.micronaut.inject.ast.Element&nbsp;element)</span></div>
-<div class="block">Reads the security requirements annotation of the specified element.</div>
+<div class="block">Reads <code>SecurityRequirement</code> annotations from the element.
+ Method-level requirements take precedence and completely replace class-level requirements.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>element</code> - The Element to process.</dd>
+<dd><code>element</code> - The element to inspect (method or class)</dd>
 <dt>Returns:</dt>
-<dd>A list of SecurityRequirement</dd>
+<dd>A list of resolved <code>SecurityRequirement</code> objects</dd>
 </dl>
 </section>
 </li>
