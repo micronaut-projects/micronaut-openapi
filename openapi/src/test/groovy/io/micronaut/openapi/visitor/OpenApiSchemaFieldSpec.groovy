@@ -50,7 +50,8 @@ class MyDto {
             maxProperties = 100,
             multipleOf = 1.5,
             pattern = "ppp",
-            additionalProperties = Schema.AdditionalPropertiesValue.TRUE,
+            additionalProperties = Schema.AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION,
+            additionalPropertiesSchema = Integer.class,
             externalDocs = @ExternalDocumentation(description = "external docs"),
             example = "{\\n" +
                     "  \\"stampWidth\\": 220,\\n" +
@@ -107,9 +108,9 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema dtoSchema = openAPI.components.schemas['MyDto']
-        Schema parametersSchema = openAPI.components.schemas['Parameters']
+        var openApi = Utils.testReference
+        Schema dtoSchema = openApi.components.schemas['MyDto']
+        Schema parametersSchema = openApi.components.schemas['Parameters']
 
         then: "the components are valid"
         dtoSchema != null
@@ -119,7 +120,7 @@ class MyBean {}
         parametersSchema instanceof Schema
 
         when:
-        Operation operation = openAPI.paths."/path".post
+        Operation operation = openApi.paths."/path".post
 
         then:
         operation
@@ -137,7 +138,9 @@ class MyBean {}
         dtoSchema.properties.test.readOnly
         dtoSchema.properties.test.description == 'this is description'
         dtoSchema.properties.test.externalDocs.description == 'external docs'
-        dtoSchema.properties.test.additionalProperties == true
+        dtoSchema.properties.test.additionalProperties
+        dtoSchema.properties.test.additionalProperties.type == 'integer'
+        dtoSchema.properties.test.additionalProperties.format == 'int32'
         dtoSchema.properties.test.example
         dtoSchema.properties.test.example.stampWidth == 220
         dtoSchema.properties.test.example.stampHeight == 85
@@ -1239,8 +1242,7 @@ class MyBean {}
         def schemas = openApi.components.schemas
 
         then: "the components are valid"
-        schemas.AuditSearchCriteria.additionalProperties != null
-        schemas.AuditSearchCriteria.additionalProperties == false
+        schemas.AuditSearchCriteria.additionalProperties == null
     }
 
     void "test jackson and swagger annotations together"() {

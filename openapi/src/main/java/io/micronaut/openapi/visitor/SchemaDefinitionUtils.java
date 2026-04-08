@@ -59,7 +59,6 @@ import io.micronaut.inject.ast.PropertyElementQuery;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -74,6 +73,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -128,6 +128,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
+import static io.micronaut.openapi.OpenApiUtils.getConvertJsonMapper;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
@@ -154,6 +155,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecord;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecordType;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilCollectionType;
+import static io.micronaut.openapi.visitor.ElementUtils.isJsonNode;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
@@ -175,6 +177,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.DISCRIMINATOR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
@@ -436,8 +439,8 @@ public final class SchemaDefinitionUtils {
                 if (schema == null) {
 
                     if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
-                        schema = createSchema();
-                        schema.setName(schemaName);
+                        schema = createSchema()
+                            .name(schemaName);
                         processJacksonDescription(enumEl, schema);
                         if (schema.getDescription() == null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
@@ -483,7 +486,8 @@ public final class SchemaDefinitionUtils {
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
                     // Break recursion
-                    return createSchema().$ref(SchemaUtils.schemaRef(schemaName));
+                    return createSchema()
+                        .$ref(SchemaUtils.schemaRef(schemaName));
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -874,6 +878,25 @@ public final class SchemaDefinitionUtils {
             if (isArray != null && isArray) {
                 schema = SchemaUtils.arraySchema(schema);
             }
+        } else if (isJsonNode(type)) {
+            schema = createSchema();
+            schema.setAdditionalProperties(true);
+            if (schemaAnnValue != null) {
+                var addProps = schemaAnnValue.get(PROP_ADDITIONAL_PROPERTIES, AdditionalPropertiesValue.class).orElse(null);
+                if (addProps == null || addProps == AdditionalPropertiesValue.TRUE) {
+                    schema.setAdditionalProperties(true);
+                } else if (addProps == AdditionalPropertiesValue.FALSE) {
+                    schema.setAdditionalProperties(null);
+                } else if (addProps == AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION) {
+                    var additionalPropsSchemaClass = schemaAnnValue.stringValue(PROP_ADDITIONAL_PROPERTIES_SCHEMA).orElse(null);
+                    if (StringUtils.isNotEmpty(additionalPropsSchemaClass)) {
+                        var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClass).orElse(null);
+                        if (additionalPropsClassEl != null) {
+                            schema.setAdditionalProperties(resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                        }
+                    }
+                }
+            }
         } else if (type != null) {
 
             boolean isPublisher = false;
@@ -941,7 +964,7 @@ public final class SchemaDefinitionUtils {
                     // For file upload, we use PrimitiveType.BINARY
                     typeName = PrimitiveType.BINARY.name();
                 }
-                PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
+                var primitiveType = PrimitiveType.fromName(typeName);
                 schema = protobufTypeSchema(type);
                 if (schema != null) {
                     return schema;
@@ -1353,7 +1376,7 @@ public final class SchemaDefinitionUtils {
                                                         type = SchemaUtils.getType(type, new HashSet<>(Arrays.asList((String[]) headerSchema.get(PROP_ONE_TYPES))));
                                                     }
                                                 }
-                                                var headerExampleStr = OpenApiUtils.getConvertJsonMapper().writeValueAsString(headerExample);
+                                                var headerExampleStr = getConvertJsonMapper().writeValueAsString(headerExample);
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
@@ -1481,13 +1504,25 @@ public final class SchemaDefinitionUtils {
                         newValues.put(key, a);
                     }
                 } else if (key.equals(PROP_ADDITIONAL_PROPERTIES)) {
-                    if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
+                    if (AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, true);
-                    } else if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
+                    } else if (AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, false);
+                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
+                        var additionalPropsSchemaClass = values.get(PROP_ADDITIONAL_PROPERTIES_SCHEMA);
+                        if (additionalPropsSchemaClass!= null) {
+                            String additionalPropsSchemaClassName;
+                            if (additionalPropsSchemaClass instanceof AnnotationClassValue<?> acv) {
+                                additionalPropsSchemaClassName = acv.getName();
+                            } else {
+                                additionalPropsSchemaClassName = additionalPropsSchemaClass.toString();
+                            }
+                            var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClassName).orElse(null);
+                            if (additionalPropsClassEl != null) {
+                                newValues.put(PROP_ADDITIONAL_PROPERTIES, resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                            }
+                        }
                     }
-                    // TODO
-//                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                 } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
                 } else if (key.equals(PROP_DISCRIMINATOR_PROPERTY)) {
@@ -1734,7 +1769,7 @@ public final class SchemaDefinitionUtils {
                 required = true;
             }
 
-            // check JsonInclude mode, if swagger schema required mode not set
+            // check JsonInclude mode if swagger schema required mode not set
             if (reqMode.elementSchemaRequired() == null) {
                 var classJsonIncludeAnn = classEl != null ? getAnnotation(classEl, JsonInclude.class) : null;
                 JsonInclude.Include classIncludeMode = null;
@@ -2364,11 +2399,19 @@ public final class SchemaDefinitionUtils {
 
         var addProps = (String) annValues.get(PROP_ADDITIONAL_PROPERTIES);
         if (StringUtils.isNotEmpty(addProps)) {
-            var schemaAdditionalProperties = io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.valueOf(addProps);
-            if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE) {
-                schemaToBind.additionalProperties(true);
-            } else if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE) {
-                schemaToBind.additionalProperties(false);
+            var schemaAdditionalProperties = AdditionalPropertiesValue.valueOf(addProps);
+            if (schemaAdditionalProperties == AdditionalPropertiesValue.TRUE) {
+                schemaToBind.setAdditionalProperties(true);
+            } else if (schemaAdditionalProperties == AdditionalPropertiesValue.FALSE) {
+                schemaToBind.setAdditionalProperties(false);
+            } else if (schemaAdditionalProperties == AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION) {
+                var additionalPropsSchemaClass = (AnnotationClassValue) annValues.get(PROP_ADDITIONAL_PROPERTIES_SCHEMA);
+                if (additionalPropsSchemaClass != null) {
+                    var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClass.getName()).orElse(null);
+                    if (additionalPropsClassEl != null) {
+                        schemaToBind.setAdditionalProperties(resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                    }
+                }
             }
         }
 

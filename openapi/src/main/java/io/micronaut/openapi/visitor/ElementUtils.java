@@ -124,6 +124,11 @@ public final class ElementUtils {
     private ElementUtils() {
     }
 
+    public static boolean isJsonNode(ClassElement classEl) {
+        return classEl.isAssignable("com.fasterxml.jackson.databind.JsonNode")
+            || classEl.isAssignable("io.micronaut.json.tree.JsonNode");
+    }
+
     public static boolean isJavaRecord(ClassElement classEl) {
         return classEl.isAssignable(Record.class.getName());
     }
