@@ -13,5 +13,5 @@ micronautBuild {
     }
 }
 dependencies {
-    implementation("io.micronaut:micronaut-module-info:5.0.0-M16")
+    implementation("io.micronaut:micronaut-module-info:5.0.0-M22")
 }

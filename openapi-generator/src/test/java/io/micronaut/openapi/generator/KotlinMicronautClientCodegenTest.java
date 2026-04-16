@@ -3278,7 +3278,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """
                     @Get("/getIgnoredHeader")
                     @Consumes("text/plain")
-                    fun getIgnoredHeader(): Mono<HttpResponse<String?>>
+                    fun getIgnoredHeader(): Mono<HttpResponse<String>>
                 """,
             """
                     @Get("/sendValidatedPrimitives")
@@ -3288,7 +3288,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @QueryValue("age") @Nullable @Min(10) @Max(200) age: Int? = null,
                         @QueryValue("favoriteNumber") @Nullable @DecimalMin("-100.5") @DecimalMax("100.5") favoriteNumber: BigDecimal? = null,
                         @QueryValue("height") @Nullable @DecimalMin("0.1", inclusive = false) @DecimalMax("3", inclusive = false) height: Double? = null,
-                    ): Mono<String?>
+                    ): Mono<String>
                 """
         );
 

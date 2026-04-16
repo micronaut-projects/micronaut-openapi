@@ -34,7 +34,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Default: false
      *
      * @param useUrlConnectionCache Use URLConnection cache or not
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withUseUrlConnectionCache(boolean useUrlConnectionCache);
@@ -243,7 +242,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * If set to true, {@literal @}JsonInclude annotation will be with value ALWAYS for required properties in POJO's.
      *
      * @param jsonIncludeAlwaysForRequiredFields set value ALWAYS to JsonInclude annotation for required properties or not
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withJsonIncludeAlwaysForRequiredFields(boolean jsonIncludeAlwaysForRequiredFields);
@@ -348,7 +346,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Flag to indicate whether to use the utils.OneOfImplementorAdditionalData related logic.
      *
      * @param useOneOfInterfaces if true, then use the utils.OneOfImplementorAdditionalData related logic.
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withUseOneOfInterfaces(boolean useOneOfInterfaces);
@@ -357,7 +354,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Additional annotations for enum type (class level annotations).
      *
      * @param additionalEnumTypeAnnotations additional annotations for enum type (class level annotations).
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withAdditionalEnumTypeAnnotations(List<String> additionalEnumTypeAnnotations);
@@ -366,7 +362,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Additional annotations for model type (class level annotations).
      *
      * @param additionalModelTypeAnnotations additional annotations for model type (class level annotations).
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withAdditionalModelTypeAnnotations(List<String> additionalModelTypeAnnotations);
@@ -375,7 +370,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Additional annotations for oneOf interfaces (class level annotations).
      *
      * @param additionalOneOfTypeAnnotations additional annotations for oneOf interfaces (class level annotations).
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations);
@@ -384,7 +378,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Additional generator properties.
      *
      * @param additionalProperties additional generator properties.
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withAdditionalProperties(Map<String, Object> additionalProperties);
@@ -393,7 +386,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Whether to use tags for creating interface and controller class names.
      *
      * @param useTags Whether to use tags for creating interface and controller class names.
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withUseTags(boolean useTags);
@@ -402,7 +394,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * If `true` operations wil be generated only for first tag, otherwise - for every tag.
      *
      * @param generateOperationOnlyForFirstTag If `true` operations wil be generated only for first tag, otherwise - for every tag.
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withGenerateOperationOnlyForFirstTag(boolean generateOperationOnlyForFirstTag);
@@ -411,7 +402,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Flag to indicate whether to use the "jakarta" or "javax" package.
      *
      * @param useJakartaEe if true, then use the "jakarta" package, otherwise - "javax".
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withUseJakartaEe(boolean useJakartaEe);
@@ -421,7 +411,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Default: true
      *
      * @param sortParamsByRequiredFlag Sort method arguments to place required parameters before optional parameters
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withSortParamsByRequiredFlag(boolean sortParamsByRequiredFlag);
@@ -431,7 +420,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * Default: false
      *
      * @param skipOperationExample Skip examples defined in operations to avoid out of memory errors.
-     *
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withSkipOperationExample(boolean skipOperationExample);

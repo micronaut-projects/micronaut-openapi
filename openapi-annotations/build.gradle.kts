@@ -5,6 +5,7 @@ plugins {
 dependencies {
     api(libs.managed.swagger.annotations)
     api(mn.micronaut.core) {
+        exclude(group = "org.jspecify")
         exclude(group = "io.micronaut")
         exclude(group = "org.slf4j")
     }
@@ -18,7 +19,8 @@ dependencies {
         exclude(group = "io.micronaut")
         exclude(group = "org.slf4j")
     }
-    testImplementation(mnTest.junit.platform.launcher)
+
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {

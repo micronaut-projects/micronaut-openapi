@@ -15,7 +15,6 @@ dependencies {
     api(libs.guava)
     api(mnLogging.slf4j.ext)
     api(mn.snakeyaml)
-    api(mn.jackson.datatype.jsr310)
     api(libs.rhino) // TODO remove once `org.openapitools:openapi-generator` does not ship with a vulnerable version of rhino
 
     testImplementation(mnTest.micronaut.test.junit5)
