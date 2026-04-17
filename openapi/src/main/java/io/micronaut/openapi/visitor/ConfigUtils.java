@@ -16,9 +16,15 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.context.exceptions.ConfigurationException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.PropertyNamingStrategies;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
@@ -30,7 +36,6 @@ import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.env.AnnProcessorEnvironment;
 import io.micronaut.openapi.javadoc.DocsFormat;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -43,11 +48,6 @@ import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.PropertyNamingStrategy;
 
 import java.io.IOException;
@@ -171,6 +171,12 @@ import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFA
 import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
 import static io.micronaut.openapi.visitor.management.SpringActuatorConfigUtils.mergeWithActuatorProperties;
 import static org.jsoup.helper.Validate.fail;
+import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
  * Configuration utilities methods.
@@ -535,7 +541,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = (AnnProcessorEnvironment) getEnv(context);
+        var env = getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -602,7 +608,7 @@ public final class ConfigUtils {
         var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
-        var env = (AnnProcessorEnvironment) getEnv(context);
+        var env = getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -1390,6 +1396,39 @@ public final class ConfigUtils {
             }
 
             @Override
+            public @Nullable List<String> getOverrideConfigLocations() {
+                boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
+                if (isEnabled) {
+                    List<String> annotationProcessingConfigLocations = new ArrayList<>();
+                    String projectResourcesPath = null;
+                    String projectDir = StringUtils.EMPTY_STRING;
+
+                    Path projectPath = getProjectPath(context);
+                    if (projectPath != null) {
+                        projectDir = FILE_SCHEME + normalizePath(projectPath.toString());
+                        projectResourcesPath = projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/main/resources/";
+                    }
+
+                    String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
+                    if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
+                        annotationProcessingConfigLocations.add(projectResourcesPath);
+                    } else if (StringUtils.isNotEmpty(configFileLocations)) {
+                        for (String configFileLocation : configFileLocations.split(COMMA)) {
+                            if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
+                                throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
+                            }
+                            if (configFileLocation.startsWith(PROJECT_SCHEME)) {
+                                configFileLocation = configFileLocation.replace(PROJECT_SCHEME, projectDir);
+                            }
+                            annotationProcessingConfigLocations.add(configFileLocation);
+                        }
+                    }
+                    return annotationProcessingConfigLocations;
+                }
+                return ApplicationContextConfiguration.super.getOverrideConfigLocations();
+            }
+
+            @Override
             @NonNull
             public List<String> getEnvironments() {
                 return getActiveEnvs(context);
@@ -1398,7 +1437,7 @@ public final class ConfigUtils {
 
         Environment environment = null;
         try {
-            environment = new AnnProcessorEnvironment(configuration, context);
+            environment = Environment.create(configuration);
             environment.start();
             return environment;
         } catch (Exception e) {

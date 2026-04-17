@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
@@ -61,8 +63,6 @@ import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1749,18 +1749,10 @@ public final class SchemaUtils {
         return schema;
     }
 
-    /**
-     * Required mode meta information class.
-     *
-     * @param elementSchemaRequired is element schema required
-     * @param isAutoRequiredMode is auto required mode
-     * @param isRequiredDefaultValueSet is required default value set
-     */
     public record RequiredMode(
         Boolean elementSchemaRequired,
         boolean isAutoRequiredMode,
         boolean isRequiredDefaultValueSet
     ) {
-
     }
 }
