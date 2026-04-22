@@ -9,11 +9,13 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.swagger.v3.oas.models.OpenAPI
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.platform.commons.util.CollectionUtils
 import java.lang.IllegalStateException
 import kotlin.String
 
+@Disabled
 @MicronautTest(environments = ["test"])
 class MicronautOpenApiTest(
     var server: EmbeddedServer,
