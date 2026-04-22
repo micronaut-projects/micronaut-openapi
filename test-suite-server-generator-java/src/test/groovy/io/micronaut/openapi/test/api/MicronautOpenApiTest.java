@@ -1,6 +1,5 @@
 package io.micronaut.openapi.test.api;
 
-import tools.jackson.core.JacksonException;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
@@ -11,6 +10,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.JacksonException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +35,7 @@ public class MicronautOpenApiTest {
     }
 
     @Test
-    void testOpenApiView() throws JsonProcessingException {
+    void testOpenApiView() throws JacksonException {
         var swaggerUi = client.retrieve("/swagger-ui", String.class);
 
         assertNotNull(swaggerUi);

@@ -15,16 +15,15 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.micronaut.openapi.swagger.core.jackson.ApiResponsesSerializer;
 import io.micronaut.openapi.swagger.core.jackson.CallbackSerializer;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import tools.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Map;
 
 /**
  * This class is copied from swagger-core library.

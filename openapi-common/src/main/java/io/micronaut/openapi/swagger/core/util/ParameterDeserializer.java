@@ -15,15 +15,12 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
-
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -31,7 +28,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.cfg.EnumFeature;
 
 /**
  * This class is copied from swagger-core library.
@@ -53,13 +49,13 @@ public class ParameterDeserializer extends ValueDeserializer<Parameter> {
         JsonNode desc = node.get("description");
 
         if (sub != null) {
-            result = new Parameter().$ref(sub.asText());
+            result = new Parameter().$ref(sub.asString());
             if (desc != null && openapi31) {
-                result.description(desc.asText());
+                result.description(desc.asString());
             }
 
         } else if (inNode != null) {
-            String in = inNode.asText();
+            String in = inNode.asString();
 
             ObjectReader reader = null;
             ObjectMapper mapper;
@@ -79,7 +75,7 @@ public class ParameterDeserializer extends ValueDeserializer<Parameter> {
                 reader = mapper.readerFor(CookieParameter.class);
             }
             if (reader != null) {
-                result = reader.with(EnumFeature.READ_ENUMS_USING_TO_STRING).readValue(node);
+                result = reader.readValue(node);
             }
         }
 

@@ -5,11 +5,9 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Encoding
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiEncodingSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI encoding block"() {
 
         when:
@@ -170,7 +168,6 @@ class MyBean {}
         operation.requestBody.content."multipart/form-data".encoding."template".contentType == "application/octet-stream"
     }
 
-    @PendingFeature
     void "test build OpenAPI complex encoding block"() {
 
         when:
@@ -811,7 +808,6 @@ class MyBean {}
         operation.requestBody.content."multipart/form-data".encoding."parameters".contentType == "application/json"
     }
 
-    @PendingFeature
     void "test build OpenAPI multipart form data with custom schema"() {
 
         when:

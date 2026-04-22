@@ -420,6 +420,7 @@ final class JdkVersion {
     public static final JdkVersion JDK_19 = new JdkVersion(19);
     public static final JdkVersion JDK_20 = new JdkVersion(20);
     public static final JdkVersion JDK_21 = new JdkVersion(21);
+    public static final JdkVersion JDK_25 = new JdkVersion(25);
     private static final String PREFIX_JDK = "JDK_";
 
     int majorVersion;

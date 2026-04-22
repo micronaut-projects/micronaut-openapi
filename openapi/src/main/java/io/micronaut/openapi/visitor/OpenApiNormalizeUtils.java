@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.core.JacksonException;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -31,6 +30,7 @@ import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import tools.jackson.core.JacksonException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -302,7 +302,7 @@ public final class OpenApiNormalizeUtils {
         if (CollectionUtils.isNotEmpty(allOf)) {
             if (allOf.size() == 1) {
 
-                Schema<?> allOfSchema = allOf.get(0);
+                Schema<?> allOfSchema = allOf.getFirst();
                 if (CollectionUtils.isEmpty(allOfSchema.getExtensions())) {
                     allOfSchema.setExtensions(null);
                 }

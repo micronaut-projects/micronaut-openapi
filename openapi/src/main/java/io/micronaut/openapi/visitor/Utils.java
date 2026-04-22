@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.databind.ObjectMapper;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.MediaType;
@@ -30,6 +29,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.tags.Tag;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -390,6 +390,10 @@ public final class Utils {
     public static void setOpenapi31(boolean openapi31) {
         System.setProperty(BIND_TYPE_AND_TYPES, "true");
         Utils.openapi31 = openapi31;
+    }
+
+    public static ObjectMapper getConvertMapper() {
+        return openapi31 ? OpenApiUtils.getConvertJsonMapper31() : OpenApiUtils.getConvertJsonMapper();
     }
 
     public static void clean() {

@@ -1,11 +1,11 @@
 package io.micronaut.openapi.spring;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-@Configuration
+@TestConfiguration
 public class TestConfig {
 
     public static final String APP_NAME = "test-suite-java-spring";

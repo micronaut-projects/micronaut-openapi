@@ -3,11 +3,9 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiJsonUnwrappedSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test JsonUnwrapped annotation"() {
 
         given: "An API definition"
@@ -15,19 +13,19 @@ class OpenApiJsonUnwrappedSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.*;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.rxjava3.core.Single;
+import io.swagger.v3.oas.annotations.media.Schema;
 import tools.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.annotation.JsonNaming;
 
 @Controller("/test")
 interface TestOperations {
 
-    @Post("/")
+    @Post
     Single<Test> save(String name, int age);
 }
 
@@ -240,7 +238,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Controller
 class DemoController {
 
-    @Get("/")
+    @Get
     MyDto index() {
         return null;
     }
@@ -277,20 +275,19 @@ class MyBean {}
         schema.properties.field1.type == "string"
     }
 
-    @PendingFeature
     void "test JsonUnwrapped annotation and schema allOf annotation"() {
         given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 import io.reactivex.Single;
-import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.*;
-import com.fasterxml.jackson.annotation.*;
 import tools.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.annotation.JsonNaming;
 
 @Controller("/test")
 interface TestOperations {

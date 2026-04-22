@@ -3,6 +3,9 @@ spring:
     name: test-suite-java-spring
   main:
     banner-mode: off
+  web:
+    resources:
+      static-locations: classpath:/META-INF/swagger,classpath:/META-INF/swagger/views/swagger-ui/
 
 server:
   port: 8090

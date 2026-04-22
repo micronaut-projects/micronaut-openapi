@@ -15,17 +15,15 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import io.swagger.v3.oas.models.headers.Header;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ValueDeserializer;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * This class is copied from swagger-core library.
@@ -39,7 +37,7 @@ public class HeaderStyleEnumDeserializer extends ValueDeserializer<Header.StyleE
         throws JacksonException {
         JsonNode node = ctxt.readTree(jp);
         if (node != null) {
-            String value = node.asText();
+            String value = node.asString();
             return getStyleEnum(value);
         }
         return null;

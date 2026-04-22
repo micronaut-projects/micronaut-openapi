@@ -2,11 +2,9 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
-import spock.lang.PendingFeature
 
 class OpenApiDateTimeExampleSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test jdk8 date time example"() {
 
         when:
@@ -76,7 +74,7 @@ public class MyBean {}
         OpenAPI openAPI = Utils.testReference
 
         openAPI.paths.get("/times").get.parameters.size() == 1
-        openAPI.paths.get("/times").get.parameters[0].name =='query'
+        openAPI.paths.get("/times").get.parameters[0].name == 'query'
         !openAPI.paths.get("/times").get.parameters[0].required
         openAPI.paths.get("/times").get.parameters[0].schema.type == 'string'
         openAPI.paths.get("/times").get.parameters[0].example == "2020-11-03T20:12:00Z"

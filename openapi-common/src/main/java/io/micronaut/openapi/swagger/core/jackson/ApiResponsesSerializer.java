@@ -15,15 +15,14 @@
  */
 package io.micronaut.openapi.swagger.core.jackson;
 
-import java.util.Map.Entry;
-
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
+
+import java.util.Map.Entry;
 
 /**
  * This class is copied from swagger-core library.

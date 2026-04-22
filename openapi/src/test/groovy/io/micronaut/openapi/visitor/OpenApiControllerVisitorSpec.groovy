@@ -8,7 +8,6 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
-import spock.lang.PendingFeature
 import spock.util.environment.RestoreSystemProperties
 
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE
@@ -426,7 +425,6 @@ class MyBean {}
         parameter.schema.maxItems == 20
     }
 
-    @PendingFeature
     void "test build OpenAPI doc with @Content without mediaType information"() {
 
         given: "An API definition"
@@ -1827,7 +1825,7 @@ class HelloWorldController {
     public com.google.common.base.Optional<MyDto> endpoint1(@Body com.google.common.base.Optional<MyDto> body) {
         return null;
     }
-    
+
     @Post("/optInt")
     public OptionalInt optInt(@Body OptionalInt body) {
         return null;
@@ -2425,7 +2423,7 @@ class TestArgumentBinder implements TypedRequestArgumentBinder<FilterProvidedArg
     public Argument<FilterProvidedArgument> argumentType() {
         return Argument.of(FilterProvidedArgument.class);
     }
-    
+
     @Override
     public BindingResult<FilterProvidedArgument> bind(ArgumentConversionContext<FilterProvidedArgument> context, HttpRequest<?> source) {
         return () -> Optional.of(new FilterProvidedArgument("my-id"));
@@ -2802,7 +2800,7 @@ class ConsentsApiImpl implements ConsentsApi {
 
     @Status(HttpStatus.PARTIAL_CONTENT)
     public void rewriteStatus() {
-        
+
     }
 
     @Override
@@ -2819,11 +2817,11 @@ class ConsentsApiImpl implements ConsentsApi {
 
 
 class ConsentResponse {
-    
+
 }
 
 class ConsentRequest {
-    
+
 }
 
 @Singleton
@@ -3138,24 +3136,24 @@ class MyBean {}
 
         then:
         op1
-        var paramA = op1.parameters.find {it.name == 'a' }
+        var paramA = op1.parameters.find { it.name == 'a' }
         paramA
         paramA.name == 'a'
         paramA.schema.type == 'array'
         paramA.schema.items.type == 'string'
 
-        var paramB = op1.parameters.find {it.name == 'b' }
+        var paramB = op1.parameters.find { it.name == 'b' }
         paramB.name == 'b'
         paramB.schema.type == 'array'
         paramB.schema.items.type == 'string'
 
         op2
-        var paramArg1 = op2.parameters.find {it.name == 'arg1' }
+        var paramArg1 = op2.parameters.find { it.name == 'arg1' }
         paramArg1
         paramArg1.name == 'arg1'
         paramArg1.schema.type == 'string'
 
-        var paramArg2 = op2.parameters.find {it.name == 'arg2' }
+        var paramArg2 = op2.parameters.find { it.name == 'arg2' }
         paramArg2
         paramArg2.name == 'arg2'
         paramArg2.schema.type == 'integer'
@@ -3186,7 +3184,7 @@ interface MyController {
 
     @Post(uri = "/byteArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
     byte[] byteArrayInParams(@PathVariable byte[] param1, @QueryValue byte[] qv1, @Body byte[] body);
-    
+
     @Post(uri = "/charArrayInParams/{param1}", produces = MediaType.APPLICATION_OCTET_STREAM)
     char[] charArrayInParams(@PathVariable char[] param1, @QueryValue char[] qv1, @Body char[] body);
 
@@ -3196,7 +3194,7 @@ interface MyController {
 
 @Introspected
 class MyDto {
-    
+
     public byte[] payload;
     public char[] payload2;
 }

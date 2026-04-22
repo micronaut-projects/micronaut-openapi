@@ -1,9 +1,10 @@
 package io.micronaut.configuration.openapi.docs
 
 import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+
 // tag::imports[]
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.info.License
@@ -20,7 +21,7 @@ import io.swagger.v3.oas.annotations.info.License
         )
 )
 class Application {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         Micronaut.run(Application)
     }
 }

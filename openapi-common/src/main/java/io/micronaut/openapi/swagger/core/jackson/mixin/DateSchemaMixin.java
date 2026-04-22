@@ -15,11 +15,11 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.Map;
 
 /**
  * This class is copied from swagger-core library.
@@ -31,10 +31,10 @@ public abstract class DateSchemaMixin {
     @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
     public abstract Object getExample();
 
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public abstract Object getDefault();
 
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public abstract Object getEnum();
 
     @JsonIgnore

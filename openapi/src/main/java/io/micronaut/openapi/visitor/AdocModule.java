@@ -79,7 +79,7 @@ public final class AdocModule {
                 Files.writeString(outputPath, adoc);
             }
         } catch (Exception e) {
-            warn("Can't convert to ADoc format\n" + Utils.printStackTrace(e), context);
+            warn("Can't convert to Adoc format\n" + Utils.printStackTrace(e), context);
         }
     }
 

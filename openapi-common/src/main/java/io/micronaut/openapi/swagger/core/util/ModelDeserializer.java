@@ -15,14 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import tools.jackson.core.JsonParser;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
-import tools.jackson.databind.node.StringNode;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.media.ArbitrarySchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -40,6 +32,14 @@ import io.swagger.v3.oas.models.media.PasswordSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -88,21 +88,21 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
         }
 
         JsonNode type = node.get("type");
-        String format = node.get("format") == null ? "" : node.get("format").textValue();
+        String format = node.get("format") == null ? "" : node.get("format").stringValue();
 
-        if (type != null && "array".equals(type.textValue())) {
+        if (type != null && "array".equals(type.stringValue())) {
             schema = OpenApiUtils.getJsonMapper().convertValue(node, ArraySchema.class);
         } else if (type != null) {
-            if (type.textValue().equals("integer")) {
+            if (type.stringValue().equals("integer")) {
                 schema = OpenApiUtils.getJsonMapper().convertValue(node, IntegerSchema.class);
                 if (format == null || format.isBlank()) {
                     schema.setFormat(null);
                 }
-            } else if (type.textValue().equals("number")) {
+            } else if (type.stringValue().equals("number")) {
                 schema = OpenApiUtils.getJsonMapper().convertValue(node, NumberSchema.class);
-            } else if (type.textValue().equals("boolean")) {
+            } else if (type.stringValue().equals("boolean")) {
                 schema = OpenApiUtils.getJsonMapper().convertValue(node, BooleanSchema.class);
-            } else if (type.textValue().equals("string")) {
+            } else if (type.stringValue().equals("string")) {
                 if ("date".equals(format)) {
                     schema = OpenApiUtils.getJsonMapper().convertValue(node, DateSchema.class);
                 } else if ("date-time".equals(format)) {
@@ -116,11 +116,11 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
                 } else {
                     schema = OpenApiUtils.getJsonMapper().convertValue(node, StringSchema.class);
                 }
-            } else if (type.textValue().equals("object")) {
+            } else if (type.stringValue().equals("object")) {
                 schema = deserializeArbitraryOrObjectSchema(node, true);
             }
         } else if (node.get("$ref") != null) {
-            schema = new Schema().$ref(node.get("$ref").asText());
+            schema = new Schema().$ref(node.get("$ref").asString());
         } else {
             schema = deserializeArbitraryOrObjectSchema(node, false);
         }
@@ -186,10 +186,10 @@ public class ModelDeserializer extends ValueDeserializer<Schema> {
             }
             schema = OpenApiUtils.getJsonMapper31().convertValue(node, JsonSchema.class);
             if (type instanceof StringNode) {
-                schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
+                schema.types(new LinkedHashSet<>(Collections.singletonList(type.stringValue())));
             } else if (type instanceof ArrayNode arrayNode) {
                 Set<String> types = new LinkedHashSet<>();
-                arrayNode.elements().forEach(n -> types.add(n.textValue()));
+                arrayNode.elements().forEach(n -> types.add(n.stringValue()));
                 schema.types(types);
             }
             if (additionalProperties != null) {

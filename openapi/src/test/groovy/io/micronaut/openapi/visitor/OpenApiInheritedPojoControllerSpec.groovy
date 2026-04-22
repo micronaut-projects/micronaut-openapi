@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiInheritedPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -787,7 +786,6 @@ class MyBean {}
         dogSchema.allOf[1].properties.size() == 1
     }
 
-    @PendingFeature
     void "test build OpenAPI doc for POJO with Inheritance and response discriminator mapping"() {
 
         when:

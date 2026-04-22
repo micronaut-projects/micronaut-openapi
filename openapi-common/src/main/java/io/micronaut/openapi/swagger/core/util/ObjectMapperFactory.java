@@ -15,9 +15,7 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.micronaut.openapi.swagger.core.jackson.ExampleSerializer;
 import io.micronaut.openapi.swagger.core.jackson.MediaTypeSerializer;
 import io.micronaut.openapi.swagger.core.jackson.Schema31Serializer;
@@ -70,26 +68,26 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.servers.ServerVariable;
 import io.swagger.v3.oas.models.servers.ServerVariables;
 import io.swagger.v3.oas.models.tags.Tag;
-
 import org.snakeyaml.engine.v2.api.LoadSettings;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.databind.BeanDescription;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationConfig;
-import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.cfg.DateTimeFeature;
-import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.cfg.MapperBuilder;
+import tools.jackson.databind.introspect.DefaultAccessorNamingStrategy;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.ser.ValueSerializerModifier;
-import tools.jackson.databind.ValueSerializer;
 import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
+
+import java.util.LinkedHashMap;
 
 /**
  * This class is copied from swagger-core library.
@@ -97,6 +95,48 @@ import tools.jackson.dataformat.yaml.YAMLWriteFeature;
  * @since 4.6.0
  */
 public class ObjectMapperFactory {
+
+    private static final JacksonModule MODULE_SERIALIZATION_30 = new SimpleModule() {
+        @Override
+        public void setupModule(SetupContext context) {
+            super.setupModule(context);
+            context.addSerializerModifier(new ValueSerializerModifier() {
+                @Override
+                public ValueSerializer<?> modifySerializer(
+                    SerializationConfig config, BeanDescription.Supplier desc, ValueSerializer<?> serializer) {
+                    if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new SchemaSerializer((ValueSerializer<Object>) serializer);
+                    } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
+                    } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new ExampleSerializer((ValueSerializer<Object>) serializer);
+                    }
+                    return serializer;
+                }
+            });
+        }
+    };
+
+    private static final JacksonModule MODULE_SERIALIZATION_31 = new SimpleModule() {
+        @Override
+        public void setupModule(SetupContext context) {
+            super.setupModule(context);
+            context.addSerializerModifier(new ValueSerializerModifier() {
+                @Override
+                public ValueSerializer<?> modifySerializer(
+                    SerializationConfig config, BeanDescription.Supplier desc, ValueSerializer<?> serializer) {
+                    if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new Schema31Serializer((ValueSerializer<Object>) serializer);
+                    } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
+                    } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
+                        return new ExampleSerializer((ValueSerializer<Object>) serializer);
+                    }
+                    return serializer;
+                }
+            });
+        }
+    };
 
     private ObjectMapperFactory() {
     }
@@ -118,11 +158,10 @@ public class ObjectMapperFactory {
     }
 
     private static YAMLFactory buildYamlFactory() {
-        LoadSettings loadSettings = LoadSettings.builder()
-            .setAllowDuplicateKeys(false)
-            .build();
         return YAMLFactory.builder()
-            .loadSettings(loadSettings)
+            .loadSettings(LoadSettings.builder()
+                .setAllowDuplicateKeys(false)
+                .build())
             .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
             .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
             .enable(YAMLWriteFeature.SPLIT_LINES)
@@ -130,60 +169,9 @@ public class ObjectMapperFactory {
             .build();
     }
 
-    @SuppressWarnings("deprecation")
     private static ObjectMapper create(MapperBuilder<?, ?> builder, boolean openapi31) {
 
-        SimpleModule serializerModule;
-        if (!openapi31) {
-            serializerModule = new SimpleModule() {
-                @Override
-                public void setupModule(SetupContext context) {
-                    super.setupModule(context);
-                    context.addSerializerModifier(new ValueSerializerModifier() {
-                        @Override
-                        public ValueSerializer<?> modifySerializer(
-                            SerializationConfig config, BeanDescription.Supplier desc, ValueSerializer<?> serializer) {
-                            if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new SchemaSerializer((ValueSerializer<Object>) serializer);
-                            } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
-                            } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new ExampleSerializer((ValueSerializer<Object>) serializer);
-                            }
-                            return serializer;
-                        }
-                    });
-                }
-            };
-        } else {
-            serializerModule = new SimpleModule() {
-                @Override
-                public void setupModule(SetupContext context) {
-                    super.setupModule(context);
-                    context.addSerializerModifier(new ValueSerializerModifier() {
-                        @Override
-                        public ValueSerializer<?> modifySerializer(
-                            SerializationConfig config, BeanDescription.Supplier desc, ValueSerializer<?> serializer) {
-                            if (Schema.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new Schema31Serializer((ValueSerializer<Object>) serializer);
-                            } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new MediaTypeSerializer((ValueSerializer<Object>) serializer);
-                            } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new ExampleSerializer((ValueSerializer<Object>) serializer);
-                            }
-                            return serializer;
-                        }
-                    });
-                }
-            };
-        }
-
-        SimpleModule deserializerModule = openapi31 ? new DeserializationModule31() : new DeserializationModule();
-
-        builder.addModule(serializerModule);
-        builder.addModule(deserializerModule);
-
-        Map<Class<?>, Class<?>> sourceMixins = new LinkedHashMap<>();
+        var sourceMixins = new LinkedHashMap<Class<?>, Class<?>>();
 
         sourceMixins.put(ApiResponses.class, ExtensionsMixin.class);
         sourceMixins.put(Contact.class, ExtensionsMixin.class);
@@ -229,33 +217,54 @@ public class ObjectMapperFactory {
             sourceMixins.put(Discriminator.class, Discriminator31Mixin.class);
         }
 
-        for (Map.Entry<Class<?>, Class<?>> entry : sourceMixins.entrySet()) {
-            builder.addMixIn(entry.getKey(), entry.getValue());
+        if (openapi31) {
+            builder.addModules(MODULE_SERIALIZATION_31, new DeserializationModule31());
+        } else {
+            builder.addModules(MODULE_SERIALIZATION_30, new DeserializationModule());
         }
 
-        builder.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        builder.configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        builder.configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true);
-        builder.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        builder.configure(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN, true);
-        builder.changeDefaultPropertyInclusion(incl -> incl
-            .withValueInclusion(Include.NON_NULL)
-            .withContentInclusion(Include.NON_NULL)
-        );
-        return builder.build();
-    }
-
-    @SuppressWarnings("deprecation")
-    public static ObjectMapper buildStrictGenericObjectMapper() {
-        return JsonMapper.builder()
-            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-            .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            .configure(EnumFeature.WRITE_ENUMS_USING_TO_STRING, true)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true)
+        return builder
+            .addMixIns(sourceMixins)
+            .enable(MapperFeature.USE_GETTERS_AS_SETTERS)
+            .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .accessorNaming(new DefaultAccessorNamingStrategy.Provider()
+                .withFirstCharAcceptance(true, true))
             .changeDefaultPropertyInclusion(incl -> incl
                 .withValueInclusion(Include.NON_NULL)
                 .withContentInclusion(Include.NON_NULL)
-            )            .build();
+            )
+            .build();
+    }
+
+    public static JsonMapper createConvertObjectMapper() {
+        return createConvertObjectMapper(JsonMapper.builder(), false);
+    }
+
+    public static JsonMapper createConvertObjectMapper31() {
+        return createConvertObjectMapper(JsonMapper.builder(), true);
+    }
+
+    private static JsonMapper createConvertObjectMapper(JsonMapper.Builder builder, boolean openapi31) {
+
+        if (openapi31) {
+            builder.addModules(MODULE_SERIALIZATION_31, new DeserializationModule31());
+        } else {
+            builder.addModules(MODULE_SERIALIZATION_30, new DeserializationModule());
+        }
+
+        return builder
+            .enable(MapperFeature.USE_GETTERS_AS_SETTERS, MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS, MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+            .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            .accessorNaming(new DefaultAccessorNamingStrategy.Provider()
+                .withFirstCharAcceptance(true, true))
+            .changeDefaultPropertyInclusion(incl -> incl
+                .withValueInclusion(Include.NON_NULL)
+                .withContentInclusion(Include.NON_NULL)
+            )
+            .build();
     }
 }

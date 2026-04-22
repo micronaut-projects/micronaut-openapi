@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.micronaut.context.exceptions.ConfigurationException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.PropertyNamingStrategies;
@@ -35,7 +36,6 @@ import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.javadoc.DocsFormat;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -171,6 +171,12 @@ import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFA
 import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
 import static io.micronaut.openapi.visitor.management.SpringActuatorConfigUtils.mergeWithActuatorProperties;
 import static org.jsoup.helper.Validate.fail;
+import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
  * Configuration utilities methods.
@@ -1020,7 +1026,7 @@ public final class ConfigUtils {
             return Collections.emptyMap();
         }
         try {
-            return OpenApiUtils.getConvertJsonMapper().readValue(value, TYPE_EXTENSIONS);
+            return Utils.getConvertMapper().readValue(value, TYPE_EXTENSIONS);
         } catch (JacksonException e) {
             warn("Fail to parse " + TYPE_EXTENSIONS.getType().toString() + ": " + value + " - " + e.getMessage(), context);
         }
@@ -1040,7 +1046,7 @@ public final class ConfigUtils {
             return Collections.emptyList();
         }
         try {
-            return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
+            return Utils.getConvertMapper().readValue(s, typeReference);
         } catch (JacksonException e) {
             warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
         }
@@ -1368,14 +1374,14 @@ public final class ConfigUtils {
 
         var configuration = new ApplicationContextConfiguration() {
             @Override
-            public Optional<MutableConversionService> getConversionService() {
+            public @NonNull Optional<MutableConversionService> getConversionService() {
                 var conversionService = new DefaultMutableConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
                 return Optional.of(conversionService);
             }
 
             @Override
-            public ClassPathResourceLoader getResourceLoader() {
+            public @NonNull ClassPathResourceLoader getResourceLoader() {
                 var classLoader = ApplicationContextConfiguration.class.getClassLoader();
                 if (classLoader == null) {
                     classLoader = Thread.currentThread().getContextClassLoader();
@@ -1387,6 +1393,39 @@ public final class ConfigUtils {
                     classLoader = ClassLoader.getSystemClassLoader();
                 }
                 return new DefaultClassPathResourceLoader(classLoader, null, false, false);
+            }
+
+            @Override
+            public @Nullable List<String> getOverrideConfigLocations() {
+                boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
+                if (isEnabled) {
+                    List<String> annotationProcessingConfigLocations = new ArrayList<>();
+                    String projectResourcesPath = null;
+                    String projectDir = StringUtils.EMPTY_STRING;
+
+                    Path projectPath = getProjectPath(context);
+                    if (projectPath != null) {
+                        projectDir = FILE_SCHEME + normalizePath(projectPath.toString());
+                        projectResourcesPath = projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/main/resources/";
+                    }
+
+                    String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
+                    if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
+                        annotationProcessingConfigLocations.add(projectResourcesPath);
+                    } else if (StringUtils.isNotEmpty(configFileLocations)) {
+                        for (String configFileLocation : configFileLocations.split(COMMA)) {
+                            if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
+                                throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
+                            }
+                            if (configFileLocation.startsWith(PROJECT_SCHEME)) {
+                                configFileLocation = configFileLocation.replace(PROJECT_SCHEME, projectDir);
+                            }
+                            annotationProcessingConfigLocations.add(configFileLocation);
+                        }
+                    }
+                    return annotationProcessingConfigLocations;
+                }
+                return ApplicationContextConfiguration.super.getOverrideConfigLocations();
             }
 
             @Override
@@ -1482,6 +1521,7 @@ public final class ConfigUtils {
         List<String> typeArgs,
         ClassElement classElement
     ) {
+
     }
 
     /**
@@ -1528,6 +1568,7 @@ public final class ConfigUtils {
         List<String> excludePatterns,
         PatternStyle excludePatternStyle
     ) {
+
     }
 
     /**
