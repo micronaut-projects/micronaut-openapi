@@ -142,7 +142,7 @@ public final class SecurityUtils {
         if (securitySchemeName == null || CollectionUtils.isEmpty(access)) {
             return;
         }
-        String firstAccessItem = access.get(0);
+        String firstAccessItem = access.getFirst();
         if (access.size() == 1 && (firstAccessItem.equals(SecurityRule.IS_ANONYMOUS) || firstAccessItem.equals(SecurityRule.DENY_ALL))) {
             return;
         }

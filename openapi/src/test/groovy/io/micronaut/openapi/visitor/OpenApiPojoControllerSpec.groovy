@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
@@ -8,11 +9,9 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
-import spock.lang.PendingFeature
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI for List"() {
         given: "An API definition"
         when:
@@ -126,9 +125,9 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema petSchema = openAPI.components.schemas['Pet']
-        Schema petInnerBeanSchema = openAPI.components.schemas['Pet.InnerBean']
+        OpenAPI openApi = Utils.testReference
+        Schema petSchema = openApi.components.schemas['Pet']
+        Schema petInnerBeanSchema = openApi.components.schemas['Pet.InnerBean']
 
         then: "the components are valid"
         petInnerBeanSchema
@@ -140,8 +139,8 @@ class MyBean {}
         ((ArraySchema) petSchema.properties["tags"]).items.type == "string"
 
         when:
-        PathItem xyz1 = openAPI.paths.get("/pets/xyz1")
-        PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
+        PathItem xyz1 = openApi.paths.get("/pets/xyz1")
+        PathItem xyz2 = openApi.paths.get("/pets/xyz2")
 
         then:
         xyz1.post.operationId == 'xyzPost'
@@ -1587,7 +1586,6 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
-    @PendingFeature
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:
@@ -1675,14 +1673,14 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
+        OpenAPI openApi = Utils.testReference
 
         then: "The operation has only one path"
-        openAPI.paths.size() == 2
+        openApi.paths.size() == 2
 
         when: "The POST /pets operation is retrieved"
-        Operation operation = openAPI.paths?.get("/pets")?.post
-        Operation operationSave = openAPI.paths?.get("/save")?.post
+        Operation operation = openApi.paths?.get("/pets")?.post
+        Operation operationSave = openApi.paths?.get("/save")?.post
 
         then: "The body has specified attributes"
         operation.requestBody
@@ -2128,14 +2126,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.util.UUID;
-
-import jakarta.validation.Valid;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+
+import java.util.UUID;
 
 @Controller
 class UuidController {
@@ -2374,13 +2371,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import jakarta.validation.Valid;
-
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Status;
+import jakarta.validation.Valid;
 
 @Controller("/v1/customers")
 class CustomersController {
@@ -2454,10 +2450,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.*;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.responses.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import java.net.URI;
 
 @Controller
@@ -2569,7 +2568,6 @@ class MyBean {}
         root.get.responses['500'].content == null
     }
 
-    @PendingFeature
     void "@ApiResponse set mediaType"() {
         given:
         when:

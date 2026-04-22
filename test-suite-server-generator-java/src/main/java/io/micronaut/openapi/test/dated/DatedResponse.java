@@ -1,9 +1,9 @@
 package io.micronaut.openapi.test.dated;
 
-import java.time.ZonedDateTime;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.time.ZonedDateTime;
 
 /**
  * A response that contains information about last modification.
@@ -18,7 +18,7 @@ public final class DatedResponse<T> {
     @NonNull
     private final T body;
 
-    private DatedResponse(T body, ZonedDateTime lastModified) {
+    private DatedResponse(@NonNull T body, @Nullable ZonedDateTime lastModified) {
         this.body = body;
         this.lastModified = lastModified;
     }
@@ -37,14 +37,14 @@ public final class DatedResponse<T> {
     /**
      * @return The last modification date of returned resource.
      */
-    public ZonedDateTime getLastModified() {
+    public @Nullable ZonedDateTime getLastModified() {
         return lastModified;
     }
 
     /**
      * @return The response body.
      */
-    public T getBody() {
+    public @NonNull T getBody() {
         return body;
     }
 
@@ -52,8 +52,8 @@ public final class DatedResponse<T> {
      * Create a response by specifying only the body.
      *
      * @param body The response body.
-     * @return The response.
      * @param <T> The response body type.
+     * @return The response.
      */
     public static <T> DatedResponse<T> of(@NonNull T body) {
         return new DatedResponse<>(body, null);
@@ -64,8 +64,8 @@ public final class DatedResponse<T> {
      *
      * @param body The body.
      * @param lastModified The last modification date.
-     * @return The response.
      * @param <T> The body type.
+     * @return The response.
      */
     public static <T> DatedResponse<T> of(@NonNull T body, @Nullable ZonedDateTime lastModified) {
         return new DatedResponse<>(body, lastModified);

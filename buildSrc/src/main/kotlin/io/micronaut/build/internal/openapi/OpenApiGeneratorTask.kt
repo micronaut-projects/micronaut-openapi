@@ -24,15 +24,8 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Classpath
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import java.io.IOException
 import java.nio.file.Files
@@ -40,7 +33,7 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * A task which simulates what the Gradle Micronaut plugin
+ * A task that simulates what the Gradle Micronaut plugin
  * would do. Must be used with the test entry point.
  */
 abstract class OpenApiGeneratorTask : DefaultTask() {
@@ -82,11 +75,15 @@ abstract class OpenApiGeneratorTask : DefaultTask() {
 
     @get:Internal
     val generatedSourcesDirectory: Provider<Directory>
-        get() = outputDirectory.dir(if (lang.get().equals("JAVA", ignoreCase = true)) "src/main/java" else "src/main/kotlin")
+        get() = outputDirectory.dir(
+            if (lang.get().equals("JAVA", ignoreCase = true)) "src/main/java" else "src/main/kotlin"
+        )
 
     @get:Internal
     val generatedTestSourcesDirectory: Provider<Directory>
-        get() = outputDirectory.dir(if (lang.get().equals("JAVA", ignoreCase = true)) "src/test/java" else "src/test/kotlin")
+        get() = outputDirectory.dir(
+            if (lang.get().equals("JAVA", ignoreCase = true)) "src/test/java" else "src/test/kotlin"
+        )
 
     @get:Input
     abstract val outputKinds: ListProperty<String>

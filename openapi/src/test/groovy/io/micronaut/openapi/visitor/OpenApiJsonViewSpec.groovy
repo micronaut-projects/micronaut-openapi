@@ -4,11 +4,9 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiJsonViewSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test build OpenAPI with JsonView"() {
 
         setup:
@@ -18,8 +16,7 @@ class OpenApiJsonViewSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonView;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -31,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import java.util.List;
 
 @Controller
 class OpenApiController {
@@ -230,7 +227,6 @@ class MyBean {}
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
     }
 
-    @PendingFeature
     void "test build OpenAPI with changed JsonView default inclusion"() {
 
         setup:
@@ -241,20 +237,17 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonView;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import java.util.List;
 
 @Controller
 class OpenApiController {

@@ -7,11 +7,15 @@ repositories {
     mavenCentral()
     google()
 }
+
+val libs = versionCatalogs.named("libs")
+
+dependencies {
+    implementation("io.micronaut:micronaut-module-info:${libs.findVersion("micronaut").get()}")
+}
+
 micronautBuild {
     descriptor {
         parentModuleId = "io.micronaut.openapi:micronaut-openapi-annotations"
     }
-}
-dependencies {
-    implementation("io.micronaut:micronaut-module-info:5.0.0-M23")
 }

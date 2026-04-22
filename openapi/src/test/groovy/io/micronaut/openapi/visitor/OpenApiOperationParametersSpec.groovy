@@ -3,26 +3,23 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import spock.lang.PendingFeature
 
 class OpenApiOperationParametersSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test Parameters in Operation"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
-import java.util.List;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Controller
 class MyController {
@@ -69,22 +66,19 @@ class MyBean {}
         operation.parameters[0].schema.default == 'dog'
     }
 
-    @PendingFeature
     void "test ApiResponses"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
-import java.util.List;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @Controller
 class MyController {

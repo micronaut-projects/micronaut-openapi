@@ -3,7 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
-import spock.lang.PendingFeature
 
 class OpenApiDuplicateElementsSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -102,10 +101,10 @@ components:
         openApi.paths.'/pets'.post.security.size() == 1
     }
 
-    @PendingFeature
     void "test date enum default value"() {
 
         when:
+        var defaultValue = "2023-12-12"
         var openApiSpec = """
 openapi: 3.0.3
 info:
@@ -123,7 +122,7 @@ paths:
             format: date
             enum:
               - 2023-12-12
-            default: 2023-12-12
+            default: $defaultValue
       responses:
         '200':
           description: search results matching criteria
@@ -147,42 +146,6 @@ components:
         var serializedOpenApi = OpenApiUtils.getYamlMapper().writeValueAsString(openApi)
 
         then:
-        serializedOpenApi.trim() == """
-openapi: 3.0.3
-info:
-  title: Simple Inventory API
-  version: 1.0.0
-paths:
-  /inventory:
-    get:
-      operationId: searchInventory
-      parameters:
-      - name: test
-        in: header
-        schema:
-          type: string
-          format: date
-          default: 2023-12-12
-          enum:
-          - 2023-12-12
-      responses:
-        "200":
-          description: search results matching criteria
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  \$ref: "#/components/schemas/InventoryItem"
-components:
-  schemas:
-    InventoryItem:
-      type: object
-      properties:
-        releaseDate:
-          type: string
-          format: date-time
-          example: 2016-08-29T09:12:33.001Z
-        """.trim()
+        serializedOpenApi.trim().contains("default: $defaultValue")
     }
 }

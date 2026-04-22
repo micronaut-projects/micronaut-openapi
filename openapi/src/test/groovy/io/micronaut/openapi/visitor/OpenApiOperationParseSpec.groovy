@@ -4,13 +4,12 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.PendingFeature
 
 class OpenApiOperationParseSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation with custom fieldname"() {
         given:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.HttpResponse;
@@ -78,10 +77,9 @@ class MyBean {}
 
     }
 
-    @PendingFeature
     void "test parse the OpenAPI @ApiResponse Content with @ArraySchema annotation"() {
         given:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.HttpResponse;
@@ -170,10 +168,9 @@ class MyBean {}
         operationNames.responses.'200'.content['application/json'].schema.items.type == "string"
     }
 
-    @PendingFeature
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation"() {
         given:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.HttpResponse;
@@ -542,7 +539,7 @@ class DepositRequest {
         this.depositAmount = depositAmount;
     }
 }
-    
+
 @JsonPropertyOrder(GetAccount400Response.JSON_PROPERTY_ERROR)
 class GetAccount400Response {
 

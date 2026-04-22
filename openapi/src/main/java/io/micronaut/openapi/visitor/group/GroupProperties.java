@@ -48,11 +48,11 @@ public final class GroupProperties {
      */
     private String filename;
     /**
-     * Generate or not openApi document in Asciidoc format.
+     * Generate or not openApi document in AsciiDoc format.
      */
     private Boolean adocEnabled;
     /**
-     * Name of file in Asciidoc format.
+     * Name of file in AsciiDoc format.
      */
     private String adocFilename;
     /**

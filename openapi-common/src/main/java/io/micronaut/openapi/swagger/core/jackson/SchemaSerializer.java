@@ -16,7 +16,6 @@
 package io.micronaut.openapi.swagger.core.jackson;
 
 import io.swagger.v3.oas.models.media.Schema;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.DatabindException;
@@ -40,6 +39,7 @@ public class SchemaSerializer extends ValueSerializer<Schema> {
     public void resolve(SerializationContext serializerProvider) throws DatabindException {
         defaultSerializer.resolve(serializerProvider);
     }
+
     @Override
     public void serialize(Schema value, JsonGenerator jgen, SerializationContext provider) throws JacksonException {
 

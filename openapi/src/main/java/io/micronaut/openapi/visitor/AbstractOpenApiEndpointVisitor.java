@@ -15,11 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.core.JacksonException;
 import com.fasterxml.jackson.annotation.JsonView;
-import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.format.Format;
@@ -52,7 +49,6 @@ import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
 import io.micronaut.openapi.annotation.OpenAPIRequest;
 import io.micronaut.openapi.javadoc.JavadocDescription;
@@ -83,6 +79,9 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1194,7 +1193,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (newParameter == null) {
                                 newParameter = new Parameter();
                             }
-                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asText()));
+                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asString()));
                         }
                     }
                 } catch (Exception e) {
@@ -1203,29 +1202,27 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             } else {
                 try {
                     Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
+                    Map<CharSequence, Object> target = Utils.getConvertMapper().convertValue(newParameter, MAP_TYPE);
                     if (v == null) {
-                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                         for (CharSequence name : paramValues.keySet()) {
                             Object o = paramValues.get(name.toString());
                             if (o != null) {
                                 target.put(name.toString(), o);
                             }
                         }
-                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     } else {
                         // horrible hack because Swagger
                         // ParameterDeserializer breaks updating
                         // existing objects
-                        BeanMap<Parameter> beanMap = BeanMap.of(v);
-                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                        var beanMap = BeanMap.of(v);
                         for (CharSequence name : beanMap.keySet()) {
                             Object o = beanMap.get(name.toString());
                             if (o != null) {
                                 target.put(name.toString(), o);
                             }
                         }
-                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     }
+                    newParameter = Utils.getConvertMapper().convertValue(target, Parameter.class);
                 } catch (JacksonException e) {
                     warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }

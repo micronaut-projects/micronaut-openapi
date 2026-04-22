@@ -37,6 +37,7 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.processing.SupportedOptions;
 import java.util.ArrayList;
@@ -115,12 +116,12 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
@@ -330,6 +331,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
         var securityRequirements = new ArrayList<>(this.securityRequirements);
+        //noinspection unchecked
         securityRequirements.addAll(ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class, Collections.emptyList(), context));
         return securityRequirements;
     }

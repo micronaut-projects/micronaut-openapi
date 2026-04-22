@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.processing.SupportedOptions;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
     }
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
@@ -75,7 +76,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
     }
 
     @Override
-    public void visitClass(ClassElement classEl, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement classEl, @NonNull VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }

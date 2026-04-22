@@ -25,6 +25,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
 import io.micronaut.openapi.annotation.OpenAPIExtraSchemas;
 import io.swagger.v3.oas.models.media.Schema;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.processing.SupportedOptions;
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
     private static Set<String> excludedExtraSchemaPackages = new LinkedHashSet<>();
 
     @Override
-    public Set<String> getSupportedAnnotationNames() {
+    public @NonNull Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
             OpenAPIExtraSchema.class.getName(),
             OpenAPIExtraSchemas.class.getName()
@@ -77,12 +78,12 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
     }
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
     @Override
-    public void finish(VisitorContext context) {
+    public void finish(@NonNull VisitorContext context) {
 
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context) || !isExtraSchemasEnabled(context)) {
             return;
@@ -128,7 +129,7 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context) || !isExtraSchemasEnabled(context)) {
             return;
         }

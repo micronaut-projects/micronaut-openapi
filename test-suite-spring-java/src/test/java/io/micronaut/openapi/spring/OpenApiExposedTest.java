@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("test")
 @SpringBootTest(useMainMethod = UseMainMethod.ALWAYS, classes = {
-    WebConfig.class,
     TestConfig.class,
     Application.class,
 }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

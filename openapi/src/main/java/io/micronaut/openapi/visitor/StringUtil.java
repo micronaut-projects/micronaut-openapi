@@ -76,8 +76,8 @@ public final class StringUtil {
      * StringUtil.left("abc", 4)   = "abc"
      * </pre>
      *
-     * @param str  the String to get the leftmost characters from, may be null
-     * @param len  the length of the required String
+     * @param str the String to get the leftmost characters from, may be null
+     * @param len the length of the required String
      * @return the leftmost characters, {@code null} if null String input
      */
     public static String left(final String str, final int len) {

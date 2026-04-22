@@ -1,12 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 description = """
 This project tests that the generated client sources can be compiled and
-that tests can be ran with Micronaut 4
+that tests can be ran with Micronaut 5
 """
 
 dependencies {
@@ -42,5 +43,9 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(21)
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+        javaParameters = true
+        jvmTarget = JvmTarget.JVM_25
+    }
 }

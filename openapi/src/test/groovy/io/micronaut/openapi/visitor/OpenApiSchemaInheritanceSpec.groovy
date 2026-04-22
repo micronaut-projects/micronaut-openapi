@@ -6,31 +6,27 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
 import spock.lang.Issue
-import spock.lang.PendingFeature
 
 class OpenApiSchemaInheritanceSpec extends AbstractOpenApiTypeElementSpec {
 
-    @PendingFeature
     void "test parse the OpenAPI with response that contains generic types"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import java.util.List;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @Controller
 class MyController {
 
-    @Put("/")
+    @Put
     @Operation(summary = "Update an existing pet")
         @RequestBody(required = true, content = @Content(
             schema = @Schema(
@@ -124,22 +120,16 @@ class MyBean {}
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import com.fasterxml.jackson.annotation.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import java.util.List;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class MyController {
 
-    @Post("/")
+    @Post
     public void updateOwner(@Body Owner owner) {
     }
 }
@@ -201,21 +191,16 @@ class MyBean {}
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import java.util.List;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class MyController {
 
-    @Post("/")
+    @Post
     public void updateOwner(@Body Owner owner) {
     }
 }
@@ -287,7 +272,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Controller
 class MyController {
 
-    @Post("/")
+    @Post
     public void updateOwner(@Body Owner owner) {
     }
 }
@@ -349,21 +334,17 @@ class MyBean {}
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import java.util.List;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class MyController {
 
-    @Post("/")
+    @Post
     public void updateOwner(@Body Owner owner) {
     }
 }
@@ -544,12 +525,10 @@ class MyBean {}
 
 package test;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Body;
@@ -558,15 +537,15 @@ import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 class MyController {

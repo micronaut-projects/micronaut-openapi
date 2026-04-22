@@ -1,13 +1,11 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractKotlinCompilerSpec
-import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
 import spock.lang.Ignore
 
-@Ignore
 class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
 
     def setup() {
@@ -334,8 +332,8 @@ class MyBean
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        def openAPI = Utils.testReference
-        Schema schema = openAPI.components.schemas.Animal
+        def openApi = Utils.testReference
+        Schema schema = openApi.components.schemas.Animal
 
         then: "the components are valid"
         schema
@@ -373,42 +371,42 @@ open class MyEntity2Controller {
     ): String? {
         return null
     }
-    
+
     @Serdeable
     enum class MyEnum(
         @get:JsonValue val value: String
     ) {
-    
+
         @JsonProperty("v1")
         V1("v1"),
-    
+
         @JsonProperty("v2")
         V2("v2"),
-    
+
         @JsonProperty("v3")
         V3("v3"),
-    
+
         @JsonProperty("v4")
         V4("v4"),
-    
+
         @JsonProperty("v5")
         V5("v5"),
-    
+
         @JsonProperty("v6")
         V6("v6"),
-    
+
         @JsonProperty("v7")
         V7("v7");
-    
+
         override fun toString(): String {
             return value
         }
-    
+
         companion object {
-    
+
             @JvmField
             val VALUE_MAPPING = entries.associateBy { it.value }
-    
+
             /**
              * Create this enum from a value.
              *
@@ -433,22 +431,23 @@ class MyBean
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        def openAPI = Utils.testReference
-        Schema schema = openAPI.components.schemas."MyEntity2Controller.MyEnum"
+        def openApi = Utils.testReference
+        Schema schema = openApi.components.schemas."MyEntity2Controller.MyEnum"
 
         then: "the components are valid"
-        openAPI.paths."/test2"
-        openAPI.paths."/test2".post.parameters.size() == 1
-        openAPI.paths."/test2".post.parameters[0].name == "X-Favor-Token"
+        openApi.paths."/test2"
+        openApi.paths."/test2".post.parameters.size() == 1
+        openApi.paths."/test2".post.parameters[0].name == "X-Favor-Token"
 
-        openAPI.paths."/test2/{apiVersion}"
-        openAPI.paths."/test2/{apiVersion}".post.parameters.size() == 2
-        openAPI.paths."/test2/{apiVersion}".post.parameters[0].name == "X-Favor-Token"
-        openAPI.paths."/test2/{apiVersion}".post.parameters[1].name == "apiVersion"
+        openApi.paths."/test2/{apiVersion}"
+        openApi.paths."/test2/{apiVersion}".post.parameters.size() == 2
+        openApi.paths."/test2/{apiVersion}".post.parameters[0].name == "X-Favor-Token"
+        openApi.paths."/test2/{apiVersion}".post.parameters[1].name == "apiVersion"
 
         !schema.extensions
     }
 
+    @Ignore
     void "test java records with kotlin"() {
         when:
         buildBeanDefinition("test.MyBean", '''
@@ -475,15 +474,15 @@ open class Demo3Controller {
 public class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReference
+        var openApi = Utils.testReference
 
         then:
-        openAPI.components.schemas.FooRecord.type == 'object'
-        openAPI.components.schemas.FooRecord.properties
-        openAPI.components.schemas.FooRecord.properties.size() == 2
-        openAPI.components.schemas.FooRecord.properties.foo
-        openAPI.components.schemas.FooRecord.properties.foo.type == 'string'
-        openAPI.components.schemas.FooRecord.properties.bar
-        openAPI.components.schemas.FooRecord.properties.bar.type == 'string'
+        openApi.components.schemas.FooRecord.type == 'object'
+        openApi.components.schemas.FooRecord.properties
+        openApi.components.schemas.FooRecord.properties.size() == 2
+        openApi.components.schemas.FooRecord.properties.foo
+        openApi.components.schemas.FooRecord.properties.foo.type == 'string'
+        openApi.components.schemas.FooRecord.properties.bar
+        openApi.components.schemas.FooRecord.properties.bar.type == 'string'
     }
 }

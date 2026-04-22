@@ -25,6 +25,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.processing.SupportedOptions;
 import java.lang.annotation.Annotation;
@@ -53,12 +54,12 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
-    public void start(VisitorContext context) {
+    public void start(@NonNull VisitorContext context) {
         Utils.init(context);
     }
 
     @Override
-    public Set<String> getSupportedAnnotationNames() {
+    public @NonNull Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
             "com.fasterxml.jackson.annotation.JsonSubTypes",
             "com.fasterxml.jackson.annotation.JsonTypeInfo"
@@ -71,7 +72,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
+    public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }

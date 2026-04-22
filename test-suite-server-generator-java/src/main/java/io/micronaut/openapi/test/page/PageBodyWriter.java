@@ -1,10 +1,6 @@
 package io.micronaut.openapi.test.page;
 
-import java.io.OutputStream;
-import java.util.List;
-
 import io.micronaut.context.exceptions.ConfigurationException;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.annotation.Order;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.MutableHeaders;
@@ -14,9 +10,13 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.body.MessageBodyHandlerRegistry;
 import io.micronaut.http.body.MessageBodyWriter;
 import io.micronaut.http.codec.CodecException;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.io.OutputStream;
+import java.util.List;
 
 /**
  * A class for writing {@link Page} to the HTTP response with content as JSON body.
@@ -53,8 +53,10 @@ final class PageBodyWriter<T> implements MessageBodyWriter<Page<T>> {
     }
 
     @Override
-    public MessageBodyWriter<Page<T>> createSpecific(Argument<Page<T>> type) {
-        Argument<List<T>> bt = Argument.listOf(type.getTypeParameters()[0]);
+    public @NonNull MessageBodyWriter<Page<T>> createSpecific(Argument<Page<T>> type) {
+        @SuppressWarnings("unchecked")
+        var innerType = (Argument<T>) type.getTypeParameters()[0];
+        Argument<List<T>> bt = Argument.listOf(innerType);
         MessageBodyWriter<List<T>> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
             .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
         return new PageBodyWriter<>(registry, writer, bt);
