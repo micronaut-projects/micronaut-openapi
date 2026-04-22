@@ -1,4 +1,4 @@
-To use micronaut openapi views (Swagger UI, OpenAPi Explorer, Scalar, ReDoc, RapiDoc) you need to add static resources to Spring configuration like this:
+To use micronaut openapi views (Swagger UI, OpenAPI Explorer, Scalar, ReDoc, RapiDoc) you need to add static resources to Spring configuration like this:
 
 .Example Swagger UI resources routing config
 [source,yaml]

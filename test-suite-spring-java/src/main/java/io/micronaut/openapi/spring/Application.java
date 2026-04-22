@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         var application = new SpringApplication(Application.class);
         application.setBannerMode(Banner.Mode.OFF);
         application.run(args);
