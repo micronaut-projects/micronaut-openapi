@@ -237,7 +237,7 @@ controllers at compile time.</div>
 <div class="block">Returns the produces media types.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">start</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">start</a><wbr>(@NonNull io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;io.micronaut.http.uri.UriMatchTemplate&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#uriMatchTemplates(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">uriMatchTemplates</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
@@ -246,8 +246,8 @@ controllers at compile time.</div>
 <div class="block">Returns the uri paths of the element.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#visitClass(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">visitClass</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#visitClass(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">visitClass</a><wbr>(@NonNull io.micronaut.inject.ast.ClassElement&nbsp;element,
+ @NonNull io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Executed when a class is encountered that matches the generic class.</div>
 </div>
@@ -317,7 +317,7 @@ controllers at compile time.</div>
 <section class="detail" id="start(io.micronaut.inject.visitor.VisitorContext)">
 <h3>start</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(@NonNull io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>start</code>&nbsp;in interface&nbsp;<code>io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</code></dd>
@@ -329,8 +329,8 @@ controllers at compile time.</div>
 <section class="detail" id="visitClass(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)">
 <h3>visitClass</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">visitClass</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;element,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">visitClass</span><wbr><span class="parameters">(@NonNull io.micronaut.inject.ast.ClassElement&nbsp;element,
+ @NonNull io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from class:&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html#visitClass(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)">AbstractOpenApiEndpointVisitor</a></code></span></div>
 <div class="block">Executed when a class is encountered that matches the generic class.</div>
 <dl class="notes">

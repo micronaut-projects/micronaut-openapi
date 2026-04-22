@@ -62,6 +62,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#JSON_MAPPER" tabindex="0">JSON_MAPPER</a></li>
 <li><a href="#JSON_MAPPER_31" tabindex="0">JSON_MAPPER_31</a></li>
 <li><a href="#CONVERT_JSON_MAPPER" tabindex="0">CONVERT_JSON_MAPPER</a></li>
+<li><a href="#CONVERT_JSON_MAPPER_31" tabindex="0">CONVERT_JSON_MAPPER_31</a></li>
 <li><a href="#YAML_MAPPER" tabindex="0">YAML_MAPPER</a></li>
 <li><a href="#YAML_MAPPER_31" tabindex="0">YAML_MAPPER_31</a></li>
 </ol>
@@ -71,6 +72,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#getJsonMapper()" tabindex="0">getJsonMapper()</a></li>
 <li><a href="#getJsonMapper31()" tabindex="0">getJsonMapper31()</a></li>
 <li><a href="#getConvertJsonMapper()" tabindex="0">getConvertJsonMapper()</a></li>
+<li><a href="#getConvertJsonMapper31()" tabindex="0">getConvertJsonMapper31()</a></li>
 <li><a href="#getYamlMapper()" tabindex="0">getYamlMapper()</a></li>
 <li><a href="#getYamlMapper31()" tabindex="0">getYamlMapper31()</a></li>
 </ol>
@@ -111,29 +113,34 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
 <div class="col-second even-row-color"><code><a href="#CONVERT_JSON_MAPPER" class="member-name-link">CONVERT_JSON_MAPPER</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The JSON mapper for security scheme.</div>
+<div class="block">The JSON mapper for conversions.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second odd-row-color"><code><a href="#JSON_MAPPER" class="member-name-link">JSON_MAPPER</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#CONVERT_JSON_MAPPER_31" class="member-name-link">CONVERT_JSON_MAPPER_31</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">The JSON mapper for conversions (OpenAPI 3.1).</div>
+</div>
+<div class="col-first even-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
+<div class="col-second even-row-color"><code><a href="#JSON_MAPPER" class="member-name-link">JSON_MAPPER</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The JSON mapper.</div>
 </div>
-<div class="col-first even-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second even-row-color"><code><a href="#JSON_MAPPER_31" class="member-name-link">JSON_MAPPER_31</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
+<div class="col-second odd-row-color"><code><a href="#JSON_MAPPER_31" class="member-name-link">JSON_MAPPER_31</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The JSON 3.1 mapper.</div>
 </div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPENAPI_31_VERSION" class="member-name-link">OPENAPI_31_VERSION</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second even-row-color"><code><a href="#YAML_MAPPER" class="member-name-link">YAML_MAPPER</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPENAPI_31_VERSION" class="member-name-link">OPENAPI_31_VERSION</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
+<div class="col-second odd-row-color"><code><a href="#YAML_MAPPER" class="member-name-link">YAML_MAPPER</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The YAML mapper.</div>
 </div>
-<div class="col-first odd-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second odd-row-color"><code><a href="#YAML_MAPPER_31" class="member-name-link">YAML_MAPPER_31</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code>static final tools.jackson.databind.ObjectMapper</code></div>
+<div class="col-second even-row-color"><code><a href="#YAML_MAPPER_31" class="member-name-link">YAML_MAPPER_31</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The YAML 3.1 mapper.</div>
 </div>
 </div>
@@ -154,17 +161,20 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getConvertJsonMapper()" class="member-name-link">getConvertJsonMapper</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getJsonMapper()" class="member-name-link">getJsonMapper</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getConvertJsonMapper31()" class="member-name-link">getConvertJsonMapper31</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getJsonMapper31()" class="member-name-link">getJsonMapper31</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getJsonMapper()" class="member-name-link">getJsonMapper</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getYamlMapper()" class="member-name-link">getYamlMapper</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getJsonMapper31()" class="member-name-link">getJsonMapper31</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static tools.jackson.databind.ObjectMapper</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getYamlMapper31()" class="member-name-link">getYamlMapper31</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getYamlMapper()" class="member-name-link">getYamlMapper</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static tools.jackson.databind.ObjectMapper</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getYamlMapper31()" class="member-name-link">getYamlMapper31</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -221,7 +231,16 @@ loadScripts(document, 'script');</script>
 <h3>CONVERT_JSON_MAPPER</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">tools.jackson.databind.ObjectMapper</span>&nbsp;<span class="element-name">CONVERT_JSON_MAPPER</span></div>
-<div class="block">The JSON mapper for security scheme.</div>
+<div class="block">The JSON mapper for conversions.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="CONVERT_JSON_MAPPER_31">
+<h3>CONVERT_JSON_MAPPER_31</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">tools.jackson.databind.ObjectMapper</span>&nbsp;<span class="element-name">CONVERT_JSON_MAPPER_31</span></div>
+<div class="block">The JSON mapper for conversions (OpenAPI 3.1).</div>
 </div>
 </section>
 </li>
@@ -272,6 +291,14 @@ loadScripts(document, 'script');</script>
 <h3>getConvertJsonMapper</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">tools.jackson.databind.ObjectMapper</span>&nbsp;<span class="element-name">getConvertJsonMapper</span>()</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getConvertJsonMapper31()">
+<h3>getConvertJsonMapper31</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">tools.jackson.databind.ObjectMapper</span>&nbsp;<span class="element-name">getConvertJsonMapper31</span>()</div>
 </div>
 </section>
 </li>
