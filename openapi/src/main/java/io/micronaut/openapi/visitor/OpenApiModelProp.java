@@ -52,6 +52,7 @@ public interface OpenApiModelProp {
     String PROP_EXAMPLE_SET_FLAG = "exampleSetFlag";
     String PROP_DEFAULT_SET_FLAG = "defaultSetFlag";
     String PROP_ENCODING = "encoding";
+    String PROP_REQUEST_BODY = "requestBody";
     String PROP_EXAMPLES = "examples";
     String PROP_NOT = "not";
     String PROP_ALL_OF = "allOf";

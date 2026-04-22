@@ -16,15 +16,9 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ObjectNode;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
@@ -54,6 +48,12 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
@@ -88,6 +88,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENCODING;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
@@ -100,6 +101,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPEN_ID_CONNECT
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAM_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUEST_BODY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEME;
@@ -375,8 +377,8 @@ public final class ConvertUtils {
         // see https://github.com/micronaut-projects/micronaut-openapi/issues/1418
         if (clazz == Operation.class) {
 
-            var requestBodyNode = jn.get("requestBody");
-            ((ObjectNode) jn).remove("requestBody");
+            var requestBodyNode = jn.get(PROP_REQUEST_BODY);
+            ((ObjectNode) jn).remove(PROP_REQUEST_BODY);
             T value = getConvertMapper().treeToValue(jn, clazz);
             var requestBody = fixContentForGroovy(requestBodyNode, RequestBody.class);
             ((Operation) value).setRequestBody(requestBody);
@@ -423,7 +425,7 @@ public final class ConvertUtils {
             }
 
             examples = deserMap(PROP_EXAMPLES, contentNode, Example.class);
-            encoding = deserMap("encoding", contentNode, Encoding.class);
+            encoding = deserMap(PROP_ENCODING, contentNode, Encoding.class);
             extensions = deserMap(PROP_EXTENSIONS, contentNode, Object.class);
             var schemaNode = contentNode.get(PROP_SCHEMA);
             if (schemaNode != null) {
