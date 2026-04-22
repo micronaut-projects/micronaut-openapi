@@ -2,8 +2,7 @@ import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-kapt-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.kapt)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 description = """
@@ -93,6 +92,3 @@ kapt {
     useBuildCache = false
 }
 
-kotlin {
-    jvmToolchain(21)
-}
