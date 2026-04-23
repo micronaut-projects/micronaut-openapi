@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.String
 
-@Disabled
 @MicronautTest(environments = ["test"])
 class MicronautOpenApiTest(
     var server: EmbeddedServer,

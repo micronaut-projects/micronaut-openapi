@@ -15,7 +15,6 @@ import org.junit.platform.commons.util.CollectionUtils
 import java.lang.IllegalStateException
 import kotlin.String
 
-@Disabled
 @MicronautTest(environments = ["test"])
 class MicronautOpenApiTest(
     var server: EmbeddedServer,

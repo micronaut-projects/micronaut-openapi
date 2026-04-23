@@ -16,6 +16,7 @@ dependencies {
     kapt(mnSerde.micronaut.serde.processor)
     kapt(mn.micronaut.inject.kotlin)
     kapt(projects.micronautOpenapi)
+    kapt(mn.snakeyaml)
 
     compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
