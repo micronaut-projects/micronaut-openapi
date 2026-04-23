@@ -16,6 +16,8 @@ dependencies {
     ksp(mnSerde.micronaut.serde.processor)
     ksp(mn.micronaut.inject.kotlin)
     ksp(projects.micronautOpenapi)
+    ksp(projects.micronautOpenapiCommon)
+    ksp(projects.micronautOpenapiAnnotations)
     ksp(mn.snakeyaml)
 
 
