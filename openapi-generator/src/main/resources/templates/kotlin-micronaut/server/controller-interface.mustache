@@ -82,11 +82,11 @@ interface {{classname}} {
         {{#isDeprecated}}
             @java.lang.Deprecated
         {{/isDeprecated}}
- {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}},{{/formatSingleLine}}    {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
+ {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}},{{/formatSingleLine}}
+    {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
         {{/formatNoEmptyLines}}
 
     {{/operation}}
 {{/operations}}
 }
 {{/formatOneEmptyLine}}
-
