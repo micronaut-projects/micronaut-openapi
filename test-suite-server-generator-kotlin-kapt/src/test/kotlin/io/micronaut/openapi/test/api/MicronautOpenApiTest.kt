@@ -43,6 +43,7 @@ class MicronautOpenApiTest(
         val info = openApi.info ?: throw IllegalStateException("OpenAPI info not found")
         assertEquals("openapi-micronaut", info.title)
         assertEquals("1.0.0", info.version)
+
         val schema = openApi.components?.schemas?.get("TypeDto") ?: throw IllegalStateException("Schema TypeDto not found")
         assertEquals("string", schema.type)
         assertFalse(schema.enum.isNullOrEmpty())
