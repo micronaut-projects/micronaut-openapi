@@ -10,10 +10,18 @@ This project tests that the generated server sources can be compiled and
 that tests can be ran with Micronaut 4
 """
 
+//val localOpenApiProcessor = files(
+//    project(":micronaut-openapi").tasks.named("jar"),
+//    project(":micronaut-openapi-common").tasks.named("jar"),
+//    project(":micronaut-openapi-annotations").tasks.named("jar"),
+//)
+
 dependencies {
 
     annotationProcessor(mnValidation.micronaut.validation.processor)
     annotationProcessor(mnSerde.micronaut.serde.processor)
+    annotationProcessor(mn.snakeyaml)
+//    annotationProcessor(localOpenApiProcessor)
     annotationProcessor(projects.micronautOpenapi)
 
     compileOnly(mn.jackson.annotations)
@@ -88,6 +96,7 @@ tasks.withType(JavaCompile::class) {
         "-Xlint:deprecation",
     )
     options.forkOptions.jvmArgs = mutableListOf(
+        "-Dmicronaut.openapi.project.dir=$projectDir",
         "-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true",
         "-Dmicronaut.openapi.environments=local",
     )

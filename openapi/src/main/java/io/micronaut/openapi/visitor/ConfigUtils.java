@@ -1165,8 +1165,14 @@ public final class ConfigUtils {
             return projectPath;
         }
 
-        String projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
-        if (projectDir != null) {
+        String projectDir = null;
+        if (context != null) {
+            projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
+        }
+        if (StringUtils.isEmpty(projectDir)) {
+            projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
+        }
+        if (StringUtils.isNotEmpty(projectDir)) {
             projectPath = Path.of(projectDir);
             // calculating classes output path for KSP and gradle
             if (isKsp(context)) {
