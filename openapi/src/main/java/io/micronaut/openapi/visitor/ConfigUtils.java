@@ -1174,10 +1174,14 @@ public final class ConfigUtils {
         }
         if (StringUtils.isNotEmpty(projectDir)) {
             projectPath = Path.of(projectDir);
-            // calculating classes output path for KSP and gradle
             if (isKsp(context)) {
-                var classesOutputDir = projectPath.toString().replace('\\', '/') + "/build/generated/ksp/main/resources";
+                var classesOutputDir = projectPath.resolve("build/generated/ksp/main/resources");
                 ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
+            } else {
+                Path classesOutputDir = projectPath.resolve("build/classes/java/main/META-INF");
+                if (Files.isDirectory(classesOutputDir)) {
+                    ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
+                }
             }
         }
         if (projectPath == null) {
@@ -1418,6 +1422,10 @@ public final class ConfigUtils {
                     String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
                     if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                         annotationProcessingConfigLocations.add(projectResourcesPath);
+                        Path generatedProjectPath = projectPath != null ? projectPath.resolve("build/generated/openapi/src/main/resources") : null;
+                        if (generatedProjectPath != null && Files.isDirectory(generatedProjectPath)) {
+                            annotationProcessingConfigLocations.add(FILE_SCHEME + normalizePath(generatedProjectPath.toString()) + (generatedProjectPath.toString().endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH));
+                        }
                     } else if (StringUtils.isNotEmpty(configFileLocations)) {
                         for (String configFileLocation : configFileLocations.split(COMMA)) {
                             if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
@@ -1458,7 +1466,13 @@ public final class ConfigUtils {
             return Collections.emptyList();
         }
 
-        String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        String activeEnvStr = null;
+        if (context != null) {
+            activeEnvStr = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_ENVIRONMENTS);
+        }
+        if (StringUtils.isEmpty(activeEnvStr)) {
+            activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        }
         var activeEnvs = new ArrayList<String>();
         if (StringUtils.isNotEmpty(activeEnvStr)) {
             for (var activeEnv : activeEnvStr.split(COMMA)) {
