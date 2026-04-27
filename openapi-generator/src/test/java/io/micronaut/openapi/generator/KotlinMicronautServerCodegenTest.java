@@ -562,8 +562,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
             "@PathVariable(\"id\") @NotNull id: String,",
-            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,",
-            "@QueryValue(\"daily\") @Nullable @Format(FORMAT_MULTI) daily: List<V1ForecastIdGetDailyParameterInner>?,"
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>? = null,",
+            "@QueryValue(\"daily\") @Nullable @Format(FORMAT_MULTI) daily: List<V1ForecastIdGetDailyParameterInner>? = null,"
         );
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
@@ -648,8 +648,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Header("WCToken") @NotNull wcToken: String,
                     @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
                     @Part("name") @NotNull name: String,
-                    @Part("title") @Nullable title: String?,
-                    @Part("file") @Nullable file: CompletedFileUpload?,
+                    @Part("title") @Nullable title: String? = "bla-bla",
+                    @Part("file") @Nullable file: CompletedFileUpload? = null,
                 ): Mono<SuccessResetPassword>
             """);
     }
@@ -665,7 +665,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/json", "application/xml")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp(
-                        @Body @Nullable @Valid coordinates: Coordinates?,
+                        @Body @Nullable @Valid coordinates: Coordinates? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -673,8 +673,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
-                        @Body("coordinates") @Nullable @Valid coordinates: Coordinates?,
-                        @Body("file") @Nullable file: CompletedFileUpload?,
+                        @Body("coordinates") @Nullable @Valid coordinates: Coordinates? = null,
+                        @Body("file") @Nullable file: CompletedFileUpload? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -682,7 +682,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/yaml", "text/json")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_2(
-                        @Body @Nullable @Valid mySchema: MySchema?,
+                        @Body @Nullable @Valid mySchema: MySchema? = null,
                     ): Mono<HttpResponse<Void>>
                 """);
     }
@@ -827,7 +827,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue("status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>?,
+                        @QueryValue("status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf("available"),
                     ): Mono<List<Pet>>
                 """);
     }
@@ -845,10 +845,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun sendPrimitives(
                         @PathVariable("name") @NotNull name: String,
-                        @QueryValue("brand") @Nullable brand: String?,
-                        @CookieValue("coc") @Nullable coc: String?,
-                        @Header("head") @Nullable head: String?,
-                        @Body @Nullable body: String?,
+                        @QueryValue("brand") @Nullable brand: String? = null,
+                        @CookieValue("coc") @Nullable coc: String? = null,
+                        @Header("head") @Nullable head: String? = null,
+                        @Body @Nullable body: String? = null,
                     ): Mono<String>
                 """);
     }
@@ -888,7 +888,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DocumentResourcesApi.kt", """
-            @QueryValue("CREATIONDATE") @Nullable CREATIONDATE: LocalDate?,
+            @QueryValue("CREATIONDATE") @Nullable CREATIONDATE: LocalDate? = null,
             """);
         assertFileContains(path + "model/Result.kt", """
                 var id: String? = null,
@@ -925,11 +925,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/{apiVersion}/orders")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     suspend fun browseSearchOrders(
-                        @PathVariable("apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter,
-                        @QueryValue("ids") @Nullable @Format(FORMAT_MULTI) ids: List<@NotNull Int>?,
-                        @Header("X-Favor-Token") @Nullable xFavorToken: String?,
-                        @Header("Content-Type", defaultValue = "application/json") @Nullable contentType: String?,
-                        @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter?,
+                        @PathVariable("apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
+                        @QueryValue("ids") @Nullable @Format(FORMAT_MULTI) ids: List<@NotNull Int>? = null,
+                        @Header("X-Favor-Token") @Nullable xFavorToken: String? = null,
+                        @Header("Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
+                        @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null,
                     ): String
                 """
         );
@@ -996,7 +996,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileExists(path + "api/PetApi.kt");
         assertFileContains(path + "api/PetApi.kt",
-            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>?,");
+            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
     }
 
     @Test
@@ -1007,7 +1007,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileExists(path + "api/PetApi.kt");
         assertFileContains(path + "api/PetApi.kt",
-            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>?,");
+            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
     }
 
     @Test
@@ -1018,11 +1018,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String,",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String,",
-            "@QueryValue(\"optParam\") @Nullable optParam: String?,"
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
+            "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 
         assertFileContains(path + "model/TESTRequest.kt",
@@ -1048,11 +1048,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String,",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String?,",
-            "@QueryValue(\"optParam\") @Nullable optParam: String?,"
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
+            "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 
         assertFileContains(path + "model/TESTRequest.kt",
@@ -1424,7 +1424,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/pet-public")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun savePublic(
-                        @Nullable principal: Principal?,
+                        @Nullable principal: Principal? = null,
                     ): Mono<Void>
                 """
         );
@@ -1463,7 +1463,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/pet-public")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun savePublic(
-                        @Nullable authentication: Authentication?,
+                        @Nullable authentication: Authentication? = null,
                     ): Mono<Void>
                 """
         );
@@ -1516,7 +1516,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/pet-public")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun savePublic(
-                        @Nullable authentication: CustomUserParameter?,
+                        @Nullable authentication: CustomUserParameter? = null,
                     ): Mono<Void>
                 """
         );
@@ -1605,22 +1605,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("\\$application/json")
                     @Secured("\\$notRead", "\\$notWrite")
                     fun getStrings(
-                        @PathVariable("\\$pathVar", defaultValue = "\\$dollar") @NotNull dollarPathVar: String,
+                        @PathVariable("\\$pathVar", defaultValue = "\\$dollar") @NotNull dollarPathVar: String = "\\$dollar",
                         @Body @NotNull @Valid schemaTitleWithDollarDollarSign: SchemaTitleWithDollarDollarSign,
-                        @QueryValue("\\$queryVar", defaultValue = "ref2/\\$ref") @Nullable @java.lang.Deprecated dollarQueryVar: DollarGetDollarStringsDollarQueryVarParameter?,
-                        @Header("\\$headerVar", defaultValue = "\\$dollar") @Nullable dollarHeaderVar: String?,
-                        @CookieValue("\\$cookieVar", defaultValue = "\\$dollar") @Nullable dollarCookieVar: String?,
-                        @QueryValue("\\$propDouble") @Nullable @DecimalMin("10", message = "Message with \\$dollarSign") @DecimalMax("100", message = "Message with \\$dollarSign") dollarPropDouble: BigDecimal?,
-                        @QueryValue("\\$propLong") @Nullable @Min(10L, message = "Message with \\$dollarSign") @Max(100L, message = "Message with \\$dollarSign") dollarPropLong: Long?,
-                        @QueryValue("\\$propInt") @Nullable @Min(10, message = "Message with \\$dollarSign") @Max(100, message = "Message with \\$dollarSign") dollarPropInt: Int?,
-                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String?,
-                        @QueryValue("\\$propListMinMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMinMax: List<@NotNull String>?,
-                        @QueryValue("\\$propListMin") @Nullable @Format(FORMAT_MULTI) dollarPropListMin: List<@NotNull String>?,
-                        @QueryValue("\\$propListMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMax: List<@NotNull String>?,
-                        @QueryValue("\\$propStrMinMax") @Nullable @Size(min = 10, max = 100, message = "Message with \\$dollarSign") dollarPropStrMinMax: String?,
-                        @QueryValue("\\$propStrMin") @Nullable @Size(min = 10, message = "Message with \\$dollarSign") dollarPropStrMin: String?,
-                        @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String?,
-                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String?,
+                        @QueryValue("\\$queryVar", defaultValue = "ref2/\\$ref") @Nullable @java.lang.Deprecated dollarQueryVar: DollarGetDollarStringsDollarQueryVarParameter? = DollarGetDollarStringsDollarQueryVarParameter.REF2__REF,
+                        @Header("\\$headerVar", defaultValue = "\\$dollar") @Nullable dollarHeaderVar: String? = "\\$dollar",
+                        @CookieValue("\\$cookieVar", defaultValue = "\\$dollar") @Nullable dollarCookieVar: String? = "\\$dollar",
+                        @QueryValue("\\$propDouble") @Nullable @DecimalMin("10", message = "Message with \\$dollarSign") @DecimalMax("100", message = "Message with \\$dollarSign") dollarPropDouble: BigDecimal? = null,
+                        @QueryValue("\\$propLong") @Nullable @Min(10L, message = "Message with \\$dollarSign") @Max(100L, message = "Message with \\$dollarSign") dollarPropLong: Long? = null,
+                        @QueryValue("\\$propInt") @Nullable @Min(10, message = "Message with \\$dollarSign") @Max(100, message = "Message with \\$dollarSign") dollarPropInt: Int? = null,
+                        @QueryValue("\\$propEmail") @Nullable @Email(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropEmail: String? = null,
+                        @QueryValue("\\$propListMinMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMinMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMin") @Nullable @Format(FORMAT_MULTI) dollarPropListMin: List<@NotNull String>? = null,
+                        @QueryValue("\\$propListMax") @Nullable @Format(FORMAT_MULTI) dollarPropListMax: List<@NotNull String>? = null,
+                        @QueryValue("\\$propStrMinMax") @Nullable @Size(min = 10, max = 100, message = "Message with \\$dollarSign") dollarPropStrMinMax: String? = null,
+                        @QueryValue("\\$propStrMin") @Nullable @Size(min = 10, message = "Message with \\$dollarSign") dollarPropStrMin: String? = null,
+                        @QueryValue("\\$propStrMax") @Nullable @Size(max = 100, message = "Message with \\$dollarSign") dollarPropStrMax: String? = null,
+                        @QueryValue("\\$propStrPattern") @Nullable @Pattern(regexp = "poi\\\\.feedback\\\\.Review$0(.)*", message = "Message with \\$dollarSign") dollarPropStrPattern: String? = null,
                     ): Mono<String>
 
                 }
@@ -1873,9 +1873,9 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/auth/form-part")
                     @Consumes("application/x-www-form-urlencoded")
                     fun indexPart(
-                        @Body("grant_type", defaultValue = "none") @NotNull grantType: String,
+                        @Body("grant_type", defaultValue = "none") @NotNull grantType: String = "none",
                         @Body("client_id") @NotNull clientId: String,
-                        @Body("not_required_param\\$") @Nullable notRequiredParamDollar: Int?,
+                        @Body("not_required_param\\$") @Nullable notRequiredParamDollar: Int? = null,
                     ): Mono<String>
                 """
         );
