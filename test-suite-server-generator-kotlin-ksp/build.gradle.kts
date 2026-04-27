@@ -91,3 +91,11 @@ ksp {
     arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
 }
 
+
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("io.micronaut.openapi:micronaut-openapi")).using(project(":micronaut-openapi"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-common")).using(project(":micronaut-openapi-common"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-annotations")).using(project(":micronaut-openapi-annotations"))
+    }
+}
