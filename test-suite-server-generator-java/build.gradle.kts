@@ -1,5 +1,4 @@
 import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
-import org.gradle.jvm.tasks.Jar
 
 plugins {
     id("io.micronaut.build.internal.openapi-java-generator-test-suite")
@@ -11,16 +10,22 @@ This project tests that the generated server sources can be compiled and
 that tests can be ran with Micronaut 4
 """
 
-val localOpenapiJar = project(":micronaut-openapi").tasks.named<Jar>("jar").flatMap { it.archiveFile }
-val localOpenapiCommonJar = project(":micronaut-openapi-common").tasks.named<Jar>("jar").flatMap { it.archiveFile }
-val localOpenapiAnnotationsJar = project(":micronaut-openapi-annotations").tasks.named<Jar>("jar").flatMap { it.archiveFile }
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("io.micronaut.openapi:micronaut-openapi")).using(project(":micronaut-openapi"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-common")).using(project(":micronaut-openapi-common"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-annotations")).using(project(":micronaut-openapi-annotations"))
+    }
+}
 
 dependencies {
 
     annotationProcessor(mnValidation.micronaut.validation.processor)
     annotationProcessor(mnSerde.micronaut.serde.processor)
     annotationProcessor(mn.snakeyaml)
-    annotationProcessor(files(localOpenapiJar, localOpenapiCommonJar, localOpenapiAnnotationsJar))
+    annotationProcessor(projects.micronautOpenapi)
+    annotationProcessor(projects.micronautOpenapiCommon)
+    annotationProcessor(projects.micronautOpenapiAnnotations)
     compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
 
@@ -85,11 +90,6 @@ tasks.named("generateOpenApi", OpenApiGeneratorTask::class) {
 }
 
 tasks.withType(JavaCompile::class) {
-    dependsOn(
-        project(":micronaut-openapi").tasks.named("jar"),
-        project(":micronaut-openapi-common").tasks.named("jar"),
-        project(":micronaut-openapi-annotations").tasks.named("jar"),
-    )
     options.encoding = "UTF-8"
     options.isIncremental = true
     options.isFork = true
