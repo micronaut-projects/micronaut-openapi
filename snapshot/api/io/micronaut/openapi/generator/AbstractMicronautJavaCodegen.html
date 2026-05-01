@@ -93,6 +93,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE" tabindex="0">OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE</a></li>
 <li><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE" tabindex="0">OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE</a></li>
 <li><a href="#OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG" tabindex="0">OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG</a></li>
+<li><a href="#OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME" tabindex="0">OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME</a></li>
 <li><a href="#OPT_SKIP_SORTING_OPERATIONS" tabindex="0">OPT_SKIP_SORTING_OPERATIONS</a></li>
 <li><a href="#OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS" tabindex="0">OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS</a></li>
 <li><a href="#CONTENT_TYPE_APPLICATION_FORM_URLENCODED" tabindex="0">CONTENT_TYPE_APPLICATION_FORM_URLENCODED</a></li>
@@ -224,6 +225,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#setDateTimeFormat(java.lang.String)" tabindex="0">setDateTimeFormat(String)</a></li>
 <li><a href="#setUseEnumCaseInsensitive(boolean)" tabindex="0">setUseEnumCaseInsensitive(boolean)</a></li>
 <li><a href="#setRequiredPropertiesInConstructor(boolean)" tabindex="0">setRequiredPropertiesInConstructor(boolean)</a></li>
+<li><a href="#setEnumUnknownDefaultCaseName(java.lang.String)" tabindex="0">setEnumUnknownDefaultCaseName(String)</a></li>
 <li><a href="#postProcess()" tabindex="0">postProcess()</a></li>
 </ol>
 </li>
@@ -367,134 +369,137 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <div class="col-second even-row-color"><code><a href="#OPT_DATE_TIME_FORMAT" class="member-name-link">OPT_DATE_TIME_FORMAT</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_FLUX_FOR_ARRAYS" class="member-name-link">OPT_FLUX_FOR_ARRAYS</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME" class="member-name-link">OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_CONTROLLER_AS_ABSTRACT" class="member-name-link">OPT_GENERATE_CONTROLLER_AS_ABSTRACT</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_FLUX_FOR_ARRAYS" class="member-name-link">OPT_FLUX_FOR_ARRAYS</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_ENUM_CONVERTERS" class="member-name-link">OPT_GENERATE_ENUM_CONVERTERS</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_CONTROLLER_AS_ABSTRACT" class="member-name-link">OPT_GENERATE_CONTROLLER_AS_ABSTRACT</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_ALWAYS" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_ALWAYS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_ENUM_CONVERTERS" class="member-name-link">OPT_GENERATE_ENUM_CONVERTERS</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_ALWAYS" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_ALWAYS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_ONLY_FOR_MULTIPLE_STATUSES</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG" class="member-name-link">OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED" class="member-name-link">OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG" class="member-name-link">OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_GENERATED_ANNOTATION" class="member-name-link">OPT_GENERATED_ANNOTATION</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE" class="member-name-link">OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS" class="member-name-link">OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_GENERATED_ANNOTATION" class="member-name-link">OPT_GENERATED_ANNOTATION</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_NO_ARGS_CONSTRUCTOR" class="member-name-link">OPT_NO_ARGS_CONSTRUCTOR</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS" class="member-name-link">OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_REACTIVE" class="member-name-link">OPT_REACTIVE</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_NO_ARGS_CONSTRUCTOR" class="member-name-link">OPT_NO_ARGS_CONSTRUCTOR</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR" class="member-name-link">OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_REACTIVE" class="member-name-link">OPT_REACTIVE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_SKIP_SORTING_OPERATIONS" class="member-name-link">OPT_SKIP_SORTING_OPERATIONS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR" class="member-name-link">OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_TEST" class="member-name-link">OPT_TEST</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_SKIP_SORTING_OPERATIONS" class="member-name-link">OPT_SKIP_SORTING_OPERATIONS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_TEST_JUNIT" class="member-name-link">OPT_TEST_JUNIT</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_TEST" class="member-name-link">OPT_TEST</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_TEST_SPOCK" class="member-name-link">OPT_TEST_SPOCK</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_TEST_JUNIT" class="member-name-link">OPT_TEST_JUNIT</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_TITLE" class="member-name-link">OPT_TITLE</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_TEST_SPOCK" class="member-name-link">OPT_TEST_SPOCK</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_USE_AUTH" class="member-name-link">OPT_USE_AUTH</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_TITLE" class="member-name-link">OPT_TITLE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_USE_ENUM_CASE_INSENSITIVE" class="member-name-link">OPT_USE_ENUM_CASE_INSENSITIVE</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_USE_AUTH" class="member-name-link">OPT_USE_AUTH</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_USE_LOMBOK" class="member-name-link">OPT_USE_LOMBOK</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_USE_ENUM_CASE_INSENSITIVE" class="member-name-link">OPT_USE_ENUM_CASE_INSENSITIVE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_USE_PLURAL" class="member-name-link">OPT_USE_PLURAL</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_USE_LOMBOK" class="member-name-link">OPT_USE_LOMBOK</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_USE_SEALED" class="member-name-link">OPT_USE_SEALED</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_USE_PLURAL" class="member-name-link">OPT_USE_PLURAL</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_USE_TAGS" class="member-name-link">OPT_USE_TAGS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_USE_SEALED" class="member-name-link">OPT_USE_SEALED</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_VISITABLE" class="member-name-link">OPT_VISITABLE</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_USE_TAGS" class="member-name-link">OPT_USE_TAGS</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="ParameterMapping.html" title="class in io.micronaut.openapi.generator">ParameterMapping</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#parameterMappings" class="member-name-link">parameterMappings</a></code></div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_VISITABLE" class="member-name-link">OPT_VISITABLE</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#plural" class="member-name-link">plural</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/security/SecureRandom.html" title="class or interface in java.security" class="external-link">SecureRandom</a></code></div>
-<div class="col-second even-row-color"><code><a href="#random" class="member-name-link">random</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#reactive" class="member-name-link">reactive</a></code></div>
+<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="ParameterMapping.html" title="class in io.micronaut.openapi.generator">ParameterMapping</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#parameterMappings" class="member-name-link">parameterMappings</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#requiredPropertiesInConstructor" class="member-name-link">requiredPropertiesInConstructor</a></code></div>
+<div class="col-second even-row-color"><code><a href="#plural" class="member-name-link">plural</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">ResponseBodyMapping</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#responseBodyMappings" class="member-name-link">responseBodyMappings</a></code></div>
+<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/security/SecureRandom.html" title="class or interface in java.security" class="external-link">SecureRandom</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#random" class="member-name-link">random</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#serializationLibrary" class="member-name-link">serializationLibrary</a></code></div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#reactive" class="member-name-link">reactive</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#requiredPropertiesInConstructor" class="member-name-link">requiredPropertiesInConstructor</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">ResponseBodyMapping</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#responseBodyMappings" class="member-name-link">responseBodyMappings</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#testTool" class="member-name-link">testTool</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#serializationLibrary" class="member-name-link">serializationLibrary</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#title" class="member-name-link">title</a></code></div>
+<div class="col-second even-row-color"><code><a href="#testTool" class="member-name-link">testTool</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#useEnumCaseInsensitive" class="member-name-link">useEnumCaseInsensitive</a></code></div>
+<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#title" class="member-name-link">title</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#useOptional" class="member-name-link">useOptional</a></code></div>
+<div class="col-second even-row-color"><code><a href="#useEnumCaseInsensitive" class="member-name-link">useEnumCaseInsensitive</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#useSealed" class="member-name-link">useSealed</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#useOptional" class="member-name-link">useOptional</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#useTags" class="member-name-link">useTags</a></code></div>
+<div class="col-second even-row-color"><code><a href="#useSealed" class="member-name-link">useSealed</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#visitable" class="member-name-link">visitable</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#useTags" class="member-name-link">useTags</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#visitable" class="member-name-link">visitable</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.openapitools.codegen.languages.AbstractJavaCodegen">Fields inherited from class&nbsp;org.openapitools.codegen.languages.AbstractJavaCodegen</h3>
@@ -736,148 +741,151 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDateTimeLibrary(java.lang.String)" class="member-name-link">setDateTimeLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setFluxForArrays(boolean)" class="member-name-link">setFluxForArrays</a><wbr>(boolean&nbsp;fluxForArrays)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setEnumUnknownDefaultCaseName(java.lang.String)" class="member-name-link">setEnumUnknownDefaultCaseName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;enumUnknownDefaultCaseName)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateControllerAsAbstract(boolean)" class="member-name-link">setGenerateControllerAsAbstract</a><wbr>(boolean&nbsp;generateControllerAsAbstract)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setFluxForArrays(boolean)" class="member-name-link">setFluxForArrays</a><wbr>(boolean&nbsp;fluxForArrays)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGeneratedAnnotation(boolean)" class="member-name-link">setGeneratedAnnotation</a><wbr>(boolean&nbsp;generatedAnnotation)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateControllerAsAbstract(boolean)" class="member-name-link">setGenerateControllerAsAbstract</a><wbr>(boolean&nbsp;generateControllerAsAbstract)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateEnumConverters(boolean)" class="member-name-link">setGenerateEnumConverters</a><wbr>(boolean&nbsp;generateEnumConverters)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGeneratedAnnotation(boolean)" class="member-name-link">setGeneratedAnnotation</a><wbr>(boolean&nbsp;generatedAnnotation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseAlways(boolean)" class="member-name-link">setGenerateHttpResponseAlways</a><wbr>(boolean&nbsp;generateHttpResponseAlways)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateEnumConverters(boolean)" class="member-name-link">setGenerateEnumConverters</a><wbr>(boolean&nbsp;generateEnumConverters)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseOnlyForMultipleStatuses(boolean)" class="member-name-link">setGenerateHttpResponseOnlyForMultipleStatuses</a><wbr>(boolean&nbsp;generateHttpResponseOnlyForMultipleStatuses)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseAlways(boolean)" class="member-name-link">setGenerateHttpResponseAlways</a><wbr>(boolean&nbsp;generateHttpResponseAlways)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseWhereRequired(boolean)" class="member-name-link">setGenerateHttpResponseWhereRequired</a><wbr>(boolean&nbsp;generateHttpResponseWhereRequired)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseOnlyForMultipleStatuses(boolean)" class="member-name-link">setGenerateHttpResponseOnlyForMultipleStatuses</a><wbr>(boolean&nbsp;generateHttpResponseOnlyForMultipleStatuses)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateOperationOnlyForFirstTag(boolean)" class="member-name-link">setGenerateOperationOnlyForFirstTag</a><wbr>(boolean&nbsp;generateOperationOnlyForFirstTag)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateHttpResponseWhereRequired(boolean)" class="member-name-link">setGenerateHttpResponseWhereRequired</a><wbr>(boolean&nbsp;generateHttpResponseWhereRequired)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateSwaggerAnnotations(boolean)" class="member-name-link">setGenerateSwaggerAnnotations</a><wbr>(boolean&nbsp;generateSwaggerAnnotations)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateOperationOnlyForFirstTag(boolean)" class="member-name-link">setGenerateOperationOnlyForFirstTag</a><wbr>(boolean&nbsp;generateOperationOnlyForFirstTag)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInvokerPackage(java.lang.String)" class="member-name-link">setInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGenerateSwaggerAnnotations(boolean)" class="member-name-link">setGenerateSwaggerAnnotations</a><wbr>(boolean&nbsp;generateSwaggerAnnotations)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setJsonIncludeAlwaysForRequiredFields(boolean)" class="member-name-link">setJsonIncludeAlwaysForRequiredFields</a><wbr>(boolean&nbsp;jsonIncludeAlwaysForRequiredFields)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInvokerPackage(java.lang.String)" class="member-name-link">setInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLombok(boolean)" class="member-name-link">setLombok</a><wbr>(boolean&nbsp;lombok)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setJsonIncludeAlwaysForRequiredFields(boolean)" class="member-name-link">setJsonIncludeAlwaysForRequiredFields</a><wbr>(boolean&nbsp;jsonIncludeAlwaysForRequiredFields)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelNamePrefix(java.lang.String)" class="member-name-link">setModelNamePrefix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNamePrefix)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLombok(boolean)" class="member-name-link">setLombok</a><wbr>(boolean&nbsp;lombok)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelNameSuffix(java.lang.String)" class="member-name-link">setModelNameSuffix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNameSuffix)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelNamePrefix(java.lang.String)" class="member-name-link">setModelNamePrefix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNamePrefix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelPackage(java.lang.String)" class="member-name-link">setModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelNameSuffix(java.lang.String)" class="member-name-link">setModelNameSuffix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNameSuffix)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNoArgsConstructor(boolean)" class="member-name-link">setNoArgsConstructor</a><wbr>(boolean&nbsp;noArgsConstructor)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelPackage(java.lang.String)" class="member-name-link">setModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setParameterExampleValue(org.openapitools.codegen.CodegenParameter)" class="member-name-link">setParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNoArgsConstructor(boolean)" class="member-name-link">setNoArgsConstructor</a><wbr>(boolean&nbsp;noArgsConstructor)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setParameterExampleValue(org.openapitools.codegen.CodegenParameter)" class="member-name-link">setParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the example value of the parameter.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPlural(boolean)" class="member-name-link">setPlural</a><wbr>(boolean&nbsp;plural)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReactive(boolean)" class="member-name-link">setReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPlural(boolean)" class="member-name-link">setPlural</a><wbr>(boolean&nbsp;plural)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setRequiredPropertiesInConstructor(boolean)" class="member-name-link">setRequiredPropertiesInConstructor</a><wbr>(boolean&nbsp;requiredPropertiesInConstructor)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReactive(boolean)" class="member-name-link">setReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSerializationLibrary(java.lang.String)" class="member-name-link">setSerializationLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;serializationLibrary)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setRequiredPropertiesInConstructor(boolean)" class="member-name-link">setRequiredPropertiesInConstructor</a><wbr>(boolean&nbsp;requiredPropertiesInConstructor)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTestTool(java.lang.String)" class="member-name-link">setTestTool</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;testTool)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSerializationLibrary(java.lang.String)" class="member-name-link">setSerializationLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;serializationLibrary)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseBeanValidation(boolean)" class="member-name-link">setUseBeanValidation</a><wbr>(boolean&nbsp;useBeanValidation)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTestTool(java.lang.String)" class="member-name-link">setTestTool</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;testTool)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseEnumCaseInsensitive(boolean)" class="member-name-link">setUseEnumCaseInsensitive</a><wbr>(boolean&nbsp;useEnumCaseInsensitive)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseBeanValidation(boolean)" class="member-name-link">setUseBeanValidation</a><wbr>(boolean&nbsp;useBeanValidation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOneOfInterfaces(java.lang.Boolean)" class="member-name-link">setUseOneOfInterfaces</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&nbsp;useOneOfInterfaces)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseEnumCaseInsensitive(boolean)" class="member-name-link">setUseEnumCaseInsensitive</a><wbr>(boolean&nbsp;useEnumCaseInsensitive)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOptional(boolean)" class="member-name-link">setUseOptional</a><wbr>(boolean&nbsp;useOptional)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOneOfInterfaces(java.lang.Boolean)" class="member-name-link">setUseOneOfInterfaces</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&nbsp;useOneOfInterfaces)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseSealed(boolean)" class="member-name-link">setUseSealed</a><wbr>(boolean&nbsp;useSealed)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOptional(boolean)" class="member-name-link">setUseOptional</a><wbr>(boolean&nbsp;useOptional)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseTags(boolean)" class="member-name-link">setUseTags</a><wbr>(boolean&nbsp;useTags)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseSealed(boolean)" class="member-name-link">setUseSealed</a><wbr>(boolean&nbsp;useSealed)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setVisitable(boolean)" class="member-name-link">setVisitable</a><wbr>(boolean&nbsp;visitable)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseTags(boolean)" class="member-name-link">setUseTags</a><wbr>(boolean&nbsp;useTags)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#testFileFolder()" class="member-name-link">testFileFolder</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setVisitable(boolean)" class="member-name-link">setVisitable</a><wbr>(boolean&nbsp;visitable)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiName(java.lang.String)" class="member-name-link">toApiName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#testFileFolder()" class="member-name-link">testFileFolder</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiName(java.lang.String)" class="member-name-link">toApiName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Output the API (class) name (capitalized) ending with the specified or default suffix
 Return DefaultApi if name is empty</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiTestFilename(java.lang.String)" class="member-name-link">toApiTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiTestFilename(java.lang.String)" class="member-name-link">toApiTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the file name of the Api Test</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiVarName(java.lang.String)" class="member-name-link">toApiVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiVarName(java.lang.String)" class="member-name-link">toApiVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the variable name in the Api</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toDefaultValue(org.openapitools.codegen.CodegenProperty,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">toDefaultValue</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;cp,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toDefaultValue(org.openapitools.codegen.CodegenProperty,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">toDefaultValue</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;cp,
  io.swagger.v3.oas.models.media.Schema&nbsp;schema)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the default value of the property</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toEnumValue(java.lang.String,java.lang.String)" class="member-name-link">toEnumValue</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toEnumValue(java.lang.String,java.lang.String)" class="member-name-link">toEnumValue</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datatype)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the enum value in the language specified format
 e.g.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toEnumVarName(java.lang.String,java.lang.String)" class="member-name-link">toEnumVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toEnumVarName(java.lang.String,java.lang.String)" class="member-name-link">toEnumVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datatype)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the sanitized variable name for enum</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toModelTestFilename(java.lang.String)" class="member-name-link">toModelTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toModelTestFilename(java.lang.String)" class="member-name-link">toModelTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the capitalized file name of the model test</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toVarName(java.lang.String)" class="member-name-link">toVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toVarName(java.lang.String)" class="member-name-link">toVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Return the variable name by removing invalid characters and proper escaping if
 it's a reserved word.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateEnumVarsWithExtensions(java.util.List,java.util.Map,java.lang.String)" class="member-name-link">updateEnumVarsWithExtensions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&gt;&nbsp;enumVars,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateEnumVarsWithExtensions(java.util.List,java.util.Map,java.lang.String)" class="member-name-link">updateEnumVarsWithExtensions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&gt;&nbsp;enumVars,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;vendorExtensions,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataType)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -1432,6 +1440,22 @@ it's a reserved word.</div>
 <dd>
 <ul class="tag-list">
 <li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME">
+<h3>OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -2857,6 +2881,14 @@ Corresponding user documentation: docs/templating.md, section "Mustache Lambdas"
 <h3>setRequiredPropertiesInConstructor</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setRequiredPropertiesInConstructor</span><wbr><span class="parameters">(boolean&nbsp;requiredPropertiesInConstructor)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setEnumUnknownDefaultCaseName(java.lang.String)">
+<h3>setEnumUnknownDefaultCaseName</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setEnumUnknownDefaultCaseName</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;enumUnknownDefaultCaseName)</span></div>
 </div>
 </section>
 </li>

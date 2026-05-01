@@ -61,6 +61,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#TYPE_ARG_MAP_KEY" tabindex="0">TYPE_ARG_MAP_KEY</a></li>
 <li><a href="#TYPE_ARG_MAP_VALUE" tabindex="0">TYPE_ARG_MAP_VALUE</a></li>
 <li><a href="#EMPTY_ANNOTATION_VALUES_ARRAY" tabindex="0">EMPTY_ANNOTATION_VALUES_ARRAY</a></li>
+<li><a href="#ARRAY_CONTAINER_TYPES" tabindex="0">ARRAY_CONTAINER_TYPES</a></li>
+<li><a href="#SINGLE_CONTAINER_TYPES" tabindex="0">SINGLE_CONTAINER_TYPES</a></li>
 <li><a href="#CONTAINER_TYPES" tabindex="0">CONTAINER_TYPES</a></li>
 <li><a href="#FILE_TYPES" tabindex="0">FILE_TYPES</a></li>
 <li><a href="#VOID_TYPES" tabindex="0">VOID_TYPES</a></li>
@@ -68,6 +70,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#isJsonNode(io.micronaut.inject.ast.ClassElement)" tabindex="0">isJsonNode(ClassElement)</a></li>
 <li><a href="#isJavaRecord(io.micronaut.inject.ast.ClassElement)" tabindex="0">isJavaRecord(ClassElement)</a></li>
 <li><a href="#isJavaRecordType(io.micronaut.inject.ast.ClassElement)" tabindex="0">isJavaRecordType(ClassElement)</a></li>
 <li><a href="#isJavaUtilType(io.micronaut.inject.ast.ClassElement)" tabindex="0">isJavaUtilType(ClassElement)</a></li>
@@ -82,6 +85,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#hasNoBindingAnnotationOrType(io.micronaut.inject.ast.TypedElement)" tabindex="0">hasNoBindingAnnotationOrType(TypedElement)</a></li>
 <li><a href="#isReturnTypeFile(io.micronaut.inject.ast.ClassElement)" tabindex="0">isReturnTypeFile(ClassElement)</a></li>
 <li><a href="#isContainerType(io.micronaut.inject.ast.ClassElement)" tabindex="0">isContainerType(ClassElement)</a></li>
+<li><a href="#isArrayContainerType(io.micronaut.inject.ast.ClassElement)" tabindex="0">isArrayContainerType(ClassElement)</a></li>
+<li><a href="#isSingleContainerType(io.micronaut.inject.ast.ClassElement)" tabindex="0">isSingleContainerType(ClassElement)</a></li>
 <li><a href="#isVoid(io.micronaut.inject.ast.ClassElement)" tabindex="0">isVoid(ClassElement)</a></li>
 <li><a href="#isReactiveAndVoid(io.micronaut.inject.ast.ClassElement)" tabindex="0">isReactiveAndVoid(ClassElement)</a></li>
 <li><a href="#isJavaBasicType(java.lang.String)" tabindex="0">isJavaBasicType(String)</a></li>
@@ -103,6 +108,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#isMapOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" tabindex="0">isMapOfMultipartFiles(TypedElement)</a></li>
 <li><a href="#isMapOfStrings(io.micronaut.inject.ast.TypedElement)" tabindex="0">isMapOfStrings(TypedElement)</a></li>
 <li><a href="#isIgnored(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" tabindex="0">isIgnored(ClassElement, VisitorContext)</a></li>
+<li><a href="#isImplicitQueryAggregator(io.micronaut.inject.ast.TypedElement)" tabindex="0">isImplicitQueryAggregator(TypedElement)</a></li>
 </ol>
 </li>
 </ol>
@@ -140,13 +146,19 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#CONTAINER_TYPES" class="member-name-link">CONTAINER_TYPES</a></code></div>
+<div class="col-second even-row-color"><code><a href="#ARRAY_CONTAINER_TYPES" class="member-name-link">ARRAY_CONTAINER_TYPES</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final io.micronaut.core.annotation.AnnotationValue&lt;?&gt;[]</code></div>
-<div class="col-second odd-row-color"><code><a href="#EMPTY_ANNOTATION_VALUES_ARRAY" class="member-name-link">EMPTY_ANNOTATION_VALUES_ARRAY</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#CONTAINER_TYPES" class="member-name-link">CONTAINER_TYPES</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final io.micronaut.core.annotation.AnnotationValue&lt;?&gt;[]</code></div>
+<div class="col-second even-row-color"><code><a href="#EMPTY_ANNOTATION_VALUES_ARRAY" class="member-name-link">EMPTY_ANNOTATION_VALUES_ARRAY</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#FILE_TYPES" class="member-name-link">FILE_TYPES</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#FILE_TYPES" class="member-name-link">FILE_TYPES</a></code></div>
+<div class="col-second even-row-color"><code><a href="#SINGLE_CONTAINER_TYPES" class="member-name-link">SINGLE_CONTAINER_TYPES</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#TYPE_ARG_MAP_KEY" class="member-name-link">TYPE_ARG_MAP_KEY</a></code></div>
@@ -202,38 +214,48 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;annName)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isContainerType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isContainerType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isArrayContainerType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isArrayContainerType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Checking if the type is container array.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isContainerType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isContainerType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Checking if the type is container.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isDeprecated(io.micronaut.inject.ast.Element)" class="member-name-link">isDeprecated</a><wbr>(io.micronaut.inject.ast.Element&nbsp;el)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEnum(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isEnum</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classElement)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isDeprecated(io.micronaut.inject.ast.Element)" class="member-name-link">isDeprecated</a><wbr>(io.micronaut.inject.ast.Element&nbsp;el)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isExtraBodyParameter(io.micronaut.inject.ast.TypedElement,boolean,java.util.List,java.util.Map,java.util.Map)" class="member-name-link">isExtraBodyParameter</a><wbr>(@NonNull io.micronaut.inject.ast.TypedElement&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEnum(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isEnum</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classElement)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isExtraBodyParameter(io.micronaut.inject.ast.TypedElement,boolean,java.util.List,java.util.Map,java.util.Map)" class="member-name-link">isExtraBodyParameter</a><wbr>(@NonNull io.micronaut.inject.ast.TypedElement&nbsp;parameter,
  boolean&nbsp;permitsRequestBody,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.uri.UriMatchTemplate&gt;&nbsp;matchTemplates,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, io.micronaut.http.uri.UriMatchVariable&gt;&nbsp;pathVariables,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, io.micronaut.http.uri.UriMatchVariable&gt;&nbsp;queryParams)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isFileUpload(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isFileUpload</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Checking if the type is file upload type.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnored(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isIgnored</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnoredParameter(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isIgnoredParameter</a><wbr>(@NonNull io.micronaut.inject.ast.TypedElement&nbsp;parameter)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AbstractOpenApiEndpointVisitor.VarMetadata.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor.VarMetadata</a>&gt;&nbsp;pathVariables,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AbstractOpenApiEndpointVisitor.VarMetadata.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor.VarMetadata</a>&gt;&nbsp;queryParams)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnoredParameterType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isIgnoredParameterType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;parameterType)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isFileUpload(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isFileUpload</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Checking if the type is file upload type.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnored(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isIgnored</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnoredParameter(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isIgnoredParameter</a><wbr>(@NonNull io.micronaut.inject.ast.TypedElement&nbsp;parameter)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnoredParameterType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isIgnoredParameterType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;parameterType)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isImplicitQueryAggregator(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isImplicitQueryAggregator</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;parameter)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Determines if the given parameter should be treated as an implicit query aggregator (POJO).</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIterableOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isIterableOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
@@ -253,36 +275,44 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaUtilType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJavaUtilType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfListOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfListOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJsonNode(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJsonNode</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfListOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfListOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfStrings(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfStrings</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isNotNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNotNullable</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfStrings(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfStrings</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isNotNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNotNullable</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Checking if the element not nullable.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNullable</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNullable</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Checks Nullable annotations / optional type to understand that the element can be null.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isReactiveAndVoid(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReactiveAndVoid</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isReactiveAndVoid(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReactiveAndVoid</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Checking if the type is void.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isResponseType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isResponseType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;returnType)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isReturnTypeFile(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReturnTypeFile</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isResponseType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isResponseType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;returnType)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isReturnTypeFile(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReturnTypeFile</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Checking if the type is file.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isSingleContainerType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isSingleContainerType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Checking if the type is container single.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isSingleResponseType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isSingleResponseType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;returnType)</code></div>
@@ -361,6 +391,22 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="ARRAY_CONTAINER_TYPES">
+<h3>ARRAY_CONTAINER_TYPES</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">ARRAY_CONTAINER_TYPES</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="SINGLE_CONTAINER_TYPES">
+<h3>SINGLE_CONTAINER_TYPES</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">SINGLE_CONTAINER_TYPES</span></div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="CONTAINER_TYPES">
 <h3>CONTAINER_TYPES</h3>
 <div class="horizontal-scroll">
@@ -392,6 +438,14 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="isJsonNode(io.micronaut.inject.ast.ClassElement)">
+<h3>isJsonNode</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isJsonNode</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</span></div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="isJavaRecord(io.micronaut.inject.ast.ClassElement)">
 <h3>isJavaRecord</h3>
@@ -500,8 +554,8 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isExtraBodyParameter</span><wbr><span class="parameters">(@NonNull io.micronaut.inject.ast.TypedElement&nbsp;parameter,
  boolean&nbsp;permitsRequestBody,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.uri.UriMatchTemplate&gt;&nbsp;matchTemplates,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, io.micronaut.http.uri.UriMatchVariable&gt;&nbsp;pathVariables,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, io.micronaut.http.uri.UriMatchVariable&gt;&nbsp;queryParams)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AbstractOpenApiEndpointVisitor.VarMetadata.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor.VarMetadata</a>&gt;&nbsp;pathVariables,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="AbstractOpenApiEndpointVisitor.VarMetadata.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor.VarMetadata</a>&gt;&nbsp;queryParams)</span></div>
 </div>
 </section>
 </li>
@@ -534,6 +588,36 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isContainerType</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;type)</span></div>
 <div class="block">Checking if the type is container.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>type</code> - type element</dd>
+<dt>Returns:</dt>
+<dd>true if this type assignable with known container types</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isArrayContainerType(io.micronaut.inject.ast.ClassElement)">
+<h3>isArrayContainerType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isArrayContainerType</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;type)</span></div>
+<div class="block">Checking if the type is container array.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>type</code> - type element</dd>
+<dt>Returns:</dt>
+<dd>true if this type assignable with known container types</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isSingleContainerType(io.micronaut.inject.ast.ClassElement)">
+<h3>isSingleContainerType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isSingleContainerType</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;type)</span></div>
+<div class="block">Checking if the type is container single.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>type</code> - type element</dd>
@@ -733,6 +817,23 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isIgnored</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;element,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isImplicitQueryAggregator(io.micronaut.inject.ast.TypedElement)">
+<h3>isImplicitQueryAggregator</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isImplicitQueryAggregator</span><wbr><span class="parameters">(io.micronaut.inject.ast.TypedElement&nbsp;parameter)</span></div>
+<div class="block">Determines if the given parameter should be treated as an implicit query aggregator (POJO).
+Aggregators are complex @Introspected objects without an explicit name in @QueryValue.
+Scalar types (URI, URL, UUID, Dates, Numbers) and collections are strictly excluded.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>parameter</code> - The element to check (method parameter).</dd>
+<dt>Returns:</dt>
+<dd>true if the parameter is a single Introspected POJO to be flattened, false otherwise.</dd>
+</dl>
 </div>
 </section>
 </li>

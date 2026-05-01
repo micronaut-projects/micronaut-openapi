@@ -57,11 +57,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#isTextualIn(java.lang.String)" tabindex="0">isTextualIn(String)</a></li>
 <li><a href="#calcIn(java.lang.String,io.micronaut.http.HttpMethod,io.micronaut.inject.ast.ParameterElement)" tabindex="0">calcIn(String, HttpMethod, ParameterElement)</a></li>
 <li><a href="#paramStyle(io.swagger.v3.oas.annotations.enums.ParameterStyle,java.lang.String)" tabindex="0">paramStyle(ParameterStyle, String)</a></li>
 <li><a href="#paramStyleByFormat(java.lang.String,java.lang.String)" tabindex="0">paramStyleByFormat(String, String)</a></li>
 <li><a href="#getHeaderName(io.micronaut.inject.ast.TypedElement,java.lang.String)" tabindex="0">getHeaderName(TypedElement, String)</a></li>
 <li><a href="#addVersionParameters(io.swagger.v3.oas.models.Operation,java.util.List,boolean)" tabindex="0">addVersionParameters(Operation, List, boolean)</a></li>
+<li><a href="#readClassHeaders(io.micronaut.inject.ast.ClassElement)" tabindex="0">readClassHeaders(ClassElement)</a></li>
 </ol>
 </li>
 </ol>
@@ -114,14 +116,25 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getHeaderName(io.micronaut.inject.ast.TypedElement,java.lang.String)" class="member-name-link">getHeaderName</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.Parameter.StyleEnum</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#paramStyle(io.swagger.v3.oas.annotations.enums.ParameterStyle,java.lang.String)" class="member-name-link">paramStyle</a><wbr>(io.swagger.v3.oas.annotations.enums.ParameterStyle&nbsp;paramAnnStyle,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;in)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isTextualIn(java.lang.String)" class="member-name-link">isTextualIn</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;in)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Determines if the parameter is transported as part of the URL or HTTP headers.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.Parameter.StyleEnum</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#paramStyleByFormat(java.lang.String,java.lang.String)" class="member-name-link">paramStyleByFormat</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;format,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#paramStyle(io.swagger.v3.oas.annotations.enums.ParameterStyle,java.lang.String)" class="member-name-link">paramStyle</a><wbr>(io.swagger.v3.oas.annotations.enums.ParameterStyle&nbsp;paramAnnStyle,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;in)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.Parameter.StyleEnum</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#paramStyleByFormat(java.lang.String,java.lang.String)" class="member-name-link">paramStyleByFormat</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;format,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;in)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;io.swagger.v3.oas.models.parameters.Parameter&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#readClassHeaders(io.micronaut.inject.ast.ClassElement)" class="member-name-link">readClassHeaders</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Reads <code>Header</code> annotations from the class element
+and converts them to OpenAPI parameters.</div>
+</div>
 </div>
 </div>
 </div>
@@ -139,6 +152,24 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="isTextualIn(java.lang.String)">
+<h3>isTextualIn</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isTextualIn</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;in)</span></div>
+<div class="block">Determines if the parameter is transported as part of the URL or HTTP headers.
+In these locations, binary data (like byte arrays) must be represented as a
+Base64-encoded string (format: "byte") to comply with the OpenAPI specification,
+as raw binary data (format: "binary") is not supported in these textual contexts.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>in</code> - the parameter location (e.g., "path", "query", "header", "cookie")</dd>
+<dt>Returns:</dt>
+<dd>true if the parameter location requires textual encoding (Base64) for binary data</dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="calcIn(java.lang.String,io.micronaut.http.HttpMethod,io.micronaut.inject.ast.ParameterElement)">
 <h3>calcIn</h3>
@@ -183,6 +214,22 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addVersionParameters</span><wbr><span class="parameters">(io.swagger.v3.oas.models.Operation&nbsp;swaggerOperation,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;names,
  boolean&nbsp;isHeader)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="readClassHeaders(io.micronaut.inject.ast.ClassElement)">
+<h3>readClassHeaders</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.parameters.Parameter&gt;</span>&nbsp;<span class="element-name">readClassHeaders</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</span></div>
+<div class="block">Reads <code>Header</code> annotations from the class element
+and converts them to OpenAPI parameters.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>classEl</code> - The class element (controller) to inspect</dd>
+<dt>Returns:</dt>
+<dd>A list of <code>Parameter</code> objects with "header" location</dd>
+</dl>
 </div>
 </section>
 </li>
