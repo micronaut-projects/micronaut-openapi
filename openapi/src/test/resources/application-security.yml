@@ -21,3 +21,6 @@ micronaut:
       - pattern: /from-file2/*
         http-method: PUT
         access: role1,role2
+      - pattern: /localRoles
+        http-method: GET
+        access: role1,role2

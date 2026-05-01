@@ -341,6 +341,9 @@ public final class OpenApiNormalizeUtils {
                 if (!TYPE_STRING.equals(schema.getType()) && schema.getExample() instanceof String exampleStr) {
                     schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
                 }
+                if (schema.getAdditionalProperties() != null && schema.getAdditionalProperties() instanceof Boolean boolAddProps && !boolAddProps) {
+                    schema.setAdditionalProperties(null);
+                }
                 normalizeSchemaProperties(schema, context);
                 normalizeSchemaProperties(normalizedSchema, context);
                 unwrapAllOff(normalizedSchema);
@@ -438,6 +441,9 @@ public final class OpenApiNormalizeUtils {
 
         if (!TYPE_STRING.equals(type) && schema.getExample() instanceof String exampleStr) {
             schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
+        }
+        if (schema.getAdditionalProperties() != null && schema.getAdditionalProperties() instanceof Boolean boolAddProps && !boolAddProps) {
+            schema.setAdditionalProperties(null);
         }
     }
 

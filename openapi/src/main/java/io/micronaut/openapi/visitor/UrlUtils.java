@@ -194,16 +194,22 @@ public final class UrlUtils {
                 continue;
             }
 
+            // 1. Identify segment type and check for greedy operator '*'
             SegmentType type = nextChar == '/' ? OPT_VAR : REQ_VAR;
+            var startBlockPos = varStartPos;
+            // Skip '/' for optional variables like {/path}
+            if (pathString.charAt(startBlockPos + 1) == '/') {
+                startBlockPos++;
+            }
+            // Skip '*' for greedy variables like {*path}
+            if (pathString.charAt(startBlockPos + 1) == '*') {
+                startBlockPos++;
+            }
 
             if (!constSegment.isEmpty()) {
                 addConstValue(constSegment, segments);
             }
 
-            var startBlockPos = varStartPos;
-            if (pathString.charAt(startBlockPos + 1) == '/') {
-                startBlockPos++;
-            }
             for (; ; ) {
                 var dotPos = pathString.indexOf(',', startBlockPos + 1);
                 var dotPos2 = pathString.indexOf(':', startBlockPos + 1);

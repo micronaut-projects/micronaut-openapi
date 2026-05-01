@@ -35,6 +35,7 @@ public interface OpenApiModelProp {
     String PROP_DESCRIPTION = "description";
     String PROP_SCHEMA = "schema";
     String PROP_ARRAY_SCHEMA = "arraySchema";
+    String PROP_ARRAY = "array";
     String PROP_ITEMS = "items";
     String PROP_MIN_ITEMS = "minItems";
     String PROP_MAX_ITEMS = "maxItems";
@@ -70,6 +71,7 @@ public interface OpenApiModelProp {
     String PROP_REQUIRED = "required";
     String PROP_REQUIRED_PROPERTIES = "requiredProperties";
     String PROP_ADDITIONAL_PROPERTIES = "additionalProperties";
+    String PROP_ADDITIONAL_PROPERTIES_SCHEMA = "additionalPropertiesSchema";
     String PROP_DISCRIMINATOR_PROPERTY = "discriminatorProperty";
     String PROP_DISCRIMINATOR_MAPPING = "discriminatorMapping";
     String PROP_DEPRECATED = "deprecated";

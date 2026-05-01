@@ -94,6 +94,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -114,6 +115,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
+import static io.micronaut.openapi.visitor.ElementUtils.isImplicitQueryAggregator;
 import static io.micronaut.openapi.visitor.ElementUtils.isIterableOfMultipartFiles;
 import static io.micronaut.openapi.visitor.ElementUtils.isMapOfListOfMultipartFiles;
 import static io.micronaut.openapi.visitor.ElementUtils.isMapOfMultipartFiles;
@@ -131,6 +133,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_RESERVED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ARRAY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CALLBACK_URL_EXPRESSION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
@@ -159,26 +162,34 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static io.micronaut.openapi.visitor.ParamUtils.calcIn;
 import static io.micronaut.openapi.visitor.ParamUtils.getHeaderName;
+import static io.micronaut.openapi.visitor.ParamUtils.isTextualIn;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyle;
 import static io.micronaut.openapi.visitor.ParamUtils.paramStyleByFormat;
+import static io.micronaut.openapi.visitor.ParamUtils.readClassHeaders;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processArraySchemaAnn;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaAnn;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.resolveSchema;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
+import static io.micronaut.openapi.visitor.SchemaUtils.FORMAT_BINARY;
+import static io.micronaut.openapi.visitor.SchemaUtils.FORMAT_BYTE;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.arraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
+import static io.micronaut.openapi.visitor.SchemaUtils.isArraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SecurityUtils.processSecuritySchemes;
-import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
+import static io.micronaut.openapi.visitor.SecurityUtils.readMethodSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
@@ -466,6 +477,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             resolveWebhooks(openApi).put(webhookPair.getFirst(), webhookPair.getSecond());
         }
 
+        // Collect Class-Level Headers
+        var classHeaders = readClassHeaders(element.getOwningType());
+
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
 
@@ -509,7 +523,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openApi);
 
-                readSecurityRequirements(element, httpMethod, pathItemEntry.getKey(), swaggerOperation, methodSecurityRequirements(element, context), context);
+                readMethodSecurityRequirements(element, httpMethod, pathItemEntry.getKey(), swaggerOperation, methodSecurityRequirements(element, context), context);
 
                 readApiResponses(element, context, swaggerOperation, jsonViewClass);
 
@@ -547,14 +561,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 setOperationOnPathItem(operationEntry.getKey(), httpMethod, swaggerOperation);
 
-                var queryParams = new HashMap<String, UriMatchVariable>();
-                var pathVariables = new HashMap<String, UriMatchVariable>();
+                var queryParams = new HashMap<String, VarMetadata>();
+                var pathVariables = new HashMap<String, VarMetadata>();
                 for (UriMatchTemplate matchTemplate : matchTemplates) {
-                    for (Map.Entry<String, UriMatchVariable> varEntry : uriVariables(matchTemplate).entrySet()) {
+                    for (Map.Entry<String, VarMetadata> varEntry : uriVariables(matchTemplate).entrySet()) {
                         if (pathItemEntry.getKey().contains(OPEN_BRACE + varEntry.getKey() + CLOSE_BRACE)) {
                             pathVariables.put(varEntry.getKey(), varEntry.getValue());
                         }
-                        if (varEntry.getValue().isQuery()) {
+                        if (varEntry.getValue().var.isQuery()) {
                             queryParams.put(varEntry.getKey(), varEntry.getValue());
                         }
                     }
@@ -574,19 +588,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (webhookPair != null) {
                     SchemaUtils.mergeOperations(getOperationOnPathItem(webhookPair.getSecond(), httpMethod), swaggerOperation);
                 }
+                addHeadersToOperation(swaggerOperation, classHeaders);
             }
         }
     }
 
-    private void addParamsByUriTemplate(String path, Map<String, UriMatchVariable> pathVariables,
-                                        Map<String, UriMatchVariable> queryParams,
+    private void addParamsByUriTemplate(String path, Map<String, VarMetadata> pathVariables,
+                                        Map<String, VarMetadata> queryParams,
                                         Operation operation) {
 
         // check path variables in URL template which do not map to method parameters
         for (var entry : pathVariables.entrySet()) {
             var varName = entry.getKey();
             var pathVar = entry.getValue();
-            if (pathVar.isExploded()
+            if (pathVar.var.isExploded()
                 || !path.contains(OPEN_BRACE + varName + CLOSE_BRACE)
                 // skip placeholders
                 || path.contains(DOLLAR + OPEN_BRACE + varName + CLOSE_BRACE)
@@ -604,7 +619,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         for (var entry : queryParams.entrySet()) {
             var varName = entry.getKey();
             var pathVar = entry.getValue();
-            if (pathVar.isExploded() || isAlreadyAdded(varName, operation)) {
+            if (pathVar.var.isExploded() || isAlreadyAdded(varName, operation)) {
                 continue;
             }
 
@@ -719,8 +734,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processParameters(MethodElement element, VisitorContext context, OpenAPI openApi,
                                    Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
-                                   Map<String, UriMatchVariable> pathVariables,
-                                   Map<String, UriMatchVariable> queryParams,
+                                   Map<String, VarMetadata> pathVariables,
+                                   Map<String, VarMetadata> queryParams,
                                    List<MediaType> consumesMediaTypes,
                                    List<TypedElement> extraBodyParameters,
                                    HttpMethod httpMethod,
@@ -781,7 +796,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                     UriMatchTemplate matchTemplate,
                                                     HttpMethod httpMethod,
                                                     Operation operation,
-                                                    Map<String, UriMatchVariable> pathVariables,
+                                                    Map<String, VarMetadata> pathVariables,
                                                     VisitorContext context) {
 
         var parameterAnns = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
@@ -823,7 +838,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     } else if (paramEl.isAnnotationPresent(Header.class)) {
                         parameter.setIn(ParameterIn.HEADER.toString());
                     } else {
-                        UriMatchVariable pathVariable = pathVariables.get(parameter.getName());
+                        VarMetadata pathVariable = pathVariables.get(parameter.getName());
                         // check if this parameter is optional path variable
                         if (pathVariable == null) {
                             for (UriMatchVariable variable : matchTemplate.getVariables()) {
@@ -832,7 +847,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 }
                             }
                         }
-                        if (pathVariable != null && !pathVariable.isOptional() && !pathVariable.isQuery() && !pathVariable.isExploded()) {
+                        if (pathVariable != null && !pathVariable.var.isOptional() && !pathVariable.var.isQuery() && !pathVariable.var.isExploded()) {
                             parameter.setIn(ParameterIn.PATH.toString());
                         }
 
@@ -857,8 +872,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processParameter(VisitorContext context, OpenAPI openApi,
                                   Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody,
-                                  Map<String, UriMatchVariable> pathVariables,
-                                  Map<String, UriMatchVariable> queryParams,
+                                  Map<String, VarMetadata> pathVariables,
+                                  Map<String, VarMetadata> queryParams,
                                   List<MediaType> consumesMediaTypes,
                                   List<Parameter> swaggerParameters, TypedElement parameter,
                                   List<TypedElement> extraBodyParameters,
@@ -892,6 +907,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             || parameter.isAnnotationPresent(OpenAPIRequest.class)) {
             processRequestBean(context, openApi, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
+            return;
+        }
+
+        // Check if this @QueryValue is actually an implicit aggregator (POJO without name)
+        if (isImplicitQueryAggregator(parameter)) {
+            // We treat it exactly like a RequestBean, but specifically for Query parameters
+            processImplicitQueryAggregator(context, openApi, swaggerOperation, javadocDescription, consumesMediaTypes, swaggerParameters, parameter);
             return;
         }
 
@@ -930,6 +952,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setName(parameter.getName());
             }
 
+            var urlVar = pathVariables.get(newParameter.getName());
+            if (urlVar == null) {
+                urlVar = queryParams.get(newParameter.getName());
+            }
+            var paramPattern = urlVar != null ? urlVar.pattern() : null;
+
             if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
                 // exception for spring actuator prometheus endpoint
                 if (!get(MICRONAUT_INTERNAL_ENDPOINT_IS_PROMETHEUS, Boolean.class, false, context)
@@ -962,6 +990,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (schemaAnn == null) {
                     schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                 }
+                // Fix for byte array types: when used in textual transports (path, query, header, cookie),
+                // the format should be "byte" (Base64) to ensure compatibility with OpenAPI spec,
+                // unless a specific format is already explicitly provided via annotations.
+                if (parameterType.isArray() && parameterType.isAssignable(byte.class)
+                    && isTextualIn(newParameter.getIn())
+                    && (StringUtils.isEmpty(schema.getType()) || TYPE_STRING.equals(schema.getType()))
+                    && (StringUtils.isEmpty(schema.getFormat()) || FORMAT_BINARY.equals(schema.getFormat()))) {
+
+                    // Fix for byte array types: when used in textual transports (path, query, header, cookie),
+                    // the format should be "byte" (Base64) to ensure compatibility with OpenAPI spec,
+                    // unless a specific format is already explicitly provided via annotations.
+                    schema.setType(TYPE_STRING);
+                    schema.setFormat(FORMAT_BYTE);
+                }
 
                 var isParamRequired = parameterAnn != null ? parameterAnn.get(PROP_REQUIRED, Boolean.class).orElse(false) : false;
                 if (!isParamRequired) {
@@ -973,7 +1015,73 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                     }
                 }
+
             }
+            if (paramPattern != null) {
+                if (newParameter.getSchema() == null) {
+                    newParameter.setSchema(createSchema()
+                        .type(TYPE_STRING)
+                        .pattern(paramPattern));
+                } else if (StringUtils.isEmpty(newParameter.getSchema().getPattern())) {
+                    newParameter.getSchema().setPattern(paramPattern);
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes a POJO aggregator by iterating through its properties and adding each
+     * as an individual Swagger QueryParameter.
+     *
+     * @param context           The visitor context for logging and scanning.
+     * @param openApi           The root OpenAPI object to store schemas and components.
+     * @param swaggerOperation  The current Swagger Operation being processed.
+     * @param javadocDescription The parsed Javadoc for the controller method.
+     * @param consumesMediaTypes The list of supported media types.
+     * @param swaggerParameters  The list of existing parameters for the operation.
+     * @param parameter          The original method parameter (the POJO).
+     */
+    private void processImplicitQueryAggregator(VisitorContext context, OpenAPI openApi,
+                                                Operation swaggerOperation, JavadocDescription javadocDescription,
+                                                List<MediaType> consumesMediaTypes, List<Parameter> swaggerParameters,
+                                                TypedElement parameter) {
+        var parameterType = parameter.getType();
+        var properties = parameterType.getBeanProperties();
+
+        for (var property : properties) {
+            // Skip properties ignored by Jackson or Swagger annotations.
+            if (isIgnoredParameter(property)) {
+                continue;
+            }
+
+            var queryParam = new QueryParameter();
+
+            // Resolve name using the shared naming strategy.
+            // In Micronaut, it's consistent to use Jackson's naming for Query parameters.
+            String propertyName = resolveParameterName(property, context);
+            queryParam.setName(propertyName);
+
+            // Resolve and bind schema for the specific property type.
+            Schema<?> schema = resolveSchema(openApi, property, property.getType(), context, consumesMediaTypes, null, null, null, null);
+            if (schema != null) {
+                schema = bindSchemaForElement(context, property, property.getType(), schema, null, false, true);
+                queryParam.setSchema(schema);
+            }
+
+            // Set required flag based on nullability constraints (e.g., @NotNull or Kotlin non-null).
+            if (!isNullable(property) || isNotNullable(property)) {
+                queryParam.setRequired(true);
+            }
+
+            // Inherit description from Javadoc if property name matches.
+            if (javadocDescription != null && StringUtils.isEmpty(queryParam.getDescription())) {
+                CharSequence desc = javadocDescription.getParameters().get(property.getName());
+                if (desc != null) {
+                    queryParam.setDescription(desc.toString());
+                }
+            }
+
+            addSwaggerParameter(queryParam, swaggerParameters);
         }
     }
 
@@ -1003,8 +1111,22 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             propertySchema = (Schema) propertySchema.getAdditionalProperties();
         }
 
-        parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
-            .ifPresent(propertySchema::setDescription);
+        var paramAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+        if (paramAnn != null) {
+            var paramSchemaAnn = paramAnn.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+            if (paramSchemaAnn != null) {
+                processSchemaAnn(propertySchema, context, parameter, null, paramSchemaAnn);
+            }
+            var paramSchemaArrayAnn = paramAnn.getAnnotation(PROP_ARRAY, io.swagger.v3.oas.annotations.media.ArraySchema.class).orElse(null);
+            if (paramSchemaArrayAnn != null) {
+                if (!isArraySchema(propertySchema, openApi)) {
+                    propertySchema = arraySchema(propertySchema);
+                }
+                processArraySchemaAnn(propertySchema, context, parameter, null, paramSchemaArrayAnn);
+            }
+            paramAnn.stringValue(PROP_DESCRIPTION).ifPresent(propertySchema::setDescription);
+        }
+
         processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
         if (isNullable(parameter) && !isNotNullable(parameter)) {
             // Keep null if not
@@ -1020,8 +1142,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, Operation swaggerOperation,
                                                        boolean permitsRequestBody,
-                                                       Map<String, UriMatchVariable> pathVariables,
-                                                       Map<String, UriMatchVariable> queryParams,
+                                                       Map<String, VarMetadata> pathVariables,
+                                                       Map<String, VarMetadata> queryParams,
                                                        TypedElement parameter,
                                                        List<TypedElement> extraBodyParameters,
                                                        HttpMethod httpMethod,
@@ -1031,10 +1153,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
-            UriMatchVariable urlVar = pathVariables.get(parameterName);
-            newParameter = urlVar.isQuery() ? new QueryParameter() : new PathParameter();
+            VarMetadata urlVar = pathVariables.get(parameterName);
+            newParameter = urlVar.var.isQuery() ? new QueryParameter() : new PathParameter();
             newParameter.setName(parameterName);
-            final boolean exploded = urlVar.isExploded();
+            final boolean exploded = urlVar.var.isExploded();
             if (exploded) {
                 newParameter.setExplode(exploded);
             }
@@ -1043,7 +1165,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (paramName.isEmpty()) {
                 paramName = parameterName;
             }
-            UriMatchVariable variable = pathVariables.get(paramName);
+            VarMetadata variable = pathVariables.get(paramName);
             if (variable == null) {
                 if (!isNullable(parameter)) {
                     warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), context, parameter);
@@ -1052,7 +1174,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
             newParameter = new PathParameter();
             newParameter.setName(paramName);
-            final boolean exploded = variable.isExploded();
+            final boolean exploded = variable.var.isExploded();
             if (exploded) {
                 newParameter.setExplode(true);
             }
@@ -1120,7 +1242,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     isBodyParameter = true;
                 } else {
 
-                    UriMatchVariable pathVariable = pathVariables.get(parameterName);
+                    var pathVariable = pathVariables.get(parameterName);
                     boolean isExploded = false;
                     // check if this parameter is optional path variable
                     if (pathVariable == null) {
@@ -1136,10 +1258,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             }
                         }
                     }
-                    if (pathVariable != null && !pathVariable.isOptional() && !pathVariable.isQuery()) {
+                    if (pathVariable != null && !pathVariable.var.isOptional() && !pathVariable.var.isQuery()) {
                         newParameter = new PathParameter();
                         newParameter.setName(parameterName);
-                        if (pathVariable.isExploded()) {
+                        if (pathVariable.var.isExploded()) {
                             newParameter.setExplode(true);
                         }
                     }
@@ -1302,6 +1424,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var bodyAnn = parameter.getAnnotation(Body.class);
         String wrappedSchemaPropertyName = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
 
+        // Extract Swagger annotations from the parameter to ensure they are not ignored
+        var schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        var arraySchemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
+        // If @Schema is not present on the parameter, try to extract it from @ArraySchema.schema()
+        if (schemaAnn == null && arraySchemaAnn != null) {
+            schemaAnn = arraySchemaAnn.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+        }
+
         for (var mediaType : consumesMediaTypes) {
             var mt = content.get(mediaType.toString());
             if (mt == null) {
@@ -1322,7 +1452,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 processBodyParameter(context, openApi, javadocDescription, mediaType, wrapperSchema, parameter);
             } else {
                 var needSetSchema = true;
-                var paramSchema = resolveSchema(openApi, parameter, parameterType, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
+                var paramSchema = resolveSchema(openApi, parameter, parameterType, context, Collections.singletonList(mediaType), jsonViewClass, null, null, schemaAnn);
+                processSchemaAnn(paramSchema, context, parameter, parameterType, schemaAnn);
+                if (arraySchemaAnn != null) {
+                    paramSchema = arraySchema(paramSchema);
+                    // processArraySchemaAnn populates metadata (minItems, maxItems, etc.) into the object
+                    processArraySchemaAnn(paramSchema, context, parameter, parameterType, arraySchemaAnn);
+                }
                 if (mt.getSchema() != null) {
                     if (mt.getSchema().get$ref() != null
                         || CollectionUtils.isNotEmpty(mt.getSchema().getAnyOf())
@@ -1368,8 +1504,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processRequestBean(VisitorContext context, OpenAPI openApi,
                                     Operation swaggerOperation, JavadocDescription javadocDescription,
                                     boolean permitsRequestBody,
-                                    Map<String, UriMatchVariable> pathVariables,
-                                    Map<String, UriMatchVariable> queryParams,
+                                    Map<String, VarMetadata> pathVariables,
+                                    Map<String, VarMetadata> queryParams,
                                     List<MediaType> consumesMediaTypes,
                                     List<Parameter> swaggerParameters, TypedElement parameter,
                                     List<TypedElement> extraBodyParameters,
@@ -1453,7 +1589,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openApi, ApiResponse response, @Nullable ClassElement jsonViewClass) {
-        ClassElement returnType = returnType(element, context);
+        ClassElement returnType = returnType(element.getGenericReturnType());
         if (returnType != null && !returnType.getCanonicalName().equals(Void.class.getName())) {
             List<MediaType> producesMediaTypes = producesMediaTypes(element);
             Content content;
@@ -1466,30 +1602,53 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private ClassElement returnType(MethodElement element, VisitorContext context) {
-        ClassElement returnType = element.getGenericReturnType();
-
+    private ClassElement returnType(ClassElement returnType) {
+        if (returnType == null) {
+            return null;
+        }
         if (ElementUtils.isVoid(returnType) || ElementUtils.isReactiveAndVoid(returnType)) {
             returnType = null;
         } else if (isResponseType(returnType)) {
-            returnType = returnType.getFirstTypeArgument().orElse(returnType);
+            returnType = returnType(returnType.getFirstTypeArgument().orElse(returnType));
         } else if (isSingleResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(null);
             if (returnType != null) {
-                returnType = returnType.getFirstTypeArgument().orElse(returnType);
+                returnType = returnType(returnType.getFirstTypeArgument().orElse(returnType));
             }
         }
 
         return returnType;
     }
 
-    private Map<String, UriMatchVariable> uriVariables(UriMatchTemplate matchTemplate) {
-        List<UriMatchVariable> pv = matchTemplate.getVariables();
-        var pathVariables = new LinkedHashMap<String, UriMatchVariable>(pv.size());
-        for (UriMatchVariable variable : pv) {
-            pathVariables.put(variable.getName(), variable);
+    private Map<String, VarMetadata> uriVariables(UriMatchTemplate matchTemplate) {
+        var pv = matchTemplate.getVariables();
+        var rawTemplate = matchTemplate.toString();
+
+        var variablesMetadata = new LinkedHashMap<String, VarMetadata>(pv.size());
+        for (var variable : pv) {
+            var rawName = variable.getName();
+            String extractedPattern = null;
+
+            // Micronaut bug/feature: name might contain RFC 6570 operators like '*' or '+'
+            // We must clean it for OpenAPI compliance
+            var cleanName = rawName;
+            if (cleanName.startsWith("*") || cleanName.startsWith("+") || cleanName.startsWith("/")) {
+                cleanName = cleanName.substring(1);
+            }
+            // 1. Extract pattern
+            var p = Pattern.compile("\\{" + Pattern.quote(rawName) + ":(.+?)}");
+            var m = p.matcher(rawTemplate);
+            if (m.find()) {
+                extractedPattern = m.group(1);
+            }
+
+            // 2. Map properties from UriMatchVariable
+            variablesMetadata.put(cleanName, new VarMetadata(
+                variable,
+                extractedPattern
+            ));
         }
-        return pathVariables;
+        return variablesMetadata;
     }
 
     private JavadocDescription getMethodDescription(MethodElement element, Operation swaggerOperation, VisitorContext context) {
@@ -1905,5 +2064,80 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             content.addMediaType(mediaType.toString(), mt);
         }
         return content;
+    }
+
+    /**
+     * Adds class-level headers to the operation if they are not already present
+     * in the method parameters.
+     *
+     * @param swaggerOperation The OpenAPI operation to update
+     * @param classHeaders The list of headers extracted from the class
+     */
+    private void addHeadersToOperation(Operation swaggerOperation, List<Parameter> classHeaders) {
+        if (CollectionUtils.isEmpty(classHeaders)) {
+            return;
+        }
+
+        var currentParameters = swaggerOperation.getParameters();
+        for (var classHeader : classHeaders) {
+            var exists = false;
+            if (currentParameters != null) {
+                for (var p : currentParameters) {
+                    if (ParameterIn.HEADER.toString().equalsIgnoreCase(p.getIn())
+                        && classHeader.getName().equalsIgnoreCase(p.getName())) {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!exists) {
+                swaggerOperation.addParametersItem(classHeader);
+            }
+        }
+    }
+
+    /**
+     * Metadata for a URI variable, including its Micronaut variable definition and regex pattern.
+     *
+     * @param var The Micronaut {@link UriMatchVariable} definition
+     * @param pattern The extracted regex pattern from the URI template (e.g., "[a-z]+")
+     */
+    public record VarMetadata(
+        UriMatchVariable var,
+        String pattern
+    ) {
+    }
+
+    /**
+     * Resolves the name of a parameter or property, taking into account naming strategies
+     * and explicit annotation overrides.
+     *
+     * @param element The element whose name is being resolved (field or property).
+     * @param context The visitor context to access global configuration properties.
+     *
+     * @return The resolved name as a String.
+     */
+    private String resolveParameterName(TypedElement element, VisitorContext context) {
+        // 1. Explicit name in @QueryValue has the highest priority
+        String explicitName = element.stringValue(QueryValue.class).orElse(null);
+        if (StringUtils.isNotEmpty(explicitName)) {
+            return explicitName;
+        }
+
+        // 2. Fallback to @Parameter(name = ...) if present
+        String parameterAnnName = element.stringValue(io.swagger.v3.oas.annotations.Parameter.class, "name").orElse(null);
+        if (StringUtils.isNotEmpty(parameterAnnName)) {
+            return parameterAnnName;
+        }
+
+        // 3. Apply global naming strategy retrieved via getPropertyNamingStrategy.
+        // This is the correct strategy for mapping POJO properties to Query parameters.
+        var namingStrategy = ConfigUtils.getPropertyNamingStrategy(context);
+        if (namingStrategy != null) {
+            return namingStrategy.nameForField(null, null, element.getName());
+        }
+
+        return element.getName();
     }
 }

@@ -899,8 +899,8 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema petSchema = openAPI.components.schemas['Pet']
+        var openApi = Utils.testReference
+        Schema petSchema = openApi.components.schemas['Pet']
 
         then: "the components are valid"
         petSchema.type == 'object'
@@ -910,7 +910,7 @@ class MyBean {}
         petSchema.properties['name'].type == 'string'
 
         when: "the /pets path is retrieved"
-        PathItem pathItem = openAPI.paths.get("/pets")
+        PathItem pathItem = openApi.paths.get("/pets")
 
         then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
@@ -927,7 +927,7 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
         when: "the /{slug} path is retrieved"
-        pathItem = openAPI.paths.get("/pets/{slug}")
+        pathItem = openApi.paths.get("/pets/{slug}")
 
         then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
@@ -945,7 +945,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
 
         when: "A flowable is returned"
-        pathItem = openAPI.paths.get("/pets/flowable")
+        pathItem = openApi.paths.get("/pets/flowable")
 
         then:
         pathItem.get.operationId == 'flowable'
@@ -956,7 +956,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
         when: "A completable is returned"
-        pathItem = openAPI.paths.get("/pets/completable")
+        pathItem = openApi.paths.get("/pets/completable")
 
         then:
         pathItem.post.operationId == 'completable'
@@ -965,7 +965,7 @@ class MyBean {}
         pathItem.post.responses['200'].content == null
 
         when: "An observable is returned"
-        pathItem = openAPI.paths.get("/pets/observable")
+        pathItem = openApi.paths.get("/pets/observable")
 
         then:
         pathItem.get.operationId == 'observable'
@@ -976,7 +976,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
         when: "A Single<HttpResponse<T>> is returned"
-        pathItem = openAPI.paths.get("/pets/singleHttpResponse")
+        pathItem = openApi.paths.get("/pets/singleHttpResponse")
 
         then:
         pathItem.get.operationId == 'singleHttpResponse'

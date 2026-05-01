@@ -129,6 +129,7 @@ import static io.swagger.v3.parser.util.SchemaTypeUtil.FLOAT_FORMAT;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER64_FORMAT;
 import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.ENUM_UNKNOWN_DEFAULT_CASE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
@@ -177,6 +178,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE = "true";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
+    public static final String OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME = "enumUnknownDefaultCaseName";
     public static final String OPT_SKIP_SORTING_OPERATIONS = "skipSortingOperations";
     public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
@@ -682,10 +684,20 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (additionalProperties.containsKey(CodegenConstants.SERIALIZATION_LIBRARY)) {
             setSerializationLibrary((String) additionalProperties.get(CodegenConstants.SERIALIZATION_LIBRARY));
         }
-        additionalProperties.put(serializationLibrary.toLowerCase(Locale.US), true);
+        additionalProperties.put(serializationLibrary.toLowerCase(Locale.ENGLISH), true);
         if (SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name().equals(serializationLibrary)) {
-            additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
+            additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.ENGLISH), true);
         }
+
+        if (additionalProperties.containsKey(ENUM_UNKNOWN_DEFAULT_CASE)) {
+            enumUnknownDefaultCase = convertPropertyToBoolean(ENUM_UNKNOWN_DEFAULT_CASE);
+        }
+        writePropertyBack(ENUM_UNKNOWN_DEFAULT_CASE, enumUnknownDefaultCase);
+
+        if (additionalProperties.containsKey(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME)) {
+            enumUnknownDefaultCaseName = (String) additionalProperties.get(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME);
+        }
+        writePropertyBack(OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME, enumUnknownDefaultCaseName);
 
         // Use the default java time
         switch (dateLibrary) {
@@ -1049,10 +1061,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (value.isEmpty()) {
             return "EMPTY";
         }
+        if (enumUnknownDefaultCase && value.equals(enumUnknownDefaultCaseName)) {
+            return value;
+        }
 
         // for symbol, e.g. $, #
         if (getSymbolName(value) != null) {
-            return getSymbolName(value).toUpperCase(Locale.ROOT);
+            return getSymbolName(value).toUpperCase(Locale.ENGLISH);
         }
 
         if (" ".equals(value)) {
@@ -1069,9 +1084,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             || "Double".equalsIgnoreCase(datatype)
             || "BigDecimal".equals(datatype)) {
             String varName = "NUMBER_" + value;
-            varName = varName.replaceAll("-", "MINUS_");
-            varName = varName.replaceAll("\\+", "PLUS_");
-            varName = varName.replaceAll("\\.", "_DOT_");
+            varName = varName.replace("-", "MINUS_")
+                .replaceAll("\\+", "PLUS_")
+                .replaceAll("\\.", "_DOT_");
             return varName;
         }
 
@@ -1967,14 +1982,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     @Override
     public String toEnumValue(String value, String datatype) {
-        if ("Integer".equals(datatype) || "Double".equals(datatype)) {
+        if ("Integer".equals(datatype)) {
             return value;
         } else if ("Long".equals(datatype)) {
-            // add l to number, e.g. 2048 => 2048L
+            // add L to number, e.g. 2048 => 2048L
             return value + "L";
         } else if ("Float".equals(datatype)) {
-            // add f to number, e.g. 3.14 => 3.14F
+            // add F to number, e.g. 3.14 => 3.14F
             return value + "F";
+        } else if ("Double".equals(datatype)) {
+            // add D to number, e.g. 314 => 314D
+            return value.contains(".") ? value : value + "D";
         } else if ("BigDecimal".equals(datatype)) {
             // use BigDecimal String constructor
             return "new BigDecimal(\"" + value + "\")";
@@ -2499,14 +2517,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             if ((boolean) enumVar.get("isString")) {
                 continue;
             }
+            var isUnknownDefault = enumUnknownDefaultCase && (Boolean) enumVar.getOrDefault("isUnknownDefaultCase", false);
             var value = (String) enumVar.get("value");
             value = value.replace("\"", "");
-            if ("char".equals(baseType) && !value.startsWith("'")) {
-                enumVar.put("value", "'" + value + "'");
+            if ("char".equals(baseType)) {
+                enumVar.put("value", isUnknownDefault
+                    ? "(char) -1"
+                    : !value.startsWith("'") ? "'" + value.charAt(0) + "'" : Character.toString(value.charAt(0)));
             } else if ("short".equalsIgnoreCase(baseType) && !value.startsWith("(short)")) {
                 enumVar.put("value", "(short) " + value);
             } else if ("byte".equalsIgnoreCase(baseType) && !value.startsWith("(byte)")) {
-                enumVar.put("value", "(byte) " + value);
+                enumVar.put("value", isUnknownDefault ? "(byte) -127" : "(byte) " + value);
             }
         }
     }
@@ -2996,6 +3017,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setRequiredPropertiesInConstructor(boolean requiredPropertiesInConstructor) {
         this.requiredPropertiesInConstructor = requiredPropertiesInConstructor;
+    }
+
+    public void setEnumUnknownDefaultCaseName(String enumUnknownDefaultCaseName) {
+        this.enumUnknownDefaultCaseName = enumUnknownDefaultCaseName;
     }
 
     @Override

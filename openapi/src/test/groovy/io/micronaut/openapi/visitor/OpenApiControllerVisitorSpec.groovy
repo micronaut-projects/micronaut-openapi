@@ -1857,43 +1857,43 @@ class MyDto {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
+        var openApi = Utils.testReference
 
         then:
 
         // collection
         for (def i = 1; i < 8; i++) {
-            def operation = openAPI.paths.get("/endpoint1" + i).post
+            def operation = openApi.paths.get("/endpoint1" + i).post
             assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
         }
 
         // single
         for (def i = 1; i < 11; i++) {
-            def operation = openAPI.paths.get("/endpoint2" + i).post
+            def operation = openApi.paths.get("/endpoint2" + i).post
             assert operation.requestBody.content."application/json".schema.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
         }
 
         // optional primitives
 
-        def optInt = openAPI.paths."/optInt".post
+        def optInt = openApi.paths."/optInt".post
         optInt.requestBody.content."application/json".schema.type == 'integer'
         optInt.responses."200".content."application/json".schema.type == 'integer'
 
-        def optLong = openAPI.paths."/optLong".post
+        def optLong = openApi.paths."/optLong".post
         optLong.requestBody.content."application/json".schema.type == 'integer'
         optLong.requestBody.content."application/json".schema.format == 'int64'
         optLong.responses."200".content."application/json".schema.type == 'integer'
         optLong.responses."200".content."application/json".schema.format == 'int64'
 
-        def optDouble = openAPI.paths."/optDouble".post
+        def optDouble = openApi.paths."/optDouble".post
         optDouble.requestBody.content."application/json".schema.type == 'number'
         optDouble.requestBody.content."application/json".schema.format == 'double'
         optDouble.responses."200".content."application/json".schema.type == 'number'
         optDouble.responses."200".content."application/json".schema.format == 'double'
 
-        def myDto = openAPI.components.schemas.MyDto
+        def myDto = openApi.components.schemas.MyDto
         myDto.properties
         myDto.properties.field
         myDto.properties.field.type == 'string'
@@ -1947,8 +1947,8 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI?.paths?."/api/model"?.post
+        var openApi = Utils.testReference
+        Operation operation = openApi?.paths?."/api/model"?.post
 
         then:
         operation
@@ -1989,8 +1989,8 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI?.paths?."/api/model"?.post
+        var openApi = Utils.testReference
+        Operation operation = openApi?.paths?."/api/model"?.post
 
         then:
         operation
@@ -3213,11 +3213,11 @@ class MyBean {}
         then:
         op1
         op1.responses."200".content."application/octet-stream".schema.type == "string"
-        op1.responses."200".content."application/octet-stream".schema.format == "byte"
+        op1.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op2
         op2.responses."200".content."application/octet-stream".schema.type == "string"
-        op2.responses."200".content."application/octet-stream".schema.format == "byte"
+        op2.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op3
         op3.parameters[0].schema.type == "string"
@@ -3225,10 +3225,10 @@ class MyBean {}
         op3.parameters[1].schema.type == "string"
         op3.parameters[1].schema.format == "byte"
         op3.requestBody.content."application/json".schema.type == "string"
-        op3.requestBody.content."application/json".schema.format == "byte"
+        op3.requestBody.content."application/json".schema.format == "binary"
 
         op3.responses."200".content."application/octet-stream".schema.type == "string"
-        op3.responses."200".content."application/octet-stream".schema.format == "byte"
+        op3.responses."200".content."application/octet-stream".schema.format == "binary"
 
         op4
         op4.parameters[0].schema.type == "string"
@@ -3243,8 +3243,593 @@ class MyBean {}
 
         op5
         openApi.components.schemas.MyDto.properties.payload.type == "string"
-        openApi.components.schemas.MyDto.properties.payload.format == "byte"
+        openApi.components.schemas.MyDto.properties.payload.format == "binary"
         openApi.components.schemas.MyDto.properties.payload2.type == "string"
         !openApi.components.schemas.MyDto.properties.payload2.format
+    }
+
+    void "test controller interpretation - inline parameter validation"() {
+        given:
+        buildBeanDefinition('test.ValidationController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import jakarta.validation.constraints.*;
+import jakarta.inject.Singleton;
+
+@Controller("/validation")
+class ValidationController {
+
+    /**
+     * Testing numeric constraints on query parameters.
+     */
+    @Get("/limit")
+    public String checkLimit(
+        @QueryValue @Min(1) @Max(100) int limit,
+        @QueryValue(defaultValue = "10") int offset
+    ) {
+        return "ok";
+    }
+
+    /**
+     * Testing string constraints and regex extraction from path variable.
+     */
+    @Get("/user/{username:[a-z]+}")
+    public String getUser(
+        @PathVariable @Size(min = 3, max = 20) String username
+    ) {
+        return username;
+    }
+
+    /**
+     * Testing format mapping for email and required status for NotBlank.
+     */
+    @Post("/subscribe")
+    public String subscribe(
+        @QueryValue @Email @NotBlank String email
+    ) {
+        return email;
+    }
+}
+''')
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Numeric Constraints ---
+        var limitOp = openApi.paths."/validation/limit".get
+        var limitParam = limitOp.parameters.find { it.name == 'limit' }
+
+        limitParam.schema.minimum == 1
+        limitParam.schema.maximum == 100
+        limitParam.required == true
+
+        var offsetParam = limitOp.parameters.find { it.name == 'offset' }
+        // The processor should convert "10" string to Integer
+        offsetParam.schema.default instanceof Integer
+        offsetParam.schema.default == 10
+        offsetParam.required != true
+
+        // --- 2. Verify String Constraints & Path Regex ---
+        var userOp = openApi.paths."/validation/user/{username}".get
+        var userParam = userOp.parameters.find { it.name == 'username' }
+
+        userParam.in == 'path'
+        userParam.required == true
+        userParam.schema.minLength == 3
+        userParam.schema.maxLength == 20
+        // The regex from path template {username:[a-z]+} must be extracted to 'pattern'
+        userParam.schema.pattern == "[a-z]+"
+
+        // --- 3. Verify Email Format ---
+        var subOp = openApi.paths."/validation/subscribe".post
+        var emailParam = subOp.parameters.find { it.name == 'email' }
+
+        emailParam.required == true
+        emailParam.schema.format == 'email'
+    }
+
+    void "test controller interpretation - path templates and greedy variables"() {
+        given:
+        buildBeanDefinition('test.PathController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import jakarta.inject.Singleton;
+
+@Controller("/path")
+class PathController {
+
+    /**
+     * Testing multiple variables in a single path segment with a hyphen.
+     */
+    @Get("/archive/{year}-{month}")
+    public String getArchive(@PathVariable int year, @PathVariable String month) {
+        return year + "/" + month;
+    }
+
+    /**
+     * Testing greedy path variable interpretation (*path).
+     */
+    @Get("/files/{*path}")
+    public String getFile(@PathVariable String path) {
+        return path;
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Multi-Variable Segment ---
+        // Path segment with hyphens: /path/archive/{year}-{month}
+        var archiveOp = openApi.paths['/path/archive/{year}-{month}'].get
+        archiveOp.parameters.any { it.name == 'year' && it.in == 'path' }
+        archiveOp.parameters.any { it.name == 'month' && it.in == 'path' }
+
+        // --- 2. Verify Greedy Path ({*path}) ---
+        // Micronaut's {*path} should be normalized to {path} in OpenAPI path key
+        var fileOp = openApi.paths['/path/files/{path}'].get
+        var pathParam = fileOp.parameters.find { it.name == 'path' }
+
+        pathParam != null
+        pathParam.in == 'path'
+    }
+
+    void "test controller interpretation - content types and headers"() {
+        given:
+        buildBeanDefinition('test.ContentController', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import java.io.InputStream;
+
+/**
+ * Interface with shared headers.
+ */
+@Header(name = "X-Base-Header", value = "base-val")
+interface BaseApi {}
+/**
+ * DTO for testing JSON serialization in responses.
+ */
+@Introspected
+record Info(String version) {}
+
+/**
+ * Controller for testing content types, binary streams, and header inheritance.
+ */
+@Header(name = "X-Service-Id", value = "service-v1")
+@Controller("/content")
+class ContentController implements BaseApi {
+
+    /**
+     * Testing multiple media types for a single response.
+     */
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @Get("/report")
+    public HttpResponse<Info> getReport() {
+        return HttpResponse.ok(new Info("1.0"));
+    }
+
+    /**
+     * Testing binary stream interpretation. 
+     * InputStream must be mapped to string/binary in OpenAPI.
+     */
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Get("/raw")
+    public InputStream getRaw() {
+        return null;
+    }
+
+    /**
+     * Testing header parameters and inheritance from class-level @Header.
+     */
+    @Post("/send")
+    public HttpResponse<Void> sendData(@Header("X-Trace-Id") String traceId, @Body String data) {
+        return HttpResponse.noContent();
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Multiple Media Types ---
+        var reportOp = openApi.paths['/content/report'].get
+        var reportResponse = reportOp.responses['200']
+        reportResponse.content.containsKey('application/json')
+        reportResponse.content.containsKey('text/plain')
+        reportResponse.content['application/json'].schema.$ref == '#/components/schemas/Info'
+
+        // --- 2. Verify Binary Stream Interpretation ---
+        var rawOp = openApi.paths['/content/raw'].get
+        var rawSchema = rawOp.responses['200'].content['application/octet-stream'].schema
+        rawSchema.type == 'string'
+        rawSchema.format == 'binary'
+
+        // --- 3. Verify Header Inheritance & Params ---
+        var sendOp = openApi.paths['/content/send'].post
+        // 1. From parameter
+        sendOp.parameters.any { it.name == 'X-Trace-Id' && it.in == 'header' && it.required == true }
+        // 2. Inherited from Controller class
+        sendOp.parameters.any { it.name == 'X-Service-Id' && it.in == 'header' }
+        // 3. Inherited from Interface (BaseApi)
+        sendOp.parameters.any { it.name == 'X-Base-Header' && it.in == 'header' }
+
+        // --- 4. Verify Response Code ---
+        sendOp.responses.containsKey('200')
+    }
+
+    void "test controller interpretation - raw bodies and media types"() {
+        given:
+        buildBeanDefinition('test.RawBodyController', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
+
+@Controller("/raw")
+class RawBodyController {
+
+    @Post(value = "/text", consumes = MediaType.TEXT_PLAIN)
+    public String sendText(@Body String text) {
+        return text;
+    }
+
+    @Post(value = "/image", consumes = MediaType.IMAGE_PNG)
+    public String uploadImage(@Body byte[] data) {
+        return "ok";
+    }
+
+    @Post(value = "/json", consumes = MediaType.APPLICATION_JSON)
+    public Map<String, Object> sendJson(@Body Map<String, Object> data) {
+        return data;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Text Body ---
+        var textOp = openApi.paths['/raw/text'].post
+        var textSchema = textOp.requestBody.content['text/plain'].schema
+        textSchema.type == 'string'
+        textSchema.format == null
+
+        // --- 2. Verify Binary Body (byte[]) ---
+        var imageOp = openApi.paths['/raw/image'].post
+        var imageSchema = imageOp.requestBody.content['image/png'].schema
+        // byte[] must be translated to type: string, format: binary
+        imageSchema.type == 'string'
+        imageSchema.format == 'binary'
+
+        // --- 3. Verify Dynamic JSON (Map) ---
+        var jsonOp = openApi.paths['/raw/json'].post
+        var jsonSchema = jsonOp.requestBody.content['application/json'].schema
+        jsonSchema.type == 'object'
+        // Map<String, Object> should result in additionalProperties (free-form object)
+        jsonSchema.additionalProperties != null
+    }
+
+    void "test controller interpretation - java request composition and anyOf"() {
+        given:
+        buildBeanDefinition('test.ComposeController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.inject.Singleton;
+
+@Introspected
+class SmsAuth {
+    private String phoneNumber;
+    private String code;
+    
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+}
+
+@Introspected
+class PasswordAuth {
+    private String username;
+    private String password;
+    
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+}
+
+@Introspected
+class NotificationRequest {
+    private String id;
+    
+    @Schema(oneOf = {SmsAuth.class, PasswordAuth.class})
+    private Object payload;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public Object getPayload() { return payload; }
+    public void setPayload(Object payload) { this.payload = payload; }
+}
+
+@Controller("/auth")
+class ComposeController {
+
+    /**
+     * Using @Schema(anyOf = ...) directly on the @Body parameter.
+     */
+    @Post("/login")
+    public String login(
+        @Body 
+        @Schema(anyOf = {SmsAuth.class, PasswordAuth.class}) 
+        Object credentials
+    ) {
+        return "logged in";
+    }
+
+    /**
+     * Testing composition inside a wrapper POJO.
+     */
+    @Post("/notify")
+    public String notify(@Body NotificationRequest request) {
+        return "sent";
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Request Body Composition (Direct anyOf) ---
+        var loginOp = openApi.paths['/auth/login'].post
+        var loginSchema = loginOp.requestBody.content['application/json'].schema
+
+        // Must contain anyOf with correct references
+        loginSchema.anyOf.size() == 2
+        loginSchema.anyOf.any { it.$ref == '#/components/schemas/SmsAuth' }
+        loginSchema.anyOf.any { it.$ref == '#/components/schemas/PasswordAuth' }
+
+        // --- 2. Verify Nested Composition (oneOf in POJO) ---
+        var notifyOp = openApi.paths['/auth/notify'].post
+        var requestRef = notifyOp.requestBody.content['application/json'].schema.$ref
+        var requestSchema = openApi.components.schemas[requestRef.split('/').last()]
+
+        var payloadSchema = requestSchema.properties['payload']
+        // Must use oneOf as specified in the Java field annotation
+        payloadSchema.oneOf.size() == 2
+        payloadSchema.oneOf.any { it.$ref == '#/components/schemas/SmsAuth' }
+        payloadSchema.oneOf.any { it.$ref == '#/components/schemas/PasswordAuth' }
+
+        // --- 3. Verify Components Presence ---
+        openApi.components.schemas.containsKey('SmsAuth')
+        openApi.components.schemas.containsKey('PasswordAuth')
+    }
+
+    @RestoreSystemProperties
+    void "test controller interpretation - java pojo query parameters and validation"() {
+        given:
+        // Set the naming strategy using the correct constant
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
+
+        buildBeanDefinition('test.SearchController', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+import jakarta.validation.constraints.*;
+
+@Introspected
+class SearchFilter {
+
+    @NotBlank
+    private String query;
+
+    /**
+     * Explicitly setting defaultValue in the annotation 
+     * so the processor can see it during compilation.
+     */
+    @Min(1)
+    @Max(100)
+    @QueryValue(defaultValue = "20")
+    private Integer pageSize;
+
+    /**
+     * Boolean defaultValue must be provided as a String "false".
+     * The processor must convert it to a Boolean instance.
+     */
+    @QueryValue(defaultValue = "false")
+    private boolean includeDeleted;
+
+    public String getQuery() { 
+        return query; 
+    }
+    public void setQuery(String query) { 
+        this.query = query; 
+    }
+
+    public Integer getPageSize() { 
+        return pageSize; 
+    }
+    public void setPageSize(Integer pageSize) { 
+        this.pageSize = pageSize; 
+    }
+
+    public boolean isIncludeDeleted() { 
+        return includeDeleted; 
+    }
+    public void setIncludeDeleted(boolean includeDeleted) { 
+        this.includeDeleted = includeDeleted; 
+    }
+}
+
+@Controller("/search")
+class SearchController {
+
+    /**
+     * POJO Aggregator: Micronaut will flatten this because 
+     * there's no explicit name in @QueryValue.
+     */
+    @Get("/list")
+    public String list(@QueryValue SearchFilter filter) {
+        return "searching...";
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // Back to idiomatic Groovy/Spock property access
+        var operation = openApi.paths['/search/list'].get
+        var parameters = operation.parameters
+
+        // 1. Verify Flattening (Aggregation)
+        parameters.size() == 3
+        parameters.every { it.in == 'query' }
+
+        // 2. Verify Naming Strategy (SNAKE_CASE)
+        var qParam = parameters.find { it.name == 'query' }
+        var sizeParam = parameters.find { it.name == 'page_size' }
+        var deletedParam = parameters.find { it.name == 'include_deleted' }
+
+        qParam != null
+        sizeParam != null
+        deletedParam != null
+
+        // 3. Verify Constraints
+        qParam.required == true
+        sizeParam.schema.minimum == 1
+        sizeParam.schema.maximum == 100
+
+        // 4. Verify Typed Default Values (Result of your convertDefaultValue logic)
+        sizeParam.schema.default instanceof Integer
+        sizeParam.schema.default == 20
+
+        deletedParam.schema.default instanceof Boolean
+        deletedParam.schema.default == false
+    }
+
+    void "test controller interpretation - async and status codes java"() {
+        given:
+        buildBeanDefinition('test.AsyncController', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.*;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.concurrent.CompletableFuture;
+import io.micronaut.core.annotation.Introspected;
+import reactor.core.publisher.Flux;
+
+@Controller("/async")
+class AsyncController {
+
+    // 1. Reactive Single with custom success status (201 Created)
+    @Post("/single")
+    @Status(HttpStatus.CREATED)
+    public Single<SimpleDto> createSingle(@Body String name) {
+        return null;
+    }
+
+    // 2. CompletableFuture with explicit @ApiResponse and HttpResponse wrapper
+    @Get("/future/{id}")
+    @ApiResponse(responseCode = "200", description = "Success from Future")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    public CompletableFuture<HttpResponse<SimpleDto>> getFuture(String id) {
+        return null;
+    }
+
+    // 2. CompletableFuture with explicit @ApiResponse and HttpResponse wrapper
+    @Get("/future2/{id}")
+    @ApiResponse(responseCode = "200", description = "Success from Future")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    public Flux<SimpleDto> getFuture2(String id) {
+        return null;
+    }
+
+    // 3. Void return with No Content status (204)
+    @Delete("/empty")
+    @Status(HttpStatus.NO_CONTENT)
+    public void deleteEmpty() {
+    }
+}
+
+@Introspected
+class SimpleDto {
+    private String msg;
+    public String getMsg() { return msg; }
+    public void setMsg(String msg) { this.msg = msg; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        // --- 1. Verify Reactive Unwrapping (Single<SimpleDto>) ---
+        var singleOp = openApi.paths['/async/single'].post
+        // Status 201 from @Status(HttpStatus.CREATED)
+        singleOp.responses.containsKey('201')
+        var singleResponseSchema = singleOp.responses['201'].content['application/json'].schema
+        // Should unwrap Single and point directly to SimpleDto
+        singleResponseSchema.$ref == '#/components/schemas/SimpleDto'
+
+        // --- 2. Verify CompletableFuture & Path Parameters ---
+        var futureOp = openApi.paths['/async/future/{id}'].get
+        // In Java, path variables are always required in OpenAPI
+        var idParam = futureOp.parameters.find { it.name == 'id' }
+        idParam.in == 'path'
+        idParam.required == true
+
+        // Check @ApiResponse metadata
+        futureOp.responses.containsKey('200')
+        futureOp.responses['200'].description == "Success from Future"
+        futureOp.responses.containsKey('404')
+
+        // Response schema check (Unwrapping Future -> HttpResponse -> SimpleDto)
+        var futureResponseSchema = futureOp.responses['200'].content['application/json'].schema
+        futureResponseSchema.$ref == '#/components/schemas/SimpleDto'
+
+        // --- 3. Verify Void/No Content (204) ---
+        var deleteOp = openApi.paths['/async/empty'].delete
+        deleteOp.responses.containsKey('204')
+        // 204 No Content should have no content/schema defined
+        deleteOp.responses['204'].content == null
     }
 }

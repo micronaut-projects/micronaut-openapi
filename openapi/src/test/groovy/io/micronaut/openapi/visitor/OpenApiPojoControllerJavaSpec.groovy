@@ -194,4 +194,93 @@ class MyBean {}
         schemas.Bird
         schemas.ColorEnum
     }
+
+    void "test JsonNode"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import tools.jackson.databind.JsonNode;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
+
+import static io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION;
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    JsonNodeMicronaut sendModelWithDiscriminator(@Body @NotNull @Valid JsonNodeJackson body) {
+        return null;
+    }
+}
+
+@Serdeable
+class JsonNodeJackson {
+
+    public Integer param1;
+    public BigDecimal param2;
+    public JsonNode other;
+    @Schema(additionalProperties = Schema.AdditionalPropertiesValue.FALSE)
+    public JsonNode other1;
+    @Schema(implementation = MyNodeImpl.class)
+    public JsonNode other2;
+    @Schema(additionalProperties = USE_ADDITIONAL_PROPERTIES_ANNOTATION, additionalPropertiesSchema = String.class)
+    public JsonNode stringOther;
+}
+
+class MyNodeImpl {
+   public String prop1; 
+}
+
+@Serdeable
+class JsonNodeMicronaut {
+
+    public Integer p1;
+    public BigDecimal p2;
+    public io.micronaut.json.tree.JsonNode other;
+    @Schema(additionalProperties = Schema.AdditionalPropertiesValue.FALSE)
+    public io.micronaut.json.tree.JsonNode other1;
+    @Schema(implementation = MyNodeImpl.class)
+    public io.micronaut.json.tree.JsonNode other2;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def jacksonSchema = openApi.components.schemas.JsonNodeJackson
+        def mnSchema = openApi.components.schemas.JsonNodeMicronaut
+
+        then: "the components are valid"
+        jacksonSchema.properties.other.type == 'object'
+        jacksonSchema.properties.other.additionalProperties == true
+        jacksonSchema.properties.other1.type == 'object'
+        jacksonSchema.properties.other1.additionalProperties == null
+        jacksonSchema.properties.other2.type == null
+        jacksonSchema.properties.other2.$ref == "#/components/schemas/MyNodeImpl"
+        !jacksonSchema.properties.stringOther.$ref
+        jacksonSchema.properties.stringOther.additionalProperties != null
+        jacksonSchema.properties.stringOther.additionalProperties.type == "string"
+        !jacksonSchema.properties.stringOther.additionalProperties.$ref
+
+        mnSchema.properties.other.type == 'object'
+        mnSchema.properties.other.additionalProperties == true
+        mnSchema.properties.other1.type == 'object'
+        mnSchema.properties.other1.additionalProperties == null
+        mnSchema.properties.other2.type == null
+        mnSchema.properties.other2.$ref == "#/components/schemas/MyNodeImpl"
+    }
 }

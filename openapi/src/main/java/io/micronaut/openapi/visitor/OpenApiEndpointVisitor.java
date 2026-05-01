@@ -67,6 +67,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ID;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.TagUtils.readTags;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
@@ -197,10 +198,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
         if (additionalSecurityRequirements != null) {
             if (securityRequirements == null) {
-                securityRequirements = SecurityUtils.readSecurityRequirements(additionalSecurityRequirements);
+                securityRequirements = readSecurityRequirements(additionalSecurityRequirements);
             } else {
                 securityRequirements = new ArrayList<>(securityRequirements);
-                securityRequirements.addAll(SecurityUtils.readSecurityRequirements(additionalSecurityRequirements));
+                securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
             }
         }
         super.visitClass(element, context);
