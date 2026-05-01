@@ -149,6 +149,8 @@ import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
 import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
+import static io.micronaut.openapi.visitor.ElementUtils.isArrayContainerType;
+import static io.micronaut.openapi.visitor.ElementUtils.isContainerType;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
@@ -158,6 +160,8 @@ import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilCollectionType
 import static io.micronaut.openapi.visitor.ElementUtils.isJsonNode;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
+import static io.micronaut.openapi.visitor.ElementUtils.isSingleContainerType;
 import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isVoid;
 import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
@@ -240,6 +244,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.arraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
@@ -854,6 +859,17 @@ public final class SchemaDefinitionUtils {
 
         Boolean isArray = null;
         Boolean isIterable = null;
+        if (isContainerType(type) && !isFileUpload(type) && !type.isAssignable("io.micronaut.http.server.multipart.MultipartBody")) {
+            var typeArg = type.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(type));
+            if (isSingleContainerType(type) || isResponseType(typeArg)) {
+                return resolveSchema(definingElement, typeArg, context, mediaTypes, jsonViewClass);
+            } else if (isArrayContainerType(type) && !isResponseType(typeArg)) {
+                return arraySchema(resolveSchema(definingElement, typeArg, context, mediaTypes, jsonViewClass));
+            }
+        }
+        if (isResponseType(type)) {
+            return resolveSchema(definingElement, type.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(type)), context, mediaTypes, jsonViewClass);
+        }
 
         ClassElement componentType = type != null ? type.getFirstTypeArgument().orElse(null) : null;
         if (type instanceof WildcardElement wildcardEl) {
@@ -876,7 +892,7 @@ public final class SchemaDefinitionUtils {
         if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
             schema = getSchemaDefinition(openApi, context, enumEl, typeArgs, definingElement, mediaTypes, jsonViewClass);
             if (isArray != null && isArray) {
-                schema = SchemaUtils.arraySchema(schema);
+                schema = arraySchema(schema);
             }
         } else if (isJsonNode(type)) {
             schema = createSchema();
@@ -912,7 +928,7 @@ public final class SchemaDefinitionUtils {
                     .flatMap(ClassElement::getFirstTypeArgument)
                     .orElse(null);
                 // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && ElementUtils.isContainerType(type)) {
+            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
                 isPublisher = (type.isAssignable("org.reactivestreams.Publisher") || type.isAssignable("kotlinx.coroutines.flow.Flow"))
                     && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = (type.isAssignable("io.reactivex.Observable") || type.isAssignable("io.reactivex.rxjava3.core.Observable"))
@@ -993,7 +1009,7 @@ public final class SchemaDefinitionUtils {
                     if (isArray) {
                         schema = resolveSchema(openApi, type, type.fromArray(), context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
                         if (schema != null) {
-                            schema = SchemaUtils.arraySchema(schema);
+                            schema = arraySchema(schema);
                         }
                     } else {
                         if (componentType != null) {
@@ -1031,7 +1047,7 @@ public final class SchemaDefinitionUtils {
                         }
                         if (schema != null && filteredFields.isEmpty()) {
                             schema = processGenericAnnotations(schema, componentType, context);
-                            schema = SchemaUtils.arraySchema(schema);
+                            schema = arraySchema(schema);
                         } else {
                             schema = getSchemaDefinition(openApi, context, type, typeArgs, definingElement, mediaTypes, jsonViewClass);
                         }
@@ -1130,7 +1146,7 @@ public final class SchemaDefinitionUtils {
                 }
 
                 if (!isStream && (isPublisher || isObservable)) {
-                    schema = SchemaUtils.arraySchema(schema);
+                    schema = arraySchema(schema);
                 } else if (isNullable) {
                     SchemaUtils.setNullable(schema);
                 }
@@ -1633,7 +1649,7 @@ public final class SchemaDefinitionUtils {
             }
             if (classEl != null) {
                 if (primitiveType == null) {
-                    final ArraySchema schema = SchemaUtils.arraySchema(resolveSchema(null, classEl, context, Collections.emptyList(), jsonViewClass));
+                    final ArraySchema schema = arraySchema(resolveSchema(null, classEl, context, Collections.emptyList(), jsonViewClass));
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
@@ -1642,7 +1658,7 @@ public final class SchemaDefinitionUtils {
                     if (description != null && !description.isEmpty()) {
                         items.setDescription(description);
                     }
-                    final ArraySchema schema = SchemaUtils.arraySchema(items);
+                    final ArraySchema schema = arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
             } else {
@@ -1676,7 +1692,7 @@ public final class SchemaDefinitionUtils {
         } else {
             return schemaToBind;
         }
-        if (ElementUtils.isContainerType(classEl)) {
+        if (isContainerType(classEl)) {
             classEl = classEl.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(classEl));
         }
         Pair<String, String> typeAndFormat;
@@ -3075,7 +3091,7 @@ public final class SchemaDefinitionUtils {
         return false;
     }
 
-    private static Schema<?> schemaFromAnnotation(VisitorContext context, Element element, ClassElement type, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+    public static Schema<?> schemaFromAnnotation(VisitorContext context, Element element, ClassElement type, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         if (schemaAnn == null) {
             return null;
         }
