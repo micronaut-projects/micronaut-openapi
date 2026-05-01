@@ -2098,18 +2098,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     /**
-     * Metadata for a URI variable, including its Micronaut variable definition and regex pattern.
-     *
-     * @param var The Micronaut {@link UriMatchVariable} definition
-     * @param pattern The extracted regex pattern from the URI template (e.g., "[a-z]+")
-     */
-    public record VarMetadata(
-        UriMatchVariable var,
-        String pattern
-    ) {
-    }
-
-    /**
      * Resolves the name of a parameter or property, taking into account naming strategies
      * and explicit annotation overrides.
      *
@@ -2139,5 +2127,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         return element.getName();
+    }
+
+    /**
+     * Metadata for a URI variable, including its Micronaut variable definition and regex pattern.
+     *
+     * @param var The Micronaut {@link UriMatchVariable} definition
+     * @param pattern The extracted regex pattern from the URI template (e.g., "[a-z]+")
+     */
+    public record VarMetadata(
+        UriMatchVariable var,
+        String pattern
+    ) {
     }
 }
