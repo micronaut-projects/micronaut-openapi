@@ -127,7 +127,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
-import static io.micronaut.openapi.OpenApiUtils.getConvertJsonMapper;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
