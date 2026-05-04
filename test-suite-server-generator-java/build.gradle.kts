@@ -96,10 +96,7 @@ tasks.withType(JavaCompile::class) {
     options.compilerArgs = mutableListOf(
         "-parameters",
         "-Xlint:unchecked",
-        "-Xlint:deprecation",
-        "-Amicronaut.openapi.project.dir=$projectDir",
-        "-Amicronaut.openapi.views.spec=swagger-ui.enabled=true",
-        "-Amicronaut.openapi.environments=local",
+        "-Xlint:deprecation"
     )
     options.forkOptions.jvmArgs = mutableListOf(
         "-Dmicronaut.openapi.project.dir=$projectDir",
