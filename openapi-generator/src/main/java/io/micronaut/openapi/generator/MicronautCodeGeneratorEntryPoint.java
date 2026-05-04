@@ -244,6 +244,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setEnsureUniqueParams(options.ensureUniqueParams);
             javaCodeGen.setAllowUnicodeIdentifiers(options.allowUnicodeIdentifiers);
             javaCodeGen.setPrependFormOrBodyParameters(options.prependFormOrBodyParameters);
+            javaCodeGen.setEnumUnknownDefaultCase(options.enumUnknownDefaultCase);
+            javaCodeGen.setEnumUnknownDefaultCaseName(options.enumUnknownDefaultCaseName);
 
             configureJavaServerOptions();
             configureJavaClientOptions();
@@ -343,6 +345,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setEnsureUniqueParams(options.ensureUniqueParams);
             kotlinCodeGen.setAllowUnicodeIdentifiers(options.allowUnicodeIdentifiers);
             kotlinCodeGen.setPrependFormOrBodyParameters(options.prependFormOrBodyParameters);
+            kotlinCodeGen.setEnumUnknownDefaultCase(options.enumUnknownDefaultCase);
+            kotlinCodeGen.setEnumUnknownDefaultCaseName(options.enumUnknownDefaultCaseName);
 
             configureKotlinServerOptions();
             configureKotlinClientOptions();
@@ -712,6 +716,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean ensureUniqueParams = true;
             private boolean allowUnicodeIdentifiers;
             private boolean prependFormOrBodyParameters;
+            private boolean enumUnknownDefaultCase;
+            private String enumUnknownDefaultCaseName;
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withUseUrlConnectionCache(boolean useUrlConnectionCache) {
@@ -1049,6 +1055,18 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withEnumUnknownDefaultCase(boolean enumUnknownDefaultCase) {
+                this.enumUnknownDefaultCase = enumUnknownDefaultCase;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withEnumUnknownDefaultCaseName(String enumUnknownDefaultCaseName) {
+                this.enumUnknownDefaultCaseName = enumUnknownDefaultCaseName;
+                return this;
+            }
+
             private Options build() {
                 return new Options(
                     useUrlConnectionCache,
@@ -1110,7 +1128,9 @@ public final class MicronautCodeGeneratorEntryPoint {
                     sortModelPropertiesByRequiredFlag,
                     ensureUniqueParams,
                     allowUnicodeIdentifiers,
-                    prependFormOrBodyParameters
+                    prependFormOrBodyParameters,
+                    enumUnknownDefaultCase,
+                    enumUnknownDefaultCaseName
                 );
             }
         }
@@ -1192,7 +1212,9 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean sortModelPropertiesByRequiredFlag,
         boolean ensureUniqueParams,
         boolean allowUnicodeIdentifiers,
-        boolean prependFormOrBodyParameters
+        boolean prependFormOrBodyParameters,
+        boolean enumUnknownDefaultCase,
+        String enumUnknownDefaultCaseName
     ) {
     }
 

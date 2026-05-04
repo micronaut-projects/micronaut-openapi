@@ -24,6 +24,7 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.multipart.StreamingFileUpload;
 import org.jspecify.annotations.NonNull;
@@ -41,7 +42,6 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.RequestAttribute;
 import io.micronaut.http.annotation.RequestBean;
 import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -50,6 +50,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIRequest;
+import io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor.VarMetadata;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,14 +59,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.time.temporal.Temporal;
+import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
@@ -89,40 +98,64 @@ public final class ElementUtils {
 
     public static final AnnotationValue<?>[] EMPTY_ANNOTATION_VALUES_ARRAY = new AnnotationValue[0];
 
-    public static final List<String> CONTAINER_TYPES = List.of(
+    public static final List<String> ARRAY_CONTAINER_TYPES = List.of(
+        "io.reactivex.Flowable",
+        "io.reactivex.Observable",
+        "io.reactivex.rxjava3.core.Flowable",
+        "io.reactivex.rxjava3.core.Observable",
+        "reactor.core.publisher.Flux",
+        "kotlinx.coroutines.flow.Flow",
+        "org.reactivestreams.Publisher",
+        "io.smallrye.mutiny.Multi"
+    );
+
+    public static final List<String> SINGLE_CONTAINER_TYPES = List.of(
         AtomicReference.class.getName(),
         "com.google.common.base.Optional",
         Optional.class.getName(),
         Future.class.getName(),
         Callable.class.getName(),
         CompletionStage.class.getName(),
-        "org.reactivestreams.Publisher",
         "io.reactivex.Single",
-        "io.reactivex.Observable",
         "io.reactivex.Maybe",
         "io.reactivex.rxjava3.core.Single",
-        "io.reactivex.rxjava3.core.Observable",
         "io.reactivex.rxjava3.core.Maybe",
-        "kotlinx.coroutines.flow.Flow",
+        "io.smallrye.mutiny.Uni",
+        "reactor.core.publisher.Mono",
         "org.springframework.web.context.request.async.DeferredResult",
+        "org.springframework.web.context.request.async.WebAsyncTask",
         "org.springframework.boot.actuate.endpoint.web.WebEndpointResponse"
     );
+
+    public static final List<String> CONTAINER_TYPES = List.copyOf(new ArrayList<>(SINGLE_CONTAINER_TYPES) {{
+        addAll(ARRAY_CONTAINER_TYPES);
+    }});
 
     public static final List<String> FILE_TYPES = List.of(
         // this class from micronaut-http-server
         "io.micronaut.http.server.types.files.FileCustomizableResponseType",
         File.class.getName(),
         InputStream.class.getName(),
-        ByteBuffer.class.getName()
+        ByteBuffer.class.getName(),
+        "org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody",
+        "org.springframework.core.io.Resource"
     );
 
     public static final List<String> VOID_TYPES = List.of(
         void.class.getName(),
         Void.class.getName(),
-        "kotlin.Unit"
+        "kotlin.Unit",
+        "io.reactivex.Completable",
+        "io.reactivex.rxjava3.core.Completable"
     );
 
     private ElementUtils() {
+    }
+
+    public static boolean isJsonNode(ClassElement classEl) {
+        return classEl.isAssignable("com.fasterxml.jackson.databind.JsonNode")
+            || classEl.isAssignable("tools.jackson.databind.JsonNode")
+            || classEl.isAssignable("io.micronaut.json.tree.JsonNode");
     }
 
     public static boolean isJavaRecord(ClassElement classEl) {
@@ -142,9 +175,7 @@ public final class ElementUtils {
     }
 
     public static boolean isSingleResponseType(ClassElement returnType) {
-        return (returnType.isAssignable("io.reactivex.Single")
-            || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
-            || returnType.isAssignable("org.reactivestreams.Publisher"))
+        return findAnyAssignable(returnType, SINGLE_CONTAINER_TYPES)
             && returnType.getFirstTypeArgument().isPresent()
             && isResponseType(returnType.getFirstTypeArgument().orElse(null));
     }
@@ -235,8 +266,8 @@ public final class ElementUtils {
 
     public static boolean isExtraBodyParameter(@NonNull TypedElement parameter, boolean permitsRequestBody,
                                                List<UriMatchTemplate> matchTemplates,
-                                               Map<String, UriMatchVariable> pathVariables,
-                                               Map<String, UriMatchVariable> queryParams) {
+                                               Map<String, VarMetadata> pathVariables,
+                                               Map<String, VarMetadata> queryParams) {
 
         if (isWrappedBodyParameter(parameter)) {
             return false;
@@ -295,6 +326,26 @@ public final class ElementUtils {
      */
     public static boolean isContainerType(ClassElement type) {
         return findAnyAssignable(type, CONTAINER_TYPES);
+    }
+
+    /**
+     * Checking if the type is container array.
+     *
+     * @param type type element
+     * @return true if this type assignable with known container types
+     */
+    public static boolean isArrayContainerType(ClassElement type) {
+        return findAnyAssignable(type, ARRAY_CONTAINER_TYPES);
+    }
+
+    /**
+     * Checking if the type is container single.
+     *
+     * @param type type element
+     * @return true if this type assignable with known container types
+     */
+    public static boolean isSingleContainerType(ClassElement type) {
+        return findAnyAssignable(type, SINGLE_CONTAINER_TYPES);
     }
 
     /**
@@ -701,5 +752,58 @@ public final class ElementUtils {
             isExcluded = true;
         }
         return isExcluded;
+    }
+
+    /**
+     * Determines if the given parameter should be treated as an implicit query aggregator (POJO).
+     * Aggregators are complex @Introspected objects without an explicit name in @QueryValue.
+     * Scalar types (URI, URL, UUID, Dates, Numbers) and collections are strictly excluded.
+     *
+     * @param parameter The element to check (method parameter).
+     *
+     * @return true if the parameter is a single Introspected POJO to be flattened, false otherwise.
+     */
+    public static boolean isImplicitQueryAggregator(TypedElement parameter) {
+        if (!parameter.isAnnotationPresent(QueryValue.class)) {
+            return false;
+        }
+
+        // Explicit name in @QueryValue("name") means it's a single param, not an aggregator.
+        var explicitName = parameter.stringValue(QueryValue.class).orElse(null);
+        if (StringUtils.isNotEmpty(explicitName)) {
+            return false;
+        }
+
+        var type = parameter.getType();
+
+        // 1. Exclude fundamental types and their descendants
+        if (type.isPrimitive()
+            || type.isEnum()
+            || type.isAssignable(CharSequence.class)
+            || type.isAssignable(Character.class)) {
+            return false;
+        }
+
+        // 2. Exclude collections, arrays, and maps
+        if (type.isArray()
+            || type.isAssignable(Iterable.class)
+            || type.isAssignable(Map.class)) {
+            return false;
+        }
+
+        // 3. Exclude complex scalars that Micronaut binds from a single string
+        if (type.isAssignable(Number.class)
+            || type.isAssignable(Temporal.class)
+            || type.isAssignable(Date.class)
+            || type.isAssignable(UUID.class)
+            || type.isAssignable(URI.class)
+            || type.isAssignable(URL.class)
+            || type.isAssignable(Locale.class)
+            || type.isAssignable(TimeZone.class)) {
+            return false;
+        }
+
+        // 4. Aggregators must be annotated with @Introspected for compile-time access
+        return type.hasAnnotation(Introspected.class);
     }
 }

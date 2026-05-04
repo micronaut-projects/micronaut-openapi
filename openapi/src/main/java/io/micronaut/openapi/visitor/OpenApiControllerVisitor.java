@@ -63,6 +63,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isIgnored;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.SecurityUtils.readSecurityRequirements;
 import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
 import static io.micronaut.openapi.visitor.TagUtils.readTags;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
@@ -277,10 +278,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
-        List<SecurityRequirement> securityRequirements = SecurityUtils.readSecurityRequirements(element);
+        List<SecurityRequirement> securityRequirements = readSecurityRequirements(element);
         if (!additionalSecurityRequirements.isEmpty()) {
             securityRequirements = new ArrayList<>(securityRequirements);
-            securityRequirements.addAll(SecurityUtils.readSecurityRequirements(additionalSecurityRequirements));
+            securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
         }
         return securityRequirements;
     }

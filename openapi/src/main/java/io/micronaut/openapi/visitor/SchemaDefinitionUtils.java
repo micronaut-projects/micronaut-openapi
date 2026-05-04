@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -66,6 +67,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -145,14 +147,19 @@ import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
 import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
+import static io.micronaut.openapi.visitor.ElementUtils.isArrayContainerType;
+import static io.micronaut.openapi.visitor.ElementUtils.isContainerType;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecord;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaRecordType;
 import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilCollectionType;
+import static io.micronaut.openapi.visitor.ElementUtils.isJsonNode;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
+import static io.micronaut.openapi.visitor.ElementUtils.isSingleContainerType;
 import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isVoid;
 import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
@@ -172,6 +179,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.DISCRIMINATOR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
@@ -236,6 +244,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.arraySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getReqMode;
@@ -436,8 +445,8 @@ public final class SchemaDefinitionUtils {
                 if (schema == null) {
 
                     if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
-                        schema = createSchema();
-                        schema.setName(schemaName);
+                        schema = createSchema()
+                            .name(schemaName);
                         processJacksonDescription(enumEl, schema);
                         if (schema.getDescription() == null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
@@ -483,7 +492,8 @@ public final class SchemaDefinitionUtils {
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
                     // Break recursion
-                    return createSchema().$ref(SchemaUtils.schemaRef(schemaName));
+                    return createSchema()
+                        .$ref(SchemaUtils.schemaRef(schemaName));
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -780,7 +790,7 @@ public final class SchemaDefinitionUtils {
             componentSchemaAnn = arraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
                 .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class)
                     .orElse(typeArraySchemaAnnValue != null ? typeArraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
-                        .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null)) : null));
+                                                              .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null)) : null));
             if (componentSchemaAnn != null) {
                 String componentImpl = componentSchemaAnn.stringValue(PROP_IMPLEMENTATION).orElse(null);
                 if (StringUtils.isNotEmpty(componentImpl)) {
@@ -850,6 +860,17 @@ public final class SchemaDefinitionUtils {
 
         Boolean isArray = null;
         Boolean isIterable = null;
+        if (isContainerType(type) && !isFileUpload(type) && !type.isAssignable("io.micronaut.http.server.multipart.MultipartBody")) {
+            var typeArg = type.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(type));
+            if (isSingleContainerType(type) || isResponseType(typeArg)) {
+                return resolveSchema(definingElement, typeArg, context, mediaTypes, jsonViewClass);
+            } else if (isArrayContainerType(type) && !isResponseType(typeArg)) {
+                return arraySchema(resolveSchema(definingElement, typeArg, context, mediaTypes, jsonViewClass));
+            }
+        }
+        if (isResponseType(type)) {
+            return resolveSchema(definingElement, type.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(type)), context, mediaTypes, jsonViewClass);
+        }
 
         ClassElement componentType = type != null ? type.getFirstTypeArgument().orElse(null) : null;
         if (type instanceof WildcardElement wildcardEl) {
@@ -872,7 +893,26 @@ public final class SchemaDefinitionUtils {
         if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
             schema = getSchemaDefinition(openApi, context, enumEl, typeArgs, definingElement, mediaTypes, jsonViewClass);
             if (isArray != null && isArray) {
-                schema = SchemaUtils.arraySchema(schema);
+                schema = arraySchema(schema);
+            }
+        } else if (isJsonNode(type)) {
+            schema = createSchema();
+            schema.setAdditionalProperties(true);
+            if (schemaAnnValue != null) {
+                var addProps = schemaAnnValue.get(PROP_ADDITIONAL_PROPERTIES, AdditionalPropertiesValue.class).orElse(null);
+                if (addProps == null || addProps == AdditionalPropertiesValue.TRUE) {
+                    schema.setAdditionalProperties(true);
+                } else if (addProps == AdditionalPropertiesValue.FALSE) {
+                    schema.setAdditionalProperties(null);
+                } else if (addProps == AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION) {
+                    var additionalPropsSchemaClass = schemaAnnValue.stringValue(PROP_ADDITIONAL_PROPERTIES_SCHEMA).orElse(null);
+                    if (StringUtils.isNotEmpty(additionalPropsSchemaClass)) {
+                        var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClass).orElse(null);
+                        if (additionalPropsClassEl != null) {
+                            schema.setAdditionalProperties(resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                        }
+                    }
+                }
             }
         } else if (type != null) {
 
@@ -889,7 +929,7 @@ public final class SchemaDefinitionUtils {
                     .flatMap(ClassElement::getFirstTypeArgument)
                     .orElse(null);
                 // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && ElementUtils.isContainerType(type)) {
+            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
                 isPublisher = (type.isAssignable("org.reactivestreams.Publisher") || type.isAssignable("kotlinx.coroutines.flow.Flow"))
                     && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = (type.isAssignable("io.reactivex.Observable") || type.isAssignable("io.reactivex.rxjava3.core.Observable"))
@@ -941,7 +981,7 @@ public final class SchemaDefinitionUtils {
                     // For file upload, we use PrimitiveType.BINARY
                     typeName = PrimitiveType.BINARY.name();
                 }
-                PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
+                var primitiveType = PrimitiveType.fromName(typeName);
                 schema = protobufTypeSchema(type);
                 if (schema != null) {
                     return schema;
@@ -949,7 +989,7 @@ public final class SchemaDefinitionUtils {
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(type, typeName, context);
                 } else if (isArray && type.isAssignable(byte.class)) {
-                    schema = PrimitiveType.BYTE.createProperty();
+                    schema = PrimitiveType.BINARY.createProperty();
                 } else if (isArray && type.isAssignable(char.class)) {
                     schema = PrimitiveType.STRING.createProperty();
                 } else if (!isArray && primitiveType != null) {
@@ -970,7 +1010,7 @@ public final class SchemaDefinitionUtils {
                     if (isArray) {
                         schema = resolveSchema(openApi, type, type.fromArray(), context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
                         if (schema != null) {
-                            schema = SchemaUtils.arraySchema(schema);
+                            schema = arraySchema(schema);
                         }
                     } else {
                         if (componentType != null) {
@@ -1008,7 +1048,7 @@ public final class SchemaDefinitionUtils {
                         }
                         if (schema != null && filteredFields.isEmpty()) {
                             schema = processGenericAnnotations(schema, componentType, context);
-                            schema = SchemaUtils.arraySchema(schema);
+                            schema = arraySchema(schema);
                         } else {
                             schema = getSchemaDefinition(openApi, context, type, typeArgs, definingElement, mediaTypes, jsonViewClass);
                         }
@@ -1018,7 +1058,7 @@ public final class SchemaDefinitionUtils {
                 } else if (type.isAssignable(Boolean.class) || type.isAssignable(boolean.class)) {
                     schema = PrimitiveType.BOOLEAN.createProperty(openapi31);
                 } else if (type.isAssignable(Byte.class) || type.isAssignable(byte.class)) {
-                    schema = PrimitiveType.BYTE.createProperty(openapi31);
+                    schema = PrimitiveType.BINARY.createProperty(openapi31);
                 } else if (type.isAssignable(UUID.class)) {
                     schema = PrimitiveType.UUID.createProperty(openapi31);
                 } else if (type.isAssignable(URL.class)) {
@@ -1107,7 +1147,7 @@ public final class SchemaDefinitionUtils {
                 }
 
                 if (!isStream && (isPublisher || isObservable)) {
-                    schema = SchemaUtils.arraySchema(schema);
+                    schema = arraySchema(schema);
                 } else if (isNullable) {
                     SchemaUtils.setNullable(schema);
                 }
@@ -1481,13 +1521,25 @@ public final class SchemaDefinitionUtils {
                         newValues.put(key, a);
                     }
                 } else if (key.equals(PROP_ADDITIONAL_PROPERTIES)) {
-                    if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
+                    if (AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, true);
-                    } else if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
+                    } else if (AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, false);
+                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
+                        var additionalPropsSchemaClass = values.get(PROP_ADDITIONAL_PROPERTIES_SCHEMA);
+                        if (additionalPropsSchemaClass != null) {
+                            String additionalPropsSchemaClassName;
+                            if (additionalPropsSchemaClass instanceof AnnotationClassValue<?> acv) {
+                                additionalPropsSchemaClassName = acv.getName();
+                            } else {
+                                additionalPropsSchemaClassName = additionalPropsSchemaClass.toString();
+                            }
+                            var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClassName).orElse(null);
+                            if (additionalPropsClassEl != null) {
+                                newValues.put(PROP_ADDITIONAL_PROPERTIES, resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                            }
+                        }
                     }
-                    // TODO
-//                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                 } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
                 } else if (key.equals(PROP_DISCRIMINATOR_PROPERTY)) {
@@ -1598,7 +1650,7 @@ public final class SchemaDefinitionUtils {
             }
             if (classEl != null) {
                 if (primitiveType == null) {
-                    final ArraySchema schema = SchemaUtils.arraySchema(resolveSchema(null, classEl, context, Collections.emptyList(), jsonViewClass));
+                    final ArraySchema schema = arraySchema(resolveSchema(null, classEl, context, Collections.emptyList(), jsonViewClass));
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
@@ -1607,7 +1659,7 @@ public final class SchemaDefinitionUtils {
                     if (description != null && !description.isEmpty()) {
                         items.setDescription(description);
                     }
-                    final ArraySchema schema = SchemaUtils.arraySchema(items);
+                    final ArraySchema schema = arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
             } else {
@@ -1641,7 +1693,7 @@ public final class SchemaDefinitionUtils {
         } else {
             return schemaToBind;
         }
-        if (ElementUtils.isContainerType(classEl)) {
+        if (isContainerType(classEl)) {
             classEl = classEl.getFirstTypeArgument().orElse(context.getClassElement(Object.class).orElse(classEl));
         }
         Pair<String, String> typeAndFormat;
@@ -1734,7 +1786,7 @@ public final class SchemaDefinitionUtils {
                 required = true;
             }
 
-            // check JsonInclude mode, if swagger schema required mode not set
+            // check JsonInclude mode if swagger schema required mode not set
             if (reqMode.elementSchemaRequired() == null) {
                 var classJsonIncludeAnn = classEl != null ? getAnnotation(classEl, JsonInclude.class) : null;
                 JsonInclude.Include classIncludeMode = null;
@@ -2089,7 +2141,7 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static void processArraySchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+    public static void processArraySchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
                                               @Nullable ClassElement classEl,
                                               @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnnValue) {
 
@@ -2175,13 +2227,13 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+    public static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
                                          @Nullable ClassElement classEl,
                                          @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         processSchemaAnn(schemaToBind, context, element, false, classEl, schemaAnn);
     }
 
-    private static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+    public static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
                                          boolean isArraySchema,
                                          @Nullable ClassElement classEl,
                                          @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
@@ -2370,11 +2422,19 @@ public final class SchemaDefinitionUtils {
 
         var addProps = (String) annValues.get(PROP_ADDITIONAL_PROPERTIES);
         if (StringUtils.isNotEmpty(addProps)) {
-            var schemaAdditionalProperties = io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.valueOf(addProps);
-            if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE) {
-                schemaToBind.additionalProperties(true);
-            } else if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE) {
-                schemaToBind.additionalProperties(false);
+            var schemaAdditionalProperties = AdditionalPropertiesValue.valueOf(addProps);
+            if (schemaAdditionalProperties == AdditionalPropertiesValue.TRUE) {
+                schemaToBind.setAdditionalProperties(true);
+            } else if (schemaAdditionalProperties == AdditionalPropertiesValue.FALSE) {
+                schemaToBind.setAdditionalProperties(false);
+            } else if (schemaAdditionalProperties == AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION) {
+                var additionalPropsSchemaClass = (AnnotationClassValue) annValues.get(PROP_ADDITIONAL_PROPERTIES_SCHEMA);
+                if (additionalPropsSchemaClass != null) {
+                    var additionalPropsClassEl = context.getClassElement(additionalPropsSchemaClass.getName()).orElse(null);
+                    if (additionalPropsClassEl != null) {
+                        schemaToBind.setAdditionalProperties(resolveSchema(null, additionalPropsClassEl, context, List.of(), null));
+                    }
+                }
             }
         }
 
@@ -2946,6 +3006,12 @@ public final class SchemaDefinitionUtils {
             if (isHiddenElement(publicField)) {
                 continue;
             }
+            if (isAnyGetterSetter(publicField)) {
+                if (schema.getAdditionalProperties() == null) {
+                    schema.setAdditionalProperties(true);
+                }
+                continue;
+            }
 
             var isGetterOverridden = false;
             JavadocDescription fieldJavadoc = null;
@@ -2972,7 +3038,10 @@ public final class SchemaDefinitionUtils {
                 }
             }
 
-            if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
+            if (
+                (publicField instanceof PropertyElement propEl && (propEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden))
+                    || (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden))
+            ) {
 
                 if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
@@ -2993,15 +3062,20 @@ public final class SchemaDefinitionUtils {
         }
     }
 
+    private static boolean isAnyGetterSetter(TypedElement elementType) {
+        var jsonAnyGetterAnn = getAnnotation(elementType, JsonAnyGetter.class);
+        var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
+        return (jsonAnyGetterAnn != null && jsonAnyGetterAnn.booleanValue(PROP_ENABLED).orElse(true))
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true));
+    }
+
     private static boolean isHiddenElement(TypedElement elementType) {
         boolean isHidden = getAnnotationMetadata(elementType)
             .booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_HIDDEN).orElse(false);
-        var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
         return elementType.getType().isAssignable(Class.class)
             || isAnnotationPresent(elementType, JsonIgnore.class)
             || isAnnotationPresent(elementType, JsonBackReference.class)
             || isAnnotationPresent(elementType, Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true))
             || isHidden;
     }
 
@@ -3024,7 +3098,7 @@ public final class SchemaDefinitionUtils {
         return false;
     }
 
-    private static Schema<?> schemaFromAnnotation(VisitorContext context, Element element, ClassElement type, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+    public static Schema<?> schemaFromAnnotation(VisitorContext context, Element element, ClassElement type, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         if (schemaAnn == null) {
             return null;
         }

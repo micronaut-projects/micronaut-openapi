@@ -7130,13 +7130,16 @@ public class DefaultCodegen implements CodegenConfig {
                 // [SE-0192](https://github.com/apple/swift-evolution/blob/master/proposals/0192-non-exhaustive-enums.md)
                 // Since this functionality was born in the Swift 5 generator and latter on broth to all generators
                 // https://github.com/OpenAPITools/openapi-generator/pull/11013
-                String.valueOf(11184809);
+                Integer.toString(11184809);
 
-            enumVar.put("name", toEnumVarName(enumName, dataType));
+            enumName = toEnumVarName(enumName, dataType).toUpperCase(Locale.ENGLISH);
+            enumVar.put("name", enumName);
             enumVar.put("value", toEnumValue(enumValue, dataType));
             enumVar.put("isString", isDataTypeString(dataType));
+            enumVar.put("isUnknownDefaultCase", true);
             // TODO: add isNumeric
             enumVars.add(enumVar);
+            additionalProperties.put("enumUnknownDefaultCaseEnumName", enumName);
         }
 
         return enumVars;

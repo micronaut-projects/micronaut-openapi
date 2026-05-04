@@ -2595,4 +2595,125 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testEnumUnknownDefaultCase() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setEnumUnknownDefaultCase(true);
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/ByteEnum.java",
+            """
+                    public static final Map<Byte, ByteEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
+                        .filter(v -> v != UNKNOWN_DEFAULT_OPEN_API)
+                        .collect(Collectors.toMap(v -> v.value, Function.identity())));
+                """,
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API((byte) -127),
+                """,
+            """
+                        if (!VALUE_MAPPING.containsKey(value)) {
+                            return UNKNOWN_DEFAULT_OPEN_API;
+                        }
+                """
+        );
+
+        assertFileContains(path + "model/CharPrimitiveEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API((char) -1),
+                """);
+
+        assertFileContains(path + "model/DoubleEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809D),
+                """);
+        assertFileContains(path + "model/FloatEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809F),
+                """);
+        assertFileContains(path + "model/IntEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809),
+                """);
+        assertFileContains(path + "model/LongEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API(11184809L),
+                """);
+
+        assertFileContains(path + "model/StringEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    UNKNOWN_DEFAULT_OPEN_API("unknown_default_open_api"),
+                """);
+    }
+
+    @Test
+    void testEnumUnknownDefaultCaseWithCustomName() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setEnumUnknownDefaultCase(true);
+        codegen.setEnumUnknownDefaultCaseName("my_default");
+        String outputPathApi = generateFiles(codegen, "src/test/resources/3_0/enum2.yml");
+
+        String path = outputPathApi + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/ByteEnum.java",
+            """
+                    public static final Map<Byte, ByteEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
+                        .filter(v -> v != MY_DEFAULT)
+                        .collect(Collectors.toMap(v -> v.value, Function.identity())));
+                """,
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT((byte) -127),
+                """,
+            """
+                        if (!VALUE_MAPPING.containsKey(value)) {
+                            return MY_DEFAULT;
+                        }
+                """
+        );
+
+        assertFileContains(path + "model/CharPrimitiveEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT((char) -1),
+                """);
+
+        assertFileContains(path + "model/DoubleEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809D),
+                """);
+        assertFileContains(path + "model/FloatEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809F),
+                """);
+        assertFileContains(path + "model/IntEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809),
+                """);
+        assertFileContains(path + "model/LongEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT(11184809L),
+                """);
+
+        assertFileContains(path + "model/StringEnum.java",
+            """
+                    @JsonEnumDefaultValue
+                    MY_DEFAULT("my_default"),
+                """);
+    }
 }

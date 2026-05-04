@@ -5,6 +5,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.security.SecurityScheme
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiSchemaSecuritySpec extends AbstractOpenApiTypeElementSpec {
 
@@ -261,6 +262,7 @@ class MyBean {}
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
+    @RestoreSystemProperties
     void "test map micronaut security settings to OpenAPI with custom schema name"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
@@ -378,11 +380,6 @@ class MyBean {}
         openAPI.paths."/privateRoles".get.security.get(0)."customSchema".size() == 2
         openAPI.paths."/privateRoles".get.security.get(0)."customSchema".contains("myRole1")
         openAPI.paths."/privateRoles".get.security.get(0)."customSchema".contains("myRole2")
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME)
-        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test map micronaut security settings to OpenAPI with class level annotation"() {
@@ -449,6 +446,12 @@ class OpenApiController {
         return null;
     }
 
+    @Secured({"local-role1", "local-role2"})
+    @Get("/localRoles")
+    public MyDto localRoles() {
+        return null;
+    }
+
     @Secured({"myRole1", "myRole2"})
     @Get("/privateRoles")
     public MyDto privateEndpointWithRoles() {
@@ -468,49 +471,58 @@ class MyBean {}
         Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReference
-        Schema myDtoSchema = openAPI.components.schemas.MyDto
-        SecurityScheme secSchema = openAPI.components.securitySchemes."Authorization"
+        var openApi = Utils.testReference
+        Schema myDtoSchema = openApi.components.schemas.MyDto
+        SecurityScheme secSchema = openApi.components.securitySchemes."Authorization"
 
         then:
 
-        openAPI.paths."/private".get.security != null
-        openAPI.paths."/private".get.security.size() == 1
-        openAPI.paths."/private".get.security.get(0)."Authorization" != null
-        openAPI.paths."/private".get.security.get(0)."Authorization".isEmpty()
+        openApi.paths."/private".get.security != null
+        openApi.paths."/private".get.security.size() == 1
+        openApi.paths."/private".get.security.get(0)."Authorization" != null
+        openApi.paths."/private".get.security.get(0)."Authorization".isEmpty()
 
-        openAPI.paths."/public".get.security == null
-        openAPI.paths."/denyAll".get.security == null
+        openApi.paths."/public".get.security == null
+        openApi.paths."/denyAll".get.security == null
 
-        openAPI.paths."/fromfile/endpoint".get.security != null
-        openAPI.paths."/fromfile/endpoint".get.security.size() == 1
-        openAPI.paths."/fromfile/endpoint".get.security.get(0)."Authorization" != null
-        openAPI.paths."/fromfile/endpoint".get.security.get(0)."Authorization".size() == 2
-        openAPI.paths."/fromfile/endpoint".get.security.get(0)."Authorization".contains("global-role1")
-        openAPI.paths."/fromfile/endpoint".get.security.get(0)."Authorization".contains("global-role2")
+        openApi.paths."/fromfile/endpoint".get.security != null
+        openApi.paths."/fromfile/endpoint".get.security.size() == 1
+        openApi.paths."/fromfile/endpoint".get.security.get(0)."Authorization" != null
+        openApi.paths."/fromfile/endpoint".get.security.get(0)."Authorization".size() == 2
+        openApi.paths."/fromfile/endpoint".get.security.get(0)."Authorization".contains("global-role1")
+        openApi.paths."/fromfile/endpoint".get.security.get(0)."Authorization".contains("global-role2")
 
-        openAPI.paths."/from-file2/endpointGet".get.security != null
-        openAPI.paths."/from-file2/endpointGet".get.security.size() == 1
-        openAPI.paths."/from-file2/endpointGet".get.security.get(0)."Authorization" != null
-        openAPI.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".size() == 2
-        openAPI.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".contains("global-role1")
-        openAPI.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".contains("global-role2")
+        openApi.paths."/from-file2/endpointGet".get.security != null
+        openApi.paths."/from-file2/endpointGet".get.security.size() == 1
+        openApi.paths."/from-file2/endpointGet".get.security.get(0)."Authorization" != null
+        openApi.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".size() == 2
+        openApi.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".contains("global-role1")
+        openApi.paths."/from-file2/endpointGet".get.security.get(0)."Authorization".contains("global-role2")
 
-        openAPI.paths."/from-file2/endpoint".put.security != null
-        openAPI.paths."/from-file2/endpoint".put.security.size() == 1
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization" != null
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization".size() == 4
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("role1")
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("role2")
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("global-role1")
-        openAPI.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("global-role2")
+        openApi.paths."/from-file2/endpoint".put.security != null
+        openApi.paths."/from-file2/endpoint".put.security.size() == 1
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization" != null
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization".size() == 4
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("role1")
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("role2")
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("global-role1")
+        openApi.paths."/from-file2/endpoint".put.security.get(0)."Authorization".contains("global-role2")
 
-        openAPI.paths."/privateRoles".get.security != null
-        openAPI.paths."/privateRoles".get.security.size() == 1
-        openAPI.paths."/privateRoles".get.security.get(0)."Authorization" != null
-        openAPI.paths."/privateRoles".get.security.get(0)."Authorization".size() == 2
-        openAPI.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole1")
-        openAPI.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole2")
+        openApi.paths."/privateRoles".get.security != null
+        openApi.paths."/privateRoles".get.security.size() == 1
+        openApi.paths."/privateRoles".get.security.get(0)."Authorization" != null
+        openApi.paths."/privateRoles".get.security.get(0)."Authorization".size() == 2
+        openApi.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole1")
+        openApi.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole2")
+
+        openApi.paths."/localRoles".get.security != null
+        openApi.paths."/localRoles".get.security.size() == 1
+        openApi.paths."/localRoles".get.security.get(0)."Authorization" != null
+        openApi.paths."/localRoles".get.security.get(0)."Authorization".size() == 4
+        openApi.paths."/localRoles".get.security.get(0)."Authorization".contains("role1")
+        openApi.paths."/localRoles".get.security.get(0)."Authorization".contains("role2")
+        openApi.paths."/localRoles".get.security.get(0)."Authorization".contains("local-role1")
+        openApi.paths."/localRoles".get.security.get(0)."Authorization".contains("local-role2")
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
