@@ -119,13 +119,17 @@ We have a [template repo](https://github.com/micronaut-projects/micronaut-projec
 source of truth for certain files. It is used as a template to create new repos, and changes to certain files in the
 template repo will get propagated automatically. The files propagated are:
 
-* Workflow files (`.github/workflows/*`). They are copied using rsync"
+* Workflow files (`.github/workflows/*`). They are copied using rsync:
   * `central-sync.yml`.
-  * `dependency-update.yml`.
-  * `graalvm.yml`.
   * `gradle.yml`.
+  * `publish-snapshot.yml`.
   * `release.yml`.
-  * `release-notes.yml`.
+  * `sonatype.yml`.
+
+The `graalvm-dev.yml` and `graalvm-latest.yml` workflows were synced once to downstream projects and are now excluded
+from future files sync runs. Future changes to those workflows are maintained through
+[`micronaut-projects/github-actions`](https://github.com/micronaut-projects/github-actions/tree/master/graalvm).
+
 * Renovate configuration (`.github/renovate.json`).
 * Gradle wrapper.
 * `.gitignore`.
