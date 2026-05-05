@@ -121,14 +121,12 @@ template repo will get propagated automatically. The files propagated are:
 
 * Workflow files (`.github/workflows/*`). They are copied using rsync:
   * `central-sync.yml`.
+  * `graalvm-dev.yml`.
+  * `graalvm-latest.yml`.
   * `gradle.yml`.
   * `publish-snapshot.yml`.
   * `release.yml`.
   * `sonatype.yml`.
-
-The `graalvm-dev.yml` and `graalvm-latest.yml` workflows were synced once to downstream projects and are now excluded
-from future files sync runs. Future changes to those workflows are maintained through
-[`micronaut-projects/github-actions`](https://github.com/micronaut-projects/github-actions/tree/master/graalvm).
 
 * Renovate configuration (`.github/renovate.json`).
 * Gradle wrapper.
