@@ -231,7 +231,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean useEnumCaseInsensitive;
     protected boolean ksp;
     protected boolean jsonIncludeAlwaysForRequiredFields;
-    protected boolean implicitHeaders;
+
     protected boolean jvmOverloads;
     protected boolean jvmRecord;
     protected boolean javaCompatibility = true;
@@ -378,7 +378,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
         cliOptions.add(CliOption.newBoolean(OPT_USE_SEALED, "Whether to generate sealed model interfaces and classes", useSealed));
         cliOptions.add(CliOption.newBoolean(OPT_COROUTINES, "Make functions suspend", coroutines));
-        cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
         cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, "If true, then controller interface will be without @Controller annotation", generateControllerAsAbstract));
@@ -799,7 +798,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             additionalProperties.put("isTestJunit", true);
         }
 
-        convertPropertyToBooleanAndWriteBack(OPT_IMPLICIT_HEADERS, this::setImplicitHeaders);
         convertPropertyToStringAndWriteBack(OPT_IMPLICIT_HEADERS_REGEX, this::setImplicitHeadersRegex);
 
         maybeSetSwagger();
@@ -2445,6 +2443,17 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+        // Normalize x-implements from String to List<String> for compatibility with parent class
+        // AbstractKotlinCodegen.postProcessAllModels() (since v7.22.0) assumes it is always a List
+        for (ModelsMap modelsAttrs : objs.values()) {
+            for (ModelMap mo : modelsAttrs.getModels()) {
+                CodegenModel cm = mo.getModel();
+                var xImplements = cm.getVendorExtensions().get(CodegenConstants.X_IMPLEMENTS);
+                if (xImplements instanceof String s) {
+                    cm.getVendorExtensions().put(CodegenConstants.X_IMPLEMENTS, List.of(s));
+                }
+            }
+        }
         objs = super.postProcessAllModels(objs);
 
         if (!additionalOneOfTypeAnnotations.isEmpty()) {
