@@ -15,18 +15,19 @@
  */
 package io.micronaut.openapi.swagger.core.jackson.mixin;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import io.swagger.v3.oas.models.media.Schema;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import io.micronaut.openapi.swagger.core.jackson.AdditionalPropertiesDeserializer;
+import io.swagger.v3.oas.models.media.Schema;
+import tools.jackson.databind.annotation.JsonDeserialize;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is copied from swagger-core library.
@@ -133,4 +134,7 @@ public abstract class SchemaMixin {
 
     @JsonIgnore
     public abstract Boolean getBooleanSchemaValue();
+
+    @JsonDeserialize(using = AdditionalPropertiesDeserializer.class)
+    public abstract void setAdditionalProperties(Object additionalProperties);
 }

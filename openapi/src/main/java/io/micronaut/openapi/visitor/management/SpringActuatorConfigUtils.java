@@ -196,11 +196,8 @@ public final class SpringActuatorConfigUtils {
                 endpointProperties = new EndpointProperties(endpointName);
                 endpointPropertiesMap.put(endpointName, endpointProperties);
             }
-            if (endpointProperties.getElement() == null) {
-                var classEl = ContextUtils.getClassElement(entry.getValue(), context);
-                if (classEl != null) {
-                    endpointProperties.setElement(classEl);
-                }
+            if (endpointProperties.getClassName() == null) {
+                endpointProperties.setClassName(entry.getValue());
             }
             if (endpointProperties.getEnabled() == null) {
                 endpointProperties.setEnabled(true);

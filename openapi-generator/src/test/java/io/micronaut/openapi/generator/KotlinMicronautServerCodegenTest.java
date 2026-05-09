@@ -1677,8 +1677,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         @JvmStatic
                         @JsonCreator
                         fun fromValue(value: String): DollarGetDollarStringsDollarQueryVarParameter {
-                            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
-                            return VALUE_MAPPING[value]!!
+                            return VALUE_MAPPING[value]
+                                ?: throw IllegalArgumentException("Unexpected value '$value'")
                         }
                     }
                 }

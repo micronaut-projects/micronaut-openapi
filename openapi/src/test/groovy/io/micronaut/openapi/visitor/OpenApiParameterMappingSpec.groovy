@@ -189,7 +189,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import java.util.List;
@@ -250,7 +250,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import java.util.List;
@@ -311,7 +311,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import java.util.List;
@@ -791,7 +791,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import java.util.List;

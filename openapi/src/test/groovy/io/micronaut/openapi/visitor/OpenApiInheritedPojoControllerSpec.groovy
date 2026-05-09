@@ -161,7 +161,7 @@ package test;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.Min;
@@ -306,10 +306,10 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema petSchema = openAPI.components.schemas['Pet']
-        Schema catSchema = openAPI.components.schemas['Cat']
-        Schema dogSchema = openAPI.components.schemas['Dog']
+        var openApi = Utils.testReference
+        Schema petSchema = openApi.components.schemas['Pet']
+        Schema catSchema = openApi.components.schemas['Cat']
+        Schema dogSchema = openApi.components.schemas['Dog']
 
         then: "the components are valid"
         petSchema != null
@@ -327,7 +327,7 @@ class MyBean {}
         petSchema.oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
-        Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
+        Operation operation = openApi.paths.get("/pet/cat/claw/{size}").get
 
         then:
         operation
@@ -350,7 +350,7 @@ package test;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -670,7 +670,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import java.util.List;
@@ -800,7 +800,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
@@ -1060,7 +1060,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import java.util.List;

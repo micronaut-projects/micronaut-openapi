@@ -20,8 +20,8 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.multipart.PartData;
 import io.micronaut.http.multipart.StreamingFileUpload;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,14 +76,14 @@ class UploadOpenApiController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReference
+        var openApi = Utils.testReference
 
         then:
-        openAPI
-        openAPI.paths.size() == 5
+        openApi
+        openApi.paths.size() == 5
 
         when:
-        Operation operation = openAPI.paths?.get("/receive-flow-control")?.post
+        Operation operation = openApi.paths?.get("/receive-flow-control")?.post
         RequestBody requestBody = operation.requestBody
 
         then:
@@ -102,7 +102,7 @@ class MyBean {}
         operation.responses.size() == 1
 
         when:
-        operation = openAPI.paths?.get("/receive-complete-file")?.post
+        operation = openApi.paths?.get("/receive-complete-file")?.post
         requestBody = operation.requestBody
 
         then:
@@ -121,7 +121,7 @@ class MyBean {}
         operation.responses.size() == 1
 
         when:
-        operation = openAPI.paths?.get("/receive-streaming-file")?.post
+        operation = openApi.paths?.get("/receive-streaming-file")?.post
         requestBody = operation.requestBody
 
         then:
@@ -140,7 +140,7 @@ class MyBean {}
         operation.responses.size() == 1
 
         when:
-        operation = openAPI.paths?.get("/receive-streaming-multiple")?.post
+        operation = openApi.paths?.get("/receive-streaming-multiple")?.post
         requestBody = operation.requestBody
 
         then:
@@ -163,7 +163,7 @@ class MyBean {}
         operation.responses.size() == 1
 
         when:
-        operation = openAPI.paths?.get("/receive-streaming-iterable")?.post
+        operation = openApi.paths?.get("/receive-streaming-iterable")?.post
         requestBody = operation.requestBody
 
         then:
@@ -237,15 +237,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.server.multipart.MultipartBody;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import jakarta.inject.Singleton;
+import io.micronaut.http.server.multipart.MultipartBody;
 import org.reactivestreams.Publisher;
 
-@Singleton
 @Controller
 class UploadOpenApiController {
 
