@@ -21,8 +21,8 @@ class OpenApiMergeSchemaSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.*;

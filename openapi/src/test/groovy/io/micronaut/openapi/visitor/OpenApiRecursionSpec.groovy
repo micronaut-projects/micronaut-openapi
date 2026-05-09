@@ -16,7 +16,7 @@ package test;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
-import io.reactivex.Maybe;
+import io.reactivex.rxjava3.core.Maybe;
 
 @Controller
 class MyController {
@@ -124,7 +124,7 @@ package test;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
-import io.reactivex.Maybe;
+import io.reactivex.rxjava3.core.Maybe;
 
 @Controller
 class MyController {
@@ -194,7 +194,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
-import io.reactivex.Maybe;
+import io.reactivex.rxjava3.core.Maybe;
 
 @Controller
 class MyController {

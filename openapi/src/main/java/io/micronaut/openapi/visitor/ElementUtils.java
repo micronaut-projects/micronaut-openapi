@@ -99,8 +99,6 @@ public final class ElementUtils {
     public static final AnnotationValue<?>[] EMPTY_ANNOTATION_VALUES_ARRAY = new AnnotationValue[0];
 
     public static final List<String> ARRAY_CONTAINER_TYPES = List.of(
-        "io.reactivex.Flowable",
-        "io.reactivex.Observable",
         "io.reactivex.rxjava3.core.Flowable",
         "io.reactivex.rxjava3.core.Observable",
         "reactor.core.publisher.Flux",
@@ -116,8 +114,6 @@ public final class ElementUtils {
         Future.class.getName(),
         Callable.class.getName(),
         CompletionStage.class.getName(),
-        "io.reactivex.Single",
-        "io.reactivex.Maybe",
         "io.reactivex.rxjava3.core.Single",
         "io.reactivex.rxjava3.core.Maybe",
         "io.smallrye.mutiny.Uni",
@@ -145,7 +141,6 @@ public final class ElementUtils {
         void.class.getName(),
         Void.class.getName(),
         "kotlin.Unit",
-        "io.reactivex.Completable",
         "io.reactivex.rxjava3.core.Completable"
     );
 
@@ -365,8 +360,7 @@ public final class ElementUtils {
      * @return true if this type assignable with known container and type argument is void
      */
     public static boolean isReactiveAndVoid(ClassElement type) {
-        return type.isAssignable("io.reactivex.Completable")
-            || type.isAssignable("io.reactivex.rxjava3.core.Completable")
+        return type.isAssignable("io.reactivex.rxjava3.core.Completable")
             || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
     }
 
