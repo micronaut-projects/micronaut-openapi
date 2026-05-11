@@ -14,7 +14,7 @@ class SchemaMetaAnnotationSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
@@ -66,7 +66,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
@@ -126,7 +126,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.*;

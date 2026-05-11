@@ -932,7 +932,7 @@ public final class SchemaDefinitionUtils {
             } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
                 isPublisher = (type.isAssignable("org.reactivestreams.Publisher") || type.isAssignable("kotlinx.coroutines.flow.Flow"))
                     && !type.isAssignable("reactor.core.publisher.Mono");
-                isObservable = (type.isAssignable("io.reactivex.Observable") || type.isAssignable("io.reactivex.rxjava3.core.Observable"))
+                isObservable = type.isAssignable("io.reactivex.rxjava3.core.Observable")
                     && !type.isAssignable("reactor.core.publisher.Mono");
                 type = componentType;
                 if (componentType != null) {

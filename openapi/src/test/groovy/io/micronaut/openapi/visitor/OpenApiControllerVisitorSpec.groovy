@@ -432,7 +432,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.micronaut.http.*;
@@ -505,7 +505,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.micronaut.http.*;
@@ -608,7 +608,7 @@ class MyBean {}
 package test;
 
 import io.micronaut.http.MediaType;
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 
@@ -1753,17 +1753,6 @@ class HelloWorldController {
         return null;
     }
 
-    // reactivex2
-    @Post("/endpoint14")
-    public io.reactivex.Flowable<MyDto> endpoint1(@Body io.reactivex.Flowable<MyDto> body) {
-        return null;
-    }
-
-    @Post("/endpoint15")
-    public io.reactivex.Observable<MyDto> endpoint1(@Body io.reactivex.Observable<MyDto> body) {
-        return null;
-    }
-
     // reactor
     @Post("/endpoint16")
     public Flux<MyDto> endpoint1(@Body Flux<MyDto> body) {
@@ -1803,16 +1792,6 @@ class HelloWorldController {
 
     @Post("/endpoint26")
     public Maybe<MyDto> endpoint1(@Body Maybe<MyDto> body) {
-        return null;
-    }
-
-    @Post("/endpoint27")
-    public io.reactivex.Single<MyDto> endpoint1(@Body io.reactivex.Single<MyDto> body) {
-        return null;
-    }
-
-    @Post("/endpoint28")
-    public io.reactivex.Maybe<MyDto> endpoint1(@Body io.reactivex.Maybe<MyDto> body) {
         return null;
     }
 
@@ -1862,15 +1841,15 @@ class MyBean {}
         then:
 
         // collection
-        for (def i = 1; i < 8; i++) {
-            def operation = openApi.paths.get("/endpoint1" + i).post
+        for (def path in ["/endpoint11", "/endpoint12", "/endpoint13", "/endpoint16", "/endpoint17"]) {
+            def operation = openApi.paths.get(path).post
             assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
         }
 
         // single
-        for (def i = 1; i < 11; i++) {
-            def operation = openApi.paths.get("/endpoint2" + i).post
+        for (def path in ["/endpoint21", "/endpoint22", "/endpoint23", "/endpoint24", "/endpoint25", "/endpoint26", "/endpoint29", "/endpoint210"]) {
+            def operation = openApi.paths.get(path).post
             assert operation.requestBody.content."application/json".schema.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
         }
@@ -3419,7 +3398,7 @@ class ContentController implements BaseApi {
     }
 
     /**
-     * Testing binary stream interpretation. 
+     * Testing binary stream interpretation.
      * InputStream must be mapped to string/binary in OpenAPI.
      */
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
@@ -3543,7 +3522,7 @@ import jakarta.inject.Singleton;
 class SmsAuth {
     private String phoneNumber;
     private String code;
-    
+
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getCode() { return code; }
@@ -3554,7 +3533,7 @@ class SmsAuth {
 class PasswordAuth {
     private String username;
     private String password;
-    
+
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }
@@ -3564,7 +3543,7 @@ class PasswordAuth {
 @Introspected
 class NotificationRequest {
     private String id;
-    
+
     @Schema(oneOf = {SmsAuth.class, PasswordAuth.class})
     private Object payload;
 
@@ -3582,8 +3561,8 @@ class ComposeController {
      */
     @Post("/login")
     public String login(
-        @Body 
-        @Schema(anyOf = {SmsAuth.class, PasswordAuth.class}) 
+        @Body
+        @Schema(anyOf = {SmsAuth.class, PasswordAuth.class})
         Object credentials
     ) {
         return "logged in";
@@ -3651,7 +3630,7 @@ class SearchFilter {
     private String query;
 
     /**
-     * Explicitly setting defaultValue in the annotation 
+     * Explicitly setting defaultValue in the annotation
      * so the processor can see it during compilation.
      */
     @Min(1)
@@ -3666,25 +3645,25 @@ class SearchFilter {
     @QueryValue(defaultValue = "false")
     private boolean includeDeleted;
 
-    public String getQuery() { 
-        return query; 
+    public String getQuery() {
+        return query;
     }
-    public void setQuery(String query) { 
-        this.query = query; 
-    }
-
-    public Integer getPageSize() { 
-        return pageSize; 
-    }
-    public void setPageSize(Integer pageSize) { 
-        this.pageSize = pageSize; 
+    public void setQuery(String query) {
+        this.query = query;
     }
 
-    public boolean isIncludeDeleted() { 
-        return includeDeleted; 
+    public Integer getPageSize() {
+        return pageSize;
     }
-    public void setIncludeDeleted(boolean includeDeleted) { 
-        this.includeDeleted = includeDeleted; 
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public boolean isIncludeDeleted() {
+        return includeDeleted;
+    }
+    public void setIncludeDeleted(boolean includeDeleted) {
+        this.includeDeleted = includeDeleted;
     }
 }
 
@@ -3692,7 +3671,7 @@ class SearchFilter {
 class SearchController {
 
     /**
-     * POJO Aggregator: Micronaut will flatten this because 
+     * POJO Aggregator: Micronaut will flatten this because
      * there's no explicit name in @QueryValue.
      */
     @Get("/list")
@@ -3747,7 +3726,7 @@ package test;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.concurrent.CompletableFuture;

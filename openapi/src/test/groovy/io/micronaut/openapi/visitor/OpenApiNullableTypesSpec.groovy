@@ -279,7 +279,6 @@ class PetController {
                 'javax.annotation.Nullable',
                 'androidx.annotation.Nullable',
                 'edu.umd.cs.findbugs.annotations.Nullable',
-                'io.reactivex.annotations.Nullable',
                 'io.reactivex.rxjava3.annotations.Nullable',
                 'reactor.util.annotation.Nullable',
         ]
