@@ -187,7 +187,7 @@ package test;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 
 @Controller("/test")
 interface TestOperations {
@@ -284,7 +284,7 @@ package test;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;

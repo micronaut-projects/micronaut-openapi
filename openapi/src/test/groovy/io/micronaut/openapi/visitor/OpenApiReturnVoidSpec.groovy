@@ -15,7 +15,7 @@ package test;
 
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.*;
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import reactor.core.publisher.*;
 
 @Controller

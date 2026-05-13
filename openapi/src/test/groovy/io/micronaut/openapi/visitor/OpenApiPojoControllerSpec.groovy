@@ -805,11 +805,11 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 /**
  * @author graemerocher
@@ -998,9 +998,9 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -1243,7 +1243,7 @@ package test;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/pets")
@@ -1324,7 +1324,7 @@ package test;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 
 /**
  * @author graemerocher
@@ -1905,7 +1905,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import io.micronaut.core.annotation.*;
 import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.media.*;
