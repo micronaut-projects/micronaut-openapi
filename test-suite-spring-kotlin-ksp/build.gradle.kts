@@ -47,6 +47,9 @@ ksp {
 }
 
 tasks.register("removeMnFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from main KSP outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/generated/ksp/main/resources/META-INF/micronaut"))
         delete(
@@ -66,6 +69,9 @@ tasks.compileKotlin {
 }
 
 tasks.register("removeMnTestFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from test KSP outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/generated/ksp/test/resources/META-INF/micronaut"))
         delete(

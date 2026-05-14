@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(environments = "test")
-public class MicronautOpenApiTest {
+class MicronautOpenApiTest {
 
     EmbeddedServer server;
     HttpClient reactiveClient;

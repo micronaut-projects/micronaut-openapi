@@ -191,7 +191,9 @@ public final class ConfigUtils {
 
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
-    private static final String GENERATED_OPENAPI_RESOURCES_PATH = "build/generated/openapi/src/main/resources";
+    private static final Path GENERATED_OPENAPI_RESOURCES_PATH = Path.of("build", "generated", "openapi", "src", "main", "resources");
+    private static final Path KSP_CLASSES_OUTPUT_PATH = Path.of("build", "generated", "ksp", "main", "resources");
+    private static final Path JAVA_CLASSES_OUTPUT_PATH = Path.of("build", "classes", "java", "main", "META-INF");
 
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
@@ -1165,6 +1167,22 @@ public final class ConfigUtils {
             return projectPath;
         }
 
+        String projectDir = getConfiguredProjectDir(context);
+        if (StringUtils.isNotEmpty(projectDir)) {
+            projectPath = Path.of(projectDir);
+            configureClassesOutputPath(projectPath, context);
+        }
+        if (projectPath == null) {
+            projectPath = resolveProjectPathFallback(context);
+        }
+
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath, context);
+
+        return projectPath;
+    }
+
+    @Nullable
+    private static String getConfiguredProjectDir(VisitorContext context) {
         String projectDir = null;
         if (context != null) {
             projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
@@ -1172,38 +1190,38 @@ public final class ConfigUtils {
         if (StringUtils.isEmpty(projectDir)) {
             projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
         }
-        if (StringUtils.isNotEmpty(projectDir)) {
-            projectPath = Path.of(projectDir);
-            if (isKsp(context)) {
-                var classesOutputDir = projectPath.resolve("build/generated/ksp/main/resources");
-                ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
-            } else {
-                Path classesOutputDir = projectPath.resolve("build/classes/java/main/META-INF");
-                if (Files.isDirectory(classesOutputDir)) {
-                    ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
-                }
-            }
+        return projectDir;
+    }
+
+    private static void configureClassesOutputPath(Path projectPath, VisitorContext context) {
+        if (context != null && isKsp(context)) {
+            ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, projectPath.resolve(KSP_CLASSES_OUTPUT_PATH), context);
+            return;
         }
-        if (projectPath == null) {
-            try {
-                if (context != null) {
-                    projectPath = getProjectDir(context);
-                }
-                if (projectPath == null) {
-                    projectPath = context.getProjectDir().orElse(null);
-                }
-                if (projectPath == null && Utils.isTestMode()) {
-                    projectPath = Path.of(System.getProperty("user.dir"));
-                }
-            } catch (Exception e) {
-                // Should never happen
+        Path classesOutputDir = projectPath.resolve(JAVA_CLASSES_OUTPUT_PATH);
+        if (Files.isDirectory(classesOutputDir)) {
+            ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
+        }
+    }
+
+    @Nullable
+    private static Path resolveProjectPathFallback(VisitorContext context) {
+        try {
+            if (context == null) {
+                return Path.of(System.getProperty("user.dir"));
+            }
+            Path projectPath = getProjectDir(context);
+            if (projectPath == null) {
+                projectPath = context.getProjectDir().orElse(null);
+            }
+            if (projectPath == null && Utils.isTestMode()) {
                 projectPath = Path.of(System.getProperty("user.dir"));
             }
+            return projectPath;
+        } catch (Exception e) {
+            // Should never happen
+            return Path.of(System.getProperty("user.dir"));
         }
-
-        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath, context);
-
-        return projectPath;
     }
 
     public static PropertyNamingStrategy getPropertyNamingStrategy(VisitorContext context) {
@@ -1422,8 +1440,8 @@ public final class ConfigUtils {
                     String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
                     if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                         annotationProcessingConfigLocations.add(projectResourcesPath);
-                        Path generatedProjectPath = projectPath != null ? projectPath.resolve(GENERATED_OPENAPI_RESOURCES_PATH) : null;
-                        if (generatedProjectPath != null && Files.isDirectory(generatedProjectPath)) {
+                        Path generatedProjectPath = projectPath.resolve(GENERATED_OPENAPI_RESOURCES_PATH);
+                        if (Files.isDirectory(generatedProjectPath)) {
                             annotationProcessingConfigLocations.add(FILE_SCHEME + normalizePath(generatedProjectPath.toString()) + (generatedProjectPath.toString().endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH));
                         }
                     } else if (StringUtils.isNotEmpty(configFileLocations)) {

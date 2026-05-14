@@ -50,6 +50,9 @@ kapt {
 }
 
 tasks.register("removeMnFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from main KAPT outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/tmp/kapt3/classes/main/META-INF/micronaut"))
         delete(
