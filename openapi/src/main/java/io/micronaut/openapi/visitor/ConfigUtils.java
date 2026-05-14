@@ -191,6 +191,7 @@ public final class ConfigUtils {
 
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
+    private static final String GENERATED_OPENAPI_RESOURCES_PATH = "build/generated/openapi/src/main/resources";
 
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
@@ -1421,7 +1422,7 @@ public final class ConfigUtils {
                     String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
                     if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                         annotationProcessingConfigLocations.add(projectResourcesPath);
-                        Path generatedProjectPath = projectPath != null ? projectPath.resolve("build/generated/openapi/src/main/resources") : null;
+                        Path generatedProjectPath = projectPath != null ? projectPath.resolve(GENERATED_OPENAPI_RESOURCES_PATH) : null;
                         if (generatedProjectPath != null && Files.isDirectory(generatedProjectPath)) {
                             annotationProcessingConfigLocations.add(FILE_SCHEME + normalizePath(generatedProjectPath.toString()) + (generatedProjectPath.toString().endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH));
                         }
