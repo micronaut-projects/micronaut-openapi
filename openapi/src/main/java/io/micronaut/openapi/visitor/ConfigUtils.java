@@ -189,11 +189,13 @@ public final class ConfigUtils {
     public static final String ALL_ENDPOINTS_NAME = "all";
     public static final String ALL_SPRING_ACTUATOR_ENDPOINTS_NAME = "*";
 
+    private static final String USER_DIR_PROPERTY = "user.dir";
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
-    private static final Path GENERATED_OPENAPI_RESOURCES_PATH = Path.of("build", "generated", "openapi", "src", "main", "resources");
-    private static final Path KSP_CLASSES_OUTPUT_PATH = Path.of("build", "generated", "ksp", "main", "resources");
-    private static final Path JAVA_CLASSES_OUTPUT_PATH = Path.of("build", "classes", "java", "main", "META-INF");
+    private static final String BUILD_DIRECTORY = "build";
+    private static final Path GENERATED_OPENAPI_RESOURCES_PATH = Path.of(BUILD_DIRECTORY, "generated", "openapi", "src", "main", "resources");
+    private static final Path KSP_CLASSES_OUTPUT_PATH = Path.of(BUILD_DIRECTORY, "generated", "ksp", "main", "resources");
+    private static final Path JAVA_CLASSES_OUTPUT_PATH = Path.of(BUILD_DIRECTORY, "classes", "java", "main", "META-INF");
 
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
@@ -1208,19 +1210,19 @@ public final class ConfigUtils {
     private static Path resolveProjectPathFallback(VisitorContext context) {
         try {
             if (context == null) {
-                return Path.of(System.getProperty("user.dir"));
+                return Path.of(System.getProperty(USER_DIR_PROPERTY));
             }
             Path projectPath = getProjectDir(context);
             if (projectPath == null) {
                 projectPath = context.getProjectDir().orElse(null);
             }
             if (projectPath == null && Utils.isTestMode()) {
-                projectPath = Path.of(System.getProperty("user.dir"));
+                projectPath = Path.of(System.getProperty(USER_DIR_PROPERTY));
             }
             return projectPath;
         } catch (Exception e) {
             // Should never happen
-            return Path.of(System.getProperty("user.dir"));
+            return Path.of(System.getProperty(USER_DIR_PROPERTY));
         }
     }
 
