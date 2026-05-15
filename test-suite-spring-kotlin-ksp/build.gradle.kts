@@ -1,10 +1,6 @@
-import com.google.devtools.ksp.gradle.KspTask
-
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.allopen)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 sourceSets {
@@ -20,6 +16,7 @@ dependencies {
     ksp(mnSpring.micronaut.spring.web.annotation)
     ksp(mnSpring.micronaut.spring.boot.annotation)
     ksp(mn.micronaut.inject.kotlin)
+    ksp(mn.snakeyaml)
     ksp(projects.micronautOpenapi)
 
     compileOnly(projects.micronautOpenapiAnnotations)
@@ -44,22 +41,15 @@ dependencies {
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_25
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
-    }
-}
-
 ksp {
     arg("micronaut.openapi.project.dir", "$projectDir")
     arg("micronaut.openapi.expand.app.version", "myVersion")
 }
 
 tasks.register("removeMnFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from main KSP outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/generated/ksp/main/resources/META-INF/micronaut"))
         delete(
@@ -79,6 +69,9 @@ tasks.compileKotlin {
 }
 
 tasks.register("removeMnTestFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from test KSP outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/generated/ksp/test/resources/META-INF/micronaut"))
         delete(
@@ -97,8 +90,8 @@ tasks.compileTestKotlin {
     dependsOn(tasks.named("removeMnTestFiles"))
 }
 
-tasks.withType(KspTask::class) {
-    if (name == "kspTestKotlin") {
+afterEvaluate {
+    tasks.named("kspTestKotlin") {
         enabled = false
     }
 }

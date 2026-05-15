@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(environments = "test")
-public class MicronautOpenApiTest {
+class MicronautOpenApiTest {
 
     EmbeddedServer server;
     HttpClient reactiveClient;
@@ -43,20 +43,13 @@ public class MicronautOpenApiTest {
 
         var openApiSpec = client.retrieve("/swagger/openapi-micronaut-1.0.0.yml", String.class);
         assertNotNull(openApiSpec);
-        assertTrue(
-            openApiSpec.contains(
-                """
-                    openapi: 3.0.1
-                    info:
-                      title: openapi-micronaut
-                      version: 1.0.0
-                    """
-            )
-        );
 
         var openApi = OpenApiUtils.getYamlMapper().readValue(openApiSpec, OpenAPI.class);
 
         assertNotNull(openApi);
+        assertNotNull(openApi.getInfo());
+        assertEquals("openapi-micronaut", openApi.getInfo().getTitle());
+        assertEquals("1.0.0", openApi.getInfo().getVersion());
         assertNotNull(openApi.getComponents());
         assertNotNull(openApi.getComponents().getSchemas());
         var schema = openApi.getComponents().getSchemas().get("TypeDto");

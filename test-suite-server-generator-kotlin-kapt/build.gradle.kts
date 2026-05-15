@@ -2,8 +2,7 @@ import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-kapt-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.kapt)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 description = """
@@ -17,6 +16,9 @@ dependencies {
     kapt(mnSerde.micronaut.serde.processor)
     kapt(mn.micronaut.inject.kotlin)
     kapt(projects.micronautOpenapi)
+    kapt(projects.micronautOpenapiAnnotations)
+    kapt(projects.micronautOpenapiCommon)
+    kapt(mn.snakeyaml)
 
     compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
@@ -93,6 +95,11 @@ kapt {
     useBuildCache = false
 }
 
-kotlin {
-    jvmToolchain(21)
+
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("io.micronaut.openapi:micronaut-openapi")).using(project(":micronaut-openapi"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-common")).using(project(":micronaut-openapi-common"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-annotations")).using(project(":micronaut-openapi-annotations"))
+    }
 }

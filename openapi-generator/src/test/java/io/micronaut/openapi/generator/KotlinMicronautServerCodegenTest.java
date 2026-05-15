@@ -4,6 +4,7 @@ import com.tschuchort.compiletesting.SourceFile;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -17,6 +18,7 @@ import static org.openapitools.codegen.CodegenConstants.MODELS;
 import static org.openapitools.codegen.CodegenConstants.MODEL_TESTS;
 import static org.openapitools.codegen.CodegenConstants.SUPPORTING_FILES;
 
+@Disabled("https://github.com/micronaut-projects/micronaut-core/issues/12638")
 class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     static String ROLES_EXTENSION_TEST_PATH = "src/test/resources/3_0/micronaut/roles-extension-test.yml";

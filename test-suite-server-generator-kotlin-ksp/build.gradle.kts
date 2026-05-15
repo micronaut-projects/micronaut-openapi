@@ -2,8 +2,7 @@ import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.ksp)
+    id("io.micronaut.build.internal.kotlin-ksp")
 }
 
 description = """
@@ -17,6 +16,10 @@ dependencies {
     ksp(mnSerde.micronaut.serde.processor)
     ksp(mn.micronaut.inject.kotlin)
     ksp(projects.micronautOpenapi)
+    ksp(projects.micronautOpenapiCommon)
+    ksp(projects.micronautOpenapiAnnotations)
+    ksp(mn.snakeyaml)
+
 
     compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
@@ -88,6 +91,11 @@ ksp {
     arg("micronaut.openapi.views.spec", "swagger-ui.enabled=true")
 }
 
-kotlin {
-    jvmToolchain(21)
+
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("io.micronaut.openapi:micronaut-openapi")).using(project(":micronaut-openapi"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-common")).using(project(":micronaut-openapi-common"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-annotations")).using(project(":micronaut-openapi-annotations"))
+    }
 }

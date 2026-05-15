@@ -64,11 +64,12 @@ class ResponseBodyControllerTest(
         val response = client.exchange(request, Argument.listOf(SimpleModel::class.java))
         val totalCount = "3"
         val pageCount = "1"
+        val body = requireNotNull(response.body())
         assertEquals(HttpStatus.OK, response.status())
-        assertEquals(ResponseBodyController.SIMPLE_MODELS, response.body())
+        assertEquals(ResponseBodyController.SIMPLE_MODELS, body)
         assertEquals(page, response.header("X-Page-Number"))
         assertEquals(totalCount, response.header("X-Total-Count"))
-        assertEquals(3, response.body().size)
+        assertEquals(3, body.size)
         assertEquals(pageSize, response.header("X-Page-Size"))
         assertEquals(pageCount, response.header("X-Page-Count"))
     }

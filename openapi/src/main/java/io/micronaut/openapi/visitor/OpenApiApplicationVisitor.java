@@ -1038,10 +1038,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (!isAllEnabled || (endpointProps.getEnabled() != null && !endpointProps.getEnabled())) {
                 continue;
             }
-            // Resolve ClassElement fresh from the class name to avoid KSP2 PSI lifecycle issues.
-            // Stored ClassElement references from previous phases may have stale PSI tokens.
             String className = endpointProps.getClassName();
-            if (className == null) {
+            if (StringUtils.isEmpty(className)) {
+                ClassElement prevEl = endpointProps.getElement();
+                className = prevEl != null ? prevEl.getName() : null;
+                endpointProps.setClassName(className);
+            }
+            if (StringUtils.isEmpty(className)) {
                 continue;
             }
             if (!canProcessEndpoint(className, context)) {

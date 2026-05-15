@@ -189,8 +189,13 @@ public final class ConfigUtils {
     public static final String ALL_ENDPOINTS_NAME = "all";
     public static final String ALL_SPRING_ACTUATOR_ENDPOINTS_NAME = "*";
 
+    private static final String USER_DIR_PROPERTY = "user.dir";
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
+    private static final String BUILD_DIRECTORY = "build";
+    private static final Path GENERATED_OPENAPI_RESOURCES_PATH = Path.of(BUILD_DIRECTORY, "generated", "openapi", "src", "main", "resources");
+    private static final Path KSP_CLASSES_OUTPUT_PATH = Path.of(BUILD_DIRECTORY, "generated", "ksp", "main", "resources");
+    private static final Path JAVA_CLASSES_OUTPUT_PATH = Path.of(BUILD_DIRECTORY, "classes", "java", "main", "META-INF");
 
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
@@ -1164,35 +1169,61 @@ public final class ConfigUtils {
             return projectPath;
         }
 
-        String projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
-        if (projectDir != null) {
+        String projectDir = getConfiguredProjectDir(context);
+        if (StringUtils.isNotEmpty(projectDir)) {
             projectPath = Path.of(projectDir);
-            // calculating classes output path for KSP and gradle
-            if (isKsp(context)) {
-                var classesOutputDir = projectPath.toString().replace('\\', '/') + "/build/generated/ksp/main/resources";
-                ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
-            }
+            configureClassesOutputPath(projectPath, context);
         }
         if (projectPath == null) {
-            try {
-                if (context != null) {
-                    projectPath = getProjectDir(context);
-                }
-                if (projectPath == null) {
-                    projectPath = context.getProjectDir().orElse(null);
-                }
-                if (projectPath == null && Utils.isTestMode()) {
-                    projectPath = Path.of(System.getProperty("user.dir"));
-                }
-            } catch (Exception e) {
-                // Should never happen
-                projectPath = Path.of(System.getProperty("user.dir"));
-            }
+            projectPath = resolveProjectPathFallback(context);
         }
 
         ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath, context);
 
         return projectPath;
+    }
+
+    @Nullable
+    private static String getConfiguredProjectDir(VisitorContext context) {
+        String projectDir = null;
+        if (context != null) {
+            projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
+        }
+        if (StringUtils.isEmpty(projectDir)) {
+            projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
+        }
+        return projectDir;
+    }
+
+    private static void configureClassesOutputPath(Path projectPath, VisitorContext context) {
+        if (context != null && isKsp(context)) {
+            ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, projectPath.resolve(KSP_CLASSES_OUTPUT_PATH), context);
+            return;
+        }
+        Path classesOutputDir = projectPath.resolve(JAVA_CLASSES_OUTPUT_PATH);
+        if (Files.isDirectory(classesOutputDir)) {
+            ContextUtils.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, classesOutputDir, context);
+        }
+    }
+
+    @Nullable
+    private static Path resolveProjectPathFallback(VisitorContext context) {
+        try {
+            if (context == null) {
+                return Path.of(System.getProperty(USER_DIR_PROPERTY));
+            }
+            Path projectPath = getProjectDir(context);
+            if (projectPath == null) {
+                projectPath = context.getProjectDir().orElse(null);
+            }
+            if (projectPath == null && Utils.isTestMode()) {
+                projectPath = Path.of(System.getProperty(USER_DIR_PROPERTY));
+            }
+            return projectPath;
+        } catch (Exception e) {
+            // Should never happen
+            return Path.of(System.getProperty(USER_DIR_PROPERTY));
+        }
     }
 
     public static PropertyNamingStrategy getPropertyNamingStrategy(VisitorContext context) {
@@ -1411,6 +1442,10 @@ public final class ConfigUtils {
                     String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
                     if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                         annotationProcessingConfigLocations.add(projectResourcesPath);
+                        Path generatedProjectPath = projectPath.resolve(GENERATED_OPENAPI_RESOURCES_PATH);
+                        if (Files.isDirectory(generatedProjectPath)) {
+                            annotationProcessingConfigLocations.add(FILE_SCHEME + normalizePath(generatedProjectPath.toString()) + (generatedProjectPath.toString().endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH));
+                        }
                     } else if (StringUtils.isNotEmpty(configFileLocations)) {
                         for (String configFileLocation : configFileLocations.split(COMMA)) {
                             if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
@@ -1451,7 +1486,13 @@ public final class ConfigUtils {
             return Collections.emptyList();
         }
 
-        String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        String activeEnvStr = null;
+        if (context != null) {
+            activeEnvStr = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_ENVIRONMENTS);
+        }
+        if (StringUtils.isEmpty(activeEnvStr)) {
+            activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        }
         var activeEnvs = new ArrayList<String>();
         if (StringUtils.isNotEmpty(activeEnvStr)) {
             for (var activeEnv : activeEnvStr.split(COMMA)) {

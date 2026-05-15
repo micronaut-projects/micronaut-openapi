@@ -1064,6 +1064,44 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
+    void "test auto generated info block with application name from openapi environment"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS, "info")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class MyController {
+
+    @Get("/get")
+    public String get() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.info
+        openAPI.info.title == "openapi-test"
+        openAPI.info.version == OpenApiApplicationVisitor.DEFAULT_OPENAPI_VERSION
+    }
+
+    @RestoreSystemProperties
     void "test auto generated info block with spring application name"() {
 
         given:

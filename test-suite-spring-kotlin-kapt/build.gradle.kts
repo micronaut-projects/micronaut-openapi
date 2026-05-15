@@ -2,9 +2,7 @@ import org.jetbrains.kotlin.gradle.internal.KaptTask
 
 plugins {
     id("io.micronaut.build.internal.openapi-test-java")
-    alias(mn.plugins.kotlin.jvm)
-    alias(mn.plugins.kotlin.kapt)
-    alias(mn.plugins.kotlin.allopen)
+    id("io.micronaut.build.internal.kotlin-kapt")
 }
 
 sourceSets {
@@ -44,16 +42,6 @@ dependencies {
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_25
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
-    }
-}
-
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", "$projectDir")
@@ -62,6 +50,9 @@ kapt {
 }
 
 tasks.register("removeMnFiles") {
+    group = "build"
+    description = "Removes generated Micronaut metadata from main KAPT outputs."
+
     doLast {
         delete(layout.buildDirectory.dir("/tmp/kapt3/classes/main/META-INF/micronaut"))
         delete(

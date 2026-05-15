@@ -10,15 +10,25 @@ This project tests that the generated server sources can be compiled and
 that tests can be ran with Micronaut 4
 """
 
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("io.micronaut.openapi:micronaut-openapi")).using(project(":micronaut-openapi"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-common")).using(project(":micronaut-openapi-common"))
+        substitute(module("io.micronaut.openapi:micronaut-openapi-annotations")).using(project(":micronaut-openapi-annotations"))
+    }
+}
+
 dependencies {
 
     annotationProcessor(mnValidation.micronaut.validation.processor)
     annotationProcessor(mnSerde.micronaut.serde.processor)
+    annotationProcessor(mn.snakeyaml)
     annotationProcessor(projects.micronautOpenapi)
-
+    annotationProcessor(projects.micronautOpenapiCommon)
+    annotationProcessor(projects.micronautOpenapiAnnotations)
+    compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
 
-    implementation(projects.micronautOpenapi)
     implementation(mn.micronaut.http)
     implementation(mnSerde.micronaut.serde.api)
     implementation(mn.jakarta.annotation.api)
@@ -34,6 +44,7 @@ dependencies {
 
     testImplementation(mnTest.micronaut.test.spock)
     testImplementation(mn.micronaut.http.client)
+    testImplementation(projects.micronautOpenapi)
     testImplementation(projects.micronautOpenapiCommon)
 
     testRuntimeOnly(mn.micronaut.json.core)
@@ -85,9 +96,10 @@ tasks.withType(JavaCompile::class) {
     options.compilerArgs = mutableListOf(
         "-parameters",
         "-Xlint:unchecked",
-        "-Xlint:deprecation",
+        "-Xlint:deprecation"
     )
     options.forkOptions.jvmArgs = mutableListOf(
+        "-Dmicronaut.openapi.project.dir=$projectDir",
         "-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true",
         "-Dmicronaut.openapi.environments=local",
     )
