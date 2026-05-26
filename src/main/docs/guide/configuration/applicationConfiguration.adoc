@@ -41,3 +41,8 @@ public class Application {
     }
 }
 ----
+
+[WARNING]
+====
+KSP: When using KSP, the properties from `application.yml` are not loaded and will have no effect. Instead use system properties or the `openapi.properties` file.
+====
