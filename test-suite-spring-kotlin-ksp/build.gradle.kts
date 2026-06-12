@@ -16,7 +16,6 @@ dependencies {
     ksp(mnSpring.micronaut.spring.web.annotation)
     ksp(mnSpring.micronaut.spring.boot.annotation)
     ksp(mn.micronaut.inject.kotlin)
-    ksp(mn.snakeyaml)
     ksp(projects.micronautOpenapi)
 
     compileOnly(projects.micronautOpenapiAnnotations)

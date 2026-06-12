@@ -47,6 +47,18 @@ class OpenApiExposedTest {
 
     @Test
     @Throws(IOException::class)
+    fun testOpenApiSpecUsesApplicationYml() {
+        javaClass.getResourceAsStream("/META-INF/swagger/" + TestConfig.APP_NAME + '-' + TestConfig.APP_VERSION + ".yml")
+            .use {
+                assertNotNull(it)
+                val openApiSpec = String(it!!.readAllBytes())
+                assertTrue(openApiSpec.contains("display_name:"))
+                assertFalse(openApiSpec.contains("displayName:"))
+            }
+    }
+
+    @Test
+    @Throws(IOException::class)
     fun testSwaggerUiEndpoint() {
         val openApiSpec: String
         javaClass.getResourceAsStream("/META-INF/swagger/views/swagger-ui/index.html")
