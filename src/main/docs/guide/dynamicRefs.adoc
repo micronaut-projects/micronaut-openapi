@@ -1,0 +1,100 @@
+JSON Schema 2020-12 introduces the `$dynamicAnchor` and `$dynamicRef` keywords, which resolve a reference through the *dynamic scope* at the point of use rather than at the point of definition (see the https://json-schema.org/draft/2020-12/json-schema-core#section-7.7[specification, window="_blank"]).
+
+This is useful for recursive type hierarchies: a base type that references itself in one of its properties can be subtyped, and the recursive property should resolve to the *active subtype*, not back to the base.
+
+For example, given:
+
+[source,java]
+----
+class BaseCategory {
+    public List<BaseCategory> children;
+}
+
+class LocalizedCategory extends BaseCategory {
+    public String displayName;
+    public String locale;
+}
+----
+
+By default Micronaut OpenAPI emits a static self-reference for `children`:
+
+[source,yaml]
+----
+BaseCategory:
+  type: object
+  properties:
+    children:
+      type: array
+      items:
+        $ref: '#/components/schemas/BaseCategory'
+----
+
+So any subtype inherits `children` typed as `BaseCategory[]`, even when validating a `LocalizedCategory`.
+
+== Enabling dynamic references
+
+Set the `micronaut.openapi.schema.dynamic-refs.enabled` property to `true`.
+
+NOTE: Dynamic references require an https://json-schema.org/draft/2020-12/json-schema-core[OpenAPI 3.1, window="_blank"] document. The flag is ignored when generating an OpenAPI 3.0 document.
+
+By system property:
+
+[source,commandline]
+----
+-Dmicronaut.openapi.openapi31.enabled=true -Dmicronaut.openapi.schema.dynamic-refs.enabled=true
+----
+
+or in `openapi.properties`:
+
+[source,properties]
+----
+micronaut.openapi.openapi31.enabled=true
+micronaut.openapi.schema.dynamic-refs.enabled=true
+----
+
+or in `application.yml`:
+
+[configuration]
+----
+micronaut:
+  openapi:
+    openapi31:
+      enabled: true
+    schema:
+      dynamic-refs:
+        enabled: true
+----
+
+With the flag enabled, the same types produce:
+
+[source,yaml]
+----
+BaseCategory:
+  $dynamicAnchor: BaseCategory
+  type: object
+  properties:
+    children:
+      type: array
+      items:
+        $dynamicRef: '#BaseCategory'
+LocalizedCategory:
+  $dynamicAnchor: BaseCategory
+  type: object
+  allOf:
+    - $ref: '#/components/schemas/BaseCategory'
+    - type: object
+      properties:
+        displayName:
+          type: string
+        locale:
+          type: string
+----
+
+The base type and every subtype declare the same `$dynamicAnchor`, and the recursive property emits a `$dynamicRef`. A consumer that understands dynamic scope (for example, a validator or SDK generator) then resolves `children` to `LocalizedCategory` when operating on `LocalizedCategory`.
+
+== Anchor naming and limitations
+
+* The anchor name is derived from the recursive base type's schema name (for example `BaseCategory`). If the schema name is not a valid JSON Schema anchor, Micronaut OpenAPI sanitizes it by replacing invalid characters with `_` and prefixing `_` when the name does not start with a valid anchor character. For example, schema name `2024 v1:Category` becomes anchor `_2024_v1_Category`.
+* The base type and all of its subtypes share the same anchor.
+* A single schema can carry only one `$dynamicAnchor`. If a subtype introduces a *different* recursive property of its own, the inherited anchor takes precedence; the subtype's own recursion keeps a normal `$ref`. This is an edge case that may be revisited in a future release.
+* Outside dynamic-refs mode (the default), output is unchanged: recursive properties use a static `$ref`.

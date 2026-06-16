@@ -135,6 +135,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDuplicateResolution;
 import static io.micronaut.openapi.visitor.ConfigUtils.isConstructorArgumentsAsRequired;
+import static io.micronaut.openapi.visitor.ConfigUtils.isDynamicRefsEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -273,6 +274,13 @@ public final class SchemaDefinitionUtils {
      */
     private static List<String> inProgressSchemas = new ArrayList<>(10);
     /**
+     * Stores schema names detected as recursive (a property references the enclosing type),
+     * mapped to the valid {@code $dynamicAnchor} name generated for the schema.
+     * Used to stamp a {@code $dynamicAnchor} on the registered schema and emit
+     * {@code $dynamicRef} consumers in dynamic-refs mode.
+     */
+    private static Map<String, String> recursiveSchemaAnchors = new HashMap<>();
+    /**
      * Stores relations between schema names and class names.
      */
     private static Map<String, String> schemaNameToClassNameMap = new HashMap<>();
@@ -293,9 +301,80 @@ public final class SchemaDefinitionUtils {
      */
     public static void clean() {
         inProgressSchemas = new ArrayList<>(10);
+        recursiveSchemaAnchors = new HashMap<>();
         schemaNameToClassNameMap = new HashMap<>();
         schemaNameSuffixCounterMap = new HashMap<>();
         propertyNamingStrategyInstances = new HashMap<>();
+    }
+
+    /**
+     * Returns a schema reference for a type that recurses into itself while still being processed.
+     * <p>
+     * In dynamic-refs mode (OpenAPI 3.1), emits a {@code $dynamicRef} and ensures a matching
+     * {@code $dynamicAnchor} is stamped on the registered schema, so that JSON Schema 2020-12
+     * dynamic-scope resolution can switch the reference to an active subtype (e.g. resolving
+     * {@code children} to {@code LocalizedCategory} instead of {@code BaseCategory}). Outside
+     * dynamic-refs mode, falls back to a normal {@code $ref}, preserving the default behavior.
+     *
+     * @param schemaName the name of the recursive schema
+     * @param schemas    the components schemas map
+     * @param context    the visitor context
+     * @return a {@code $dynamicRef} (dynamic-refs mode) or a {@code $ref} (default)
+     */
+    private static Schema<?> recursiveSchemaRef(String schemaName, Map<String, Schema> schemas, VisitorContext context) {
+        if (isOpenapi31() && isDynamicRefsEnabled(context)) {
+            String dynamicAnchor = toDynamicAnchorName(schemaName);
+            Schema<?> registered = schemas.get(schemaName);
+            if (registered != null && registered.get$dynamicAnchor() != null && !dynamicAnchor.equals(registered.get$dynamicAnchor())) {
+                return createSchema()
+                    .$ref(SchemaUtils.schemaRef(schemaName));
+            }
+            recursiveSchemaAnchors.put(schemaName, dynamicAnchor);
+            stampRecursiveAnchor(schemaName, schemas);
+            Schema<?> dynamicRef = createSchema();
+            dynamicRef.set$dynamicRef("#" + dynamicAnchor);
+            return dynamicRef;
+        }
+        return createSchema()
+            .$ref(SchemaUtils.schemaRef(schemaName));
+    }
+
+    /**
+     * Stamps the {@code $dynamicAnchor} (equal to the schema name) on the registered schema
+     * when recursion into it has been detected. Idempotent: only sets the anchor if missing.
+     *
+     * @param schemaName the name of the recursive schema
+     * @param schemas    the components schemas map
+     */
+    private static void stampRecursiveAnchor(String schemaName, Map<String, Schema> schemas) {
+        Schema<?> registered = schemas.get(schemaName);
+        String dynamicAnchor = recursiveSchemaAnchors.get(schemaName);
+        if (registered != null && dynamicAnchor != null && registered.get$dynamicAnchor() == null) {
+            registered.set$dynamicAnchor(dynamicAnchor);
+        }
+    }
+
+    private static String toDynamicAnchorName(String schemaName) {
+        if (StringUtils.isEmpty(schemaName)) {
+            return "_";
+        }
+        var result = new StringBuilder(schemaName.length() + 1);
+        for (int i = 0; i < schemaName.length(); i++) {
+            char c = schemaName.charAt(i);
+            if (i == 0 && !isDynamicAnchorStart(c)) {
+                result.append('_');
+            }
+            result.append(isDynamicAnchorPart(c) ? c : '_');
+        }
+        return result.toString();
+    }
+
+    private static boolean isDynamicAnchorStart(char c) {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+    }
+
+    private static boolean isDynamicAnchorPart(char c) {
+        return isDynamicAnchorStart(c) || (c >= '0' && c <= '9') || c == '-' || c == '.';
     }
 
     /**
@@ -442,6 +521,10 @@ public final class SchemaDefinitionUtils {
                 String schemaName = computeDefaultSchemaName(defaultName, definingElement, type, typeArgs, context, jsonViewClass);
                 schema = schemas.get(schemaName);
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
+                if (schema != null && inProgressSchemas.contains(schemaName)) {
+                    // Detected recursion into a schema currently being processed
+                    return recursiveSchemaRef(schemaName, schemas, context);
+                }
                 if (schema == null) {
 
                     if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
@@ -469,8 +552,13 @@ public final class SchemaDefinitionUtils {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
 
-                        populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
-                        checkAllOf(schema);
+                        inProgressSchemas.add(schemaName);
+                        try {
+                            populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
+                            checkAllOf(schema);
+                        } finally {
+                            inProgressSchemas.remove(schemaName);
+                        }
                     }
                     if (isDeprecated(type) && schema != null) {
                         schema.setDeprecated(true);
@@ -491,9 +579,8 @@ public final class SchemaDefinitionUtils {
             schema = schemas.get(schemaName);
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
-                    // Break recursion
-                    return createSchema()
-                        .$ref(SchemaUtils.schemaRef(schemaName));
+                    // Detected recursion into a schema currently being processed
+                    return recursiveSchemaRef(schemaName, schemas, context);
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -2030,6 +2117,9 @@ public final class SchemaDefinitionUtils {
             }
         }
         schemas.put(schemaName, schema);
+        if (recursiveSchemaAnchors.containsKey(schemaName) && schema.get$dynamicAnchor() == null) {
+            schema.set$dynamicAnchor(recursiveSchemaAnchors.get(schemaName));
+        }
 
         return schema;
     }
@@ -2047,6 +2137,13 @@ public final class SchemaDefinitionUtils {
             parentSchema.set$ref(SchemaUtils.schemaRef(parentSchemaName));
             if (schema.getAllOf() == null || !schema.getAllOf().contains(parentSchema)) {
                 schema.addAllOfItem(parentSchema);
+            }
+            // Propagate the dynamic anchor from a recursive parent so that dynamic-scope
+            // resolution switches $dynamicRef to this subtype at the point of use.
+            Schema<?> registeredParent = schemas.get(parentSchemaName);
+            if (registeredParent != null && registeredParent.get$dynamicAnchor() != null
+                && schema.get$dynamicAnchor() == null) {
+                schema.set$dynamicAnchor(registeredParent.get$dynamicAnchor());
             }
         }
         if (superType.isInterface()) {

@@ -69,6 +69,7 @@ directory. |
 |`*micronaut.openapi.schema.duplicate-resolution*` | System property to set schema duplicate resolution. Available values: +
 `*auto*` - micronaut-openapi automatically add index suffix to duplicate schema. +
 `*error*` - micronaut-openapi throws an exception when found duplicate schema. | Default: `auto`
+|`*micronaut.openapi.schema.dynamic-refs.enabled*` | If this property true and OpenAPI 3.1 generation is enabled, recursive schemas emit JSON Schema 2020-12 `$dynamicAnchor` / `$dynamicRef` keywords instead of static self-`$ref` references. | Default: `false`
 |`*micronaut.openapi.schema.name.separator.empty*` | If this property true, generic separators and inner class separators in schema name will be empty string. | Default: `false`
 |`*micronaut.openapi.schema.name.separator.generic*` | System property that set generic class separator for schema name generation. | Default: `_`
 |`*micronaut.openapi.schema.name.separator.inner-class*` | System property that set inner class separator for schema name generation. | Default: `.`
