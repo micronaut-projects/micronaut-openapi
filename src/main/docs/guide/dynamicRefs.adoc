@@ -92,10 +92,73 @@ LocalizedCategory:
 
 The base type and every subtype declare the same `$dynamicAnchor`, and the recursive property emits a `$dynamicRef`. A consumer that understands dynamic scope (for example, a validator or SDK generator) then resolves `children` to `LocalizedCategory` when operating on `LocalizedCategory`.
 
+== Generic types
+
+Dynamic-refs mode also collapses single-variable generic wrappers into one reusable template plus inline `$defs` bindings, instead of duplicating a concrete schema per type argument. Given:
+
+[source,java]
+----
+class Response<T> {
+    public T data;
+}
+
+class Page<T> {
+    public List<T> items;
+    public int total;
+}
+----
+
+used as `Response<Pet>`, `Response<Group>`, and `Page<Pet>`, the default mode produces a concrete schema per binding (`Response_Pet_`, `Response_Group_`, `Page_Pet_`). With dynamic-refs enabled, a single template is emitted per generic and each usage site gets an inline binding:
+
+[source,yaml]
+----
+components:
+  schemas:
+    Response:                  # one template, defined once
+      $dynamicAnchor: dataType
+      properties:
+        data:
+          $dynamicRef: '#dataType'
+      $defs:
+        dataType:
+          $dynamicAnchor: dataType
+          not: {}
+    Page:
+      $dynamicAnchor: itemType
+      properties:
+        items:
+          type: array
+          items:
+            $dynamicRef: '#itemType'
+        total:
+          type: integer
+      $defs:
+        itemType:
+          $dynamicAnchor: itemType
+          not: {}
+paths:
+  /pet:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+                $defs:
+                  dataType:
+                    $dynamicAnchor: dataType
+                    $ref: '#/components/schemas/Pet'
+----
+
+The template declares a `$dynamicAnchor` (named after the variable's role: `itemType` when used as a collection/array element, `dataType` otherwise) and a `$defs` placeholder (`$dynamicAnchor` + `not: {}`) marking the unbound slot; the variable's usages become `$dynamicRef` consumers. Each binding re-declares the anchor via an inline `$defs` entry pointing at the concrete type. Dynamic-scope resolution then switches the slot to the bound type at the point of use, while the wrapper instance validates against the template only.
+
+NOTE: swagger-core's `Schema` model does not expose a `$defs` field. Micronaut OpenAPI attaches `$defs` via a reflective workaround on the schema's extensions map (which the serializer emits verbatim). This is temporary and is replaced automatically by native `$defs` support once a future swagger-core ships it.
+
 == Anchor naming and limitations
 
-* The anchor name is derived from the recursive base type's schema name (for example `BaseCategory`). If the name is not a valid JSON Schema anchor, Micronaut OpenAPI sanitizes it by replacing invalid characters with `_` and prefixing `_` when the name does not start with a valid anchor character. For example, schema name `2024 v1:Category` becomes anchor `_2024_v1_Category`.
+* The anchor name is derived from the recursive base type's schema name (for example `BaseCategory`), or from the generic type variable's role (`itemType` for collection/array elements, `dataType` for scalar fields). If the name is not a valid JSON Schema anchor, Micronaut OpenAPI sanitizes it by replacing invalid characters with `_` and prefixing `_` when the name does not start with a valid anchor character. For example, schema name `2024 v1:Category` becomes anchor `_2024_v1_Category`.
 * For recursive types, the base type and all of its subtypes share the same anchor.
 * A single schema can carry only one `$dynamicAnchor`. As a result, if a recursive subtype introduces a *different* recursive property of its own, the inherited anchor takes precedence and the subtype's own recursion keeps a normal `$ref`. This edge case may be revisited in a future release.
-* Dynamic-refs mode does not change generic schema generation. Parameterized types such as `Response<Pet>` keep their default concrete schemas, because JSON Schema dynamic scope can only re-target a `$dynamicRef` to an already active matching `$dynamicAnchor`; it cannot bind a type variable to a sibling schema without also applying that sibling schema to the wrapper instance.
+* Generic-template preservation currently applies to single-parameter generics used directly (for example as a controller return type or field) where the type argument is a reference type. Cases that keep their default concrete schemas include: multi-parameter generics (`Map<K, V>`), a concrete argument that is a primitive, array, collection or map (for example `Response<String>`), generics annotated with `@Schema`, named subtypes (for example `class PetResponse extends Response<Pet>`), and nested parameterized bindings (for example `Response<Page<Pet>>`). A template is not independently usable on its own (its unbound slot validates nothing); it is meaningful only at a binding site.
 * Outside dynamic-refs mode (the default), output is unchanged: recursive properties use a static `$ref`, and generics produce their default concrete schemas.
