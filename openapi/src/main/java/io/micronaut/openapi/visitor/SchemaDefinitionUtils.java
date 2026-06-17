@@ -274,19 +274,6 @@ public final class SchemaDefinitionUtils {
      */
     private static List<String> inProgressSchemas = new ArrayList<>(10);
     /**
-     * Stores schema names detected as recursive (a property references the enclosing type),
-     * mapped to the valid {@code $dynamicAnchor} name generated for the schema.
-     * Used to stamp a {@code $dynamicAnchor} on the registered schema and emit
-     * {@code $dynamicRef} consumers in dynamic-refs mode.
-     */
-    private static Map<String, String> recursiveSchemaAnchors = new HashMap<>();
-    /**
-     * Stack of type-variable frames (var name -&gt; anchor) for generic templates currently
-     * being built in dynamic-refs mode. While non-empty, an unresolved type variable is emitted
-     * as a {@code $dynamicRef} consumer instead of being resolved to its bound.
-     */
-    private static List<Map<String, String>> templateVarStack = new ArrayList<>();
-    /**
      * Stores relations between schema names and class names.
      */
     private static Map<String, String> schemaNameToClassNameMap = new HashMap<>();
@@ -299,22 +286,6 @@ public final class SchemaDefinitionUtils {
      */
     private static Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
 
-    /**
-     * Reflective handle to {@link Schema}'s private {@code extensions} map, used by
-     * {@link #setSchemaDefs} to inject a {@code $defs} block (a JSON Schema 2020-12 keyword that
-     * swagger-core 2.2.x does not model). See {@link #setSchemaDefs} for the full rationale.
-     */
-    private static final java.lang.reflect.Field SCHEMA_EXTENSIONS_FIELD;
-
-    static {
-        try {
-            SCHEMA_EXTENSIONS_FIELD = Schema.class.getDeclaredField("extensions");
-            SCHEMA_EXTENSIONS_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new ExceptionInInitializerError("io.swagger.v3.oas.models.media.Schema.extensions field not found: " + e.getMessage());
-        }
-    }
-
     private SchemaDefinitionUtils() {
     }
 
@@ -323,287 +294,10 @@ public final class SchemaDefinitionUtils {
      */
     public static void clean() {
         inProgressSchemas = new ArrayList<>(10);
-        recursiveSchemaAnchors = new HashMap<>();
-        templateVarStack = new ArrayList<>();
         schemaNameToClassNameMap = new HashMap<>();
         schemaNameSuffixCounterMap = new HashMap<>();
         propertyNamingStrategyInstances = new HashMap<>();
-    }
-
-    /**
-     * Returns a schema reference for a type that recurses into itself while still being processed.
-     * <p>
-     * In dynamic-refs mode (OpenAPI 3.1), emits a {@code $dynamicRef} and ensures a matching
-     * {@code $dynamicAnchor} is stamped on the registered schema, so that JSON Schema 2020-12
-     * dynamic-scope resolution can switch the reference to an active subtype (e.g. resolving
-     * {@code children} to {@code LocalizedCategory} instead of {@code BaseCategory}). Outside
-     * dynamic-refs mode, falls back to a normal {@code $ref}, preserving the default behavior.
-     *
-     * @param schemaName the name of the recursive schema
-     * @param schemas    the components schemas map
-     * @param context    the visitor context
-     * @return a {@code $dynamicRef} (dynamic-refs mode) or a {@code $ref} (default)
-     */
-    private static Schema<?> recursiveSchemaRef(String schemaName, Map<String, Schema> schemas, VisitorContext context) {
-        if (isOpenapi31() && isDynamicRefsEnabled(context)) {
-            String dynamicAnchor = toDynamicAnchorName(schemaName);
-            Schema<?> registered = schemas.get(schemaName);
-            if (registered != null && registered.get$dynamicAnchor() != null && !dynamicAnchor.equals(registered.get$dynamicAnchor())) {
-                return createSchema()
-                    .$ref(SchemaUtils.schemaRef(schemaName));
-            }
-            recursiveSchemaAnchors.put(schemaName, dynamicAnchor);
-            stampRecursiveAnchor(schemaName, schemas);
-            Schema<?> dynamicRef = createSchema();
-            dynamicRef.set$dynamicRef("#" + dynamicAnchor);
-            return dynamicRef;
-        }
-        return createSchema()
-            .$ref(SchemaUtils.schemaRef(schemaName));
-    }
-
-    /**
-     * Stamps the {@code $dynamicAnchor} (equal to the schema name) on the registered schema
-     * when recursion into it has been detected. Idempotent: only sets the anchor if missing.
-     *
-     * @param schemaName the name of the recursive schema
-     * @param schemas    the components schemas map
-     */
-    private static void stampRecursiveAnchor(String schemaName, Map<String, Schema> schemas) {
-        Schema<?> registered = schemas.get(schemaName);
-        String dynamicAnchor = recursiveSchemaAnchors.get(schemaName);
-        if (registered != null && dynamicAnchor != null && registered.get$dynamicAnchor() == null) {
-            registered.set$dynamicAnchor(dynamicAnchor);
-        }
-    }
-
-    // ---- generic dynamic-ref ($dynamicAnchor / $defs / $dynamicRef) support -------------
-
-    /**
-     * Returns the anchor for the single type variable of the generic template currently being built
-     * (top of {@link #templateVarStack}), or {@code null} when no template build is active.
-     */
-    private static String currentTemplateAnchor() {
-        return templateVarStack.isEmpty() ? null : templateVarStack.get(0).values().iterator().next();
-    }
-
-    /**
-     * Derives the {@code $dynamicAnchor} name for a generic template from how its single type
-     * variable is used: {@code itemType} when the variable is used as a collection/array element,
-     * otherwise {@code dataType}.
-     */
-    private static String deriveTemplateAnchor(ClassElement rawType) {
-        for (FieldElement field : rawType.getFields()) {
-            ClassElement ft = field.getGenericType();
-            if (ft == null) {
-                continue;
-            }
-            if (ft.isIterable() || ft.isArray()) {
-                ClassElement element = ft.getFirstTypeArgument().orElse(null);
-                if (element instanceof GenericElement || element instanceof GenericPlaceholderElement) {
-                    return "itemType";
-                }
-            }
-        }
-        return "dataType";
-    }
-
-    /**
-     * Whether the given parameterized type should be emitted as a dynamic-ref generic binding:
-     * dynamic-refs mode is on, it has exactly one type argument, it is not a collection / map,
-     * and the argument is a concrete reference type (not an unresolved type variable, primitive,
-     * array, collection or map — those cannot form a {@code $ref} binding slot).
-     */
-    private static boolean isGenericBindingCandidate(ClassElement type, Map<String, ClassElement> typeArgs) {
-        if (typeArgs == null || typeArgs.size() != 1) {
-            return false;
-        }
-        if (isJavaUtilCollectionType(type) || type.isAssignable(Map.class) || isContainerType(type)) {
-            return false;
-        }
-        ClassElement arg = typeArgs.values().iterator().next();
-        if (arg instanceof GenericElement || arg instanceof GenericPlaceholderElement) {
-            return false;
-        }
-        if (ElementUtils.isJavaBasicType(arg.getName())
-            || arg.isArray()
-            || isContainerType(arg)
-            || arg.isAssignable(Map.class)) {
-            return false;
-        }
-        // Self-referential generics combine the template and recursion mechanisms in ways that
-        // produce inconsistent output today (the recursive descent leaks the template context).
-        // Keep the default concrete behavior for them until that interaction is resolved.
-        if (isRecursiveType(type)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Whether the given type references itself in one of its fields (directly or through type
-     * arguments), i.e. it is self-referential / recursive.
-     */
-    private static boolean isRecursiveType(ClassElement type) {
-        if (type == null) {
-            return false;
-        }
-        String name = type.getName();
-        for (FieldElement field : type.getFields()) {
-            if (referencesType(field.getGenericType(), name, new HashSet<>())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean referencesType(ClassElement el, String targetName, Set<String> seen) {
-        if (el == null || !seen.add(el.getName())) {
-            return false;
-        }
-        if (targetName.equals(el.getName())) {
-            return true;
-        }
-        if (referencesType(el.getFirstTypeArgument().orElse(null), targetName, seen)) {
-            return true;
-        }
-        for (ClassElement arg : el.getTypeArguments().values()) {
-            if (referencesType(arg, targetName, seen)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Sets a {@code $defs} block on a schema.
-     * <p>
-     * <b>Workaround:</b> swagger-core 2.2.x {@link Schema} has no {@code $defs} field, and
-     * {@link Schema#addExtension(String, Object)} rejects keys that do not start with {@code x-}.
-     * The serializer, however, emits every entry of the {@code extensions} map verbatim via
-     * {@code @JsonAnyGetter}, so {@code $defs} is injected directly into that map by reflection.
-     * When a future swagger-core exposes a native {@code set$defs}, the reflection branch below
-     * auto-switches to it; remove this workaround once the minimum supported swagger-core ships it.
-     *
-     * @param schema the schema to attach {@code $defs} to
-     * @param defs   the {@code $defs} entries (anchor name -&gt; schema)
-     */
-    private static void setSchemaDefs(Schema<?> schema, Map<String, Schema> defs) {
-        if (schema == null || defs == null || defs.isEmpty()) {
-            return;
-        }
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> extensions = (Map<String, Object>) SCHEMA_EXTENSIONS_FIELD.get(schema);
-            if (extensions == null) {
-                extensions = new LinkedHashMap<>();
-                SCHEMA_EXTENSIONS_FIELD.set(schema, extensions);
-            }
-            extensions.put("$defs", defs);
-        } catch (IllegalAccessException e) {
-            // best-effort: if reflection is blocked, $defs is silently omitted
-        }
-    }
-
-    /**
-     * Builds a dynamic-ref generic binding for a parameterized type such as {@code Response<Pet>}.
-     * <p>
-     * Emits one reusable template schema (e.g. {@code Response}) whose type-variable usages become
-     * {@code $dynamicRef} consumers and which carries a {@code $defs} placeholder
-     * ({@code $dynamicAnchor} + {@code not: {}}), and returns an inline binding at the usage site
-     * that re-declares the anchor via {@code $defs} pointing at the concrete argument. The wrapper
-     * instance validates against the template only; the concrete schema applies solely where the
-     * {@code $dynamicRef} sits.
-     *
-     * @param openApi       the OpenAPI
-     * @param context       the visitor context
-     * @param type          the parameterized generic type (e.g. {@code Response<Pet>})
-     * @param typeArgs      the concrete type arguments (e.g. {@code {T: Pet}})
-     * @param mediaTypes    the media types
-     * @param jsonViewClass the JSON view class
-     * @return an inline {@code $defs} binding schema, or {@code null} if the template cannot be built
-     */
-    private static Schema<?> resolveGenericBinding(OpenAPI openApi, VisitorContext context, ClassElement type,
-                                                   Map<String, ClassElement> typeArgs,
-                                                   List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
-        var schemas = resolveSchemas(openApi);
-        ClassElement rawType = context.getClassElement(type.getName()).orElse(null);
-        if (rawType == null) {
-            return null;
-        }
-        String templateName = computeDefaultSchemaName(getNameFromAnn(rawType), rawType, rawType, Collections.emptyMap(), context, jsonViewClass);
-
-        var varEntry = typeArgs.entrySet().iterator().next();
-        String varName = varEntry.getKey();
-        String anchor = deriveTemplateAnchor(rawType);
-
-        Schema<?> template = schemas.get(templateName);
-        if (template != null && !anchor.equals(template.get$dynamicAnchor())) {
-            // A non-template schema already occupies this name (for example a raw usage of the
-            // generic). Do not poison it; fall back to the default concrete behavior.
-            return null;
-        }
-        if (template == null) {
-            template = createSchema();
-            template.name(templateName);
-            schemas.put(templateName, template);
-            var frame = new LinkedHashMap<String, String>();
-            frame.put(varName, anchor);
-            templateVarStack.add(0, frame);
-            try {
-                populateSchemaProperties(openApi, context, rawType, rawType.getTypeArguments(), template, mediaTypes, null, jsonViewClass);
-            } finally {
-                templateVarStack.remove(0);
-            }
-            if (template.get$dynamicAnchor() == null) {
-                template.set$dynamicAnchor(anchor);
-            }
-            var placeholder = createSchema();
-            placeholder.set$dynamicAnchor(anchor);
-            placeholder.setNot(createSchema());
-            var placeholderDefs = new LinkedHashMap<String, Schema>();
-            placeholderDefs.put(anchor, placeholder);
-            setSchemaDefs(template, placeholderDefs);
-        }
-
-        ClassElement concreteType = varEntry.getValue();
-        Schema<?> concreteRef = getSchemaDefinition(openApi, context, concreteType, concreteType.getTypeArguments(), null, mediaTypes, jsonViewClass);
-
-        var slot = createSchema();
-        slot.set$dynamicAnchor(anchor);
-        if (concreteRef != null && concreteRef.get$ref() != null) {
-            slot.set$ref(concreteRef.get$ref());
-        }
-        var slotDefs = new LinkedHashMap<String, Schema>();
-        slotDefs.put(anchor, slot);
-
-        var binding = createSchema();
-        binding.set$ref(SchemaUtils.schemaRef(templateName));
-        setSchemaDefs(binding, slotDefs);
-        return binding;
-    }
-
-    private static String toDynamicAnchorName(String schemaName) {
-        if (StringUtils.isEmpty(schemaName)) {
-            return "_";
-        }
-        var result = new StringBuilder(schemaName.length() + 1);
-        for (int i = 0; i < schemaName.length(); i++) {
-            char c = schemaName.charAt(i);
-            if (i == 0 && !isDynamicAnchorStart(c)) {
-                result.append('_');
-            }
-            result.append(isDynamicAnchorPart(c) ? c : '_');
-        }
-        return result.toString();
-    }
-
-    private static boolean isDynamicAnchorStart(char c) {
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
-    }
-
-    private static boolean isDynamicAnchorPart(char c) {
-        return isDynamicAnchorStart(c) || (c >= '0' && c <= '9') || c == '-' || c == '.';
+        DynamicRefUtils.clean();
     }
 
     /**
@@ -738,8 +432,8 @@ public final class SchemaDefinitionUtils {
                 primitiveType = null;
             }
             if (primitiveType == null) {
-                if (definingElement != null && isOpenapi31() && isDynamicRefsEnabled(context) && isGenericBindingCandidate(type, typeArgs)) {
-                    Schema<?> binding = resolveGenericBinding(openApi, context, type, typeArgs, mediaTypes, jsonViewClass);
+                if (definingElement != null && isOpenapi31() && isDynamicRefsEnabled(context) && DynamicRefUtils.isGenericBindingCandidate(type, typeArgs)) {
+                    Schema<?> binding = DynamicRefUtils.resolveGenericBinding(openApi, context, type, typeArgs, mediaTypes, jsonViewClass);
                     if (binding != null) {
                         return binding;
                     }
@@ -758,7 +452,7 @@ public final class SchemaDefinitionUtils {
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
                 if (schema != null && inProgressSchemas.contains(schemaName)) {
                     // Detected recursion into a schema currently being processed
-                    return recursiveSchemaRef(schemaName, schemas, context);
+                    return DynamicRefUtils.recursiveSchemaRef(schemaName, schemas, context);
                 }
                 if (schema == null) {
 
@@ -815,7 +509,7 @@ public final class SchemaDefinitionUtils {
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
                     // Detected recursion into a schema currently being processed
-                    return recursiveSchemaRef(schemaName, schemas, context);
+                    return DynamicRefUtils.recursiveSchemaRef(schemaName, schemas, context);
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -1198,7 +892,7 @@ public final class SchemaDefinitionUtils {
         if (type instanceof WildcardElement wildcardEl) {
             type = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().getFirst() : null;
         } else if (type instanceof GenericPlaceholderElement placeholderEl) {
-            var templateAnchor = currentTemplateAnchor();
+            var templateAnchor = DynamicRefUtils.currentTemplateAnchor();
             if (templateAnchor != null && placeholderEl.getResolved().isEmpty()) {
                 Schema<?> slot = createSchema();
                 slot.set$dynamicRef("#" + templateAnchor);
@@ -1210,7 +904,7 @@ public final class SchemaDefinitionUtils {
                 type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().getFirst() : null);
             }
         } else if (type instanceof GenericElement genericEl) {
-            var templateAnchor = currentTemplateAnchor();
+            var templateAnchor = DynamicRefUtils.currentTemplateAnchor();
             if (templateAnchor != null && genericEl.getResolved().isEmpty()) {
                 Schema<?> slot = createSchema();
                 slot.set$dynamicRef("#" + templateAnchor);
@@ -2169,7 +1863,7 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
+    static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
                                                  List<MediaType> mediaTypes, JavadocDescription classJavadoc, @Nullable ClassElement jsonViewClass) {
         ClassElement classEl = null;
         if (type instanceof ClassElement classElem) {
@@ -2364,9 +2058,7 @@ public final class SchemaDefinitionUtils {
             }
         }
         schemas.put(schemaName, schema);
-        if (recursiveSchemaAnchors.containsKey(schemaName) && schema.get$dynamicAnchor() == null) {
-            schema.set$dynamicAnchor(recursiveSchemaAnchors.get(schemaName));
-        }
+        DynamicRefUtils.stampAnchorIfRecursive(schema, schemaName);
 
         return schema;
     }
