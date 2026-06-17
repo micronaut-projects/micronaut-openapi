@@ -1,4 +1,4 @@
-JSON Schema 2020-12 introduces the `$dynamicAnchor` and `$dynamicRef` keywords, which resolve a reference through the *dynamic scope* at the point of use rather than at the point of definition (see the https://json-schema.org/draft/2020-12/json-schema-core#section-7.7[specification, window="_blank"]).
+JSON Schema 2020-12 introduces the `$dynamicAnchor` and `$dynamicRef` keywords, which resolve a reference through the *dynamic scope* at the point of use rather than at the point of definition (see the https://json-schema.org/draft/2020-12/json-schema-core#section-7.1[specification, window="_blank"]).
 
 This is useful for recursive type hierarchies: a base type that references itself in one of its properties can be subtyped, and the recursive property should resolve to the *active subtype*, not back to the base.
 
@@ -94,7 +94,8 @@ The base type and every subtype declare the same `$dynamicAnchor`, and the recur
 
 == Anchor naming and limitations
 
-* The anchor name is derived from the recursive base type's schema name (for example `BaseCategory`). If the schema name is not a valid JSON Schema anchor, Micronaut OpenAPI sanitizes it by replacing invalid characters with `_` and prefixing `_` when the name does not start with a valid anchor character. For example, schema name `2024 v1:Category` becomes anchor `_2024_v1_Category`.
-* The base type and all of its subtypes share the same anchor.
-* A single schema can carry only one `$dynamicAnchor`. If a subtype introduces a *different* recursive property of its own, the inherited anchor takes precedence; the subtype's own recursion keeps a normal `$ref`. This is an edge case that may be revisited in a future release.
-* Outside dynamic-refs mode (the default), output is unchanged: recursive properties use a static `$ref`.
+* The anchor name is derived from the recursive base type's schema name (for example `BaseCategory`). If the name is not a valid JSON Schema anchor, Micronaut OpenAPI sanitizes it by replacing invalid characters with `_` and prefixing `_` when the name does not start with a valid anchor character. For example, schema name `2024 v1:Category` becomes anchor `_2024_v1_Category`.
+* For recursive types, the base type and all of its subtypes share the same anchor.
+* A single schema can carry only one `$dynamicAnchor`. As a result, if a recursive subtype introduces a *different* recursive property of its own, the inherited anchor takes precedence and the subtype's own recursion keeps a normal `$ref`. This edge case may be revisited in a future release.
+* Dynamic-refs mode does not change generic schema generation. Parameterized types such as `Response<Pet>` keep their default concrete schemas, because JSON Schema dynamic scope can only re-target a `$dynamicRef` to an already active matching `$dynamicAnchor`; it cannot bind a type variable to a sibling schema without also applying that sibling schema to the wrapper instance.
+* Outside dynamic-refs mode (the default), output is unchanged: recursive properties use a static `$ref`, and generics produce their default concrete schemas.
