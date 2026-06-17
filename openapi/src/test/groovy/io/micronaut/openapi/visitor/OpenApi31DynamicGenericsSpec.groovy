@@ -336,6 +336,58 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
+    void "test recursive generic falls back to concrete schema"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/tree")
+    public Tree<Pet> getTree() { return null; }
+}
+
+class Tree<T> {
+    private T value;
+    private List<Tree<T>> children;
+    public T getValue() { return value; }
+    public void setValue(T value) { this.value = value; }
+    public List<Tree<T>> getChildren() { return children; }
+    public void setChildren(List<Tree<T>> children) { this.children = children; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // Self-referential generics combine the template and recursion mechanisms in ways that
+        // are not supported, so they keep the default concrete behavior (no leaked $dynamicRef).
+        !openApi.components.schemas.containsKey('Tree')
+        openApi.components.schemas.containsKey('Tree_Pet_')
+        openApi.components.schemas['Tree_Pet_'].properties.value.get$ref() == '#/components/schemas/Pet'
+        // No leaked unresolvable dynamic anchor on the concrete schema.
+        openApi.components.schemas['Tree_Pet_'].getExtensions() == null || openApi.components.schemas['Tree_Pet_'].getExtensions().get('$defs') == null
+    }
+
+    @RestoreSystemProperties
     void "test defs serialized to JSON output"() {
 
         setup:

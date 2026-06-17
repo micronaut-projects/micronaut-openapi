@@ -431,7 +431,48 @@ public final class SchemaDefinitionUtils {
             || arg.isAssignable(Map.class)) {
             return false;
         }
+        // Self-referential generics combine the template and recursion mechanisms in ways that
+        // produce inconsistent output today (the recursive descent leaks the template context).
+        // Keep the default concrete behavior for them until that interaction is resolved.
+        if (isRecursiveType(type)) {
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Whether the given type references itself in one of its fields (directly or through type
+     * arguments), i.e. it is self-referential / recursive.
+     */
+    private static boolean isRecursiveType(ClassElement type) {
+        if (type == null) {
+            return false;
+        }
+        String name = type.getName();
+        for (FieldElement field : type.getFields()) {
+            if (referencesType(field.getGenericType(), name, new HashSet<>())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean referencesType(ClassElement el, String targetName, Set<String> seen) {
+        if (el == null || !seen.add(el.getName())) {
+            return false;
+        }
+        if (targetName.equals(el.getName())) {
+            return true;
+        }
+        if (referencesType(el.getFirstTypeArgument().orElse(null), targetName, seen)) {
+            return true;
+        }
+        for (ClassElement arg : el.getTypeArguments().values()) {
+            if (referencesType(arg, targetName, seen)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
