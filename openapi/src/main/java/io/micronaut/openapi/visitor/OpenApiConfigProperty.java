@@ -331,6 +331,16 @@ public interface OpenApiConfigProperty {
      * Default: .
      */
     String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS = "micronaut.openapi.schema.name.separator.inner-class";
+    /**
+     * System property that enables emission of JSON Schema 2020-12 {@code $dynamicAnchor} /
+     * {@code $dynamicRef} keywords from recursive types. When enabled (and generating an
+     * OpenAPI 3.1 document), a self-referential property emits a {@code $dynamicRef} and the
+     * referenced schema (plus any subtypes) gets a matching {@code $dynamicAnchor}, so that
+     * dynamic-scope resolution switches the reference to the active subtype at the point of use.
+     * <br>
+     * Default: false
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED = "micronaut.openapi.schema.dynamic-refs.enabled";
 
     /**
      * If this property is 'true', then generated OpenAPI specification will be with extensions for OpenAPI Generator

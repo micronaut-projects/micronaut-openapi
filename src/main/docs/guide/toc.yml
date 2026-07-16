@@ -16,6 +16,7 @@ controllers: OpenAPI Generation for Controllers
 namingStrategy: Naming Strategy
 customSerializers: Custom serializers
 schemaDecorators: Schema decorators
+dynamicRefs: Dynamic references (recursive types)
 openApiGeneratorExtensions: OpenAPI Generator extensions
 kotlin: Kotlin specific
 swaggerAnnotations:

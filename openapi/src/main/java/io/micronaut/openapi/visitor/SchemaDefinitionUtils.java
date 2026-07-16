@@ -135,6 +135,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDuplicateResolution;
 import static io.micronaut.openapi.visitor.ConfigUtils.isConstructorArgumentsAsRequired;
+import static io.micronaut.openapi.visitor.ConfigUtils.isDynamicRefsEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -296,6 +297,7 @@ public final class SchemaDefinitionUtils {
         schemaNameToClassNameMap = new HashMap<>();
         schemaNameSuffixCounterMap = new HashMap<>();
         propertyNamingStrategyInstances = new HashMap<>();
+        DynamicRefUtils.clean();
     }
 
     /**
@@ -430,6 +432,12 @@ public final class SchemaDefinitionUtils {
                 primitiveType = null;
             }
             if (primitiveType == null) {
+                if (definingElement != null && isOpenapi31() && isDynamicRefsEnabled(context) && DynamicRefUtils.isGenericBindingCandidate(type, typeArgs)) {
+                    Schema<?> binding = DynamicRefUtils.resolveGenericBinding(openApi, context, type, typeArgs, mediaTypes, jsonViewClass);
+                    if (binding != null) {
+                        return binding;
+                    }
+                }
                 String defaultName = null;
                 if (arraySchemaAnn != null) {
                     @SuppressWarnings("unchecked")
@@ -442,6 +450,10 @@ public final class SchemaDefinitionUtils {
                 String schemaName = computeDefaultSchemaName(defaultName, definingElement, type, typeArgs, context, jsonViewClass);
                 schema = schemas.get(schemaName);
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
+                if (schema != null && inProgressSchemas.contains(schemaName)) {
+                    // Detected recursion into a schema currently being processed
+                    return DynamicRefUtils.recursiveSchemaRef(schemaName, schemas, context);
+                }
                 if (schema == null) {
 
                     if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
@@ -469,8 +481,13 @@ public final class SchemaDefinitionUtils {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
 
-                        populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
-                        checkAllOf(schema);
+                        inProgressSchemas.add(schemaName);
+                        try {
+                            populateSchemaProperties(openApi, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
+                            checkAllOf(schema);
+                        } finally {
+                            inProgressSchemas.remove(schemaName);
+                        }
                     }
                     if (isDeprecated(type) && schema != null) {
                         schema.setDeprecated(true);
@@ -491,9 +508,8 @@ public final class SchemaDefinitionUtils {
             schema = schemas.get(schemaName);
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
-                    // Break recursion
-                    return createSchema()
-                        .$ref(SchemaUtils.schemaRef(schemaName));
+                    // Detected recursion into a schema currently being processed
+                    return DynamicRefUtils.recursiveSchemaRef(schemaName, schemas, context);
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -876,12 +892,24 @@ public final class SchemaDefinitionUtils {
         if (type instanceof WildcardElement wildcardEl) {
             type = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().getFirst() : null;
         } else if (type instanceof GenericPlaceholderElement placeholderEl) {
+            var templateAnchor = DynamicRefUtils.currentTemplateAnchor();
+            if (templateAnchor != null && placeholderEl.getResolved().isEmpty()) {
+                Schema<?> slot = createSchema();
+                slot.set$dynamicRef("#" + templateAnchor);
+                return slot;
+            }
             isArray = type.isArray();
             isIterable = type.isIterable();
             if (!isArray) {
                 type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().getFirst() : null);
             }
         } else if (type instanceof GenericElement genericEl) {
+            var templateAnchor = DynamicRefUtils.currentTemplateAnchor();
+            if (templateAnchor != null && genericEl.getResolved().isEmpty()) {
+                Schema<?> slot = createSchema();
+                slot.set$dynamicRef("#" + templateAnchor);
+                return slot;
+            }
             isArray = type.isArray();
             isIterable = type.isIterable();
             type = genericEl.getResolved().orElse(null);
@@ -1835,7 +1863,7 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
+    static void populateSchemaProperties(OpenAPI openApi, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema<?> schema,
                                                  List<MediaType> mediaTypes, JavadocDescription classJavadoc, @Nullable ClassElement jsonViewClass) {
         ClassElement classEl = null;
         if (type instanceof ClassElement classElem) {
@@ -2030,6 +2058,7 @@ public final class SchemaDefinitionUtils {
             }
         }
         schemas.put(schemaName, schema);
+        DynamicRefUtils.stampAnchorIfRecursive(schema, schemaName);
 
         return schema;
     }
@@ -2047,6 +2076,13 @@ public final class SchemaDefinitionUtils {
             parentSchema.set$ref(SchemaUtils.schemaRef(parentSchemaName));
             if (schema.getAllOf() == null || !schema.getAllOf().contains(parentSchema)) {
                 schema.addAllOfItem(parentSchema);
+            }
+            // Propagate the dynamic anchor from a recursive parent so that dynamic-scope
+            // resolution switches $dynamicRef to this subtype at the point of use.
+            Schema<?> registeredParent = schemas.get(parentSchemaName);
+            if (registeredParent != null && registeredParent.get$dynamicAnchor() != null
+                && schema.get$dynamicAnchor() == null) {
+                schema.set$dynamicAnchor(registeredParent.get$dynamicAnchor());
             }
         }
         if (superType.isInterface()) {

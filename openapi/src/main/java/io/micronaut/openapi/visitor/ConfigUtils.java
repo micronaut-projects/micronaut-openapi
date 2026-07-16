@@ -137,6 +137,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_MAPPING;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY;
@@ -339,6 +340,7 @@ public final class ConfigUtils {
             || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC)
             || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS)
             || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION)
+            || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED)
             || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED);
     }
 
@@ -381,6 +383,17 @@ public final class ConfigUtils {
             return DuplicateResolution.ERROR;
         }
         return DuplicateResolution.AUTO;
+    }
+
+    /**
+     * Whether {@code $dynamicAnchor} / {@code $dynamicRef} keywords should be emitted from
+     * recursive types. Requires OpenAPI 3.1; when set without 3.1 the flag is ignored.
+     *
+     * @param context the visitor context
+     * @return true if dynamic-refs emission is enabled
+     */
+    public static boolean isDynamicRefsEnabled(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, false, context);
     }
 
     public static DuplicateResolution getOperationDuplicateResolution(VisitorContext context) {
