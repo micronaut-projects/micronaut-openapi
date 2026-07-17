@@ -816,6 +816,10 @@ Otherwise, return the original pattern</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#classTags" class="member-name-link">classTags</a> - Variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/DynamicRefUtils.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/DynamicRefUtils.html" title="class in io.micronaut.openapi.visitor">DynamicRefUtils</a></dt>
+<dd>
+<div class="block">Cleanup context.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiExcludeVisitor.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiExcludeVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiExcludeVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiExtraSchemaVisitor.html#clean()" class="member-name-link">clean()</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiExtraSchemaVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiExtraSchemaVisitor</a></dt>
@@ -1325,6 +1329,12 @@ mustache files.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#DOUBLE" class="member-name-link">DOUBLE</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/DynamicRefUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">DynamicRefUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Helpers for the opt-in dynamic-refs mode (<code>micronaut.openapi.schema.dynamic-refs.enabled</code>,
+OpenAPI 3.1 only): emission of JSON Schema 2020-12 <code>$dynamicAnchor</code> / <code>$dynamicRef</code>
+from recursive types and single-variable generic templates.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
@@ -3373,6 +3383,11 @@ e.g.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isDeprecated(io.micronaut.inject.ast.Element)" class="member-name-link">isDeprecated(Element)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#isDynamicRefsEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isDynamicRefsEnabled(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
+<dd>
+<div class="block">Whether <code>$dynamicAnchor</code> / <code>$dynamicRef</code> keywords should be emitted from
+recursive types.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/adoc/utils/CollectionUtils.html#isEmpty(java.util.Collection)" class="member-name-link">isEmpty(Collection)</a> - Static method in class io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/CollectionUtils.html" title="class in io.micronaut.openapi.adoc.utils">CollectionUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/utils/CollectionUtils.html#isEmpty(java.util.Map)" class="member-name-link">isEmpty(Map)</a> - Static method in class io.micronaut.openapi.adoc.utils.<a href="io/micronaut/openapi/adoc/utils/CollectionUtils.html" title="class in io.micronaut.openapi.adoc.utils">CollectionUtils</a></dt>
@@ -4253,6 +4268,11 @@ if successful code didn't set in swagger annotations.</div>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION" class="member-name-link">MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></dt>
 <dd>
 <div class="block">System property to set schema duplicate resolution.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED" class="member-name-link">MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></dt>
+<dd>
+<div class="block">System property that enables emission of JSON Schema 2020-12 <code>$dynamicAnchor</code> /
+<code>$dynamicRef</code> keywords from recursive types.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED" class="member-name-link">MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED</a> - Static variable in interface io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></dt>
 <dd>
