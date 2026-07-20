@@ -3,6 +3,10 @@ plugins {
 }
 
 dependencies {
+    constraints {
+        api(libs.jackson.databind)
+    }
+
     api(libs.openapi.generator)
     api(libs.swagger.parser)
     api(libs.swagger.parser.v3)
