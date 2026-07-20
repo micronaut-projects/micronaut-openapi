@@ -228,6 +228,9 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> importMapping = new HashMap<>();
     // a map to store the mapping between a schema and the new one
     protected Map<String, String> schemaMapping = new HashMap<>();
+    // a set of schema names that must be generated even when listed in schemaMappings or importMappings.
+    // Use CodegenConstants.FORCE_GENERATE_ALL_SCHEMAS ("*") to force-generate all mapped schemas.
+    protected Set<String> forcedGenerateSchemas = new HashSet<>();
     // a map to store the mapping between inline schema and the name provided by the user
     protected Map<String, String> inlineSchemaNameMapping = new HashMap<>();
     // a map to store the inline schema naming conventions
@@ -1431,6 +1434,11 @@ public class DefaultCodegen implements CodegenConfig {
     @Override
     public Map<String, String> schemaMapping() {
         return schemaMapping;
+    }
+
+    @Override
+    public Set<String> forcedGenerateSchemas() {
+        return forcedGenerateSchemas;
     }
 
     @Override
@@ -7309,6 +7317,16 @@ public class DefaultCodegen implements CodegenConfig {
             return Collections.singletonList((String) value);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Normalizes a vendor extension value to a mutable list of strings.
+     *
+     * @param vendorExtensions vendor extension map to update
+     * @param name vendor extension name
+     */
+    public static void normalizeVendorExtensionWithStringList(Map<String, Object> vendorExtensions, String name) {
+        vendorExtensions.put(name, new ArrayList<>(getObjectAsStringList(vendorExtensions.get(name))));
     }
 
     public Map<String, String> getPropertyAsStringMap(String propertyKey) {
