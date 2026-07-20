@@ -9,7 +9,6 @@ managed-parboiled = "1.4.1"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "2.0"
 
-rhino = "1.9.1"
 jspecify = "1.0.0"
 jdt-annotation = "2.4.100"
 android-annotation = "1.10.0"
@@ -90,7 +89,6 @@ micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", vers
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin" }
 
 # Other
-rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
