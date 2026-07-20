@@ -9,12 +9,12 @@ managed-parboiled = "1.4.1"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "2.0"
 
-rhino = "1.9.1"
 jspecify = "1.0.0"
 jdt-annotation = "2.4.100"
 android-annotation = "1.10.0"
 spotbugs-annotations = "4.10.3"
-openapi-generator = "7.22.0"
+jackson = "2.22.1"
+openapi-generator = "7.24.0"
 swagger-parser = "1.0.76"
 swagger-parser-v3 = "2.1.45"
 javaparser = "3.28.2"
@@ -90,7 +90,6 @@ micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", vers
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin" }
 
 # Other
-rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
@@ -109,6 +108,7 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
 kotlin-compile-testing = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlin-compile-testing" }

@@ -53,6 +53,7 @@ import org.openapitools.codegen.IJsonSchemaValidationProperties;
 import org.openapitools.codegen.VendorExtension;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractKotlinCodegen;
+import org.openapitools.codegen.languages.AbstractKotlinCodegen.KotlinEnumNamingType;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.meta.features.ClientModificationFeature;
 import org.openapitools.codegen.meta.features.DocumentationFeature;
@@ -323,7 +324,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         appName = artifactId;
         generateSwaggerAnnotations = this instanceof KotlinMicronautClientCodegen ? OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
         generateOperationOnlyForFirstTag = this instanceof KotlinMicronautServerCodegen;
-        enumPropertyNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.UPPERCASE;
+        enumPropertyNaming = KotlinEnumNamingType.UPPERCASE;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
         useOneOfInterfaces = true;
         // CHECKSTYLE:ON
