@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
+import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.visitMetaInfFile;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -86,6 +87,8 @@ public final class AdocModule {
                 if (generatedFile == null) {
                     throw new IOException("Unable to create AsciiDoc resource: " + fileName);
                 }
+                addGeneratedResource("swagger/" + fileName, context);
+                addGeneratedResource("swagger", context);
                 var generatedContentKey = GENERATED_ADOC_CONTENT + fileName;
                 var previousContent = ContextUtils.get(generatedContentKey, String.class, null, context);
                 var generatedContent = previousContent == null ? adoc : previousContent + adoc;

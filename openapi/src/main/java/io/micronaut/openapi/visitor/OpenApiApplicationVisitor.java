@@ -949,6 +949,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (CollectionUtils.isNotEmpty(openApiInfos)) {
                     cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
                 }
+                // Keep the generated-resource metadata for native-image processing in sync with the output path.
+                addGeneratedResource("swagger/views", context);
+                addGeneratedResource("swagger", context);
                 cfg.renderMetaInf(context, "swagger/views", getOriginatingElements(context));
             } catch (Exception e) {
                 warn("Unable to render OpenAPI views: " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);
@@ -1002,6 +1005,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (generatedFile == null) {
                     throw new IllegalStateException("Unable to create OpenAPI resource: " + openApiInfo.getFilename());
                 }
+                addGeneratedResource("swagger/" + openApiInfo.getFilename(), context);
+                addGeneratedResource("swagger", context);
             }
             try (Writer writer = generatedFile != null ? generatedFile.openWriter() : getFileWriter(specFile)) {
                 objectMapper.writeValue(writer, openApiInfo.getOpenApi());
