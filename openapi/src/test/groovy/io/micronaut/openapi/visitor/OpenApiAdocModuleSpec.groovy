@@ -5,6 +5,7 @@ import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import spock.util.environment.RestoreSystemProperties
 
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH
@@ -135,5 +136,39 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH)
+    }
+
+    @RestoreSystemProperties
+    void "test default ADoc output is generated as a classpath resource"() {
+
+        given:
+        System.clearProperty(Utils.ATTR_TEST_MODE)
+        System.clearProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH)
+        System.clearProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME)
+
+        when:
+        def classLoader = buildClassLoader('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@OpenAPIDefinition(info = @Info(title = "the title", version = "0.0"))
+class Application {}
+
+@Controller("/hello")
+class HelloController {
+    @Get
+    String hello() { return "hello"; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        classLoader.getResources('META-INF/swagger/the-title-0.0.adoc').toList().size() == 1
     }
 }

@@ -31,6 +31,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,8 @@ public final class ContextUtils {
     };
     public static final Argument<Map<String, EndpointProperties>> ARGUMENT_ENDPOINT_PROPERTIES_MAP = new GenericArgument<>() {
     };
+
+    private static final String ORIGINATING_ELEMENTS = "io.micronaut.OPENAPI.originating.elements";
 
     private ContextUtils() {
     }
@@ -155,16 +158,61 @@ public final class ContextUtils {
     }
 
     public static GeneratedFile visitMetaInfFile(String path, VisitorContext context) {
+        return visitMetaInfFile(path, context, false, Element.EMPTY_ELEMENT_ARRAY);
+    }
+
+    /**
+     * Locate or create a META-INF resource and associate it with the contributing elements.
+     *
+     * @param path The META-INF-relative resource path
+     * @param context The visitor context
+     * @param originatingElements The elements contributing to the resource
+     * @return The generated file, or {@code null} when the visitor context cannot create it
+     */
+    public static GeneratedFile visitMetaInfFile(String path, VisitorContext context, Element... originatingElements) {
+        return visitMetaInfFile(path, context, true, originatingElements);
+    }
+
+    private static GeneratedFile visitMetaInfFile(String path, VisitorContext context, boolean allowMemory, Element... originatingElements) {
         var generatedFile = get(MICRONAUT_INTERNAL_GENERATED_FILE + "META-INF/" + path, GeneratedFile.class, null, context);
         if (generatedFile == null) {
-            generatedFile = context.visitMetaInfFile(path, Element.EMPTY_ELEMENT_ARRAY).orElse(null);
-            if (generatedFile == null || (generatedFile.toURI().getScheme() != null && generatedFile.toURI().getScheme().equals("mem"))) {
+            generatedFile = context.visitMetaInfFile(path, originatingElements).orElse(null);
+            if (generatedFile == null || (!allowMemory && generatedFile.toURI().getScheme() != null && generatedFile.toURI().getScheme().equals("mem"))) {
                 return null;
             }
             put(MICRONAUT_INTERNAL_GENERATED_FILE + "META-INF/" + path, generatedFile, context);
         }
         calcProjectPath(generatedFile, context);
         return generatedFile;
+    }
+
+    /**
+     * Records an element contributing to the OpenAPI output for the current visitor context.
+     *
+     * @param element The contributing element
+     * @param context The visitor context
+     */
+    public static void addOriginatingElement(Element element, VisitorContext context) {
+        if (element == null) {
+            return;
+        }
+        var elements = get(ORIGINATING_ELEMENTS, LinkedHashSet.class, null, context);
+        if (elements == null) {
+            elements = new LinkedHashSet<>();
+            put(ORIGINATING_ELEMENTS, elements, context);
+        }
+        elements.add(element);
+    }
+
+    /**
+     * Returns the deduplicated elements contributing to the current OpenAPI output.
+     *
+     * @param context The visitor context
+     * @return The contributing elements in their deterministic insertion order
+     */
+    public static Element[] getOriginatingElements(VisitorContext context) {
+        var elements = get(ORIGINATING_ELEMENTS, LinkedHashSet.class, null, context);
+        return elements == null ? Element.EMPTY_ELEMENT_ARRAY : (Element[]) elements.toArray(new Element[0]);
     }
 
     public static Path getProjectDir(VisitorContext context) {

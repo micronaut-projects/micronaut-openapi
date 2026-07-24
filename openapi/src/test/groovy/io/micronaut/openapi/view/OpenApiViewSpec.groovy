@@ -20,6 +20,40 @@ class OpenApiViewSpec extends AbstractOpenApiTypeElementSpec {
     }
 
     @RestoreSystemProperties
+    void "test default views and specification are generated as classpath resources"() {
+        given:
+        System.clearProperty(Utils.ATTR_TEST_MODE)
+        System.setProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, "swagger-ui.enabled=true")
+
+        when:
+        def classLoader = buildClassLoader('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@OpenAPIDefinition(info = @Info(title = "the title", version = "0.0"))
+class Application {}
+
+@Controller("/hello")
+class HelloController {
+    @Get
+    String hello() { return "hello"; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        classLoader.getResources('META-INF/swagger/the-title-0.0.yml').toList().size() == 1
+        classLoader.getResources('META-INF/swagger/views/swagger-ui/index.html').toList().size() == 1
+        classLoader.getResources('META-INF/swagger/views/swagger-ui/res/swagger-ui.css').toList().size() == 1
+    }
+
+    @RestoreSystemProperties
     void "test disable generation spec and enabled views"() {
 
         given:
