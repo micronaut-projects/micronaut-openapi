@@ -264,6 +264,10 @@ This includes a flat property type (e.g.</div>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#addOption(java.lang.String,java.lang.String,java.lang.String,java.util.Map)" class="member-name-link">addOption(String, String, String, Map)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#addOriginatingElement(io.micronaut.inject.ast.Element,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addOriginatingElement(Element, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>
+<div class="block">Records an element contributing to the OpenAPI output for the current visitor context.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/GeneratorUtils.html#addParameterDeprecatedExtension(io.micronaut.inject.ast.TypedElement,io.swagger.v3.oas.models.parameters.Parameter,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addParameterDeprecatedExtension(TypedElement, Parameter, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorUtils.html" title="class in io.micronaut.openapi.visitor">GeneratorUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#addParameterMappings(java.util.List)" class="member-name-link">addParameterMappings(List)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -2667,6 +2671,10 @@ the required discriminator.</div>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getOrGenerateOperationId(io.swagger.v3.oas.models.Operation,java.lang.String,java.lang.String)" class="member-name-link">getOrGenerateOperationId(Operation, String, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>
 <div class="block">Get operationId from the operation object, and if it's blank, generate a new one from the given parameters.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#getOriginatingElements(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getOriginatingElements(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>
+<div class="block">Returns the deduplicated elements contributing to the current OpenAPI output.</div>
 </dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#getOutputDir()" class="member-name-link">getOutputDir()</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -5951,6 +5959,10 @@ Marks a self referencing property, if detected</div>
 <dd>
 <div class="block">Generates the views given this configuration.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/view/OpenApiViewConfig.html#renderMetaInf(io.micronaut.inject.visitor.VisitorContext,java.lang.String,io.micronaut.inject.ast.Element...)" class="member-name-link">renderMetaInf(VisitorContext, String, Element...)</a> - Method in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.html" title="class in io.micronaut.openapi.view">OpenApiViewConfig</a></dt>
+<dd>
+<div class="block">Generates views as META-INF resources through the visitor context.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.MergeMode.html#REPLACE" class="member-name-link">REPLACE</a> - Enum constant in enum class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.MergeMode.html" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.MergeMode</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Formatting.ReplaceDotsWithUnderscoreLambda.html#%3Cinit%3E()" class="member-name-link">ReplaceDotsWithUnderscoreLambda()</a> - Constructor for class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Formatting.ReplaceDotsWithUnderscoreLambda.html" title="class in io.micronaut.openapi.generator">Formatting.ReplaceDotsWithUnderscoreLambda</a></dt>
@@ -8144,6 +8156,10 @@ the order they are declared.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#visitMetaInfFile(java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">visitMetaInfFile(String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#visitMetaInfFile(java.lang.String,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element...)" class="member-name-link">visitMetaInfFile(String, VisitorContext, Element...)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>
+<div class="block">Locate or create a META-INF resource and associate it with the contributing elements.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#visitMethod(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">visitMethod(MethodElement, VisitorContext)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Executed when a method is encountered that matches the generic element.</div>
