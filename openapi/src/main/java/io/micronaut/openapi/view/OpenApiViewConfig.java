@@ -21,6 +21,7 @@ import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.openapi.visitor.ConfigUtils;
 import io.micronaut.openapi.visitor.ContextUtils;
 import io.micronaut.openapi.visitor.Pair;
@@ -46,6 +47,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.ContextUtils.visitMetaInfFile;
 import static io.micronaut.openapi.visitor.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
@@ -237,6 +239,126 @@ public final class OpenApiViewConfig {
                 render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, context);
             }
             copySwaggerUiTheme(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, context);
+        }
+    }
+
+    /**
+     * Generates views as META-INF resources through the visitor context.
+     *
+     * @param context The visitor context
+     * @param basePath The META-INF-relative base path
+     * @param originatingElements The elements contributing to the generated views
+     * @throws IOException If a resource cannot be generated
+     * @since 7.1.1
+     */
+    public void renderMetaInf(VisitorContext context, String basePath, Element... originatingElements) throws IOException {
+        if (redocConfig != null) {
+            generatedCopyResources(context, basePath, REDOC, TEMPLATES_REDOC, redocConfig, redocConfig.rapiPDFConfig, originatingElements);
+        }
+        if (rapidocConfig != null) {
+            generatedCopyResources(context, basePath, RAPIDOC, TEMPLATES_RAPIDOC, rapidocConfig, rapidocConfig.rapiPDFConfig, originatingElements);
+        }
+        if (openApiExplorerConfig != null) {
+            generatedRender(openApiExplorerConfig, context, basePath + SLASH + OPENAPI_EXPLORER,
+                TEMPLATES + SLASH + TEMPLATES_OPENAPI_EXPLORER + SLASH + TEMPLATE_INDEX_HTML, originatingElements);
+            generatedCopyResources(openApiExplorerConfig, context, basePath + SLASH + OPENAPI_EXPLORER,
+                TEMPLATES_OPENAPI_EXPLORER, openApiExplorerConfig.getResources(), originatingElements);
+            if (openApiExplorerConfig.rapiPDFConfig.enabled) {
+                generatedCopyResources(openApiExplorerConfig.rapiPDFConfig, context, basePath + SLASH + OPENAPI_EXPLORER,
+                    TEMPLATES_RAPIPDF, openApiExplorerConfig.rapiPDFConfig.getResources(), originatingElements);
+            }
+        }
+        if (scalarConfig != null) {
+            generatedRender(scalarConfig, context, basePath + SLASH + SCALAR,
+                TEMPLATES + SLASH + TEMPLATES_SCALAR + SLASH + TEMPLATE_INDEX_HTML, originatingElements);
+            generatedCopyResources(scalarConfig, context, basePath + SLASH + SCALAR,
+                TEMPLATES_SCALAR, scalarConfig.getResources(), originatingElements);
+            if (scalarConfig.rapiPDFConfig.enabled) {
+                generatedCopyResources(scalarConfig.rapiPDFConfig, context, basePath + SLASH + SCALAR,
+                    TEMPLATES_RAPIPDF, scalarConfig.rapiPDFConfig.getResources(), originatingElements);
+            }
+        }
+        if (swaggerUIConfig != null) {
+            generatedCopyResources(context, basePath, SWAGGER_UI, TEMPLATES_SWAGGER_UI,
+                swaggerUIConfig, swaggerUIConfig.rapiPDFConfig, originatingElements);
+            if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
+                generatedRender(swaggerUIConfig, context, basePath + SLASH + SWAGGER_UI,
+                    TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, originatingElements);
+            }
+            generatedCopyTheme(swaggerUIConfig, context, basePath + SLASH + SWAGGER_UI, originatingElements);
+        }
+    }
+
+    private void generatedCopyResources(VisitorContext context, String basePath, String otherDir, String templates,
+                                        AbstractViewConfig viewConfig, AbstractViewConfig rapidPDFConfig,
+                                        Element... originatingElements) throws IOException {
+        generatedRender(viewConfig, context, basePath + SLASH + otherDir,
+            TEMPLATES + SLASH + templates + SLASH + TEMPLATE_INDEX_HTML, originatingElements);
+        generatedCopyResources(viewConfig, context, basePath + SLASH + otherDir, templates,
+            viewConfig.getResources(), originatingElements);
+        if (rapidPDFConfig.isEnabled()) {
+            generatedCopyResources(rapidPDFConfig, context, basePath + SLASH + otherDir,
+                TEMPLATES_RAPIPDF, rapidPDFConfig.getResources(), originatingElements);
+        }
+    }
+
+    private void generatedCopyTheme(SwaggerUIConfig cfg, VisitorContext context, String outputDir,
+                                    Element... originatingElements) throws IOException {
+        if (!cfg.copyTheme) {
+            return;
+        }
+        String themeFileName = cfg.theme.getCss() + ".css";
+        String resource = outputDir + SLASH + RESOURCE_DIR + SLASH + themeFileName;
+        copyGeneratedResource(context, resource, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + THEMES_DIR + SLASH + themeFileName, originatingElements);
+    }
+
+    private void generatedCopyResources(AbstractViewConfig cfg, VisitorContext context, String outputDir,
+                                        String templateDir, List<String> resources,
+                                        Element... originatingElements) throws IOException {
+        if (!cfg.copyResources || CollectionUtils.isEmpty(resources)) {
+            return;
+        }
+        for (String resource : resources) {
+            copyGeneratedResource(context, outputDir + SLASH + resource,
+                TEMPLATES + SLASH + templateDir + SLASH + resource, originatingElements);
+        }
+    }
+
+    private void generatedRender(AbstractViewConfig cfg, VisitorContext context, String outputDir,
+                                 String templateName, Element... originatingElements) throws IOException {
+        String template = StringUtils.isEmpty(cfg.templatePath)
+            ? readTemplateFromClasspath(templateName)
+            : readTemplateFromCustomPath(cfg.templatePath, context);
+        cfg.specUrl = getSpecURL(cfg, context);
+        template = replacePlaceHolder(replacePlaceHolder(cfg.render(template, context), "specURL", cfg.specUrl), "title", title);
+        String fileName = templateName.substring(templateName.lastIndexOf(SLASH) + 1);
+        writeGeneratedResource(context, outputDir + SLASH + fileName, template, originatingElements);
+    }
+
+    private void copyGeneratedResource(VisitorContext context, String path, String classpathResource,
+                                       Element... originatingElements) throws IOException {
+        try (var is = getClass().getClassLoader().getResourceAsStream(classpathResource)) {
+            if (is == null) {
+                throw new IOException("Missing resource: " + classpathResource);
+            }
+            var file = visitMetaInfFile(path, context, originatingElements);
+            if (file == null) {
+                throw new IOException("Unable to create resource: " + path);
+            }
+            try (var outputStream = file.openOutputStream()) {
+                is.transferTo(outputStream);
+            }
+        }
+    }
+
+    private void writeGeneratedResource(VisitorContext context, String path, String content,
+                                        Element... originatingElements) throws IOException {
+        var file = visitMetaInfFile(path, context, originatingElements);
+        if (file == null) {
+            throw new IOException("Unable to create resource: " + path);
+        }
+        try (var writer = file.openWriter()) {
+            writer.write(content);
         }
     }
 

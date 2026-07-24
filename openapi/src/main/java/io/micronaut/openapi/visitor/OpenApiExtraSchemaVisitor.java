@@ -133,6 +133,7 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context) || !isExtraSchemasEnabled(context)) {
             return;
         }
+        ContextUtils.addOriginatingElement(element, context);
 
         for (var extraSchemaAnn : element.getAnnotationValuesByType(OpenAPIExtraSchema.class)) {
             String[] classes = extraSchemaAnn.stringValues();
@@ -189,6 +190,7 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
         if (classEl == null) {
             return;
         }
+        ContextUtils.addOriginatingElement(classEl, context);
 
         var nameFromAnn = getNameFromAnn(classEl);
         String schemaName = computeDefaultSchemaName(nameFromAnn, null, classEl, classEl.getTypeArguments(), context, null);

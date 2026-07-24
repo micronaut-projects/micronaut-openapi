@@ -1,6 +1,7 @@
 package io.micronaut.openapi.view
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.openapi.visitor.Utils
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -80,5 +81,47 @@ class MyBean {}
         var scalarContent = scalarIndexPath.toFile().getText(StandardCharsets.UTF_8.displayName())
 
         scalarContent.contains("sources: [{title: \"api-v2\",url: contextPath + \"/swagger/service-1.0.0-api-v2.yml\",},{title: \"api-v1\",url: contextPath + \"/swagger/service-1.0.0-api-v1.yml\",default: true}],")
+    }
+
+    @RestoreSystemProperties
+    void "test default multiple documents and views are generated as classpath resources"() {
+
+        given:
+        System.clearProperty(Utils.ATTR_TEST_MODE)
+        System.setProperty(MICRONAUT_OPENAPI_GROUPS + ".api-v1.primary", "true")
+        System.setProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, "swagger-ui.enabled=true,scalar.enabled=true")
+        System.clearProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR)
+
+        when:
+        def classLoader = buildClassLoader('test.MyBean', '''
+package test;
+
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@OpenAPIGroup("api-v1")
+@Controller
+class ApiV1Controller {
+    @Get("/v1/create")
+    String getPet() { return null; }
+}
+
+@OpenAPIGroup("api-v2")
+@Controller
+class ApiV2Controller {
+    @Get("/v2/create")
+    String getPet() { return null; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        classLoader.getResources('META-INF/swagger/service-1.0.0-api-v1.yml').toList().size() == 1
+        classLoader.getResources('META-INF/swagger/service-1.0.0-api-v2.yml').toList().size() == 1
+        classLoader.getResources('META-INF/swagger/views/swagger-ui/index.html').toList().size() == 1
+        classLoader.getResources('META-INF/swagger/views/scalar/index.html').toList().size() == 1
     }
 }

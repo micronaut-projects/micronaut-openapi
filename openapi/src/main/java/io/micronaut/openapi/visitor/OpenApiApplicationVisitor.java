@@ -25,6 +25,7 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
@@ -102,6 +103,8 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
+import static io.micronaut.openapi.visitor.ContextUtils.addOriginatingElement;
+import static io.micronaut.openapi.visitor.ContextUtils.getOriginatingElements;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.put;
 import static io.micronaut.openapi.visitor.ContextUtils.remove;
@@ -114,7 +117,7 @@ import static io.micronaut.openapi.visitor.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
 import static io.micronaut.openapi.visitor.FileUtils.normalizePath;
-import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
+import static io.micronaut.openapi.visitor.FileUtils.userDefinedSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
@@ -179,6 +182,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (ignore(element)) {
                 return;
             }
+            addOriginatingElement(element, context);
             incrementVisitedElements(context);
 
             info("Generating OpenAPI Documentation", context);
@@ -933,15 +937,25 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        Path viewsDestDirs = getViewsDestDir(context);
-        if (viewsDestDirs == null) {
-            return;
-        }
         String viewSpecification = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiInfos, readOpenApiConfigFile(context), context);
         if (!cfg.isEnabled()) {
             return;
         }
+        String configuredViewsDestDir = getConfigProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
+        if (StringUtils.isEmpty(configuredViewsDestDir)) {
+            try {
+                cfg.setTitle(documentTitle);
+                if (CollectionUtils.isNotEmpty(openApiInfos)) {
+                    cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
+                }
+                cfg.renderMetaInf(context, "swagger/views", getOriginatingElements(context));
+            } catch (Exception e) {
+                warn("Unable to render OpenAPI views: " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);
+            }
+            return;
+        }
+        Path viewsDestDirs = getViewsDestDir(context);
         if (context != null) {
             info("Writing OpenAPI views to destination: " + viewsDestDirs, context);
             var classesOutputPath = ContextUtils.getClassesOutputPath(context);
@@ -980,8 +994,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         var objectMapper = isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper();
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
-            Path specFile = openApiSpecFile(openApiInfo.getFilename(), context);
-            try (Writer writer = getFileWriter(specFile)) {
+            var targetFile = userDefinedSpecFile(context);
+            GeneratedFile generatedFile = null;
+            Path specFile = targetFile;
+            if (!Utils.isTestMode() && targetFile == null) {
+                generatedFile = ContextUtils.visitMetaInfFile("swagger/" + openApiInfo.getFilename(), context, getOriginatingElements(context));
+                if (generatedFile == null) {
+                    throw new IllegalStateException("Unable to create OpenAPI resource: " + openApiInfo.getFilename());
+                }
+            }
+            try (Writer writer = generatedFile != null ? generatedFile.openWriter() : getFileWriter(specFile)) {
                 objectMapper.writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
@@ -991,19 +1013,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         Utils.setTestJsonReference(writer.toString());
                     }
                 } else {
-                    info("Writing OpenAPI file to destination: " + specFile, context);
+                    info("Writing OpenAPI file to destination: " + (generatedFile != null ? generatedFile.toURI() : specFile), context);
                     var classesOutputPath = ContextUtils.getClassesOutputPath(context);
-                    if (classesOutputPath != null) {
+                    if (classesOutputPath != null && specFile != null) {
                         // add relative paths for the specFile, and its parent META-INF/swagger
                         // so that micronaut-graal visitor knows about them
                         addGeneratedResource(classesOutputPath.relativize(specFile).toString(), context);
                         addGeneratedResource(classesOutputPath.relativize(specFile.getParent()).toString(), context);
                     }
-                    openApiInfo.setSpecFilePath(specFile.getFileName().toString());
+                    openApiInfo.setSpecFilePath(specFile != null ? specFile.getFileName().toString() : openApiInfo.getFilename());
                 }
                 if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
                     var adocProperties = getAdocProperties(openApiInfo, openApiInfos.size() == 1, context);
-                    AdocModule.convert(openApiInfo, adocProperties, context);
+                    AdocModule.convert(openApiInfo, adocProperties, context, getOriginatingElements(context));
                 }
             } catch (Exception e) {
                 warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);

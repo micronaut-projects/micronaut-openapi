@@ -80,6 +80,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
+        ContextUtils.addOriginatingElement(classEl, context);
 
         if (CollectionUtils.isNotEmpty(groups)) {
             Map<String, List<String>> includedClassesGroups = Utils.getIncludedClassesGroups();
@@ -102,6 +103,9 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         PackageElement packageEl = classEl.getPackage();
         var classAnns = classEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
         var packageAnns = packageEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
+        if (CollectionUtils.isNotEmpty(classAnns) || CollectionUtils.isNotEmpty(packageAnns)) {
+            ContextUtils.addOriginatingElement(packageEl, context);
+        }
         if (CollectionUtils.isEmpty(classAnns) && CollectionUtils.isEmpty(packageAnns)) {
             return;
         }

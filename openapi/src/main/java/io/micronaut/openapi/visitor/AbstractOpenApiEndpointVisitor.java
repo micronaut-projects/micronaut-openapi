@@ -224,6 +224,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
+        ContextUtils.addOriginatingElement(element, context);
         if (ignore(element, context)) {
             return;
         }
@@ -437,6 +438,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
+        ContextUtils.addOriginatingElement(element, context);
         if (ignore(element, context)) {
             return;
         }
