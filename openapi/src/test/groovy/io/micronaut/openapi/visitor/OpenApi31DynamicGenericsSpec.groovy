@@ -86,6 +86,79 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
+    void "test request body generic emits the same template plus inline defs binding"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class Api {
+
+    @Post("/pet")
+    public void savePet(@Body Response<Pet> body) { }
+
+    @Post("/group")
+    public void saveGroup(@Body Response<Group> body) { }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+class Group {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema response = openApi.components.schemas['Response']
+
+        then:
+        // A @Body generic routes through the same schema-definition path as a return type /
+        // field, so the emitted output matches the scalar GET case: one template plus an inline
+        // $defs binding on each request body.
+        response != null
+        response.get$dynamicAnchor() == 'dataType'
+        response.properties.data.get$dynamicRef() == '#dataType'
+        !openApi.components.schemas.containsKey('Response_Pet_')
+        !openApi.components.schemas.containsKey('Response_Group_')
+
+        Schema petBody = openApi.paths['/pet'].post.requestBody.content['application/json'].schema
+        petBody.get$ref() == '#/components/schemas/Response'
+        Schema petSlot = petBody.getExtensions().get('$defs')['dataType']
+        petSlot.get$dynamicAnchor() == 'dataType'
+        petSlot.get$ref() == '#/components/schemas/Pet'
+
+        Schema groupBody = openApi.paths['/group'].post.requestBody.content['application/json'].schema
+        groupBody.get$ref() == '#/components/schemas/Response'
+        Schema groupSlot = groupBody.getExtensions().get('$defs')['dataType']
+        groupSlot.get$dynamicAnchor() == 'dataType'
+        groupSlot.get$ref() == '#/components/schemas/Group'
+    }
+
+    @RestoreSystemProperties
     void "test collection generic uses itemType anchor and dynamicRef array items"() {
 
         setup:
@@ -336,7 +409,7 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
-    void "test recursive generic falls back to concrete schema"() {
+    void "test self-referential generic emits a template with a plain recursive ref"() {
 
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
@@ -376,15 +449,30 @@ class MyBean {}
 ''')
 
         OpenAPI openApi = Utils.testReference
+        Schema tree = openApi.components.schemas['Tree']
 
         then:
-        // Self-referential generics combine the template and recursion mechanisms in ways that
-        // are not supported, so they keep the default concrete behavior (no leaked $dynamicRef).
-        !openApi.components.schemas.containsKey('Tree')
-        openApi.components.schemas.containsKey('Tree_Pet_')
-        openApi.components.schemas['Tree_Pet_'].properties.value.get$ref() == '#/components/schemas/Pet'
-        // No leaked unresolvable dynamic anchor on the concrete schema.
-        openApi.components.schemas['Tree_Pet_'].getExtensions() == null || openApi.components.schemas['Tree_Pet_'].getExtensions().get('$defs') == null
+        // A self-referential generic is emitted as a template like any other generic. The single
+        // $dynamicAnchor slot belongs to the type variable (dataType); the self-reference is a
+        // plain $ref back to the template, which re-enters it in the same dynamic scope so the
+        // type-variable binding stays in effect at every recursion depth.
+        tree != null
+        tree.get$dynamicAnchor() == 'dataType'
+        tree.properties.value.get$dynamicRef() == '#dataType'
+        tree.properties.children.type == 'array'
+        tree.properties.children.items.get$ref() == '#/components/schemas/Tree'
+        tree.properties.children.items.get$dynamicRef() == null
+        // The unbound $defs placeholder is present like any generic template. (For a recursive
+        // template the $defs entry comes back as a Map through the recursion copy path.)
+        tree.getExtensions().get('$defs')['dataType']['not'] != null
+        // No duplicated concrete schema.
+        !openApi.components.schemas.containsKey('Tree_Pet_')
+
+        // Usage site binds the type variable to Pet inline.
+        Schema treeBinding = openApi.paths['/tree'].get.responses['200'].content['application/json'].schema
+        treeBinding.get$ref() == '#/components/schemas/Tree'
+        treeBinding.getExtensions().get('$defs')['dataType']['$dynamicAnchor'] == 'dataType'
+        treeBinding.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Pet'
     }
 
     @RestoreSystemProperties
@@ -430,5 +518,344 @@ class MyBean {}
         json.contains('"$defs"')
         json.contains('"$dynamicAnchor":"dataType"')
         json.contains('"$dynamicRef":"#dataType"')
+    }
+
+    @RestoreSystemProperties
+    void "test multi-variable generic emits per-variable anchors and inline defs binding"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+
+    @Get("/pair1")
+    public Pair<Pet, Group> getPair1() { return null; }
+
+    @Get("/pair2")
+    public Pair<Pet, Owner> getPair2() { return null; }
+}
+
+class Pair<K, V> {
+    private K key;
+    private V value;
+    public K getKey() { return key; }
+    public void setKey(K key) { this.key = key; }
+    public V getValue() { return value; }
+    public void setValue(V value) { this.value = value; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+class Group {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+class Owner {
+    private String email;
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema pair = openApi.components.schemas['Pair']
+
+        then:
+        pair != null
+        // Multi-variable template: root carries the primary (first) variable's anchor only,
+        // because a schema object can hold a single $dynamicAnchor.
+        pair.get$dynamicAnchor() == 'K'
+        // Each variable has its own $defs placeholder (anchor + not: {}), keyed by the sanitized
+        // variable name.
+        Schema kPlaceholder = pair.getExtensions().get('$defs')['K']
+        kPlaceholder.get$dynamicAnchor() == 'K'
+        kPlaceholder.getNot() != null
+        Schema vPlaceholder = pair.getExtensions().get('$defs')['V']
+        vPlaceholder.get$dynamicAnchor() == 'V'
+        vPlaceholder.getNot() != null
+        // Field usages resolve to the correct per-variable anchor.
+        pair.properties.key.get$dynamicRef() == '#K'
+        pair.properties.key.get$ref() == null
+        pair.properties.value.get$dynamicRef() == '#V'
+
+        // No duplicated concrete schema per binding.
+        !openApi.components.schemas.containsKey('Pair_Pet_Group_')
+        !openApi.components.schemas.containsKey('Pair_Pet_Owner_')
+
+        // Each usage site rebinds both anchors inline. (After the response-content merge path the
+        // binding's $defs slots are Maps, not Schema objects — same duality the raw-generic test
+        // asserts against — so read them with map access.)
+        Schema pair1 = openApi.paths['/pair1'].get.responses['200'].content['application/json'].schema
+        pair1.get$ref() == '#/components/schemas/Pair'
+        pair1.getExtensions().get('$defs')['K']['$dynamicAnchor'] == 'K'
+        pair1.getExtensions().get('$defs')['K']['$ref'] == '#/components/schemas/Pet'
+        pair1.getExtensions().get('$defs')['V']['$dynamicAnchor'] == 'V'
+        pair1.getExtensions().get('$defs')['V']['$ref'] == '#/components/schemas/Group'
+
+        Schema pair2 = openApi.paths['/pair2'].get.responses['200'].content['application/json'].schema
+        pair2.get$ref() == '#/components/schemas/Pair'
+        pair2.getExtensions().get('$defs')['K']['$ref'] == '#/components/schemas/Pet'
+        pair2.getExtensions().get('$defs')['V']['$ref'] == '#/components/schemas/Owner'
+    }
+
+    @RestoreSystemProperties
+    void "test multi-variable generic with a primitive argument falls back to concrete schema"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+    @Get("/entry")
+    public Pair<String, Pet> getEntry() { return null; }
+}
+
+class Pair<K, V> {
+    private K key;
+    private V value;
+    public K getKey() { return key; }
+    public void setKey(K key) { this.key = key; }
+    public V getValue() { return value; }
+    public void setValue(V value) { this.value = value; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // A primitive argument cannot form a $ref binding slot, so the all-or-nothing rule keeps
+        // the whole generic on its default concrete behavior.
+        openApi.components.schemas.containsKey('Pair_String.Pet_')
+        openApi.components.schemas['Pair'] == null
+    }
+
+    @RestoreSystemProperties
+    void "test named subtype of a parameterized generic emits a shared binding component"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+
+    @Get("/pet")
+    public PetResponse getPet() { return null; }
+
+    @Get("/group")
+    public GroupResponse getGroup() { return null; }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+}
+
+class PetResponse extends Response<Pet> {}
+class GroupResponse extends Response<Group> {}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+class Group {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // The generic template is built once.
+        Schema response = openApi.components.schemas['Response']
+        response != null
+        response.get$dynamicAnchor() == 'dataType'
+
+        // Each named subtype becomes a binding component that references the template and rebinds
+        // the anchor inline, instead of a concrete schema with materialized fields.
+        Schema petResponse = openApi.components.schemas['PetResponse']
+        petResponse != null
+        petResponse.get$ref() == '#/components/schemas/Response'
+        petResponse.getExtensions().get('$defs')['dataType']['$dynamicAnchor'] == 'dataType'
+        petResponse.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Pet'
+
+        Schema groupResponse = openApi.components.schemas['GroupResponse']
+        groupResponse.get$ref() == '#/components/schemas/Response'
+        groupResponse.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Group'
+
+        // Usages reference the shared named component by $ref (no inline binding duplicated).
+        openApi.paths['/pet'].get.responses['200'].content['application/json'].schema.get$ref() == '#/components/schemas/PetResponse'
+        openApi.paths['/group'].get.responses['200'].content['application/json'].schema.get$ref() == '#/components/schemas/GroupResponse'
+    }
+
+    @RestoreSystemProperties
+    void "test named subtype with an extra field falls back to concrete schema"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+    @Get("/pet")
+    public PetResponse getPet() { return null; }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+}
+
+class PetResponse extends Response<Pet> {
+    private String tag;
+    public String getTag() { return tag; }
+    public void setTag(String tag) { this.tag = tag; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // A subtype that adds its own field cannot be a pure binding alias (the field would be
+        // dropped), so it keeps the default concrete behavior (composed via allOf with its
+        // supertype, no inline $defs binding block).
+        Schema petResponse = openApi.components.schemas['PetResponse']
+        petResponse != null
+        petResponse.get$ref() == null
+        petResponse.getExtensions() == null || petResponse.getExtensions().get('$defs') == null
+    }
+
+    @RestoreSystemProperties
+    void "test nested parameterized generic folds the inner binding into the outer slot"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/envelope")
+    public Envelope<Page<Pet>> getEnvelope() { return null; }
+}
+
+class Envelope<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+}
+
+class Page<T> {
+    private List<T> items;
+    private int total;
+    public List<T> getItems() { return items; }
+    public void setItems(List<T> items) { this.items = items; }
+    public int getTotal() { return total; }
+    public void setTotal(int total) { this.total = total; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // Both templates are built once.
+        openApi.components.schemas['Envelope'].get$dynamicAnchor() == 'dataType'
+        openApi.components.schemas['Page'].get$dynamicAnchor() == 'itemType'
+
+        // The outer binding's data slot points at the Page template AND carries the inner binding's
+        // $defs rebinding (itemType -> Pet), so the nested Page<Pet> is fully resolved rather than
+        // collapsing to an unbound Page template.
+        Schema envelopeBinding = openApi.paths['/envelope'].get.responses['200'].content['application/json'].schema
+        envelopeBinding.get$ref() == '#/components/schemas/Envelope'
+        Map envelopeDefs = envelopeBinding.getExtensions().get('$defs')
+        envelopeDefs['dataType']['$dynamicAnchor'] == 'dataType'
+        envelopeDefs['dataType']['$ref'] == '#/components/schemas/Page'
+        Map nestedPageDefs = envelopeDefs['dataType']['$defs']
+        nestedPageDefs != null
+        nestedPageDefs['itemType']['$dynamicAnchor'] == 'itemType'
+        nestedPageDefs['itemType']['$ref'] == '#/components/schemas/Pet'
     }
 }
