@@ -858,4 +858,126 @@ class MyBean {}
         nestedPageDefs['itemType']['$dynamicAnchor'] == 'itemType'
         nestedPageDefs['itemType']['$ref'] == '#/components/schemas/Pet'
     }
+
+    @RestoreSystemProperties
+    void "test concrete-parameterization self-reference keeps its nested binding"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+    @Get("/wrap")
+    public Wrapper<Group> getWrap() { return null; }
+}
+
+class Wrapper<T> {
+    private T data;
+    private Wrapper<Pet> petWrapper;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+    public Wrapper<Pet> getPetWrapper() { return petWrapper; }
+    public void setPetWrapper(Wrapper<Pet> petWrapper) { this.petWrapper = petWrapper; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+class Group {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema wrapper = openApi.components.schemas['Wrapper']
+
+        then:
+        wrapper != null
+        wrapper.get$dynamicAnchor() == 'dataType'
+        // The unresolved-variable field stays a dynamic-ref consumer.
+        wrapper.properties.data.get$dynamicRef() == '#dataType'
+        // The concrete-parameterization self-reference (Wrapper<Pet>) keeps its nested binding
+        // instead of collapsing to a plain $ref to the unbound template — the petWrapper slot
+        // rebinds dataType to Pet.
+        Schema petWrapper = wrapper.properties.petWrapper
+        petWrapper.get$ref() == '#/components/schemas/Wrapper'
+        petWrapper.getExtensions().get('$defs')['dataType']['$dynamicAnchor'] == 'dataType'
+        petWrapper.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Pet'
+
+        // The outer usage binds the template variable to Group.
+        Schema wrapBinding = openApi.paths['/wrap'].get.responses['200'].content['application/json'].schema
+        wrapBinding.get$ref() == '#/components/schemas/Wrapper'
+        wrapBinding.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Group'
+    }
+
+    @RestoreSystemProperties
+    void "test named subtype with a getter-only property falls back to concrete"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class Api {
+    @Get("/pet")
+    public PetResponse getPet() { return null; }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+}
+
+class PetResponse extends Response<Pet> {
+    public String getComputed() { return "x"; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+
+        then:
+        // A subtype that adds a getter-only property (no backing field) is not a pure binding
+        // alias — the property would be dropped — so it keeps the default concrete behavior.
+        Schema petResponse = openApi.components.schemas['PetResponse']
+        petResponse != null
+        petResponse.get$ref() == null
+        petResponse.getExtensions() == null || petResponse.getExtensions().get('$defs') == null
+        // The concrete subtype composes via allOf (top-level properties is null), so verify the
+        // computed property actually survives the fallback by checking the serialized output —
+        // this is the contract that motivated falling back instead of emitting a binding alias.
+        Utils.getYamlMapper().writeValueAsString(petResponse).contains('computed')
+    }
 }

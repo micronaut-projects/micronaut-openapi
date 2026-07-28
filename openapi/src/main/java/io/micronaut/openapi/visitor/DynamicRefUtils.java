@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
@@ -22,6 +23,8 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
+import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
@@ -193,6 +196,33 @@ public final class DynamicRefUtils {
     }
 
     /**
+     * Whether the given type is a self-reference to the generic template currently being built that
+     * carries only unresolved type-variable arguments (or none) — i.e. the recursive same-variable
+     * case such as {@code Tree<T>}'s {@code List<Tree<T>> children}, which must collapse to a plain
+     * {@code $ref} back to the template. A self-reference with a concrete argument (e.g.
+     * {@code Wrapper<Pet>} inside a {@code Wrapper<T>} template) is <em>not</em> this case: it is a
+     * distinct binding and must go through normal resolution so the concrete binding is preserved.
+     * <p>
+     * Ceiling: a same-template self-reference whose argument is itself a parameterization with
+     * unresolved inner variables (e.g. {@code Wrapper<Wrapper<T>>} inside {@code Wrapper<T>}) is not
+     * detected as unresolved here (the immediate argument is a concrete {@link ClassElement}), so it
+     * goes through normal binding resolution. That exotic shape is out of scope and may emit a
+     * recursive rebind that does not preserve the inner variable.
+     */
+    static boolean isUnresolvedTemplateSelfRef(ClassElement type) {
+        Map<String, ClassElement> args = type.getTypeArguments();
+        if (args == null || args.isEmpty()) {
+            return true;
+        }
+        for (ClassElement arg : args.values()) {
+            if (!(arg instanceof GenericElement) && !(arg instanceof GenericPlaceholderElement)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the single anchor of the template currently being built, when that template has
      * exactly one type variable; {@code null} otherwise. Used for code paths that do not know which
      * variable a usage corresponds to (e.g. a plain {@link GenericElement} with no declared name);
@@ -266,12 +296,14 @@ public final class DynamicRefUtils {
 
     /**
      * Whether the given parameterized type should be emitted as a dynamic-ref generic binding:
-     * dynamic-refs mode is on, it has at least one type argument, it is not a collection / map,
-     * <em>every</em> argument is a concrete reference type, and the type is not self-referential.
+     * dynamic-refs mode is on, it has at least one type argument, it is not a collection / map, and
+     * <em>every</em> argument is a concrete reference type.
      * <p>
      * Arguments that are an unresolved type variable, primitive, array, collection or map cannot
      * form a {@code $ref} binding slot; if any argument is such a type, the whole generic keeps its
      * default concrete schema (a partially bound template would have an inconsistent shape).
+     * Self-referential generics are supported (the self-reference is resolved as a plain recursive
+     * {@code $ref} to the template, see {@link #activeTemplateRef}).
      */
     static boolean isGenericBindingCandidate(ClassElement type, Map<String, ClassElement> typeArgs) {
         if (typeArgs == null || typeArgs.isEmpty()) {
@@ -526,17 +558,48 @@ public final class DynamicRefUtils {
         return null;
     }
 
+    /**
+     * Whether the subtype declares any schema-emitting member beyond those it inherits from the
+     * generic supertype. Mirrors the three sources {@code populateSchemaProperties} emits — bean
+     * properties ({@code getBeanProperties()}, which includes getter-only properties), public
+     * fields, and {@code @JsonProperty}-annotated methods — so that a subtype adding a computed
+     * getter or a {@code @JsonProperty} method (with no backing field) is detected and falls back
+     * to concrete instead of being silently dropped as a pure binding alias.
+     */
     private static boolean addsOwnFields(ClassElement type, ClassElement superType) {
-        Set<String> superNames = new HashSet<>();
-        for (FieldElement f : superType.getFields()) {
-            superNames.add(f.getName());
+        Set<String> superNames = schemaPropertyNames(superType);
+        for (PropertyElement p : type.getBeanProperties()) {
+            if (!superNames.contains(p.getName())) {
+                return true;
+            }
         }
         for (FieldElement f : type.getFields()) {
             if (!superNames.contains(f.getName())) {
                 return true;
             }
         }
+        for (MethodElement m : type.getMethods()) {
+            if (m.hasAnnotation(JsonProperty.class) && !superNames.contains(m.getName())) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private static Set<String> schemaPropertyNames(ClassElement el) {
+        Set<String> names = new HashSet<>();
+        for (PropertyElement p : el.getBeanProperties()) {
+            names.add(p.getName());
+        }
+        for (FieldElement f : el.getFields()) {
+            names.add(f.getName());
+        }
+        for (MethodElement m : el.getMethods()) {
+            if (m.hasAnnotation(JsonProperty.class)) {
+                names.add(m.getName());
+            }
+        }
+        return names;
     }
 
     // ---- anchor name sanitization -------------------------------------------------------

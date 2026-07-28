@@ -434,11 +434,14 @@ public final class SchemaDefinitionUtils {
             if (primitiveType == null) {
                 if (isOpenapi31() && isDynamicRefsEnabled(context)) {
                     String activeTemplate = DynamicRefUtils.activeTemplateRef(type.getName());
-                    if (activeTemplate != null) {
+                    if (activeTemplate != null && DynamicRefUtils.isUnresolvedTemplateSelfRef(type)) {
                         // Self-reference inside a generic template being built (e.g. Tree<T>'s
                         // children: List<Tree<T>>): emit a plain $ref back to the template so the
                         // recursion re-enters it in the same dynamic scope, keeping the type-variable
                         // binding active at every depth, rather than building a concrete Tree_Object_.
+                        // Restricted to unresolved-argument self-refs: a concrete-parameterization
+                        // self-ref (Wrapper<Pet> inside Wrapper<T>) is a distinct binding and must
+                        // fall through to normal resolution so its binding is not lost.
                         return SchemaUtils.createSchema().$ref(SchemaUtils.schemaRef(activeTemplate));
                     }
                 }
