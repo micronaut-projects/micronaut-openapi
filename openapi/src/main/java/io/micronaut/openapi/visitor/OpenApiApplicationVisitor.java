@@ -174,6 +174,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     @Override
+    public @NonNull Set<String> getSupportedAnnotationNames() {
+        return Set.of(
+            OpenAPIDefinition.class.getName(),
+            OpenAPIGroupInfo.class.getName(),
+            OpenAPIGroupInfos.class.getName()
+        );
+    }
+
+    @Override
     public void visitClass(@NonNull ClassElement element, @NonNull VisitorContext context) {
         try {
             if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
