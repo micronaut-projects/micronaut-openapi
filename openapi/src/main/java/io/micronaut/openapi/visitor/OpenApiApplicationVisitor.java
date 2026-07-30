@@ -176,7 +176,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public @NonNull Set<String> getSupportedAnnotationNames() {
         return Set.of(
-            OpenAPIDefinition.class.getName(),
+            "io.swagger.v3.oas.annotations.*",
             OpenAPIGroupInfo.class.getName(),
             OpenAPIGroupInfos.class.getName()
         );

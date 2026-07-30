@@ -15,12 +15,13 @@ class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
     void "visitors declare the annotations that can contribute to aggregating output"() {
         expect:
         new OpenApiApplicationVisitor().supportedAnnotationNames == [
-            "io.swagger.v3.oas.annotations.OpenAPIDefinition",
+            "io.swagger.v3.oas.annotations.*",
             "io.micronaut.openapi.annotation.OpenAPIGroupInfo",
             "io.micronaut.openapi.annotation.OpenAPIGroupInfos"
         ] as Set
         new OpenApiControllerVisitor().supportedAnnotationNames == [
-            "io.micronaut.http.annotation.Controller"
+            "io.micronaut.http.annotation.*",
+            "io.swagger.v3.oas.annotations.*"
         ] as Set
         new OpenApiEndpointVisitor().supportedAnnotationNames == [
             "io.micronaut.management.endpoint.annotation.Endpoint",

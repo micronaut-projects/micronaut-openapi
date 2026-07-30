@@ -110,7 +110,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     public Set<String> getSupportedAnnotationNames() {
-        return Set.of(Controller.class.getName());
+        return Set.of(
+            "io.micronaut.http.annotation.*",
+            "io.swagger.v3.oas.annotations.*"
+        );
     }
 
     private boolean ignoreByRequires(Element element, VisitorContext context) {
