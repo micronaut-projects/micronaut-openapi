@@ -108,6 +108,14 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         Utils.init(context);
     }
 
+    @Override
+    public Set<String> getSupportedAnnotationNames() {
+        return Set.of(
+            "io.micronaut.http.annotation.*",
+            "io.swagger.v3.oas.annotations.*"
+        );
+    }
+
     private boolean ignoreByRequires(Element element, VisitorContext context) {
         List<AnnotationValue<Requires>> requiresAnnotations = element.getDeclaredAnnotationValuesByType(Requires.class);
         if (CollectionUtils.isEmpty(requiresAnnotations)) {

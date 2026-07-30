@@ -1,12 +1,90 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.context.env.Environment
+import io.micronaut.inject.ast.ClassElement
+import io.micronaut.inject.ast.PackageElement
+import io.micronaut.inject.visitor.VisitorContext
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.openapi.annotation.OpenAPIGroupInfo
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
 import spock.util.environment.RestoreSystemProperties
 
 class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
+
+    void "visitors declare the annotations that can contribute to aggregating output"() {
+        expect:
+        new OpenApiApplicationVisitor().supportedAnnotationNames == [
+            "io.swagger.v3.oas.annotations.*",
+            "io.micronaut.openapi.annotation.OpenAPIGroupInfo",
+            "io.micronaut.openapi.annotation.OpenAPIGroupInfos"
+        ] as Set
+        new OpenApiControllerVisitor().supportedAnnotationNames == [
+            "io.micronaut.http.annotation.*",
+            "io.swagger.v3.oas.annotations.*"
+        ] as Set
+        new OpenApiEndpointVisitor().supportedAnnotationNames == [
+            "io.micronaut.management.endpoint.annotation.Endpoint",
+            "org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint"
+        ] as Set
+        new OpenApiGroupInfoVisitor().supportedAnnotationNames == [
+            "io.micronaut.openapi.annotation.OpenAPIGroupInfo"
+        ] as Set
+    }
+
+    void "group visitor does not record an unrelated class as an originating element"() {
+        given:
+        Map<String, Object> contextValues = [:]
+        def context = Mock(VisitorContext) {
+            get(_, _) >> { CharSequence name, argument ->
+                Optional.ofNullable(contextValues[name.toString()])
+            }
+            put(_, _) >> { CharSequence name, Object value ->
+                contextValues[name.toString()] = value
+                null
+            }
+            getOptions() >> [:]
+        }
+        def packageElement = Mock(PackageElement) {
+            getAnnotationValuesByType(OpenAPIGroupInfo) >> []
+        }
+        def unrelated = Mock(ClassElement) {
+            getPackage() >> packageElement
+            getAnnotationValuesByType(OpenAPIGroupInfo) >> []
+        }
+
+        when:
+        new OpenApiGroupInfoVisitor().visitClass(unrelated, context)
+
+        then:
+        ContextUtils.getOriginatingElements(context).length == 0
+    }
+
+    void "controller visitor does not record an unrelated class as an originating element"() {
+        given:
+        Map<String, Object> contextValues = [:]
+        def context = Mock(VisitorContext) {
+            get(_, _) >> { CharSequence name, argument ->
+                Optional.ofNullable(contextValues[name.toString()])
+            }
+            put(_, _) >> { CharSequence name, Object value ->
+                contextValues[name.toString()] = value
+                null
+            }
+            getOptions() >> [:]
+        }
+        def unrelated = Mock(ClassElement) {
+            getName() >> "test.Unrelated"
+            getPackageName() >> "test"
+            isAnnotationPresent(_) >> false
+        }
+
+        when:
+        new OpenApiControllerVisitor().visitClass(unrelated, context)
+
+        then:
+        ContextUtils.getOriginatingElements(context).length == 0
+    }
 
     @RestoreSystemProperties
     void "test build OpenAPI doc for simple endpoint"() {
