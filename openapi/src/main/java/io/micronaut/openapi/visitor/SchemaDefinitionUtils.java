@@ -476,6 +476,9 @@ public final class SchemaDefinitionUtils {
                     // rebinds the anchor inline; usages then $ref this shared component.
                     Schema<?> namedBinding = DynamicRefUtils.resolveNamedSubtypeBinding(openApi, context, type, mediaTypes, jsonViewClass);
                     if (namedBinding != null) {
+                        // Stamp the schema name so a later cached lookup of this component builds a
+                        // correct $ref (the binding schema is assembled by hand and has no name set).
+                        namedBinding.name(schemaName);
                         schemas.put(schemaName, namedBinding);
                         return SchemaUtils.createSchema().$ref(SchemaUtils.schemaRef(schemaName));
                     }

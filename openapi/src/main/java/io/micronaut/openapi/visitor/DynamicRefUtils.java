@@ -503,11 +503,12 @@ public final class DynamicRefUtils {
     // ---- named subtypes ----------------------------------------------------------------
 
     /**
-     * Whether the given concrete type is a pure-specialization subtype: it extends a parameterized
-     * generic supertype (e.g. {@code class PetResponse extends Response<Pet>}) and adds no fields
-     * of its own beyond the inherited ones. Such a type is emitted as a named binding component
-     * (a {@code $ref} to the template plus a {@code $defs} rebinding) instead of a full concrete
-     * schema, so multiple usages share one component.
+     * Whether the given concrete type is a named subtype of a parameterized generic supertype
+     * (e.g. {@code class PetResponse extends Response<Pet>}). Such a type is emitted as a named
+     * binding component instead of a full concrete schema: a pure-specialization subtype (no fields
+     * of its own) becomes a {@code $ref} to the template plus a {@code $defs} rebinding; a subtype
+     * that adds its own fields becomes an {@code allOf} of that binding and an own-properties
+     * object, so the subtype's fields are preserved rather than dropped.
      */
     static boolean isNamedSubtypeBinding(ClassElement type) {
         if (type == null) {
@@ -517,19 +518,39 @@ public final class DynamicRefUtils {
         if (superBinding == null) {
             return false;
         }
-        // Guard against silently dropping a subtype's declared fields: only treat it as a binding
-        // alias when every field is inherited from the generic supertype.
-        return !addsOwnFields(type, superBinding);
+        // A self-referential named subtype (e.g. class WorkspaceFolder extends Folder<WorkspaceFolder,
+        // Resource>) would infinite-loop: resolving its binding resolves the type argument that is
+        // itself, re-entering resolveNamedSubtypeBinding. Fall back to concrete for this case.
+        if (isSelfReferentialSubtype(type, superBinding)) {
+            return false;
+        }
+        return true;
     }
 
     /**
-     * Builds a named binding schema for a pure-specialization subtype by delegating to
-     * {@link #resolveGenericBinding} on its parameterized generic supertype. The returned schema
-     * (a {@code $ref} to the template plus an inline {@code $defs} rebinding) is meant to be
-     * registered under the subtype's own schema name and referenced by {@code $ref}, so that each
-     * usage points at the shared named component.
+     * Whether the subtype appears in its own parameterized generic supertype's type arguments
+     * (directly), i.e. it is self-referential through the generic binding.
+     */
+    private static boolean isSelfReferentialSubtype(ClassElement type, ClassElement superBinding) {
+        String name = type.getName();
+        for (ClassElement arg : superBinding.getTypeArguments().values()) {
+            if (name.equals(arg.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Builds a named binding schema for a named subtype of a parameterized generic. A
+     * pure-specialization subtype (no fields of its own) becomes a {@code $ref} to the template
+     * plus an inline {@code $defs} rebinding. A subtype that adds its own fields becomes an
+     * {@code allOf} of that binding and an own-properties object, so the subtype's declared fields
+     * are preserved instead of being dropped. The result is meant to be registered under the
+     * subtype's own schema name and referenced by {@code $ref}.
      *
-     * @return the binding schema, or {@code null} if no parameterized generic supertype is found
+     * @return the binding (or composed) schema, or {@code null} if no parameterized generic
+     *         supertype is found or its binding cannot be built
      */
     static Schema<?> resolveNamedSubtypeBinding(OpenAPI openApi, VisitorContext context, ClassElement type,
                                                 List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
@@ -537,7 +558,46 @@ public final class DynamicRefUtils {
         if (superBinding == null) {
             return null;
         }
-        return resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+        Schema<?> binding = resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+        if (binding == null) {
+            return null;
+        }
+        if (!addsOwnFields(type, superBinding)) {
+            // Pure specialization: just the binding alias.
+            return binding;
+        }
+        // The subtype adds its own fields: compose the generic binding with an own-properties
+        // object so the extra fields survive (rather than falling back to a fully concrete schema).
+        Schema<?> own = buildOwnPropertiesSchema(openApi, context, type, mediaTypes, jsonViewClass);
+        // Drop any own property that shadows a name inherited from the generic supertype; the
+        // binding (via the template) already defines those, and emitting both would conflict.
+        Set<String> superNames = schemaPropertyNames(superBinding);
+        if (own.getProperties() != null && !superNames.isEmpty()) {
+            own.getProperties().keySet().removeAll(superNames);
+        }
+        if (own.getProperties() == null || own.getProperties().isEmpty()) {
+            return binding;
+        }
+        var composed = SchemaUtils.createComposedSchema();
+        composed.addAllOfItem(binding);
+        composed.addAllOfItem(own);
+        return composed;
+    }
+
+    /**
+     * Builds an {@code {type: object, properties: {...}}} schema holding only the properties
+     * declared on the subtype itself. Relies on {@code populateSchemaProperties} already filtering
+     * to own-declared elements (it skips inherited properties, which reach the schema via
+     * {@code processSuperTypes} instead).
+     */
+    private static Schema<?> buildOwnPropertiesSchema(OpenAPI openApi, VisitorContext context, ClassElement type,
+                                                     List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
+        Schema<?> own = SchemaUtils.createSchema();
+        SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
+        // Set type after populating: population/post-processing can reset it, and an explicit
+        // type:object on the allOf member keeps the emitted spec self-describing.
+        own.setType("object");
+        return own;
     }
 
     /**
