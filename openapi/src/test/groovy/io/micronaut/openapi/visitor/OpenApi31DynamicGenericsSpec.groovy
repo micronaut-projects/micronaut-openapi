@@ -1122,4 +1122,75 @@ class MyBean {}
         // This requires the strip to match the @JsonProperty value, not the raw method name.
         !ownBranch.getProperties().containsKey('checksum')
     }
+
+    @RestoreSystemProperties
+    void "test polymorphic array items fold the type variable into oneOf"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/ws")
+    public Folder<Document, Resource> get() { return null; }
+}
+
+class Folder<F, R> {
+    @ArraySchema(schema = @Schema(oneOf = { Document.class }))
+    private List<F> children;
+    private List<R> shortcuts;
+    public List<F> getChildren() { return children; }
+    public void setChildren(List<F> children) { this.children = children; }
+    public List<R> getShortcuts() { return shortcuts; }
+    public void setShortcuts(List<R> shortcuts) { this.shortcuts = shortcuts; }
+}
+
+class Document {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+class Resource {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema folder = openApi.components.schemas['Folder']
+
+        then:
+        folder != null
+        Schema children = folder.properties.children
+        children.type == 'array'
+        Schema items = children.items
+        items.oneOf != null
+        items.oneOf.size() == 2
+        items.oneOf*.get$ref() == ['#/components/schemas/Document', null]
+        items.oneOf*.get$dynamicRef() == [null, '#F']
+        items.get$dynamicRef() == null
+
+        folder.properties.shortcuts.items.get$dynamicRef() == '#R'
+
+        Schema binding = openApi.paths['/ws'].get.responses['200'].content['application/json'].schema
+        binding.get$ref() == '#/components/schemas/Folder'
+        binding.getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/Document'
+        binding.getExtensions().get('$defs')['R']['$ref'] == '#/components/schemas/Resource'
+    }
 }

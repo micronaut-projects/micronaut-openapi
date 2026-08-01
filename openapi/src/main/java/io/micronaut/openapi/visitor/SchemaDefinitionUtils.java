@@ -2256,7 +2256,18 @@ public final class SchemaDefinitionUtils {
                 itemsSchemaAnn);
             if (!SchemaUtils.isEmptySchema(itemsSchemaFromAnn)) {
                 var itemsSchema = schemaToBind.getItems();
-                if (itemsSchemaFromAnn.get$ref() != null || itemsSchema.get$ref() != null) {
+                // Dynamic-refs: when array items are a type-variable $dynamicRef slot (only produced
+                // while a generic template is being built) and the items annotation carries a oneOf,
+                // fold the $dynamicRef in as an additional oneOf branch instead of merging it as a
+                // sibling. A schema with both $dynamicRef and oneOf is not well-defined (JSON Schema
+                // 2020-12 short-circuits on $dynamicRef); folding yields the intended
+                // oneOf[concrete, $dynamicRef] shape for polymorphic template children.
+                if (itemsSchema != null
+                    && itemsSchema.get$dynamicRef() != null
+                    && CollectionUtils.isNotEmpty(itemsSchemaFromAnn.getOneOf())) {
+                    itemsSchemaFromAnn.addOneOfItem(itemsSchema);
+                    schemaToBind.setItems(itemsSchemaFromAnn);
+                } else if (itemsSchemaFromAnn.get$ref() != null || itemsSchema.get$ref() != null) {
                     var allOf = createComposedSchema();
                     allOf.addAllOfItem(itemsSchema);
                     allOf.addAllOfItem(itemsSchemaFromAnn);
