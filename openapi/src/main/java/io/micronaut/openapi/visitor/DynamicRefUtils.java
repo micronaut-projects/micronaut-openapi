@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
@@ -22,6 +23,8 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
+import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
@@ -64,6 +67,15 @@ public final class DynamicRefUtils {
     private static List<Map<String, String>> templateVarStack = new ArrayList<>();
 
     /**
+     * Generic templates currently being built, keyed by raw type name, mapped to their registered
+     * schema name. Used to short-circuit a self-reference inside a template (e.g. {@code Tree<T>}'s
+     * {@code List<Tree<T>> children}) to a plain {@code $ref} back to the template, so the
+     * recursion re-enters the template in the same dynamic scope and keeps the type-variable
+     * binding active at every depth.
+     */
+    private static Map<String, String> activeTemplates = new HashMap<>();
+
+    /**
      * Reflective handle to {@link Schema}'s private {@code extensions} map, used by
      * {@link #setSchemaDefs} to inject a {@code $defs} block (a JSON Schema 2020-12 keyword that
      * swagger-core 2.2.x does not model). See {@link #setSchemaDefs} for the full rationale.
@@ -88,6 +100,7 @@ public final class DynamicRefUtils {
     public static void clean() {
         recursiveSchemaAnchors = new HashMap<>();
         templateVarStack = new ArrayList<>();
+        activeTemplates = new HashMap<>();
     }
 
     // ---- recursive types ----------------------------------------------------------------
@@ -154,11 +167,73 @@ public final class DynamicRefUtils {
     }
 
     /**
-     * Returns the anchor for the single type variable of the generic template currently being built
-     * (top of {@link #templateVarStack}), or {@code null} when no template build is active.
+     * Returns the anchor bound to the given type-variable name in the generic template currently
+     * being built (top of {@link #templateVarStack}), or {@code null} when no template build is
+     * active or the variable is not part of it. This is the primary lookup used at field-resolution
+     * time: each {@link GenericPlaceholderElement} carries its declared variable name, which selects
+     * the correct per-variable anchor even for multi-parameter generics.
+     *
+     * @param varName the declared type-variable name (e.g. {@code "K"}, {@code "V"}, {@code "T"})
+     * @return the matching anchor, or {@code null}
+     */
+    static String templateAnchorFor(String varName) {
+        if (templateVarStack.isEmpty() || varName == null) {
+            return null;
+        }
+        return templateVarStack.get(0).get(varName);
+    }
+
+    /**
+     * Returns the registered schema name of the generic template currently being built for the
+     * given raw type name, or {@code null} if no such template build is active. Used to detect a
+     * self-reference inside a template and short-circuit it to a plain {@code $ref}.
+     *
+     * @param rawTypeName the raw (erased) type name being referenced
+     * @return the active template's schema name, or {@code null}
+     */
+    static String activeTemplateRef(String rawTypeName) {
+        return rawTypeName == null ? null : activeTemplates.get(rawTypeName);
+    }
+
+    /**
+     * Whether the given type is a self-reference to the generic template currently being built that
+     * carries only unresolved type-variable arguments (or none) — i.e. the recursive same-variable
+     * case such as {@code Tree<T>}'s {@code List<Tree<T>> children}, which must collapse to a plain
+     * {@code $ref} back to the template. A self-reference with a concrete argument (e.g.
+     * {@code Wrapper<Pet>} inside a {@code Wrapper<T>} template) is <em>not</em> this case: it is a
+     * distinct binding and must go through normal resolution so the concrete binding is preserved.
+     * <p>
+     * Ceiling: a same-template self-reference whose argument is itself a parameterization with
+     * unresolved inner variables (e.g. {@code Wrapper<Wrapper<T>>} inside {@code Wrapper<T>}) is not
+     * detected as unresolved here (the immediate argument is a concrete {@link ClassElement}), so it
+     * goes through normal binding resolution. That exotic shape is out of scope and may emit a
+     * recursive rebind that does not preserve the inner variable.
+     */
+    static boolean isUnresolvedTemplateSelfRef(ClassElement type) {
+        Map<String, ClassElement> args = type.getTypeArguments();
+        if (args == null || args.isEmpty()) {
+            return true;
+        }
+        for (ClassElement arg : args.values()) {
+            if (!(arg instanceof GenericElement) && !(arg instanceof GenericPlaceholderElement)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the single anchor of the template currently being built, when that template has
+     * exactly one type variable; {@code null} otherwise. Used for code paths that do not know which
+     * variable a usage corresponds to (e.g. a plain {@link GenericElement} with no declared name);
+     * for multi-variable templates such usages cannot be disambiguated and fall back to resolution.
      */
     static String currentTemplateAnchor() {
-        return templateVarStack.isEmpty() ? null : templateVarStack.get(0).values().iterator().next();
+        if (templateVarStack.isEmpty()) {
+            return null;
+        }
+        Map<String, String> frame = templateVarStack.get(0);
+        return frame.size() == 1 ? frame.values().iterator().next() : null;
     }
 
     // ---- generic templates --------------------------------------------------------------
@@ -185,19 +260,71 @@ public final class DynamicRefUtils {
     }
 
     /**
+     * Derives the {@code $dynamicAnchor} name for every type variable of a generic template, keyed
+     * by declared variable name.
+     * <p>
+     * For a single-variable template the name is <em>role-derived</em> ({@code itemType} when the
+     * variable is used as a collection/array element, otherwise {@code dataType}) — this preserves
+     * the existing output shape. For multi-variable templates role names would collide (two scalar
+     * variables both want {@code dataType}), so each anchor is derived from its declared variable
+     * name (e.g. {@code K}, {@code V}), sanitized to a valid JSON Schema anchor and de-duplicated
+     * when two names sanitize identically.
+     *
+     * @param rawType  the erased generic type (whose fields drive the single-variable role)
+     * @param typeArgs the type arguments (keyed by declared variable name)
+     * @return an ordered map of variable name to anchor name
+     */
+    static Map<String, String> deriveTemplateAnchors(ClassElement rawType, Map<String, ClassElement> typeArgs) {
+        var result = new LinkedHashMap<String, String>();
+        if (typeArgs.size() == 1) {
+            String varName = typeArgs.keySet().iterator().next();
+            result.put(varName, deriveTemplateAnchor(rawType));
+            return result;
+        }
+        var used = new HashSet<String>();
+        int suffix = 1;
+        for (String varName : typeArgs.keySet()) {
+            String base = toDynamicAnchorName(varName);
+            String anchor = base;
+            while (!used.add(anchor)) {
+                anchor = base + "_" + suffix++;
+            }
+            result.put(varName, anchor);
+        }
+        return result;
+    }
+
+    /**
      * Whether the given parameterized type should be emitted as a dynamic-ref generic binding:
-     * dynamic-refs mode is on, it has exactly one type argument, it is not a collection / map,
-     * and the argument is a concrete reference type (not an unresolved type variable, primitive,
-     * array, collection or map — those cannot form a {@code $ref} binding slot).
+     * dynamic-refs mode is on, it has at least one type argument, it is not a collection / map, and
+     * <em>every</em> argument is a concrete reference type.
+     * <p>
+     * Arguments that are an unresolved type variable, primitive, array, collection or map cannot
+     * form a {@code $ref} binding slot; if any argument is such a type, the whole generic keeps its
+     * default concrete schema (a partially bound template would have an inconsistent shape).
+     * Self-referential generics are supported (the self-reference is resolved as a plain recursive
+     * {@code $ref} to the template, see {@link #activeTemplateRef}).
      */
     static boolean isGenericBindingCandidate(ClassElement type, Map<String, ClassElement> typeArgs) {
-        if (typeArgs == null || typeArgs.size() != 1) {
+        if (typeArgs == null || typeArgs.isEmpty()) {
             return false;
         }
         if (ElementUtils.isJavaUtilCollectionType(type) || type.isAssignable(Map.class) || ElementUtils.isContainerType(type)) {
             return false;
         }
-        ClassElement arg = typeArgs.values().iterator().next();
+        for (ClassElement arg : typeArgs.values()) {
+            if (!isReferenceTypeArg(arg)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Whether a single type argument can occupy a {@code $ref} binding slot: a concrete reference
+     * type that is not an unresolved variable, primitive, array, collection or map.
+     */
+    private static boolean isReferenceTypeArg(ClassElement arg) {
         if (arg instanceof GenericElement || arg instanceof GenericPlaceholderElement) {
             return false;
         }
@@ -207,48 +334,7 @@ public final class DynamicRefUtils {
             || arg.isAssignable(Map.class)) {
             return false;
         }
-        // Self-referential generics combine the template and recursion mechanisms in ways that
-        // produce inconsistent output today (the recursive descent leaks the template context).
-        // Keep the default concrete behavior for them until that interaction is resolved.
-        if (isRecursiveType(type)) {
-            return false;
-        }
         return true;
-    }
-
-    /**
-     * Whether the given type references itself in one of its fields (directly or through type
-     * arguments), i.e. it is self-referential / recursive.
-     */
-    private static boolean isRecursiveType(ClassElement type) {
-        if (type == null) {
-            return false;
-        }
-        String name = type.getName();
-        for (FieldElement field : type.getFields()) {
-            if (referencesType(field.getGenericType(), name, new HashSet<>())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean referencesType(ClassElement el, String targetName, Set<String> seen) {
-        if (el == null || !seen.add(el.getName())) {
-            return false;
-        }
-        if (targetName.equals(el.getName())) {
-            return true;
-        }
-        if (referencesType(el.getFirstTypeArgument().orElse(null), targetName, seen)) {
-            return true;
-        }
-        for (ClassElement arg : el.getTypeArguments().values()) {
-            if (referencesType(arg, targetName, seen)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -282,6 +368,31 @@ public final class DynamicRefUtils {
     }
 
     /**
+     * Reads the {@code $defs} block previously attached by {@link #setSchemaDefs}, or
+     * {@code null} if none is present. Used to fold a nested generic binding's rebinding (e.g. the
+     * inner {@code Page<Pet>} binding of {@code ApiEnvelope<Page<Pet>>}) into an enclosing slot.
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Schema> getSchemaDefs(Schema<?> schema) {
+        if (schema == null) {
+            return null;
+        }
+        try {
+            Map<String, Object> extensions = (Map<String, Object>) SCHEMA_EXTENSIONS_FIELD.get(schema);
+            if (extensions == null) {
+                return null;
+            }
+            Object defs = extensions.get("$defs");
+            if (defs instanceof Map<?, ?> map) {
+                return (Map<String, Schema>) map;
+            }
+        } catch (IllegalAccessException e) {
+            // best-effort
+        }
+        return null;
+    }
+
+    /**
      * Builds a dynamic-ref generic binding for a parameterized type such as {@code Response<Pet>}.
      * <p>
      * Emits one reusable template schema (e.g. {@code Response}) whose type-variable usages become
@@ -310,12 +421,15 @@ public final class DynamicRefUtils {
         String templateName = SchemaDefinitionUtils.computeDefaultSchemaName(
             SchemaDefinitionUtils.getNameFromAnn(rawType), rawType, rawType, Collections.emptyMap(), context, jsonViewClass);
 
-        var varEntry = typeArgs.entrySet().iterator().next();
-        String varName = varEntry.getKey();
-        String anchor = deriveTemplateAnchor(rawType);
+        Map<String, String> anchors = deriveTemplateAnchors(rawType, typeArgs);
+        // A schema object can carry a single $dynamicAnchor; the first variable's anchor is the
+        // template's primary anchor (used for the collision guard and the root stamp below). Every
+        // variable additionally carries its own anchor via the $defs entries, which is what the
+        // $dynamicRef consumers resolve against.
+        String primaryAnchor = anchors.values().iterator().next();
 
         Schema<?> template = schemas.get(templateName);
-        if (template != null && !anchor.equals(template.get$dynamicAnchor())) {
+        if (template != null && !primaryAnchor.equals(template.get$dynamicAnchor())) {
             // A non-template schema already occupies this name (for example a raw usage of the
             // generic). Do not poison it; fall back to the default concrete behavior.
             return null;
@@ -324,40 +438,168 @@ public final class DynamicRefUtils {
             template = SchemaUtils.createSchema();
             template.name(templateName);
             schemas.put(templateName, template);
-            var frame = new LinkedHashMap<String, String>();
-            frame.put(varName, anchor);
-            templateVarStack.add(0, frame);
+            // Stamp the primary anchor BEFORE populating properties: a self-referential generic
+            // (Tree<T> with List<Tree<T>> children) re-enters itself during population, and the
+            // recursion guard in recursiveSchemaRef must see an existing anchor so it falls back
+            // to a plain $ref (re-entering the template in the same dynamic scope) instead of
+            // stamping a competing recursion anchor on the single $dynamicAnchor slot.
+            if (template.get$dynamicAnchor() == null) {
+                template.set$dynamicAnchor(primaryAnchor);
+            }
+            templateVarStack.add(0, new LinkedHashMap<>(anchors));
+            activeTemplates.put(rawType.getName(), templateName);
             try {
                 SchemaDefinitionUtils.populateSchemaProperties(openApi, context, rawType, rawType.getTypeArguments(), template, mediaTypes, null, jsonViewClass);
             } finally {
                 templateVarStack.remove(0);
+                activeTemplates.remove(rawType.getName());
             }
-            if (template.get$dynamicAnchor() == null) {
-                template.set$dynamicAnchor(anchor);
-            }
-            var placeholder = SchemaUtils.createSchema();
-            placeholder.set$dynamicAnchor(anchor);
-            placeholder.setNot(SchemaUtils.createSchema());
             var placeholderDefs = new LinkedHashMap<String, Schema>();
-            placeholderDefs.put(anchor, placeholder);
+            for (String anchor : anchors.values()) {
+                var placeholder = SchemaUtils.createSchema();
+                placeholder.set$dynamicAnchor(anchor);
+                placeholder.setNot(SchemaUtils.createSchema());
+                placeholderDefs.put(anchor, placeholder);
+            }
             setSchemaDefs(template, placeholderDefs);
         }
 
-        ClassElement concreteType = varEntry.getValue();
-        Schema<?> concreteRef = SchemaDefinitionUtils.getSchemaDefinition(openApi, context, concreteType, concreteType.getTypeArguments(), null, mediaTypes, jsonViewClass);
-
-        var slot = SchemaUtils.createSchema();
-        slot.set$dynamicAnchor(anchor);
-        if (concreteRef != null && concreteRef.get$ref() != null) {
-            slot.set$ref(concreteRef.get$ref());
-        }
         var slotDefs = new LinkedHashMap<String, Schema>();
-        slotDefs.put(anchor, slot);
+        for (var entry : typeArgs.entrySet()) {
+            String anchor = anchors.get(entry.getKey());
+            ClassElement concreteType = entry.getValue();
+            // A type argument that is itself a generic binding candidate (e.g. Page<Pet> as the
+            // data type of ApiEnvelope<Page<Pet>>) must be resolved as a binding directly here:
+            // getSchemaDefinition's dynamic-refs gate requires a defining element, which the type
+            // argument does not have, so delegating there would silently collapse it to concrete.
+            // Recursing here builds the inner template and returns its inline binding.
+            Schema<?> concreteRef;
+            if (isGenericBindingCandidate(concreteType, concreteType.getTypeArguments())) {
+                concreteRef = resolveGenericBinding(openApi, context, concreteType, concreteType.getTypeArguments(), mediaTypes, jsonViewClass);
+            } else {
+                concreteRef = SchemaDefinitionUtils.getSchemaDefinition(openApi, context, concreteType, concreteType.getTypeArguments(), null, mediaTypes, jsonViewClass);
+            }
+            var slot = SchemaUtils.createSchema();
+            slot.set$dynamicAnchor(anchor);
+            if (concreteRef != null && concreteRef.get$ref() != null) {
+                slot.set$ref(concreteRef.get$ref());
+                // Fold the inner binding's inline $defs rebinding into this slot so the nested
+                // binding is preserved instead of collapsing to an unbound template reference.
+                // Composes recursively for deeper nesting (Outer<Middle<Leaf>>).
+                Map<String, Schema> nestedDefs = getSchemaDefs(concreteRef);
+                if (nestedDefs != null && !nestedDefs.isEmpty()) {
+                    setSchemaDefs(slot, new LinkedHashMap<>(nestedDefs));
+                }
+            }
+            slotDefs.put(anchor, slot);
+        }
 
         var binding = SchemaUtils.createSchema();
         binding.set$ref(SchemaUtils.schemaRef(templateName));
         setSchemaDefs(binding, slotDefs);
         return binding;
+    }
+
+    // ---- named subtypes ----------------------------------------------------------------
+
+    /**
+     * Whether the given concrete type is a pure-specialization subtype: it extends a parameterized
+     * generic supertype (e.g. {@code class PetResponse extends Response<Pet>}) and adds no fields
+     * of its own beyond the inherited ones. Such a type is emitted as a named binding component
+     * (a {@code $ref} to the template plus a {@code $defs} rebinding) instead of a full concrete
+     * schema, so multiple usages share one component.
+     */
+    static boolean isNamedSubtypeBinding(ClassElement type) {
+        if (type == null) {
+            return false;
+        }
+        ClassElement superBinding = parameterizedGenericSuperType(type);
+        if (superBinding == null) {
+            return false;
+        }
+        // Guard against silently dropping a subtype's declared fields: only treat it as a binding
+        // alias when every field is inherited from the generic supertype.
+        return !addsOwnFields(type, superBinding);
+    }
+
+    /**
+     * Builds a named binding schema for a pure-specialization subtype by delegating to
+     * {@link #resolveGenericBinding} on its parameterized generic supertype. The returned schema
+     * (a {@code $ref} to the template plus an inline {@code $defs} rebinding) is meant to be
+     * registered under the subtype's own schema name and referenced by {@code $ref}, so that each
+     * usage points at the shared named component.
+     *
+     * @return the binding schema, or {@code null} if no parameterized generic supertype is found
+     */
+    static Schema<?> resolveNamedSubtypeBinding(OpenAPI openApi, VisitorContext context, ClassElement type,
+                                                List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
+        ClassElement superBinding = parameterizedGenericSuperType(type);
+        if (superBinding == null) {
+            return null;
+        }
+        return resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+    }
+
+    /**
+     * Finds the direct supertype (superclass or interface) that is itself a dynamic-ref generic
+     * binding candidate, or {@code null}. Deeper inheritance chains are not walked; a subtype that
+     * specializes a generic two levels up falls back to the default concrete behavior.
+     */
+    private static ClassElement parameterizedGenericSuperType(ClassElement type) {
+        ClassElement s = type.getSuperType().orElse(null);
+        if (s != null && isGenericBindingCandidate(s, s.getTypeArguments())) {
+            return s;
+        }
+        for (ClassElement i : type.getInterfaces()) {
+            if (isGenericBindingCandidate(i, i.getTypeArguments())) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether the subtype declares any schema-emitting member beyond those it inherits from the
+     * generic supertype. Mirrors the three sources {@code populateSchemaProperties} emits — bean
+     * properties ({@code getBeanProperties()}, which includes getter-only properties), public
+     * fields, and {@code @JsonProperty}-annotated methods — so that a subtype adding a computed
+     * getter or a {@code @JsonProperty} method (with no backing field) is detected and falls back
+     * to concrete instead of being silently dropped as a pure binding alias.
+     */
+    private static boolean addsOwnFields(ClassElement type, ClassElement superType) {
+        Set<String> superNames = schemaPropertyNames(superType);
+        for (PropertyElement p : type.getBeanProperties()) {
+            if (!superNames.contains(p.getName())) {
+                return true;
+            }
+        }
+        for (FieldElement f : type.getFields()) {
+            if (!superNames.contains(f.getName())) {
+                return true;
+            }
+        }
+        for (MethodElement m : type.getMethods()) {
+            if (m.hasAnnotation(JsonProperty.class) && !superNames.contains(m.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Set<String> schemaPropertyNames(ClassElement el) {
+        Set<String> names = new HashSet<>();
+        for (PropertyElement p : el.getBeanProperties()) {
+            names.add(p.getName());
+        }
+        for (FieldElement f : el.getFields()) {
+            names.add(f.getName());
+        }
+        for (MethodElement m : el.getMethods()) {
+            if (m.hasAnnotation(JsonProperty.class)) {
+                names.add(m.getName());
+            }
+        }
+        return names;
     }
 
     // ---- anchor name sanitization -------------------------------------------------------

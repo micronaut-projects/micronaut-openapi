@@ -432,6 +432,19 @@ public final class SchemaDefinitionUtils {
                 primitiveType = null;
             }
             if (primitiveType == null) {
+                if (isOpenapi31() && isDynamicRefsEnabled(context)) {
+                    String activeTemplate = DynamicRefUtils.activeTemplateRef(type.getName());
+                    if (activeTemplate != null && DynamicRefUtils.isUnresolvedTemplateSelfRef(type)) {
+                        // Self-reference inside a generic template being built (e.g. Tree<T>'s
+                        // children: List<Tree<T>>): emit a plain $ref back to the template so the
+                        // recursion re-enters it in the same dynamic scope, keeping the type-variable
+                        // binding active at every depth, rather than building a concrete Tree_Object_.
+                        // Restricted to unresolved-argument self-refs: a concrete-parameterization
+                        // self-ref (Wrapper<Pet> inside Wrapper<T>) is a distinct binding and must
+                        // fall through to normal resolution so its binding is not lost.
+                        return SchemaUtils.createSchema().$ref(SchemaUtils.schemaRef(activeTemplate));
+                    }
+                }
                 if (definingElement != null && isOpenapi31() && isDynamicRefsEnabled(context) && DynamicRefUtils.isGenericBindingCandidate(type, typeArgs)) {
                     Schema<?> binding = DynamicRefUtils.resolveGenericBinding(openApi, context, type, typeArgs, mediaTypes, jsonViewClass);
                     if (binding != null) {
@@ -453,6 +466,19 @@ public final class SchemaDefinitionUtils {
                 if (schema != null && inProgressSchemas.contains(schemaName)) {
                     // Detected recursion into a schema currently being processed
                     return DynamicRefUtils.recursiveSchemaRef(schemaName, schemas, context);
+                }
+                if (schema == null
+                    && definingElement != null
+                    && isOpenapi31() && isDynamicRefsEnabled(context)
+                    && DynamicRefUtils.isNamedSubtypeBinding(type)) {
+                    // A pure-specialization subtype (e.g. PetResponse extends Response<Pet>) is
+                    // emitted as a named binding component that references the generic template and
+                    // rebinds the anchor inline; usages then $ref this shared component.
+                    Schema<?> namedBinding = DynamicRefUtils.resolveNamedSubtypeBinding(openApi, context, type, mediaTypes, jsonViewClass);
+                    if (namedBinding != null) {
+                        schemas.put(schemaName, namedBinding);
+                        return SchemaUtils.createSchema().$ref(SchemaUtils.schemaRef(schemaName));
+                    }
                 }
                 if (schema == null) {
 
@@ -892,7 +918,10 @@ public final class SchemaDefinitionUtils {
         if (type instanceof WildcardElement wildcardEl) {
             type = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().getFirst() : null;
         } else if (type instanceof GenericPlaceholderElement placeholderEl) {
-            var templateAnchor = DynamicRefUtils.currentTemplateAnchor();
+            var templateAnchor = DynamicRefUtils.templateAnchorFor(placeholderEl.getVariableName());
+            if (templateAnchor == null) {
+                templateAnchor = DynamicRefUtils.currentTemplateAnchor();
+            }
             if (templateAnchor != null && placeholderEl.getResolved().isEmpty()) {
                 Schema<?> slot = createSchema();
                 slot.set$dynamicRef("#" + templateAnchor);
