@@ -802,7 +802,7 @@ class MyBean {}
         // type during allOf post-processing); the contract is that the subtype's own field survives
         // and the inherited generic field is not duplicated here.
         ownBranch.getProperties().containsKey('tag')
-        ownBranch.getProperties().get('tag').getType() instanceof String || ownBranch.getProperties().get('tag').getType() != null
+        ownBranch.getProperties().get('tag').getType() == 'string'
         !ownBranch.getProperties().containsKey('data')
 
         // The generic template itself is still emitted once.
@@ -1058,5 +1058,68 @@ class MyBean {}
         ws != null
         ws.get$ref() == null
         ws.getExtensions() == null || ws.getExtensions().get('$defs') == null
+    }
+
+    @RestoreSystemProperties
+    void "test inherited @JsonProperty-renamed method stripped from own-branch by resolved key"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Controller
+class Api {
+    @Get("/pet")
+    public PetResponse getPet() { return null; }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+    @JsonProperty("checksum")
+    public String computeChecksum() { return ""; }
+}
+
+class PetResponse extends Response<Pet> {
+    private String tag;
+    public String getTag() { return tag; }
+    public void setTag(String tag) { this.tag = tag; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema petResponse = openApi.components.schemas['PetResponse']
+
+        then:
+        petResponse != null
+        petResponse.allOf != null
+        petResponse.allOf.size() == 2
+        Schema ownBranch = petResponse.allOf[1]
+        // The subtype's own field survives...
+        ownBranch.getProperties().containsKey('tag')
+        // ...the inherited bean property is filtered upstream...
+        !ownBranch.getProperties().containsKey('data')
+        // ...and the inherited @JsonProperty-renamed method (emitted as 'checksum', not the method
+        // name 'computeChecksum') is stripped so it isn't duplicated with the binding branch.
+        // This requires the strip to match the @JsonProperty value, not the raw method name.
+        !ownBranch.getProperties().containsKey('checksum')
     }
 }

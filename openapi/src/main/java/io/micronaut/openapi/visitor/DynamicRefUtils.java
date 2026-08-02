@@ -562,16 +562,22 @@ public final class DynamicRefUtils {
         if (binding == null) {
             return null;
         }
-        if (!addsOwnFields(type, superBinding)) {
+        // Compute both name sets once: superNames is reused for the adds-own-field test and for
+        // stripping shadowed inherited names from the own branch below.
+        Set<String> superNames = schemaPropertyNames(superBinding);
+        Set<String> ownNames = schemaPropertyNames(type);
+        ownNames.removeAll(superNames);
+        if (ownNames.isEmpty()) {
             // Pure specialization: just the binding alias.
             return binding;
         }
         // The subtype adds its own fields: compose the generic binding with an own-properties
         // object so the extra fields survive (rather than falling back to a fully concrete schema).
         Schema<?> own = buildOwnPropertiesSchema(openApi, context, type, mediaTypes, jsonViewClass);
-        // Drop any own property that shadows a name inherited from the generic supertype; the
-        // binding (via the template) already defines those, and emitting both would conflict.
-        Set<String> superNames = schemaPropertyNames(superBinding);
+        // Strip inherited names from the own-branch so they aren't duplicated with the binding
+        // (template) branch. populateSchemaProperties filters ordinary inherited bean
+        // properties/fields by declaring type, but inherited @JsonProperty-annotated methods and
+        // overridden getters can still reach the own-branch — so the strip is what removes those.
         if (own.getProperties() != null && !superNames.isEmpty()) {
             own.getProperties().keySet().removeAll(superNames);
         }
@@ -585,17 +591,17 @@ public final class DynamicRefUtils {
     }
 
     /**
-     * Builds an {@code {type: object, properties: {...}}} schema holding only the properties
-     * declared on the subtype itself. Relies on {@code populateSchemaProperties} already filtering
-     * to own-declared elements (it skips inherited properties, which reach the schema via
-     * {@code processSuperTypes} instead).
+     * Builds an {@code {type: object, properties: {...}}} schema by populating the subtype's
+     * properties. {@link #resolveNamedSubtypeBinding} strips inherited names afterwards via the
+     * {@code superNames} set: {@code populateSchemaProperties} filters ordinary inherited bean
+     * properties/fields by declaring type, but inherited {@code @JsonProperty}-annotated methods
+     * and overridden getters can still reach the own-branch and would duplicate the binding branch.
      */
     private static Schema<?> buildOwnPropertiesSchema(OpenAPI openApi, VisitorContext context, ClassElement type,
                                                      List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
         Schema<?> own = SchemaUtils.createSchema();
         SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
-        // Set type after populating: population/post-processing can reset it, and an explicit
-        // type:object on the allOf member keeps the emitted spec self-describing.
+        // Reassert object typing after population; swagger-core may drop this on allOf members.
         own.setType("object");
         return own;
     }
@@ -618,34 +624,6 @@ public final class DynamicRefUtils {
         return null;
     }
 
-    /**
-     * Whether the subtype declares any schema-emitting member beyond those it inherits from the
-     * generic supertype. Mirrors the three sources {@code populateSchemaProperties} emits — bean
-     * properties ({@code getBeanProperties()}, which includes getter-only properties), public
-     * fields, and {@code @JsonProperty}-annotated methods — so that a subtype adding a computed
-     * getter or a {@code @JsonProperty} method (with no backing field) is detected and falls back
-     * to concrete instead of being silently dropped as a pure binding alias.
-     */
-    private static boolean addsOwnFields(ClassElement type, ClassElement superType) {
-        Set<String> superNames = schemaPropertyNames(superType);
-        for (PropertyElement p : type.getBeanProperties()) {
-            if (!superNames.contains(p.getName())) {
-                return true;
-            }
-        }
-        for (FieldElement f : type.getFields()) {
-            if (!superNames.contains(f.getName())) {
-                return true;
-            }
-        }
-        for (MethodElement m : type.getMethods()) {
-            if (m.hasAnnotation(JsonProperty.class) && !superNames.contains(m.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static Set<String> schemaPropertyNames(ClassElement el) {
         Set<String> names = new HashSet<>();
         for (PropertyElement p : el.getBeanProperties()) {
@@ -656,7 +634,10 @@ public final class DynamicRefUtils {
         }
         for (MethodElement m : el.getMethods()) {
             if (m.hasAnnotation(JsonProperty.class)) {
-                names.add(m.getName());
+                // Record the emitted property key (@JsonProperty value when set), not the raw
+                // method name, so shadowed-renamed properties are matched when stripping the
+                // own-branch — matches how populateSchemaProperties keys these properties.
+                names.add(m.stringValue(JsonProperty.class).filter(StringUtils::isNotEmpty).orElse(m.getName()));
             }
         }
         return names;
