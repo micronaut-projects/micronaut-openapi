@@ -573,11 +573,12 @@ public final class DynamicRefUtils {
         }
         // The subtype adds its own fields: compose the generic binding with an own-properties
         // object so the extra fields survive (rather than falling back to a fully concrete schema).
-        Schema<?> own = buildOwnPropertiesSchema(openApi, context, type, mediaTypes, jsonViewClass);
-        // Strip inherited names from the own-branch so they aren't duplicated with the binding
-        // (template) branch. populateSchemaProperties filters ordinary inherited bean
-        // properties/fields by declaring type, but inherited @JsonProperty-annotated methods and
-        // overridden getters can still reach the own-branch — so the strip is what removes those.
+        // populateSchemaProperties filters ordinary inherited bean properties/fields by declaring
+        // type, but inherited @JsonProperty methods and overridden getters can still reach the
+        // own-branch, so strip those against the supertype's emitted keys to avoid duplication.
+        Schema<?> own = SchemaUtils.createSchema();
+        SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
+        own.setType("object"); // reassert; swagger-core may drop type on allOf members
         if (own.getProperties() != null && !superNames.isEmpty()) {
             own.getProperties().keySet().removeAll(superNames);
         }
@@ -588,22 +589,6 @@ public final class DynamicRefUtils {
         composed.addAllOfItem(binding);
         composed.addAllOfItem(own);
         return composed;
-    }
-
-    /**
-     * Builds an {@code {type: object, properties: {...}}} schema by populating the subtype's
-     * properties. {@link #resolveNamedSubtypeBinding} strips inherited names afterwards via the
-     * {@code superNames} set: {@code populateSchemaProperties} filters ordinary inherited bean
-     * properties/fields by declaring type, but inherited {@code @JsonProperty}-annotated methods
-     * and overridden getters can still reach the own-branch and would duplicate the binding branch.
-     */
-    private static Schema<?> buildOwnPropertiesSchema(OpenAPI openApi, VisitorContext context, ClassElement type,
-                                                     List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
-        Schema<?> own = SchemaUtils.createSchema();
-        SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
-        // Reassert object typing after population; swagger-core may drop this on allOf members.
-        own.setType("object");
-        return own;
     }
 
     /**
@@ -634,9 +619,7 @@ public final class DynamicRefUtils {
         }
         for (MethodElement m : el.getMethods()) {
             if (m.hasAnnotation(JsonProperty.class)) {
-                // Record the emitted property key (@JsonProperty value when set), not the raw
-                // method name, so shadowed-renamed properties are matched when stripping the
-                // own-branch — matches how populateSchemaProperties keys these properties.
+                // Use the @JsonProperty value (the emitted key), not the raw method name, so renamed properties match during stripping.
                 names.add(m.stringValue(JsonProperty.class).filter(StringUtils::isNotEmpty).orElse(m.getName()));
             }
         }
