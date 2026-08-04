@@ -471,11 +471,16 @@ public final class SchemaDefinitionUtils {
                     && definingElement != null
                     && isOpenapi31() && isDynamicRefsEnabled(context)
                     && DynamicRefUtils.isNamedSubtypeBinding(type)) {
-                    // A pure-specialization subtype (e.g. PetResponse extends Response<Pet>) is
-                    // emitted as a named binding component that references the generic template and
-                    // rebinds the anchor inline; usages then $ref this shared component.
+                    // A named subtype of a parameterized generic is emitted as a binding component
+                    // that references the generic template and rebinds the anchor inline. A pure
+                    // specialization (e.g. PetResponse extends Response<Pet>) is just the binding;
+                    // a subtype that adds its own fields becomes an allOf of that binding and an
+                    // own-properties object. Usages then $ref this shared component.
                     Schema<?> namedBinding = DynamicRefUtils.resolveNamedSubtypeBinding(openApi, context, type, mediaTypes, jsonViewClass);
                     if (namedBinding != null) {
+                        // Stamp the schema name so a later cached lookup of this component builds a
+                        // correct $ref (the binding schema is assembled by hand and has no name set).
+                        namedBinding.name(schemaName);
                         schemas.put(schemaName, namedBinding);
                         return SchemaUtils.createSchema().$ref(SchemaUtils.schemaRef(schemaName));
                     }

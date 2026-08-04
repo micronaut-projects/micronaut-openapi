@@ -503,11 +503,12 @@ public final class DynamicRefUtils {
     // ---- named subtypes ----------------------------------------------------------------
 
     /**
-     * Whether the given concrete type is a pure-specialization subtype: it extends a parameterized
-     * generic supertype (e.g. {@code class PetResponse extends Response<Pet>}) and adds no fields
-     * of its own beyond the inherited ones. Such a type is emitted as a named binding component
-     * (a {@code $ref} to the template plus a {@code $defs} rebinding) instead of a full concrete
-     * schema, so multiple usages share one component.
+     * Whether the given concrete type is a named subtype of a parameterized generic supertype
+     * (e.g. {@code class PetResponse extends Response<Pet>}). Such a type is emitted as a named
+     * binding component instead of a full concrete schema: a pure-specialization subtype (no fields
+     * of its own) becomes a {@code $ref} to the template plus a {@code $defs} rebinding; a subtype
+     * that adds its own fields becomes an {@code allOf} of that binding and an own-properties
+     * object, so the subtype's fields are preserved rather than dropped.
      */
     static boolean isNamedSubtypeBinding(ClassElement type) {
         if (type == null) {
@@ -517,19 +518,39 @@ public final class DynamicRefUtils {
         if (superBinding == null) {
             return false;
         }
-        // Guard against silently dropping a subtype's declared fields: only treat it as a binding
-        // alias when every field is inherited from the generic supertype.
-        return !addsOwnFields(type, superBinding);
+        // A self-referential named subtype (e.g. class WorkspaceFolder extends Folder<WorkspaceFolder,
+        // Resource>) would infinite-loop: resolving its binding resolves the type argument that is
+        // itself, re-entering resolveNamedSubtypeBinding. Fall back to concrete for this case.
+        if (isSelfReferentialSubtype(type, superBinding)) {
+            return false;
+        }
+        return true;
     }
 
     /**
-     * Builds a named binding schema for a pure-specialization subtype by delegating to
-     * {@link #resolveGenericBinding} on its parameterized generic supertype. The returned schema
-     * (a {@code $ref} to the template plus an inline {@code $defs} rebinding) is meant to be
-     * registered under the subtype's own schema name and referenced by {@code $ref}, so that each
-     * usage points at the shared named component.
+     * Whether the subtype appears in its own parameterized generic supertype's type arguments
+     * (directly), i.e. it is self-referential through the generic binding.
+     */
+    private static boolean isSelfReferentialSubtype(ClassElement type, ClassElement superBinding) {
+        String name = type.getName();
+        for (ClassElement arg : superBinding.getTypeArguments().values()) {
+            if (name.equals(arg.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Builds a named binding schema for a named subtype of a parameterized generic. A
+     * pure-specialization subtype (no fields of its own) becomes a {@code $ref} to the template
+     * plus an inline {@code $defs} rebinding. A subtype that adds its own fields becomes an
+     * {@code allOf} of that binding and an own-properties object, so the subtype's declared fields
+     * are preserved instead of being dropped. The result is meant to be registered under the
+     * subtype's own schema name and referenced by {@code $ref}.
      *
-     * @return the binding schema, or {@code null} if no parameterized generic supertype is found
+     * @return the binding (or composed) schema, or {@code null} if no parameterized generic
+     *         supertype is found or its binding cannot be built
      */
     static Schema<?> resolveNamedSubtypeBinding(OpenAPI openApi, VisitorContext context, ClassElement type,
                                                 List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
@@ -537,7 +558,37 @@ public final class DynamicRefUtils {
         if (superBinding == null) {
             return null;
         }
-        return resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+        Schema<?> binding = resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+        if (binding == null) {
+            return null;
+        }
+        // Compute both name sets once: superNames is reused for the adds-own-field test and for
+        // stripping shadowed inherited names from the own branch below.
+        Set<String> superNames = schemaPropertyNames(superBinding);
+        Set<String> ownNames = schemaPropertyNames(type);
+        ownNames.removeAll(superNames);
+        if (ownNames.isEmpty()) {
+            // Pure specialization: just the binding alias.
+            return binding;
+        }
+        // The subtype adds its own fields: compose the generic binding with an own-properties
+        // object so the extra fields survive (rather than falling back to a fully concrete schema).
+        // populateSchemaProperties filters ordinary inherited bean properties/fields by declaring
+        // type, but inherited @JsonProperty methods and overridden getters can still reach the
+        // own-branch, so strip those against the supertype's emitted keys to avoid duplication.
+        Schema<?> own = SchemaUtils.createSchema();
+        SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
+        own.setType("object"); // reassert; swagger-core may drop type on allOf members
+        if (own.getProperties() != null && !superNames.isEmpty()) {
+            own.getProperties().keySet().removeAll(superNames);
+        }
+        if (own.getProperties() == null || own.getProperties().isEmpty()) {
+            return binding;
+        }
+        var composed = SchemaUtils.createComposedSchema();
+        composed.addAllOfItem(binding);
+        composed.addAllOfItem(own);
+        return composed;
     }
 
     /**
@@ -558,34 +609,6 @@ public final class DynamicRefUtils {
         return null;
     }
 
-    /**
-     * Whether the subtype declares any schema-emitting member beyond those it inherits from the
-     * generic supertype. Mirrors the three sources {@code populateSchemaProperties} emits — bean
-     * properties ({@code getBeanProperties()}, which includes getter-only properties), public
-     * fields, and {@code @JsonProperty}-annotated methods — so that a subtype adding a computed
-     * getter or a {@code @JsonProperty} method (with no backing field) is detected and falls back
-     * to concrete instead of being silently dropped as a pure binding alias.
-     */
-    private static boolean addsOwnFields(ClassElement type, ClassElement superType) {
-        Set<String> superNames = schemaPropertyNames(superType);
-        for (PropertyElement p : type.getBeanProperties()) {
-            if (!superNames.contains(p.getName())) {
-                return true;
-            }
-        }
-        for (FieldElement f : type.getFields()) {
-            if (!superNames.contains(f.getName())) {
-                return true;
-            }
-        }
-        for (MethodElement m : type.getMethods()) {
-            if (m.hasAnnotation(JsonProperty.class) && !superNames.contains(m.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static Set<String> schemaPropertyNames(ClassElement el) {
         Set<String> names = new HashSet<>();
         for (PropertyElement p : el.getBeanProperties()) {
@@ -596,7 +619,8 @@ public final class DynamicRefUtils {
         }
         for (MethodElement m : el.getMethods()) {
             if (m.hasAnnotation(JsonProperty.class)) {
-                names.add(m.getName());
+                // Use the @JsonProperty value (the emitted key), not the raw method name, so renamed properties match during stripping.
+                names.add(m.stringValue(JsonProperty.class).filter(StringUtils::isNotEmpty).orElse(m.getName()));
             }
         }
         return names;

@@ -739,7 +739,7 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
-    void "test named subtype with an extra field falls back to concrete schema"() {
+    void "test named subtype with an extra field emits allOf of binding and own properties"() {
 
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
@@ -781,15 +781,35 @@ class MyBean {}
 ''')
 
         OpenAPI openApi = Utils.testReference
+        Schema petResponse = openApi.components.schemas['PetResponse']
 
         then:
-        // A subtype that adds its own field cannot be a pure binding alias (the field would be
-        // dropped), so it keeps the default concrete behavior (composed via allOf with its
-        // supertype, no inline $defs binding block).
-        Schema petResponse = openApi.components.schemas['PetResponse']
+        // A subtype that adds its own field is composed as allOf[ binding, own-properties ] so the
+        // extra field survives without falling back to a fully concrete schema. The binding branch
+        // holds the generic template $ref plus the inline $defs rebinding; the own-properties
+        // branch holds only the subtype's declared field(s).
         petResponse != null
-        petResponse.get$ref() == null
-        petResponse.getExtensions() == null || petResponse.getExtensions().get('$defs') == null
+        petResponse.allOf != null
+        petResponse.allOf.size() == 2
+
+        Schema bindingBranch = petResponse.allOf[0]
+        bindingBranch.get$ref() == '#/components/schemas/Response'
+        bindingBranch.getExtensions().get('$defs')['dataType']['$dynamicAnchor'] == 'dataType'
+        bindingBranch.getExtensions().get('$defs')['dataType']['$ref'] == '#/components/schemas/Pet'
+
+        Schema ownBranch = petResponse.allOf[1]
+        // type:object on the member is implied by its properties (swagger-core drops the explicit
+        // type during allOf post-processing); the contract is that the subtype's own field survives
+        // and the inherited generic field is not duplicated here.
+        ownBranch.getProperties().containsKey('tag')
+        ownBranch.getProperties().get('tag').getType() == 'string'
+        !ownBranch.getProperties().containsKey('data')
+
+        // The generic template itself is still emitted once.
+        openApi.components.schemas['Response'].get$dynamicAnchor() == 'dataType'
+
+        // The route references the shared named component by $ref.
+        openApi.paths['/pet'].get.responses['200'].content['application/json'].schema.get$ref() == '#/components/schemas/PetResponse'
     }
 
     @RestoreSystemProperties
@@ -979,5 +999,127 @@ class MyBean {}
         // computed property actually survives the fallback by checking the serialized output —
         // this is the contract that motivated falling back instead of emitting a binding alias.
         Utils.getYamlMapper().writeValueAsString(petResponse).contains('computed')
+    }
+
+    @RestoreSystemProperties
+    void "test self-referential named subtype falls back to concrete instead of looping"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/ws")
+    public WorkspaceFolder getWorkspace() { return null; }
+}
+
+class Folder<F, R> {
+    private List<F> children;
+    private List<R> shortcuts;
+    public List<F> getChildren() { return children; }
+    public void setChildren(List<F> children) { this.children = children; }
+    public List<R> getShortcuts() { return shortcuts; }
+    public void setShortcuts(List<R> shortcuts) { this.shortcuts = shortcuts; }
+}
+
+// Self-referential named subtype: appears as its own type argument (Folder<WorkspaceFolder, ...>).
+class WorkspaceFolder extends Folder<WorkspaceFolder, Resource> {
+    private List<String> permissions;
+    public List<String> getPermissions() { return permissions; }
+    public void setPermissions(List<String> permissions) { this.permissions = permissions; }
+}
+
+class Resource {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema ws = openApi.components.schemas['WorkspaceFolder']
+
+        then:
+        // A self-referential named subtype cannot be a binding alias (resolving its binding would
+        // recurse into resolving itself), so it falls back to the default concrete behavior. The
+        // important contract: it terminates (no infinite loop) and emits no leaked dynamic anchor.
+        ws != null
+        ws.get$ref() == null
+        ws.getExtensions() == null || ws.getExtensions().get('$defs') == null
+    }
+
+    @RestoreSystemProperties
+    void "test inherited @JsonProperty-renamed method stripped from own-branch by resolved key"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Controller
+class Api {
+    @Get("/pet")
+    public PetResponse getPet() { return null; }
+}
+
+class Response<T> {
+    private T data;
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
+    @JsonProperty("checksum")
+    public String computeChecksum() { return ""; }
+}
+
+class PetResponse extends Response<Pet> {
+    private String tag;
+    public String getTag() { return tag; }
+    public void setTag(String tag) { this.tag = tag; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema petResponse = openApi.components.schemas['PetResponse']
+
+        then:
+        petResponse != null
+        petResponse.allOf != null
+        petResponse.allOf.size() == 2
+        Schema ownBranch = petResponse.allOf[1]
+        // The subtype's own field survives...
+        ownBranch.getProperties().containsKey('tag')
+        // ...the inherited bean property is filtered upstream...
+        !ownBranch.getProperties().containsKey('data')
+        // ...and the inherited @JsonProperty-renamed method (emitted as 'checksum', not the method
+        // name 'computeChecksum') is stripped so it isn't duplicated with the binding branch.
+        // This requires the strip to match the @JsonProperty value, not the raw method name.
+        !ownBranch.getProperties().containsKey('checksum')
     }
 }
