@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.ALL_ENDPOINTS_NAME;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEndpointsConfig;
@@ -119,6 +120,14 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     @Override
     public void start(@NonNull VisitorContext context) {
         Utils.init(context);
+    }
+
+    @Override
+    public @NonNull Set<String> getSupportedAnnotationNames() {
+        return Set.of(
+            "io.micronaut.management.endpoint.annotation.Endpoint",
+            "org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint"
+        );
     }
 
     @Override

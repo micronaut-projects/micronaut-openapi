@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
@@ -71,6 +72,11 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
     }
 
     @Override
+    public @NonNull Set<String> getSupportedAnnotationNames() {
+        return Set.of(OpenAPIGroupInfo.class.getName());
+    }
+
+    @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
     }
@@ -80,9 +86,8 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
-        ContextUtils.addOriginatingElement(classEl, context);
-
         if (CollectionUtils.isNotEmpty(groups)) {
+            ContextUtils.addOriginatingElement(classEl, context);
             Map<String, List<String>> includedClassesGroups = Utils.getIncludedClassesGroups();
             if (includedClassesGroups == null) {
                 includedClassesGroups = new HashMap<>();
@@ -92,6 +97,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         }
 
         if (CollectionUtils.isNotEmpty(groupsExcluded)) {
+            ContextUtils.addOriginatingElement(classEl, context);
             Map<String, List<String>> includedClassesGroupsExcluded = Utils.getIncludedClassesGroupsExcluded();
             if (includedClassesGroupsExcluded == null) {
                 includedClassesGroupsExcluded = new HashMap<>();
@@ -103,7 +109,10 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         PackageElement packageEl = classEl.getPackage();
         var classAnns = classEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
         var packageAnns = packageEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
-        if (CollectionUtils.isNotEmpty(classAnns) || CollectionUtils.isNotEmpty(packageAnns)) {
+        if (CollectionUtils.isNotEmpty(classAnns)) {
+            ContextUtils.addOriginatingElement(classEl, context);
+        }
+        if (CollectionUtils.isNotEmpty(packageAnns)) {
             ContextUtils.addOriginatingElement(packageEl, context);
         }
         if (CollectionUtils.isEmpty(classAnns) && CollectionUtils.isEmpty(packageAnns)) {
