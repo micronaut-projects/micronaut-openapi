@@ -1,9 +1,14 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.inject.ast.Element
+import io.micronaut.inject.visitor.VisitorContext
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 import spock.util.environment.RestoreSystemProperties
+
+import java.util.Optional
 
 class OpenApi31DynamicGenericsSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1192,5 +1197,26 @@ class MyBean {}
         binding.get$ref() == '#/components/schemas/Folder'
         binding.getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/Document'
         binding.getExtensions().get('$defs')['R']['$ref'] == '#/components/schemas/Resource'
+    }
+
+    void "test array schema annotation supplies missing items"() {
+
+        given:
+        def context = Mock(VisitorContext) {
+            get(_, _) >> Optional.empty()
+        }
+        def element = Mock(Element)
+        def annotation = AnnotationValue.builder(io.swagger.v3.oas.annotations.media.ArraySchema)
+            .member('schema', AnnotationValue.builder(io.swagger.v3.oas.annotations.media.Schema)
+                .member('type', 'string')
+                .build())
+            .build()
+        def schema = new io.swagger.v3.oas.models.media.ArraySchema()
+
+        when:
+        SchemaDefinitionUtils.processArraySchemaAnn(schema, context, element, null, annotation)
+
+        then:
+        schema.items.type == 'string'
     }
 }
