@@ -1944,12 +1944,16 @@ public final class SchemaDefinitionUtils {
 
             processPropertyElements(openApi, context, type, typeArgs, schema, publicFields, mediaTypes, classJavadoc, jsonViewClass);
 
+            var beanPropertyReadMethods = beanProperties.stream()
+                .flatMap(property -> property.getReadMethod().stream())
+                .collect(Collectors.toSet());
+
             // also need to check methods with @JsonProperty annotation
             for (var methodEl : classEl.getMethods()) {
                 if (!methodEl.hasAnnotation(JsonProperty.class) || isVoid(methodEl.getReturnType())) {
                     continue;
                 }
-                if (beanProperties.stream().anyMatch(property -> property.getReadMethod().filter(methodEl::equals).isPresent())) {
+                if (beanPropertyReadMethods.contains(methodEl)) {
                     continue;
                 }
                 var methodJavadoc = Utils.getJavadocParser().parse(methodEl.getDocumentation().orElse(null));
