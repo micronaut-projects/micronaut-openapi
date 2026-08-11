@@ -266,11 +266,14 @@ public final class DynamicRefUtils {
      * For a single-variable template the name is <em>role-derived</em> ({@code itemType} when the
      * variable is used as a collection/array element, otherwise {@code dataType}) — this preserves
      * the existing output shape. For multi-variable templates role names would collide (two scalar
-     * variables both want {@code dataType}), so each anchor is derived from its declared variable
-     * name (e.g. {@code K}, {@code V}), sanitized to a valid JSON Schema anchor and de-duplicated
-     * when two names sanitize identically.
+     * variables both want {@code dataType}), so each anchor is derived from the field that uses the
+     * variable when that field is unique (e.g. a variable used only in {@code children} becomes the
+     * anchor {@code children}), which is more descriptive than the raw variable name; when a variable
+     * is unused or used by several fields (collision), it falls back to the declared variable name
+     * (e.g. {@code K}, {@code V}). All anchors are sanitized and de-duplicated.
      *
-     * @param rawType  the erased generic type (whose fields drive the single-variable role)
+     * @param rawType  the erased generic type (whose fields drive the single-variable role and the
+     *                 multi-variable field-derived names)
      * @param typeArgs the type arguments (keyed by declared variable name)
      * @return an ordered map of variable name to anchor name
      */
@@ -281,10 +284,16 @@ public final class DynamicRefUtils {
             result.put(varName, deriveTemplateAnchor(rawType));
             return result;
         }
+        Map<String, List<String>> fieldsByVar = fieldsByVariable(rawType, typeArgs.keySet());
         var used = new HashSet<String>();
         int suffix = 1;
         for (String varName : typeArgs.keySet()) {
-            String base = toDynamicAnchorName(varName);
+            List<String> fields = fieldsByVar.getOrDefault(varName, List.of());
+            // Prefer a field-derived anchor when the variable is used by exactly one field (unique,
+            // descriptive); fall back to the declared variable name on collision or no usage. The
+            // "Type" suffix parallels the single-variable itemType/dataType role names and keeps the
+            // anchor distinct from the property name it was derived from.
+            String base = fields.size() == 1 ? toDynamicAnchorName(fields.get(0)) + "Type" : toDynamicAnchorName(varName);
             String anchor = base;
             while (!used.add(anchor)) {
                 anchor = base + "_" + suffix++;
@@ -292,6 +301,44 @@ public final class DynamicRefUtils {
             result.put(varName, anchor);
         }
         return result;
+    }
+
+    /**
+     * Maps each type variable name to the names of fields on the raw type that reference it (directly
+     * as the field type, or anywhere within its type arguments). Used to derive descriptive
+     * multi-variable anchors: a variable referenced by exactly one field can borrow that field's
+     * name; variables referenced by zero or several fields fall back to the declared variable name.
+     */
+    private static Map<String, List<String>> fieldsByVariable(ClassElement rawType, Set<String> varNames) {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (String v : varNames) {
+            map.put(v, new ArrayList<>());
+        }
+        for (FieldElement field : rawType.getFields()) {
+            ClassElement ft = field.getGenericType();
+            if (ft == null) {
+                continue;
+            }
+            String fieldName = field.getName();
+            for (String v : varNames) {
+                if (referencesVariable(ft, v) && !map.get(v).contains(fieldName)) {
+                    map.get(v).add(fieldName);
+                }
+            }
+        }
+        return map;
+    }
+
+    private static boolean referencesVariable(ClassElement ft, String varName) {
+        if (ft instanceof GenericPlaceholderElement pe && varName.equals(pe.getVariableName())) {
+            return true;
+        }
+        for (ClassElement arg : ft.getTypeArguments().values()) {
+            if (referencesVariable(arg, varName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
