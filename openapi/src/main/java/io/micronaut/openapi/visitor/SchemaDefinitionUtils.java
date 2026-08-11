@@ -1949,6 +1949,9 @@ public final class SchemaDefinitionUtils {
                 if (!methodEl.hasAnnotation(JsonProperty.class) || isVoid(methodEl.getReturnType())) {
                     continue;
                 }
+                if (beanProperties.stream().anyMatch(property -> property.getReadMethod().filter(methodEl::equals).isPresent())) {
+                    continue;
+                }
                 var methodJavadoc = Utils.getJavadocParser().parse(methodEl.getDocumentation().orElse(null));
                 var methodReturnType = methodEl.getReturnType();
 
