@@ -76,6 +76,14 @@ public final class DynamicRefUtils {
     private static Map<String, String> activeTemplates = new HashMap<>();
 
     /**
+     * Named subtypes currently being resolved (keyed by raw type name). Used to detect cycles —
+     * direct (WorkspaceFolder extends Folder&lt;WorkspaceFolder&gt;) or mutual (A extends Folder&lt;B&gt;,
+     * B extends Folder&lt;A&gt;) — so the second entry returns null and falls back to concrete instead
+     * of infinite-looping.
+     */
+    private static Set<String> resolvingNamedSubtypes = new HashSet<>();
+
+    /**
      * Reflective handle to {@link Schema}'s private {@code extensions} map, used by
      * {@link #setSchemaDefs} to inject a {@code $defs} block (a JSON Schema 2020-12 keyword that
      * swagger-core 2.2.x does not model). See {@link #setSchemaDefs} for the full rationale.
@@ -101,6 +109,7 @@ public final class DynamicRefUtils {
         recursiveSchemaAnchors = new HashMap<>();
         templateVarStack = new ArrayList<>();
         activeTemplates = new HashMap<>();
+        resolvingNamedSubtypes = new HashSet<>();
     }
 
     // ---- recursive types ----------------------------------------------------------------
@@ -504,41 +513,15 @@ public final class DynamicRefUtils {
 
     /**
      * Whether the given concrete type is a named subtype of a parameterized generic supertype
-     * (e.g. {@code class PetResponse extends Response<Pet>}). Such a type is emitted as a named
-     * binding component instead of a full concrete schema: a pure-specialization subtype (no fields
-     * of its own) becomes a {@code $ref} to the template plus a {@code $defs} rebinding; a subtype
-     * that adds its own fields becomes an {@code allOf} of that binding and an own-properties
-     * object, so the subtype's fields are preserved rather than dropped.
+     * (e.g. {@code class PetResponse extends Response<Pet>}). Self-referential and mutually
+     * recursive subtypes are detected at resolution time by {@link #resolveNamedSubtypeBinding}'s
+     * in-progress set, not here.
      */
     static boolean isNamedSubtypeBinding(ClassElement type) {
         if (type == null) {
             return false;
         }
-        ClassElement superBinding = parameterizedGenericSuperType(type);
-        if (superBinding == null) {
-            return false;
-        }
-        // A self-referential named subtype (e.g. class WorkspaceFolder extends Folder<WorkspaceFolder,
-        // Resource>) would infinite-loop: resolving its binding resolves the type argument that is
-        // itself, re-entering resolveNamedSubtypeBinding. Fall back to concrete for this case.
-        if (isSelfReferentialSubtype(type, superBinding)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Whether the subtype appears in its own parameterized generic supertype's type arguments
-     * (directly), i.e. it is self-referential through the generic binding.
-     */
-    private static boolean isSelfReferentialSubtype(ClassElement type, ClassElement superBinding) {
-        String name = type.getName();
-        for (ClassElement arg : superBinding.getTypeArguments().values()) {
-            if (name.equals(arg.getName())) {
-                return true;
-            }
-        }
-        return false;
+        return parameterizedGenericSuperType(type) != null;
     }
 
     /**
@@ -554,6 +537,12 @@ public final class DynamicRefUtils {
      */
     static Schema<?> resolveNamedSubtypeBinding(OpenAPI openApi, VisitorContext context, ClassElement type,
                                                 List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
+        String typeName = type.getName();
+        if (resolvingNamedSubtypes.contains(typeName)) {
+            return null;
+        }
+        resolvingNamedSubtypes.add(typeName);
+        try {
         ClassElement superBinding = parameterizedGenericSuperType(type);
         if (superBinding == null) {
             return null;
@@ -589,6 +578,9 @@ public final class DynamicRefUtils {
         composed.addAllOfItem(binding);
         composed.addAllOfItem(own);
         return composed;
+        } finally {
+            resolvingNamedSubtypes.remove(typeName);
+        }
     }
 
     /**

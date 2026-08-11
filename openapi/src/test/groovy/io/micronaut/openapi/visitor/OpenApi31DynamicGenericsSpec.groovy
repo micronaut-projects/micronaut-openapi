@@ -1007,7 +1007,7 @@ class MyBean {}
     }
 
     @RestoreSystemProperties
-    void "test self-referential named subtype falls back to concrete instead of looping"() {
+    void "test self-referential named subtype emits binding without looping"() {
 
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
@@ -1057,12 +1057,97 @@ class MyBean {}
         Schema ws = openApi.components.schemas['WorkspaceFolder']
 
         then:
-        // A self-referential named subtype cannot be a binding alias (resolving its binding would
-        // recurse into resolving itself), so it falls back to the default concrete behavior. The
-        // important contract: it terminates (no infinite loop) and emits no leaked dynamic anchor.
+        // A self-referential named subtype now gets a named binding (allOf[binding, own-props])
+        // instead of falling back to concrete — the in-progress set breaks the resolution cycle
+        // (resolving the type argument that is itself returns null, so a concrete $ref fills the
+        // slot). The binding's F slot points back at WorkspaceFolder (recursive $ref).
         ws != null
-        ws.get$ref() == null
-        ws.getExtensions() == null || ws.getExtensions().get('$defs') == null
+        ws.allOf != null
+        ws.allOf.size() == 2
+        ws.allOf[0].get$ref() == '#/components/schemas/Folder'
+        ws.allOf[0].getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/WorkspaceFolder'
+        ws.allOf[1].getProperties().containsKey('permissions')
+    }
+
+    @RestoreSystemProperties
+    void "test mutual named-subtype recursion terminates and emits bindings"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/a")
+    public NodeA getNodeA() { return null; }
+}
+
+class Folder<F, R> {
+    private List<F> children;
+    private List<R> shortcuts;
+    public List<F> getChildren() { return children; }
+    public void setChildren(List<F> children) { this.children = children; }
+    public List<R> getShortcuts() { return shortcuts; }
+    public void setShortcuts(List<R> shortcuts) { this.shortcuts = shortcuts; }
+}
+
+// Mutual recursion: NodeA references NodeB and vice versa.
+class NodeA extends Folder<NodeB, Resource> {
+    private String label;
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+}
+
+class NodeB extends Folder<NodeA, Document> {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+class Resource {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+class Document {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema nodeA = openApi.components.schemas['NodeA']
+        Schema nodeB = openApi.components.schemas['NodeB']
+
+        then:
+        // Both subtypes are in components and the build terminates (no infinite loop). NodeA gets
+        // a named binding (allOf[binding, own-props]) with its F slot pointing at NodeB. NodeB,
+        // resolved as a type argument during NodeA's binding build (where the gate's definingElement
+        // is null), may be concrete — the in-progress set breaks the cycle, and full binding for
+        // both mutual subtypes is a further refinement.
+        nodeA != null
+        nodeA.allOf != null
+        nodeA.allOf.size() == 2
+        nodeA.allOf[0].get$ref() == '#/components/schemas/Folder'
+        nodeA.allOf[0].getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/NodeB'
+        nodeA.allOf[1].getProperties().containsKey('label')
+
+        nodeB != null
+        // NodeB was registered during NodeA's resolution — it exists and carries its own field.
+        Utils.getYamlMapper().writeValueAsString(nodeB).contains('title')
     }
 
     @RestoreSystemProperties
