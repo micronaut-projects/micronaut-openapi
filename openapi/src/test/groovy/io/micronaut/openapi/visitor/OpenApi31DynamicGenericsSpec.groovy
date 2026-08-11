@@ -1,9 +1,14 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.inject.ast.Element
+import io.micronaut.inject.visitor.VisitorContext
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 import spock.util.environment.RestoreSystemProperties
+
+import java.util.Optional
 
 class OpenApi31DynamicGenericsSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1121,5 +1126,97 @@ class MyBean {}
         // name 'computeChecksum') is stripped so it isn't duplicated with the binding branch.
         // This requires the strip to match the @JsonProperty value, not the raw method name.
         !ownBranch.getProperties().containsKey('checksum')
+    }
+
+    @RestoreSystemProperties
+    void "test polymorphic array items fold the type variable into oneOf"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/ws")
+    public Folder<Document, Resource> get() { return null; }
+}
+
+class Folder<F, R> {
+    @ArraySchema(schema = @Schema(oneOf = { Document.class }))
+    private List<F> children;
+    private List<R> shortcuts;
+    public List<F> getChildren() { return children; }
+    public void setChildren(List<F> children) { this.children = children; }
+    public List<R> getShortcuts() { return shortcuts; }
+    public void setShortcuts(List<R> shortcuts) { this.shortcuts = shortcuts; }
+}
+
+class Document {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+class Resource {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema folder = openApi.components.schemas['Folder']
+
+        then:
+        folder != null
+        Schema children = folder.properties.children
+        children.type == 'array'
+        Schema items = children.items
+        items.oneOf != null
+        items.oneOf.size() == 2
+        items.oneOf*.get$ref() == ['#/components/schemas/Document', null]
+        items.oneOf*.get$dynamicRef() == [null, '#F']
+        items.get$dynamicRef() == null
+
+        folder.properties.shortcuts.items.get$dynamicRef() == '#R'
+
+        Schema binding = openApi.paths['/ws'].get.responses['200'].content['application/json'].schema
+        binding.get$ref() == '#/components/schemas/Folder'
+        binding.getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/Document'
+        binding.getExtensions().get('$defs')['R']['$ref'] == '#/components/schemas/Resource'
+    }
+
+    void "test array schema annotation supplies missing items"() {
+
+        given:
+        def context = Mock(VisitorContext) {
+            get(_, _) >> Optional.empty()
+        }
+        def element = Mock(Element)
+        def annotation = AnnotationValue.builder(io.swagger.v3.oas.annotations.media.ArraySchema)
+            .member('schema', AnnotationValue.builder(io.swagger.v3.oas.annotations.media.Schema)
+                .member('type', 'string')
+                .build())
+            .build()
+        def schema = new io.swagger.v3.oas.models.media.ArraySchema()
+
+        when:
+        SchemaDefinitionUtils.processArraySchemaAnn(schema, context, element, null, annotation)
+
+        then:
+        schema.items.type == 'string'
     }
 }
