@@ -1950,10 +1950,9 @@ public final class SchemaDefinitionUtils {
 
             // also need to check methods with @JsonProperty annotation
             for (var methodEl : classEl.getMethods()) {
-                if (!methodEl.hasAnnotation(JsonProperty.class) || isVoid(methodEl.getReturnType())) {
-                    continue;
-                }
-                if (beanPropertyReadMethods.contains(methodEl)) {
+                if (!methodEl.hasAnnotation(JsonProperty.class)
+                    || isVoid(methodEl.getReturnType())
+                    || beanPropertyReadMethods.contains(methodEl)) {
                     continue;
                 }
                 var methodJavadoc = Utils.getJavadocParser().parse(methodEl.getDocumentation().orElse(null));
