@@ -543,41 +543,41 @@ public final class DynamicRefUtils {
         }
         resolvingNamedSubtypes.add(typeName);
         try {
-        ClassElement superBinding = parameterizedGenericSuperType(type);
-        if (superBinding == null) {
-            return null;
-        }
-        Schema<?> binding = resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
-        if (binding == null) {
-            return null;
-        }
-        // Compute both name sets once: superNames is reused for the adds-own-field test and for
-        // stripping shadowed inherited names from the own branch below.
-        Set<String> superNames = schemaPropertyNames(superBinding);
-        Set<String> ownNames = schemaPropertyNames(type);
-        ownNames.removeAll(superNames);
-        if (ownNames.isEmpty()) {
-            // Pure specialization: just the binding alias.
-            return binding;
-        }
-        // The subtype adds its own fields: compose the generic binding with an own-properties
-        // object so the extra fields survive (rather than falling back to a fully concrete schema).
-        // populateSchemaProperties filters ordinary inherited bean properties/fields by declaring
-        // type, but inherited @JsonProperty methods and overridden getters can still reach the
-        // own-branch, so strip those against the supertype's emitted keys to avoid duplication.
-        Schema<?> own = SchemaUtils.createSchema();
-        SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
-        own.setType("object"); // reassert; swagger-core may drop type on allOf members
-        if (own.getProperties() != null && !superNames.isEmpty()) {
-            own.getProperties().keySet().removeAll(superNames);
-        }
-        if (own.getProperties() == null || own.getProperties().isEmpty()) {
-            return binding;
-        }
-        var composed = SchemaUtils.createComposedSchema();
-        composed.addAllOfItem(binding);
-        composed.addAllOfItem(own);
-        return composed;
+            ClassElement superBinding = parameterizedGenericSuperType(type);
+            if (superBinding == null) {
+                return null;
+            }
+            Schema<?> binding = resolveGenericBinding(openApi, context, superBinding, superBinding.getTypeArguments(), mediaTypes, jsonViewClass);
+            if (binding == null) {
+                return null;
+            }
+            // Compute both name sets once: superNames is reused for the adds-own-field test and for
+            // stripping shadowed inherited names from the own branch below.
+            Set<String> superNames = schemaPropertyNames(superBinding);
+            Set<String> ownNames = schemaPropertyNames(type);
+            ownNames.removeAll(superNames);
+            if (ownNames.isEmpty()) {
+                // Pure specialization: just the binding alias.
+                return binding;
+            }
+            // The subtype adds its own fields: compose the generic binding with an own-properties
+            // object so the extra fields survive (rather than falling back to a fully concrete schema).
+            // populateSchemaProperties filters ordinary inherited bean properties/fields by declaring
+            // type, but inherited @JsonProperty methods and overridden getters can still reach the
+            // own-branch, so strip those against the supertype's emitted keys to avoid duplication.
+            Schema<?> own = SchemaUtils.createSchema();
+            SchemaDefinitionUtils.populateSchemaProperties(openApi, context, type, type.getTypeArguments(), own, mediaTypes, null, jsonViewClass);
+            own.setType("object"); // reassert; swagger-core may drop type on allOf members
+            if (own.getProperties() != null && !superNames.isEmpty()) {
+                own.getProperties().keySet().removeAll(superNames);
+            }
+            if (own.getProperties() == null || own.getProperties().isEmpty()) {
+                return binding;
+            }
+            var composed = SchemaUtils.createComposedSchema();
+            composed.addAllOfItem(binding);
+            composed.addAllOfItem(own);
+            return composed;
         } finally {
             resolvingNamedSubtypes.remove(typeName);
         }

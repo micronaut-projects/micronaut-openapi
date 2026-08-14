@@ -1107,9 +1107,9 @@ class NodeA extends Folder<NodeB, Resource> {
 }
 
 class NodeB extends Folder<NodeA, Document> {
-    private String title;
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    private String bMarker;
+    public String getBMarker() { return bMarker; }
+    public void setBMarker(String bMarker) { this.bMarker = bMarker; }
 }
 
 class Resource {
@@ -1147,7 +1147,8 @@ class MyBean {}
 
         nodeB != null
         // NodeB was registered during NodeA's resolution — it exists and carries its own field.
-        Utils.getYamlMapper().writeValueAsString(nodeB).contains('title')
+        // (bMarker is deliberately not an OpenAPI keyword, so the substring check is unambiguous.)
+        Utils.getYamlMapper().writeValueAsString(nodeB).contains('bMarker')
     }
 
     @RestoreSystemProperties
