@@ -586,20 +586,20 @@ class MyBean {}
         then:
         pair != null
         // Multi-variable template: root carries the primary (first) variable's anchor only,
-        // because a schema object can hold a single $dynamicAnchor.
-        pair.get$dynamicAnchor() == 'K'
-        // Each variable has its own $defs placeholder (anchor + not: {}), keyed by the sanitized
-        // variable name.
-        Schema kPlaceholder = pair.getExtensions().get('$defs')['K']
-        kPlaceholder.get$dynamicAnchor() == 'K'
+        // because a schema object can hold a single $dynamicAnchor. Anchors are derived from the
+        // field that uses each variable (key -> keyType, value -> valueType).
+        pair.get$dynamicAnchor() == 'keyType'
+        // Each variable has its own $defs placeholder (anchor + not: {}), keyed by the anchor name.
+        Schema kPlaceholder = pair.getExtensions().get('$defs')['keyType']
+        kPlaceholder.get$dynamicAnchor() == 'keyType'
         kPlaceholder.getNot() != null
-        Schema vPlaceholder = pair.getExtensions().get('$defs')['V']
-        vPlaceholder.get$dynamicAnchor() == 'V'
+        Schema vPlaceholder = pair.getExtensions().get('$defs')['valueType']
+        vPlaceholder.get$dynamicAnchor() == 'valueType'
         vPlaceholder.getNot() != null
         // Field usages resolve to the correct per-variable anchor.
-        pair.properties.key.get$dynamicRef() == '#K'
+        pair.properties.key.get$dynamicRef() == '#keyType'
         pair.properties.key.get$ref() == null
-        pair.properties.value.get$dynamicRef() == '#V'
+        pair.properties.value.get$dynamicRef() == '#valueType'
 
         // No duplicated concrete schema per binding.
         !openApi.components.schemas.containsKey('Pair_Pet_Group_')
@@ -610,15 +610,78 @@ class MyBean {}
         // asserts against — so read them with map access.)
         Schema pair1 = openApi.paths['/pair1'].get.responses['200'].content['application/json'].schema
         pair1.get$ref() == '#/components/schemas/Pair'
-        pair1.getExtensions().get('$defs')['K']['$dynamicAnchor'] == 'K'
-        pair1.getExtensions().get('$defs')['K']['$ref'] == '#/components/schemas/Pet'
-        pair1.getExtensions().get('$defs')['V']['$dynamicAnchor'] == 'V'
-        pair1.getExtensions().get('$defs')['V']['$ref'] == '#/components/schemas/Group'
+        pair1.getExtensions().get('$defs')['keyType']['$dynamicAnchor'] == 'keyType'
+        pair1.getExtensions().get('$defs')['keyType']['$ref'] == '#/components/schemas/Pet'
+        pair1.getExtensions().get('$defs')['valueType']['$dynamicAnchor'] == 'valueType'
+        pair1.getExtensions().get('$defs')['valueType']['$ref'] == '#/components/schemas/Group'
 
         Schema pair2 = openApi.paths['/pair2'].get.responses['200'].content['application/json'].schema
         pair2.get$ref() == '#/components/schemas/Pair'
-        pair2.getExtensions().get('$defs')['K']['$ref'] == '#/components/schemas/Pet'
-        pair2.getExtensions().get('$defs')['V']['$ref'] == '#/components/schemas/Owner'
+        pair2.getExtensions().get('$defs')['keyType']['$ref'] == '#/components/schemas/Pet'
+        pair2.getExtensions().get('$defs')['valueType']['$ref'] == '#/components/schemas/Owner'
+    }
+
+    @RestoreSystemProperties
+    void "test multi-variable anchor falls back to var name when a variable is used in several fields"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DYNAMIC_REFS_ENABLED, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import java.util.List;
+
+@Controller
+class Api {
+    @Get("/cache")
+    public Cache<Pet, Group> getCache() { return null; }
+}
+
+class Cache<K, V> {
+    private List<K> keys;
+    private K lastKey;
+    private V value;
+    public List<K> getKeys() { return keys; }
+    public void setKeys(List<K> keys) { this.keys = keys; }
+    public K getLastKey() { return lastKey; }
+    public void setLastKey(K lastKey) { this.lastKey = lastKey; }
+    public V getValue() { return value; }
+    public void setValue(V value) { this.value = value; }
+}
+
+class Pet {
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+class Group {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openApi = Utils.testReference
+        Schema cache = openApi.components.schemas['Cache']
+
+        then:
+        cache != null
+        // V is used by exactly one field (value) -> field-derived anchor valueType.
+        cache.getExtensions().get('$defs')['valueType']['not'] != null
+        cache.properties.value.get$dynamicRef() == '#valueType'
+        // K is used by two fields (keys, lastKey) -> collision -> falls back to the variable name.
+        cache.getExtensions().get('$defs')['K']['not'] != null
+        cache.properties.keys.items.get$dynamicRef() == '#K'
+        cache.properties.lastKey.get$dynamicRef() == '#K'
     }
 
     @RestoreSystemProperties
@@ -1274,15 +1337,15 @@ class MyBean {}
         items.oneOf != null
         items.oneOf.size() == 2
         items.oneOf*.get$ref() == ['#/components/schemas/Document', null]
-        items.oneOf*.get$dynamicRef() == [null, '#F']
+        items.oneOf*.get$dynamicRef() == [null, '#childrenType']
         items.get$dynamicRef() == null
 
-        folder.properties.shortcuts.items.get$dynamicRef() == '#R'
+        folder.properties.shortcuts.items.get$dynamicRef() == '#shortcutsType'
 
         Schema binding = openApi.paths['/ws'].get.responses['200'].content['application/json'].schema
         binding.get$ref() == '#/components/schemas/Folder'
-        binding.getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/Document'
-        binding.getExtensions().get('$defs')['R']['$ref'] == '#/components/schemas/Resource'
+        binding.getExtensions().get('$defs')['childrenType']['$ref'] == '#/components/schemas/Document'
+        binding.getExtensions().get('$defs')['shortcutsType']['$ref'] == '#/components/schemas/Resource'
     }
 
     void "test array schema annotation supplies missing items"() {

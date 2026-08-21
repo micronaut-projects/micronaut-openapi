@@ -424,19 +424,19 @@ class MyBean {}
         then:
         folder != null
         // Multi-variable template: root carries the primary (first) variable's anchor; each variable
-        // has its own $defs placeholder. Fixture names them folderType/resourceType by role; Micronaut
-        // derives them from the declared variable names (F, R) since role names would collide.
-        folder.get$dynamicAnchor() == 'F'
-        folder.getExtensions().get('$defs')['F']['not'] != null
-        folder.getExtensions().get('$defs')['R']['not'] != null
-        folder.properties.children.items.get$dynamicRef() == '#F'
-        folder.properties.shortcuts.items.get$dynamicRef() == '#R'
+        // has its own $defs placeholder. Anchors are derived from the field that uses each variable
+        // (children -> childrenType, shortcuts -> shortcutsType).
+        folder.get$dynamicAnchor() == 'childrenType'
+        folder.getExtensions().get('$defs')['childrenType']['not'] != null
+        folder.getExtensions().get('$defs')['shortcutsType']['not'] != null
+        folder.properties.children.items.get$dynamicRef() == '#childrenType'
+        folder.properties.shortcuts.items.get$dynamicRef() == '#shortcutsType'
 
         // Usage rebinds both variables inline.
         Schema binding = openApi.paths['/workspaces/current'].get.responses['200'].content['application/json'].schema
         binding.get$ref() == '#/components/schemas/Folder'
-        binding.getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/Document'
-        binding.getExtensions().get('$defs')['R']['$ref'] == '#/components/schemas/Resource'
+        binding.getExtensions().get('$defs')['childrenType']['$ref'] == '#/components/schemas/Document'
+        binding.getExtensions().get('$defs')['shortcutsType']['$ref'] == '#/components/schemas/Resource'
     }
 
     // fixture: inherited-component-binding.yaml — named subtype that adds a field, used at routes.
