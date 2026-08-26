@@ -126,6 +126,7 @@ public final class SchemaUtils {
     public static final Schema<?> EMPTY_MAP_SCHEMA = new MapSchema();
     public static final Schema<?> EMPTY_NUMBER_SCHEMA = new NumberSchema();
     public static final Schema<?> EMPTY_OBJECT_SCHEMA = new ObjectSchema();
+    public static final Schema<?> EMPTY_OBJECT_TYPE_SCHEMA = new Schema<>().type(TYPE_OBJECT);
     public static final Schema<?> EMPTY_PASSWORD_SCHEMA = new PasswordSchema();
     public static final Schema<?> EMPTY_STRING_SCHEMA = new StringSchema();
     public static final Schema<?> EMPTY_UUID_SCHEMA = new UUIDSchema();
@@ -146,6 +147,7 @@ public final class SchemaUtils {
         EMPTY_MAP_SCHEMA,
         EMPTY_NUMBER_SCHEMA,
         EMPTY_OBJECT_SCHEMA,
+        EMPTY_OBJECT_TYPE_SCHEMA,
         EMPTY_PASSWORD_SCHEMA,
         EMPTY_STRING_SCHEMA,
         EMPTY_UUID_SCHEMA,
