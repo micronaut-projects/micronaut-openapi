@@ -75,6 +75,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
@@ -126,12 +127,11 @@ public final class SchemaUtils {
     public static final Schema<?> EMPTY_MAP_SCHEMA = new MapSchema();
     public static final Schema<?> EMPTY_NUMBER_SCHEMA = new NumberSchema();
     public static final Schema<?> EMPTY_OBJECT_SCHEMA = new ObjectSchema();
-    public static final Schema<?> EMPTY_OBJECT_TYPE_SCHEMA = new Schema<>().type(TYPE_OBJECT);
     public static final Schema<?> EMPTY_PASSWORD_SCHEMA = new PasswordSchema();
     public static final Schema<?> EMPTY_STRING_SCHEMA = new StringSchema();
     public static final Schema<?> EMPTY_UUID_SCHEMA = new UUIDSchema();
 
-    private static final List<Schema<?>> ALL_EMPTY_SCHEMAS = List.of(
+    private static final List<Schema<?>> ALL_EMPTY_SCHEMAS = Stream.of(
         EMPTY_SCHEMA,
         EMPTY_ARRAY_SCHEMA,
         EMPTY_BINARY_SCHEMA,
@@ -147,12 +147,40 @@ public final class SchemaUtils {
         EMPTY_MAP_SCHEMA,
         EMPTY_NUMBER_SCHEMA,
         EMPTY_OBJECT_SCHEMA,
-        EMPTY_OBJECT_TYPE_SCHEMA,
         EMPTY_PASSWORD_SCHEMA,
         EMPTY_STRING_SCHEMA,
         EMPTY_UUID_SCHEMA,
         EMPTY_ARBITRARY_SCHEMA
-    );
+    ).flatMap(SchemaUtils::createVariations).toList();
+
+    /**
+     * Create variations of the empty schemas which vary by type or implementation class, which
+     * are also functionally empty.
+     *
+     * @param schema the schema to base the variations from
+     * @return the variations
+     */
+    private static Stream<Schema<?>> createVariations(Schema<?> schema) {
+        // no variations to create
+        if (schema.getType() == null) {
+            return Stream.of(schema);
+        }
+
+        // a variation with same class, with a null type
+        final Schema<?> schemaWithNullType;
+        try {
+            schemaWithNullType =
+                schema.getClass().getDeclaredConstructor().newInstance().type(null);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                schema.getClass().getName() + " class must have no-arg constructor", e);
+        }
+
+        // a variation with the generic Schema class, with the same type
+        final Schema<?> genericSchemaWithSameType = new Schema<>().type(schema.getType());
+
+        return Stream.of(schema, schemaWithNullType, genericSchemaWithSameType);
+    }
 
     private SchemaUtils() {
     }
