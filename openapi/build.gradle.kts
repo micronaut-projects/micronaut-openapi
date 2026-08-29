@@ -12,6 +12,7 @@ dependencies {
     implementation(mn.micronaut.core)
     implementation(mn.micronaut.inject)
     implementation(mn.micronaut.http)
+    runtimeOnly(mn.snakeyaml)
 
     api(projects.micronautOpenapiAnnotations)
     api(projects.micronautOpenapiCommon)

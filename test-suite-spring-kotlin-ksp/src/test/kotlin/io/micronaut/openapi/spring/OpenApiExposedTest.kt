@@ -2,7 +2,9 @@ package io.micronaut.openapi.spring
 
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,6 +35,8 @@ class OpenApiExposedTest {
                 assertNotNull(it)
                 openApiSpec = String(it!!.readAllBytes())
             }
+        assertTrue(openApiSpec.contains("display_name:"))
+        assertFalse(openApiSpec.contains("displayName:"))
         val recievedOpenApiSpec = AtomicReference<String>()
 
         assertDoesNotThrow {

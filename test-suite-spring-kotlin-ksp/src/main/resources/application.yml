@@ -4,6 +4,12 @@ spring:
   main:
     banner-mode: off
 
+micronaut:
+  openapi:
+    property:
+      naming:
+        strategy: SNAKE_CASE
+
 server:
   port: 8092
 
