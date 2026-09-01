@@ -153,6 +153,9 @@ public final class SchemaUtils {
         EMPTY_ARBITRARY_SCHEMA
     ).flatMap(SchemaUtils::createVariations).toList();
 
+    private SchemaUtils() {
+    }
+
     /**
      * Create variations of the empty schemas which vary by type or implementation class, which
      * are also functionally empty.
@@ -180,9 +183,6 @@ public final class SchemaUtils {
         final Schema<?> genericSchemaWithSameType = new Schema<>().type(schema.getType());
 
         return Stream.of(schema, schemaWithNullType, genericSchemaWithSameType);
-    }
-
-    private SchemaUtils() {
     }
 
     public static boolean isArraySchema(Schema<?> schema, OpenAPI openApi) {
