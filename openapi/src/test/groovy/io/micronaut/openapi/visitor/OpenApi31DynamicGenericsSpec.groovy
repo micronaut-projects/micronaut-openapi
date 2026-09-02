@@ -1123,12 +1123,12 @@ class MyBean {}
         // A self-referential named subtype now gets a named binding (allOf[binding, own-props])
         // instead of falling back to concrete — the in-progress set breaks the resolution cycle
         // (resolving the type argument that is itself returns null, so a concrete $ref fills the
-        // slot). The binding's F slot points back at WorkspaceFolder (recursive $ref).
+        // slot). The binding's childrenType slot points back at WorkspaceFolder (recursive $ref).
         ws != null
         ws.allOf != null
         ws.allOf.size() == 2
         ws.allOf[0].get$ref() == '#/components/schemas/Folder'
-        ws.allOf[0].getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/WorkspaceFolder'
+        ws.allOf[0].getExtensions().get('$defs')['childrenType']['$ref'] == '#/components/schemas/WorkspaceFolder'
         ws.allOf[1].getProperties().containsKey('permissions')
     }
 
@@ -1197,7 +1197,7 @@ class MyBean {}
 
         then:
         // Both subtypes are in components and the build terminates (no infinite loop). NodeA gets
-        // a named binding (allOf[binding, own-props]) with its F slot pointing at NodeB. NodeB,
+        // a named binding (allOf[binding, own-props]) with its childrenType slot pointing at NodeB. NodeB,
         // resolved as a type argument during NodeA's binding build (where the gate's definingElement
         // is null), may be concrete — the in-progress set breaks the cycle, and full binding for
         // both mutual subtypes is a further refinement.
@@ -1205,7 +1205,7 @@ class MyBean {}
         nodeA.allOf != null
         nodeA.allOf.size() == 2
         nodeA.allOf[0].get$ref() == '#/components/schemas/Folder'
-        nodeA.allOf[0].getExtensions().get('$defs')['F']['$ref'] == '#/components/schemas/NodeB'
+        nodeA.allOf[0].getExtensions().get('$defs')['childrenType']['$ref'] == '#/components/schemas/NodeB'
         nodeA.allOf[1].getProperties().containsKey('label')
 
         nodeB != null
