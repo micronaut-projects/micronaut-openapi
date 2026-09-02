@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.54"
+managed-swagger = "2.2.55"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.23.2"
 # deprecated, use managed-flexmark
