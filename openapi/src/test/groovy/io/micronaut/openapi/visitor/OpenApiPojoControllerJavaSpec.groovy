@@ -7,6 +7,54 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 
 class OpenApiPojoControllerJavaSpec extends AbstractOpenApiTypeElementSpec {
 
+    void "test named class schema with JsonProperty getter"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Set;
+
+@Controller
+class RevokeController {
+    @Get
+    Revoke get() {
+        return null;
+    }
+}
+
+@Schema(name = "example.Revoke", description = "Class description")
+class Revoke {
+    @Schema(description = "Set description")
+    @JsonProperty("from")
+    private Set<String> from;
+
+    @JsonProperty("from")
+    public Set<String> getFrom() {
+        return from;
+    }
+
+    public void setFrom(Set<String> from) {
+        this.from = from;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Schema revokeSchema = Utils.testReference.components.schemas['example.Revoke']
+        revokeSchema.properties.keySet() == ['from'] as Set
+        revokeSchema.properties.from.type == 'array'
+        revokeSchema.properties.from.description == 'Set description'
+        revokeSchema.description == 'Class description'
+    }
+
     void "test java"() {
 
         when:
