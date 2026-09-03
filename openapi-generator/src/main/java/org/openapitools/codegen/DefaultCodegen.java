@@ -245,6 +245,8 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> enumNameMapping = new HashMap<>();
     // a map to store the mapping between operation id name and the name provided by the user
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
+    // a map to inject vendor extensions into model classes or their properties
+    protected Map<String, String> injectModelVendorExtensions = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
     protected String fileSuffix;
@@ -1474,6 +1476,11 @@ public class DefaultCodegen implements CodegenConfig {
     @Override
     public Map<String, String> operationIdNameMapping() {
         return operationIdNameMapping;
+    }
+
+    @Override
+    public Map<String, String> injectModelVendorExtensions() {
+        return injectModelVendorExtensions;
     }
 
     @Override
