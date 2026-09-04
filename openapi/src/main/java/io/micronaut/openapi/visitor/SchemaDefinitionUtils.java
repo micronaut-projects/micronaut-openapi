@@ -2260,7 +2260,15 @@ public final class SchemaDefinitionUtils {
             processSchemaAnn(itemsSchemaFromAnn, context, element, true,
                 classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
                 itemsSchemaAnn);
-            if (!SchemaUtils.isEmptySchema(itemsSchemaFromAnn)) {
+            // Note: don't use SchemaUtils.isEmptySchema here. It treats a functionally-empty typed
+            // schema (e.g. a bare {type: string}) as empty, which is correct for schema normalization,
+            // but for array items such a schema is meaningful and must be applied. Instead, detect
+            // whether the annotation actually contributed any content by comparing against a pristine
+            // default schema. We reuse the shared SchemaUtils.EMPTY_SCHEMA constant rather than
+            // allocating a throwaway createSchema() per call: isEquals normalizes a null type/types to
+            // "object", so comparing against the bare empty schema is equivalent to comparing against a
+            // fresh pristine schema, and it short-circuits on the first differing field.
+            if (!SchemaUtils.isEquals(itemsSchemaFromAnn, SchemaUtils.EMPTY_SCHEMA)) {
                 var itemsSchema = schemaToBind.getItems();
                 if (itemsSchema == null) {
                     // No existing items to merge with; adopt the annotation's items schema.
