@@ -43,7 +43,7 @@ micronaut-session = "5.1.0"
 micronaut-test = "5.1.0"
 micronaut-grpc = "5.1.0"
 micronaut-spring = "6.1.0"
-micronaut-shared-settings = "8.0.1"
+micronaut-shared-settings = "8.0.2"
 
 # JavaScript libraries
 js-swagger-ui = "5.32.1"
