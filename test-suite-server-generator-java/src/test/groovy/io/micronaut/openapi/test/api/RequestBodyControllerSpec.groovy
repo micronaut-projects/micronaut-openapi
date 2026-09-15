@@ -107,7 +107,7 @@ class RequestBodyControllerSpec extends Specification {
                 new SimpleModel().color("red").numEdges(10L).area(11.5f)
                                 .convex(true).points(["1,0", "0,0", "0,1", "2,2"]),
                 new SimpleModel().color("azure").numEdges(2L).area(1.45f)
-                                .convex(true).points(["1,1", "2,2"]),
+                                .convex(true).points(["1,1", "2,2", "1,2"]),
                 new SimpleModel().numEdges(11L).convex(false)
         ]
 
@@ -119,6 +119,26 @@ class RequestBodyControllerSpec extends Specification {
 
         then:
         models == response
+    }
+
+    void "test send list of simple models with an invalid model"() {
+        given:
+        List<SimpleModel> models = [
+                new SimpleModel().color("red").numEdges(10L).area(11.5f)
+                                .convex(true).points(["1,0", "0,0", "0,1", "2,2"]),
+                new SimpleModel().color("azure").numEdges(2L).area(1.45f)
+                                .convex(true).points(["1,1", "2,2"])
+        ]
+        HttpRequest<?> request = HttpRequest.POST("/sendListOfSimpleModels", models)
+                .contentType(MediaType.APPLICATION_JSON_TYPE)
+
+        when:
+        client.retrieve(request, Argument.listOf(SimpleModel), Argument.of(String))
+
+        then:
+        def e = thrown(HttpClientResponseException)
+        HttpStatus.BAD_REQUEST == e.status
+        e.message.contains("simpleModels[1].points: size must be between 3 and 2147483647")
     }
 
     void "test send models with required properties request"() {
