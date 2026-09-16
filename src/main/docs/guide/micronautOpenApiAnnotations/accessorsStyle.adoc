@@ -2,48 +2,15 @@ You can use https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Ac
 
 This is useful when defining getters and setters in a "fluent" way or when using Lombok for that:
 
-[source,java]
-----
-@Introspected
-@AccessorsStyle(readPrefixes = "", writePrefixes = "") // <1>
-class Person {
+snippet::io.micronaut.configuration.openapi.docs.accessors.Person[tags="imports,clazz", project-base="docs-examples/example", source="main"]
 
-    private String name;
-    private Integer debtValue;
-    private Integer totalGoals;
-
-    Person(String name, Integer debtValue, Integer totalGoals) {
-        this.name = name;
-        this.debtValue = debtValue;
-        this.totalGoals = totalGoals;
-    }
-
-    public String name() { // <2>
-        return name;
-    }
-
-    public Integer debtValue() {
-        return debtValue;
-    }
-
-    public Integer totalGoals() {
-        return totalGoals;
-    }
-
-    public void name(String name) { // <2>
-        this.name = name;
-    }
-
-    public void debtValue(Integer debtValue) {
-        this.debtValue = debtValue;
-    }
-
-    public void totalGoals(Integer totalGoals) {
-        this.totalGoals = totalGoals;
-    }
-}
-----
+[.lang-java.lang-kotlin.lang-groovy]
+--
 <1> Use `@AccessorsStyle` to configure the custom prefixes. In this case no prefix.
 <2> Define getters and setters without prefixes.
 
 Using `@AccessorsStyle` will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.
+--
+
+[.lang-python]
+Python classes expose their attributes directly, so no accessor style needs to be configured: the schema is generated from the attributes of the introspected class.

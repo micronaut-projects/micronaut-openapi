@@ -28,58 +28,11 @@ micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,sw
 
 Then, you configure the `@SecurityScheme`:
 
-[source,java]
-----
-@SecurityScheme(name = "openid",
-        type = SecuritySchemeType.OAUTH2,
-        scheme = "bearer",
-        bearerFormat = "jwt",
-        flows = @OAuthFlows(
-                authorizationCode = @OAuthFlow(
-                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
-                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
-                        refreshUrl = "",
-                        scopes = @OAuthScope(name = "openid", description = "OpenID role")
-                )
-        )
-)
-@OpenAPIDefinition(
-        info = @Info(
-                title = "API service",
-                version = "0.0",
-                description = "My API",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-public class Application {
-    public static void main(String[] args) {
-        Micronaut.run(Application.class, args);
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,securityImports,securityScheme,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 And the appropriate `@SecurityRequirement` on controllers e.g.:
 
-[source,java]
-----
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-@Controller
-@Secured(SecurityRule.IS_AUTHENTICATED)
-public class OrderController {
-
-    @Get
-    @SecurityRequirement(name = "openid", scopes = "openid")
-    public String index() {
-        return "Example Response";
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.security.OrderController[tags="imports,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 Do not forget to configure Micronaut Security accordingly:
 

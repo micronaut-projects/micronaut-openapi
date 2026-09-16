@@ -1,41 +1,11 @@
 If a method return type includes generics then these will be included when calculating the schema name. For example the following:
 
 .Swagger returns types and generics
-[source,java]
-----
-class Response<T> {
+snippet::io.micronaut.configuration.openapi.docs.generics.Response,io.micronaut.configuration.openapi.docs.generics.MyController[tags="clazz", project-base="docs-examples/example", source="main"]
 
-    private T r;
-
-    public T getResult() {
-        return r;
-    }
-
-    public void setResult(T r) {
-        this.r = r;
-    }
-}
-
-@Controller
-class MyController {
-
-    @Put("/")
-    public Response<Pet> updatePet(Pet pet) {
-        ...
-    }
-}
-----
-
-Will result in a schema called `#/components/schemas/Response<Pet>` being generated. If you wish to alter the name of the schema you can do so with the `@Schema` annotation:
+Will result in a schema called `#/components/schemas/Response_Pet_` being generated. If you wish to alter the name of the schema you can do so with the `@Schema` annotation:
 
 .Changing the name of response schema
-[source,java]
-----
-@Put("/")
-@Schema(name = "ResponseOfPet")
-public Response<Pet> updatePet(Pet pet) {
-    ...
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.generics.NamedResponseController[tags="method", indent=0, project-base="docs-examples/example", source="main"]
 
 In the above case the generated schema will be named `#/components/schemas/ResponseOfPet`.
