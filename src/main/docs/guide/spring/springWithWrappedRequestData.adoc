@@ -1,7 +1,7 @@
 If you use wrapped request data for controller method, you need to add annotation `@RequestBean` (`io.micronaut.http.annotation.RequestBean`) for this parameter.
 
 .Example Swagger UI resources routing config
-snippet::io.micronaut.openapi.spring.MyController[tags="imports,clazz", project-base="test-suite-java-spring"]
+snippet::io.micronaut.openapi.spring.api.MyController[tags="imports,clazz", project="test-suite-spring-java", source="main", language="java"]
 
 For this controller will be created this OpenAPI specification:
 

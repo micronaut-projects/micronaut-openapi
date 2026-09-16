@@ -1,4 +1,4 @@
 Annotation api:openapi.annotation.OpenAPIRequest[] can be used as alternative to *io.micronaut.http.annotation.RequestBean* to mark parameter as wrapped request details. It useful, when you haven't micronaut-http in dependencies. For example, when you use micronaut-openapi with spring-boot application.
 
 .Example of using `@OpenAPIRequest` annotation with a Spring Boot application
-snippet::io.micronaut.openapi.spring.api.MyController[tags="imports,clazz"]
+snippet::io.micronaut.openapi.spring.api.MyController[tags="imports,clazz", project="test-suite-spring-java", source="main", language="java"]

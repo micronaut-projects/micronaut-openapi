@@ -1,22 +1,24 @@
 You can add a `@OpenAPIDefinition` annotation to your `Application` class or another class to describe global components (security schemas, servers etc.) and common information, like license, contact, version etc.:
 
 .Example @OpenAPIDefinition usage
-snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,clazz", project-base="docs-examples/example", source="main"]
+snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 With that in place, you compile your project and a OpenAPI YAML file will be generated to the `META-INF/swagger` directory of your project's class output. For example, the above configuration generates:
 
 * For Java `build/classes/java/main/META-INF/swagger/hello-world-0.0.yml`
 * For Kotlin KAPT `build/tmp/kapt3/classes/main/META-INF/swagger/hello-world-0.0.yml`
 * For Kotlin KSP `build/generated/ksp/main/resources/META-INF/swagger/hello-world-0.0.yml`
+* For Groovy `build/classes/groovy/main/META-INF/swagger/hello-world-0.0.yml`
+* For Python `build/classes/python/main/META-INF/swagger/hello-world-0.0.yml`
 
 The previously defined annotations will produce YAML like the following:
 
 .Generated OpenAPI YAML
 [source,yaml]
 ----
-openapi: 3.0.3
+openapi: 3.0.1
 info:
-  title: the title
+  title: Hello World
   description: My API
   contact:
     name: Fred

@@ -4,36 +4,7 @@ annotation without `name` set, Micronaut will accidentally override one definiti
 set `name` on `@Schema` annotation.
 
 .Schema name resolution
-[source,java]
-----
-import io.swagger.v3.oas.annotations.media.Schema;
-
-@Schema(description = "A pet") // <1>
-class Pet {
-}
-
-class Owner {
-
-    private Pet bird;
-    private Pet cat;
-    private Pet dog;
-
-    @Schema(description = "Pet that is a bird") // <2>
-    public Pet getBird() {
-        return bird;
-    }
-
-    @Schema(description = "Pet that is a cat") // <3>
-    public Pet getCat() {
-        return cat;
-    }
-
-    @Schema(name = "Dog", description = "Pet that is a dog") // <4>
-    public Pet getDog() {
-        return dog;
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.naming.Pet,io.micronaut.configuration.openapi.docs.naming.Owner[tags="imports,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 <1> Micronaut will generate schema with name `Pet`
 <2> Micronaut will generate schema with name `Pet` since name is not set, this will conflict with <1> and <3>, final Pet schema might be incorrect

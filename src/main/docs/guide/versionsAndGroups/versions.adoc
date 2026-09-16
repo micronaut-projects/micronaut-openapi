@@ -5,39 +5,8 @@ with version from your `application.yml`.
 
 For example:
 
-.VersionedController.java
-[source,java]
-----
-@Controller("/versioned")
-public class VersionedController {
-
-    @Version("1")
-    @Get("/hello")
-    public String helloV1() {
-        return "helloV1";
-    }
-
-    @Version("2")
-    @Post("/hello")
-    public String helloV2(UserDto userDto) {
-        return "helloV2";
-    }
-
-    @Post("/common")
-    public String common() {
-        return null;
-    }
-
-    public static class UserDto {
-
-        public String name;
-        public int age;
-        public String secondName;
-        @NotNull
-        public String address;
-    }
-}
-----
+.VersionedController
+snippet::io.micronaut.configuration.openapi.docs.versions.VersionedController,io.micronaut.configuration.openapi.docs.versions.UserDto[tags="imports,clazz", project-base="docs-examples/example-versions", source="main"]
 
 .application.yml
 [configuration]
@@ -53,13 +22,13 @@ micronaut:
 
 After processing the annotation processor, you will see 2 swagger files:
 
-.Generated swagger-1.yml
+.Generated service-1.0.0-1.yml
 [source,yaml]
 ----
 openapi: 3.0.1
 info:
-  title: Api
-  version: "1.0"
+  title: Service
+  version: 1.0.0
 paths:
   /versioned/common:
     post:
@@ -95,13 +64,13 @@ paths:
                 type: string
 ----
 
-.Generated swagger-2.yml
+.Generated service-1.0.0-2.yml
 [source,yaml]
 ----
 openapi: 3.0.1
 info:
-  title: Api
-  version: "2.0"
+  title: Service
+  version: 1.0.0
 paths:
   /versioned/common:
     post:

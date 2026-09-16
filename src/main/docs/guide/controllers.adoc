@@ -1,7 +1,7 @@
 By default, Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:
 
 .Hello World Example
-snippet::io.micronaut.configuration.openapi.docs.controllers.HelloController[tags="imports,clazz", project-base="docs-examples/example", source="main"]
+snippet::io.micronaut.configuration.openapi.docs.controllers.HelloController[tags="imports,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 The resulting output will be:
 
@@ -42,4 +42,11 @@ paths:
 
 ----
 
+[.lang-java.lang-kotlin]
 Notice how the javadoc comments are used to fill out the description of the API.
+
+[.lang-python]
+Notice how the docstring of the method is used to fill out the description of the API: it is read like a javadoc comment, so the `@param` and `@return` tags document the parameters and the response.
+
+[.lang-groovy]
+Groovy doc comments are not available to the compiler, so the parameter and response descriptions are not generated for Groovy; use the Swagger annotations described in the next section instead.

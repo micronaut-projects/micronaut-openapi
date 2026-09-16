@@ -8,87 +8,11 @@ Use a `HttpServerFilter` to add a cookie which contains the context-path. This c
 Create a `HttpServerFilter` that will add a cookie with name `contextPath`.
 
 .HttpServerFilter for static context-path
-[source,java]
-----
-import java.time.Duration;
-
-import org.reactivestreams.Publisher;
-
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.annotation.Value;
-import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
-import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.cookie.Cookie;
-import io.micronaut.http.filter.HttpServerFilter;
-import io.micronaut.http.filter.ServerFilterChain;
-
-@Requires(property = "micronaut.server.context-path")
-@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"})
-public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
-
-    private final Cookie contextPathCookie;
-
-    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
-        contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
-    }
-
-    @Override
-    public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-        return Publishers.map(chain.proceed(request), response -> response.cookie(contextPathCookie));
-    }
-
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.filters.OpenApiViewCookieContextPathFilter[tags="imports,clazz", project-base="docs-examples/example", source="main"]
 
 === From HTTP Header
 
 The `HttpServerFilter` looks very similar to the one above. The main difference is that it parses the `context-path` value from the request headers.
 
 .HttpServerFilter from request headers
-[source,java]
-----
-import java.time.Duration;
-
-import org.reactivestreams.Publisher;
-
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.annotation.Value;
-import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
-import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.cookie.Cookie;
-import io.micronaut.http.filter.HttpServerFilter;
-import io.micronaut.http.filter.ServerFilterChain;
-
-@Filter(
-	methods = {HttpMethod.GET, HttpMethod.HEAD},
-	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}
-)
-@Requires(property = "micronaut.server.context-path-header")
-public class OpenApiContextPathFilter implements HttpServerFilter {
-
-	private final String contextPathHeader;
-
-	OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
-		this.contextPathHeader = contextPathHeader;
-	}
-
-	@Override
-	public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-		final String contextPath = request.getHeaders().get(contextPathHeader);
-
-		if (contextPath != null) {
-			Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
-			return Publishers.map(chain.proceed(request), response -> response.cookie(contextPathCookie));
-		} else {
-			return chain.proceed(request);
-		}
-	}
-
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.filters.OpenApiContextPathFilter[tags="imports,clazz", project-base="docs-examples/example", source="main"]

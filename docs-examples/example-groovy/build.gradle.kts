@@ -1,35 +1,11 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-
 plugins {
-    groovy
-}
-
-repositories {
-    mavenCentral()
+    id("io.micronaut.build.internal.openapi-example-groovy")
 }
 
 dependencies {
-    compileOnly(mn.micronaut.inject.groovy)
-    compileOnly(projects.micronautOpenapi)
-
-    implementation(mn.micronaut.http)
-    implementation(mnGroovy.micronaut.runtime.groovy)
-    implementation(mnValidation.validation)
-    implementation(mn.reactor)
-
-    runtimeOnly(mnLogging.logback.classic)
+    // used by the @OpenAPIInclude, @Secured and JAXBElement examples
+    compileOnly(mn.micronaut.http.server)
+    compileOnly(mn.micronaut.management)
+    compileOnly(mnSecurity.micronaut.security)
+    compileOnly(libs.jakarta.xml.bind.api)
 }
-
-tasks.test {
-    jvmArgs("-Duser.country=US", "-Duser.language=en")
-    testLogging {
-        exceptionFormat = FULL
-    }
-    failFast = true
-}
-
-tasks.withType(GroovyCompile::class) {
-    groovyOptions.forkOptions.jvmArgs = listOf("-Dgroovy.parameters=true")
-}
-
-ext["skipDocumentation"] = true
