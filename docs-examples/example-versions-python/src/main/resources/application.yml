@@ -1,0 +1,7 @@
+micronaut:
+  router:
+    versioning:
+      enabled: true
+      parameter:
+        enabled: true
+        names: version

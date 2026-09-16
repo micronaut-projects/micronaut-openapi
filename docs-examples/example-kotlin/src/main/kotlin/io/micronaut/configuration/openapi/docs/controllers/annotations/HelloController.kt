@@ -4,14 +4,16 @@ package io.micronaut.configuration.openapi.docs.controllers.annotations
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import jakarta.validation.constraints.NotBlank
 import reactor.core.publisher.Mono
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-
 // end::imports[]
+
 // tag::clazz[]
 @Controller
 open class HelloController {
@@ -26,8 +28,8 @@ open class HelloController {
     @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
-    open fun greetings(name: String): Mono<String> {
-        return Mono.just("Hello $name, how are you doing?")
+    open fun greetings(@Parameter(description = "The name of the person") @NotBlank name: String): Mono<String> {
+        return Mono.just("Hello $name, How are you doing?")
     }
 }
 // end::clazz[]

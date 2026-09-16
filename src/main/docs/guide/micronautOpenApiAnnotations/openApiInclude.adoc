@@ -2,39 +2,4 @@ You can use api:openapi.annotation.OpenAPIInclude[] to add additional api:http.a
 api:management.endpoint.annotation.Endpoint[] already compiled
 classes in the OpenAPI processing.
 
-[source,java]
-----
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${service.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-@OpenAPIInclude(
-        // you can specify classes to include
-        classes = {
-                io.micronaut.security.endpoints.LoginController.class,
-                io.micronaut.security.endpoints.LogoutController.class
-        },
-        // or / and you can specify packages to include
-        packages = {
-            "io.different.package.with.controllers",
-            "io.different.package.with.controllers2",
-        },
-        tags = @Tag(name = "Security")
-)
-@OpenAPIInclude(
-        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
-        tags = @Tag(name = "Management"),
-        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
-)
-public class Application {
-
-    public static void main(String[] args) {
-        Micronaut.run(Application.class);
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,includeImports,include,clazz", indent=0, project-base="docs-examples/example", source="main"]

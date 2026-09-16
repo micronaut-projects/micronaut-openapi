@@ -4,30 +4,7 @@ as well as specify groups from which this endpoint should be excluded. You can a
 
 For example, you have a controller like this:
 
-[source,java]
-----
-@Controller
-public class ApiController {
-
-    @OpenAPIGroup(exclude = "v2")
-    @Get("/read/{id}")
-    public String read(String id) {
-        return "OK!";
-    }
-
-    @OpenAPIGroup("v2")
-    @Post("/save/{id}")
-    public String save2(String id, Object body) {
-        return "OK!";
-    }
-
-    @OpenAPIGroup({"v1", "v2"})
-    @Post("/save")
-    public String save(Object body) {
-        return "OK!";
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.groups.ApiController[tags="imports,clazz", project-base="docs-examples/example-groups", source="main"]
 
 After processing, you will have 2 different swagger files. The first file for group *v1*
 contain the description of the endpoints `/save` and `/read/{id}`. The second one will contain

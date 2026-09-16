@@ -4,7 +4,7 @@ dependency:micronaut-openapi[scope="annotationProcessor", groupId="io.micronaut.
 
 [NOTE]
 ====
-For Kotlin the `openapi` dependency should be in the `kapt` or `ksp` scope and for Groovy in the `compileOnly` scope.
+For Kotlin the `openapi` dependency should be in the `kapt` or `ksp` scope, for Groovy in the `compileOnly` scope and for Python in the regular dependencies (the Python compiler runs the annotation processors found on the compile classpath).
 ====
 
 To use the https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations] or Micronaut OpenAPI annotations add them to compile classpath

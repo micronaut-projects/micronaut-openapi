@@ -4,17 +4,7 @@ This is useful for recursive type hierarchies: a base type that references itsel
 
 For example, given:
 
-[source,java]
-----
-class BaseCategory {
-    public List<BaseCategory> children;
-}
-
-class LocalizedCategory extends BaseCategory {
-    public String displayName;
-    public String locale;
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.dynamicrefs.BaseCategory,io.micronaut.configuration.openapi.docs.dynamicrefs.LocalizedCategory[tags="clazz", project-base="docs-examples/example", source="main"]
 
 By default Micronaut OpenAPI emits a static self-reference for `children`:
 
@@ -96,17 +86,7 @@ The base type and every subtype declare the same `$dynamicAnchor`, and the recur
 
 Dynamic-refs mode also collapses single-variable generic wrappers into one reusable template plus inline `$defs` bindings, instead of duplicating a concrete schema per type argument. Given:
 
-[source,java]
-----
-class Response<T> {
-    public T data;
-}
-
-class Page<T> {
-    public List<T> items;
-    public int total;
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.dynamicrefs.Response,io.micronaut.configuration.openapi.docs.dynamicrefs.Page[tags="clazz", project-base="docs-examples/example", source="main"]
 
 used as `Response<Pet>`, `Response<Group>`, and `Page<Pet>`, the default mode produces a concrete schema per binding (`Response_Pet_`, `Response_Group_`, `Page_Pet_`). With dynamic-refs enabled, a single template is emitted per generic and each usage site gets an inline binding:
 

@@ -3,14 +3,6 @@ If you don't have control of the source code and don't want to have to annotate 
 For example if the aforementioned `Pet` class cannot be annotated with `@Schema` you can define a meta annotation:
 
 .Swagger Meta Annotation
-[source,java]
-----
-@Documented
-@Retention(RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.FIELD})
-@Schema(name = "MyPet", description = "Pet description")
-@interface MyAnn {
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.schemas.MyAnn[tags="imports,clazz", indent=0, project-base="docs-examples/example", source="main"]
 
 Then whenever `Pet` is used as a parameter you can annotate the parameter with `@MyAnn`.
