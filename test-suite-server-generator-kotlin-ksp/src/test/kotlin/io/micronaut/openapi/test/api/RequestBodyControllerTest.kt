@@ -75,13 +75,28 @@ class RequestBodyControllerTest(
     fun testSendListOfSimpleModels() {
         val models = listOf(
                 SimpleModel(color = "red", numEdges = 10L, area = 11.5f, convex = true, points = listOf("1,0", "0,0", "0,1", "2,2")),
-                SimpleModel(color = "azure", numEdges = 2L, area = 1.45f, convex = true, points = listOf("1,1", "2,2")),
+                SimpleModel(color = "azure", numEdges = 2L, area = 1.45f, convex = true, points = listOf("1,1", "2,2", "1,2")),
                 SimpleModel(numEdges = 11L, convex = false)
         )
         val request = HttpRequest.POST("/sendListOfSimpleModels", models)
                 .contentType(MediaType.APPLICATION_JSON_TYPE)
         val response = client.retrieve(request, Argument.listOf(SimpleModel::class.java), Argument.of(String::class.java))
         assertEquals(models, response)
+    }
+
+    @Test
+    fun testSendListOfSimpleModelsWithInvalidModel() {
+        val models = listOf(
+                SimpleModel(color = "red", numEdges = 10L, area = 11.5f, convex = true, points = listOf("1,0", "0,0", "0,1", "2,2")),
+                SimpleModel(color = "azure", numEdges = 2L, area = 1.45f, convex = true, points = listOf("1,1", "2,2"))
+        )
+        val request = HttpRequest.POST("/sendListOfSimpleModels", models)
+                .contentType(MediaType.APPLICATION_JSON_TYPE)
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            client.retrieve(request, Argument.listOf(SimpleModel::class.java), Argument.of(String::class.java))
+        }
+        assertEquals(e.status, HttpStatus.BAD_REQUEST)
+        assertTrue(e.message!!.contains("simpleModels[1].points: size must be between 3 and 2147483647"))
     }
 
     @Test
