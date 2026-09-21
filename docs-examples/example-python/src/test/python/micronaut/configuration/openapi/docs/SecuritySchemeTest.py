@@ -1,11 +1,9 @@
-import java
 from micronaut.test.extensions.junit5.annotation import MicronautTest
 from org.junit.jupiter.api import Test
 
 from . import OpenApiSpec
 
-# TODO(python): java.type needed because `io.swagger.*` (any `io.` package other than `io.micronaut`) cannot be imported at runtime
-SecuritySchemeType = java.type("io.swagger.v3.oas.models.security.SecurityScheme$Type")
+from io.swagger.v3.oas.models.security.SecurityScheme import Type as SecuritySchemeType
 
 
 @MicronautTest

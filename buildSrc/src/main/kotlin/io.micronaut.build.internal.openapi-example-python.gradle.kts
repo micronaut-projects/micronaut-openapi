@@ -28,18 +28,9 @@ tasks.withType<Test>().configureEach {
     systemProperty("micronaut.python.pool.enabled", "false")
 }
 
-// The Python compiler does not expose the location of the generated files to the OpenAPI visitor,
-// so the project directory (openapi.properties, src/main/resources/application.yml) is passed explicitly.
+// The OpenAPI visitor cannot derive the project directory (openapi.properties, src/main/resources/application.yml)
+// from the generated files of a Python compilation, so it is passed explicitly like in the other languages (see the
+// Java convention plugin).
 tasks.withType<PythonCompile>().configureEach {
-    systemProperties.put("micronaut.openapi.project.dir", projectDir.toString())
-}
-
-// TODO(python): the Python compiler writes one GraalPy virtual file system per compilation and the generated
-// Python shims of the main and test compilations shadow each other at runtime, so the main Python sources (the
-// documented types) are compiled together with the test sources into the test output.
-tasks.named("compilePython") {
-    enabled = false
-}
-tasks.named<PythonCompile>("compileTestPython") {
-    source.from((sourceSets.main.get().extensions.getByName("python") as SourceDirectorySet).sourceDirectories)
+    compilerArgs.add("-Amicronaut.openapi.project.dir=$projectDir")
 }

@@ -2,12 +2,9 @@ from dataclasses import dataclass
 
 from micronaut.core.annotation import Introspected
 
-try:
-    # tag::imports[]
-    from io.swagger.v3.oas.annotations.media import *
-    # end::imports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations.media import *
+# tag::imports[]
+from io.swagger.v3.oas.annotations.media import Schema
+# end::imports[]
 
 
 # tag::clazz[]

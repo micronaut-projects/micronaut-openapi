@@ -25,5 +25,6 @@ dependencies {
 }
 
 tasks.withType<GroovyCompile>().configureEach {
-    groovyOptions.forkOptions.jvmArgs = listOf("-Dgroovy.parameters=true")
+    // the project directory is passed explicitly, see the Java convention plugin
+    groovyOptions.forkOptions.jvmArgs = listOf("-Dgroovy.parameters=true", "-Dmicronaut.openapi.project.dir=$projectDir")
 }

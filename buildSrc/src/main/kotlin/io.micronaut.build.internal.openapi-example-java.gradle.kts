@@ -25,4 +25,9 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
+    // The OpenAPI visitor otherwise derives the project directory (openapi.properties, application.yml) from the
+    // compiler's working directory or a micronaut.openapi.project.dir system property, both of which belong to
+    // whichever project first started the shared Gradle worker daemon (the Micronaut KSP processor copies its
+    // options to system properties), so every example passes its own directory explicitly.
+    options.compilerArgs.add("-Amicronaut.openapi.project.dir=$projectDir")
 }

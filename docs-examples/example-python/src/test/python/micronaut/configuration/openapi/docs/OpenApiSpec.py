@@ -1,9 +1,6 @@
-import java
 from java.lang import ClassLoader, String
 from micronaut.openapi import OpenApiUtils
-
-# TODO(python): java.type needed because `io.swagger.*` (any `io.` package other than `io.micronaut`) cannot be imported at runtime
-OpenAPI = java.type("io.swagger.v3.oas.models.OpenAPI")
+from io.swagger.v3.oas.models import OpenAPI
 
 
 def load(file_name: str = "hello-world-0.0.yml"):

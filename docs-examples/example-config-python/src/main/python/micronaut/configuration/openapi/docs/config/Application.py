@@ -1,12 +1,8 @@
-try:
-    # tag::imports[]
-    from micronaut.runtime import Micronaut
-    from io.swagger.v3.oas.annotations import *
-    from io.swagger.v3.oas.annotations.info import *
-    # end::imports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations import *
-    from swagger.v3.oas.annotations.info import *
+# tag::imports[]
+from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+# end::imports[]
 
 
 # tag::clazz[]

@@ -1,21 +1,13 @@
-try:
-    # tag::imports[]
-    from micronaut.runtime import Micronaut
-    from io.swagger.v3.oas.annotations import *
-    from io.swagger.v3.oas.annotations.info import *
-    # end::imports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations import *
-    from swagger.v3.oas.annotations.info import *
+# tag::imports[]
+from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+# end::imports[]
 
-try:
-    # tag::securityImports[]
-    from io.swagger.v3.oas.annotations.enums import SecuritySchemeType
-    from io.swagger.v3.oas.annotations.security import *
-    # end::securityImports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations.enums import SecuritySchemeType
-    from swagger.v3.oas.annotations.security import *
+# tag::securityImports[]
+from io.swagger.v3.oas.annotations.enums import SecuritySchemeType
+from io.swagger.v3.oas.annotations.security import OAuthFlow, OAuthFlows, OAuthScope, SecurityScheme
+# end::securityImports[]
 
 # tag::excludeImports[]
 from micronaut.openapi.annotation import OpenAPIExclude
@@ -24,17 +16,13 @@ from .exclude.InternalApi import InternalApi
 from .exclude.OldApi import OldApi
 # end::excludeImports[]
 
-try:
-    # tag::includeImports[]
-    from micronaut.management.endpoint.env import EnvironmentEndpoint
-    from micronaut.openapi.annotation import OpenAPIInclude
-    from micronaut.security.endpoints import LoginController, LogoutController
-    from io.swagger.v3.oas.annotations.security import SecurityRequirement
-    from io.swagger.v3.oas.annotations.tags import *
-    # end::includeImports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations.security import SecurityRequirement
-    from swagger.v3.oas.annotations.tags import *
+# tag::includeImports[]
+from micronaut.management.endpoint.env import EnvironmentEndpoint
+from micronaut.openapi.annotation import OpenAPIInclude
+from micronaut.security.endpoints import LoginController, LogoutController
+from io.swagger.v3.oas.annotations.security import SecurityRequirement
+from io.swagger.v3.oas.annotations.tags import Tag
+# end::includeImports[]
 
 
 # tag::securityScheme[]

@@ -5,12 +5,9 @@ from micronaut.core.annotation import Introspected
 
 from .PetType import PetType
 
-try:
-    # tag::imports[]
-    from io.swagger.v3.oas.annotations.media import *
-    # end::imports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations.media import *
+# tag::imports[]
+from io.swagger.v3.oas.annotations.media import Schema
+# end::imports[]
 
 
 # tag::clazz[]
@@ -18,7 +15,7 @@ except ImportError:  # TODO(python): packages under `io.` other than `io.microna
 @Introspected
 @dataclass
 class Pet:
-    type: PetType
+    type: PetType | None
     age: Annotated[int, Schema(description="Pet age", maximum="20")]  # <2>
     """The age"""
     name: Annotated[str, Schema(description="Pet name", maxLength=20)]

@@ -2,12 +2,15 @@ from dataclasses import dataclass
 
 from jakarta.xml.bind import JAXBElement
 
+from micronaut.core.annotation import Introspected
+
 from .XmlElement import XmlElement
 from .XmlElement2 import XmlElement2
 from .XmlElement3 import XmlElement3
 
 
 # tag::clazz[]
+@Introspected
 @dataclass
 class MyDto:
     xmlElement: JAXBElement[XmlElement]

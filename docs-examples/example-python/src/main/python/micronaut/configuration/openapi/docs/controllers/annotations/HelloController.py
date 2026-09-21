@@ -1,22 +1,16 @@
 from typing import Annotated
 
-try:
-    # tag::imports[]
-    from micronaut.http import MediaType
-    from micronaut.http.annotation import Controller, Get
-    from jakarta.validation.constraints import NotBlank
-    from reactor.core.publisher import Mono
+# tag::imports[]
+from micronaut.http import MediaType
+from micronaut.http.annotation import Controller, Get
+from jakarta.validation.constraints import NotBlank
+from reactor.core.publisher import Mono
 
-    from io.swagger.v3.oas.annotations import *
-    from io.swagger.v3.oas.annotations.media import *
-    from io.swagger.v3.oas.annotations.responses import *
-    from io.swagger.v3.oas.annotations.tags import *
-    # end::imports[]
-except ImportError:  # TODO(python): packages under `io.` other than `io.micronaut` cannot be imported at runtime
-    from swagger.v3.oas.annotations import *
-    from swagger.v3.oas.annotations.media import *
-    from swagger.v3.oas.annotations.responses import *
-    from swagger.v3.oas.annotations.tags import *
+from io.swagger.v3.oas.annotations import Operation, Parameter
+from io.swagger.v3.oas.annotations.media import Content, Schema
+from io.swagger.v3.oas.annotations.responses import ApiResponse
+from io.swagger.v3.oas.annotations.tags import Tag
+# end::imports[]
 
 
 # tag::clazz[]
