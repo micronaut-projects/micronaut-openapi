@@ -12,18 +12,31 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "8.1.1"
+    id("io.micronaut.build.shared.settings") version "8.1.2"
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "openapi-parent"
 
 include(
+    "docs-examples:example-config-groovy",
+    "docs-examples:example-config-java",
+    "docs-examples:example-config-kotlin",
+    "docs-examples:example-config-python",
     "docs-examples:example-groovy",
+    "docs-examples:example-groups-groovy",
+    "docs-examples:example-groups-java",
+    "docs-examples:example-groups-kotlin",
+    "docs-examples:example-groups-python",
     "docs-examples:example-java",
     "docs-examples:example-kotlin",
     "docs-examples:example-kotlin-kapt",
     "docs-examples:example-kotlin-ksp",
+    "docs-examples:example-python",
+    "docs-examples:example-versions-groovy",
+    "docs-examples:example-versions-java",
+    "docs-examples:example-versions-kotlin",
+    "docs-examples:example-versions-python",
     "openapi",
     "openapi-adoc",
     "openapi-annotations",

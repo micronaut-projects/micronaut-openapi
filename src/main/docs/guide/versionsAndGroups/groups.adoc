@@ -9,24 +9,8 @@ if you do not want to add annotations in the code.
 You can set some additional settings for the group through system properties / application.yml / openapi.properties:
 
 Usage example:
-[source,java]
-----
-@Controller
-public class ApiController {
 
-    @OpenAPIGroup("v2")
-    @Post("/save/{id}")
-    public String save2(String id, Object body) {
-        return "OK!";
-    }
-
-    @OpenAPIGroup({"v1", "v2"})
-    @Post("/save")
-    public String save(Object body) {
-        return "OK!";
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.groups.ApiController[tags="imports,clazz", project-base="docs-examples/example-groups", source="main"]
 
 [configuration]
 ----

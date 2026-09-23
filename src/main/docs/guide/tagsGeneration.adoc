@@ -1,32 +1,9 @@
-Typically, tags are set at the controller level, using annotations, to group multiple endpoints into a logical group, something like this:
+Typically, tags are set at the controller level, using the `@Tag` annotation, to group multiple endpoints into a logical group.
+Instead, you can enable auto-generation of tags by class name or by package, so a controller like the following does not need any `@Tag` annotation:
 
-[source,java]
-----
-/**
- * User main operations.
- */
-@Tag("user-operations") // don't need to add this annotation anymore
-@Controller
-public class UserOperationsController {
+snippet::io.micronaut.configuration.openapi.docs.config.UserOperationsController[tags="imports,clazz", project-base="docs-examples/example-config", source="main"]
 
-    @Get("/read/{id}")
-    public String read(String id) {
-        return "OK!";
-    }
-
-    @Post("/save/{id}")
-    public String save2(String id, Object body) {
-        return "OK!";
-    }
-
-    @Post("/save")
-    public String save(Object body) {
-        return "OK!";
-    }
-}
-----
-
-Now you can enable auto-generation of tags by class name or by package. Just enable it by property:
+Just enable it by property:
 
 .openapi.properties
 [source,properties]

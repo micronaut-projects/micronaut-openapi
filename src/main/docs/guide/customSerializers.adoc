@@ -28,52 +28,11 @@ Also, it can be used for replace classes schema with generics, for example, if y
 And you can set custom schemas for different type args.
 For example if you have this classes structure:
 
-[source,java]
-----
-package test.mypackage;
-
-class MyDto {
-
-    public JAXBElement<? extends XmlElement> xmlElement;
-    public JAXBElement<? extends XmlElement2> xmlElement2;
-    public JAXBElement<? extends XmlElement3> xmlElement3;
-}
-
-class XmlElement {
-    public String propStr;
-}
-
-class XmlElement2 {
-    public String propStr2;
-}
-
-class XmlElement3 {
-    public String propStr3;
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.customserializers.MyDto,io.micronaut.configuration.openapi.docs.customserializers.XmlElement,io.micronaut.configuration.openapi.docs.customserializers.XmlElement2,io.micronaut.configuration.openapi.docs.customserializers.XmlElement3[tags="clazz", project-base="docs-examples/example", source="main"]
 
 You can customize classes structure for openapi schema:
 
-[source,java]
-----
-package io.micronaut.openapi;
-
-// if you want to use generic from fields with type JAXBElement<T>
-class MyJaxbElement<T> {
-    public String type;
-    public T value;
-}
-
-class MyJaxbElement2 {
-    public String type;
-    public List<String> values;
-}
-
-class MyJaxbElement3 {
-    public String type;
-    public String value;
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement,io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2,io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3[tags="clazz", project-base="docs-examples/example", source="main"]
 
 And set openapi properties to map classes to custom openapi schema classes:
 
@@ -82,9 +41,9 @@ And set openapi properties to map classes to custom openapi schema classes:
 micronaut:
   openapi:
     schema:
-      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
-      io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement2>: io.micronaut.openapi.MyJaxbElement2
-      io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement3>: io.micronaut.openapi.MyJaxbElement3
+      jakarta.xml.bind.JAXBElement: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement
+      jakarta.xml.bind.JAXBElement<io.micronaut.configuration.openapi.docs.customserializers.XmlElement2>: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2
+      jakarta.xml.bind.JAXBElement<io.micronaut.configuration.openapi.docs.customserializers.XmlElement3>: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3
 ----
 
 [IMPORTANT]

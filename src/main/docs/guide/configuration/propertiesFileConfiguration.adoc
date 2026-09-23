@@ -21,27 +21,10 @@ micronaut.openapi.expand.api.version=v1.1
 micronaut.openapi.expand.openapi.description=A nice API
 ----
 
-The following example shows how to use the previous `micronaut.openapi.expand` properties:
+The following example shows how to use the previous `micronaut.openapi.expand` properties (the `${my.api.title}` placeholder is resolved from `application.yml`, see <<applicationConfiguration>>):
 
 .Application Simple Application
-[source,java]
-----
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${api.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-public class Application {
-
-    public static void main(String[] args) {
-        Micronaut.run(Application.class);
-    }
-}
-----
+snippet::io.micronaut.configuration.openapi.docs.config.Application[tags="imports,clazz", indent=0, project-base="docs-examples/example-config", source="main"]
 
 The generated specification file will look like:
 
