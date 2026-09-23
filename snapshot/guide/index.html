@@ -417,7 +417,7 @@ build = [
 </td>
 <td class="content">
 <div class="paragraph">
-<p>For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> or <code>ksp</code> scope and for Groovy in the <code>compileOnly</code> scope.</p>
+<p>For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> or <code>ksp</code> scope, for Groovy in the <code>compileOnly</code> scope and for Python in the regular dependencies (the Python compiler runs the annotation processors found on the compile classpath).</p>
 </div>
 </td>
 </tr>
@@ -500,7 +500,6 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 
-
 @OpenAPIDefinition(
         info = @Info(
                 title = "Hello World",
@@ -521,12 +520,35 @@ public class Application {
 <div class="listingblock multi-language-sample">
 <div class="title">Example @OpenAPIDefinition usage</div>
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+@OpenAPIDefinition(
+    info=Info(
+        title="Hello World",
+        version="0.0",
+        description="My API",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.info.License
-
 
 @OpenAPIDefinition(
         info = Info(
@@ -549,10 +571,11 @@ object Application {
 <div class="listingblock multi-language-sample">
 <div class="title">Example @OpenAPIDefinition usage</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.info.Contact
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.info.License
-
 
 @OpenAPIDefinition(
         info = @Info(
@@ -564,7 +587,7 @@ import io.swagger.v3.oas.annotations.info.License
         )
 )
 class Application {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Micronaut.run(Application)
     }
 }</code></pre>
@@ -584,6 +607,12 @@ class Application {
 <li>
 <p>For Kotlin KSP <code>build/generated/ksp/main/resources/META-INF/swagger/hello-world-0.0.yml</code></p>
 </li>
+<li>
+<p>For Groovy <code>build/classes/groovy/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+</li>
+<li>
+<p>For Python <code>build/classes/python/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -592,9 +621,9 @@ class Application {
 <div class="listingblock">
 <div class="title">Generated OpenAPI YAML</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.3
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
 info:
-  title: the title
+  title: Hello World
   description: My API
   contact:
     name: Fred
@@ -658,14 +687,20 @@ micronaut.openapi.expand.openapi.description=A nice API</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The following example shows how to use the previous <code>micronaut.openapi.expand</code> properties:</p>
+<p>The following example shows how to use the previous <code>micronaut.openapi.expand</code> properties (the <code>${my.api.title}</code> placeholder is resolved from <code>application.yml</code>, see <a href="#applicationConfiguration">[applicationConfiguration]</a>):</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Application Simple Application</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+@OpenAPIDefinition(
         info = @Info(
-                title = "Hello World",
+                title = "${my.api.title}",
                 version = "${api.version}",
                 description = "${openapi.description}",
                 license = @License(name = "Apache 2.0", url = "https://foo.bar"),
@@ -676,6 +711,82 @@ public class Application {
 
     public static void main(String[] args) {
         Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+@OpenAPIDefinition(
+    info=Info(
+        title="${my.api.title}",
+        version="${api.version}",
+        description="${openapi.description}",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "\${my.api.title}",
+                version = "\${api.version}",
+                description = "\${openapi.description}",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = '${my.api.title}',
+                version = '${api.version}',
+                description = '${openapi.description}',
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
     }
 }</code></pre>
 </div>
@@ -812,19 +923,28 @@ openapi.description=A nice API</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">my:
   api:
-    version: 1.0.0
-    title: My title
-    api-description: My description</code></pre>
+    title: Hello World</code></pre>
 </div>
 </div>
-<div class="listingblock">
-<div class="title">Application.java Simple Application</div>
+<div class="paragraph">
+<p>The following application class resolves its title from the <code>my.api.title</code> property (the other placeholders come from <code>openapi.properties</code>, see <a href="#propertiesFileConfiguration">[propertiesFileConfiguration]</a>):</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+@OpenAPIDefinition(
         info = @Info(
-                title = "${my.api.version}",
-                version = "${my.api.title}",
-                description = "${my.api.api-description}"
+                title = "${my.api.title}",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         )
 )
 public class Application {
@@ -834,6 +954,123 @@ public class Application {
     }
 }</code></pre>
 </div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+@OpenAPIDefinition(
+    info=Info(
+        title="${my.api.title}",
+        version="${api.version}",
+        description="${openapi.description}",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "\${my.api.title}",
+                version = "\${api.version}",
+                description = "\${openapi.description}",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = '${my.api.title}',
+                version = '${api.version}',
+                description = '${openapi.description}',
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>application.yml</code> file is parsed at compile time, so the YAML parser has to be available to the annotation processor:
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"org.yaml:snakeyaml")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;org.yaml&lt;/groupId&gt;
+        &lt;artifactId&gt;snakeyaml&lt;/artifactId&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
+build = [
+    <span class="hljs-string">"org.yaml:snakeyaml"</span>,
+]</code></pre>
+</div>
+</div>
+</p>
 </div>
 
 <h2 id="availableOptions"><a class="anchor" href="#availableOptions"></a>6.4 Available OpenAPI processing options</h2>
@@ -1400,6 +1637,25 @@ public class HelloController {
 <div class="listingblock multi-language-sample">
 <div class="title">Hello World Example</div>
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http import MediaType
+from micronaut.http.annotation import Controller, Get
+from reactor.core.publisher import Mono
+
+@Controller
+class HelloController:
+
+    @Get(uri="/hello/{name}", produces=MediaType.TEXT_PLAIN)
+    def index(self, name: str) -&gt; Mono[str]:
+        """
+        @param name The person's name
+        @return The greeting
+        """
+        return Mono.just("Hello " + name + "!")</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -1483,8 +1739,14 @@ paths:
                 type: string</code></pre>
 </div>
 </div>
-<div class="paragraph">
+<div class="paragraph lang-java lang-kotlin">
 <p>Notice how the javadoc comments are used to fill out the description of the API.</p>
+</div>
+<div class="paragraph lang-python">
+<p>Notice how the docstring of the method is used to fill out the description of the API: it is read like a javadoc comment, so the <code>@param</code> and <code>@return</code> tags document the parameters and the response.</p>
+</div>
+<div class="paragraph lang-groovy">
+<p>Groovy doc comments are not available to the compiler, so the parameter and response descriptions are not generated for Groovy; use the Swagger annotations described in the next section instead.</p>
 </div>
 
 <h1 id="namingStrategy"><a class="anchor" href="#namingStrategy"></a>9 Naming Strategy</h1>
@@ -1624,11 +1886,9 @@ micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code>
 And you can set custom schemas for different type args.
 For example if you have this classes structure:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package test.mypackage;
-
-class MyDto {
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class MyDto {
 
     public JAXBElement&lt;? extends XmlElement&gt; xmlElement;
     public JAXBElement&lt;? extends XmlElement2&gt; xmlElement2;
@@ -1648,14 +1908,81 @@ class XmlElement3 {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Introspected
+@dataclass
+class MyDto:
+    xmlElement: JAXBElement[XmlElement]
+    xmlElement2: JAXBElement[XmlElement2]
+    xmlElement3: JAXBElement[XmlElement3]
+
+@Introspected
+@dataclass
+class XmlElement:
+    propStr: str
+
+@Introspected
+@dataclass
+class XmlElement2:
+    propStr2: str
+
+@Introspected
+@dataclass
+class XmlElement3:
+    propStr3: str</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyDto {
+
+    var xmlElement: JAXBElement&lt;out XmlElement&gt;? = null
+    var xmlElement2: JAXBElement&lt;out XmlElement2&gt;? = null
+    var xmlElement3: JAXBElement&lt;out XmlElement3&gt;? = null
+}
+
+class XmlElement {
+    var propStr: String? = null
+}
+
+class XmlElement2 {
+    var propStr2: String? = null
+}
+
+class XmlElement3 {
+    var propStr3: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">class MyDto {
+
+    public JAXBElement&lt;? extends XmlElement&gt; xmlElement
+    public JAXBElement&lt;? extends XmlElement2&gt; xmlElement2
+    public JAXBElement&lt;? extends XmlElement3&gt; xmlElement3
+}
+
+class XmlElement {
+    public String propStr
+}
+
+class XmlElement2 {
+    public String propStr2
+}
+
+class XmlElement3 {
+    public String propStr3
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>You can customize classes structure for openapi schema:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.micronaut.openapi;
-
-// if you want to use generic from fields with type JAXBElement&lt;T&gt;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// if you want to use generic from fields with type JAXBElement&lt;T&gt;
 class MyJaxbElement&lt;T&gt; {
     public String type;
     public T value;
@@ -1672,6 +1999,66 @@ class MyJaxbElement3 {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># if you want to use generic from fields with type JAXBElement&lt;T&gt;
+@Introspected
+@dataclass
+class MyJaxbElement(Generic[T]):
+    type: str
+    value: T
+
+@Introspected
+@dataclass
+class MyJaxbElement2:
+    type: str
+    values: list[str]
+
+@Introspected
+@dataclass
+class MyJaxbElement3:
+    type: str
+    value: str</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">// if you want to use generic from fields with type JAXBElement&lt;T&gt;
+class MyJaxbElement&lt;T&gt; {
+    var type: String? = null
+    var value: T? = null
+}
+
+class MyJaxbElement2 {
+    var type: String? = null
+    var values: List&lt;String&gt;? = null
+}
+
+class MyJaxbElement3 {
+    var type: String? = null
+    var value: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">// if you want to use generic from fields with type JAXBElement&lt;T&gt;
+class MyJaxbElement&lt;T&gt; {
+    public String type
+    public T value
+}
+
+class MyJaxbElement2 {
+    public String type
+    public List&lt;String&gt; values
+}
+
+class MyJaxbElement3 {
+    public String type
+    public String value
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>And set openapi properties to map classes to custom openapi schema classes:</p>
 </div>
@@ -1679,9 +2066,9 @@ class MyJaxbElement3 {
 <div class="content">
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema.io.micronaut.openapi.JAXBElement=io.micronaut.openapi.MyJaxbElement
-micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;=io.micronaut.openapi.MyJaxbElement2
-micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;=io.micronaut.openapi.MyJaxbElement3</code></pre>
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema.jakarta.xml.bind.JAXBElement=io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement
+micronaut.openapi.schema.jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;=io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2
+micronaut.openapi.schema.jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;=io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1689,14 +2076,14 @@ micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlE
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   openapi:
     schema:
-      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
-      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;: io.micronaut.openapi.MyJaxbElement2
-      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;: io.micronaut.openapi.MyJaxbElement3</code></pre>
+      jakarta.xml.bind.JAXBElement: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement
+      jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2
+      jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;: io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {schema = {"io.micronaut.openapi.JAXBElement" = "io.micronaut.openapi.MyJaxbElement", "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;" = "io.micronaut.openapi.MyJaxbElement2", "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;" = "io.micronaut.openapi.MyJaxbElement3"}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {schema = {"jakarta.xml.bind.JAXBElement" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement", "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2", "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"}}}</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1704,9 +2091,9 @@ micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlE
 <pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
   openapi {
     schema {
-      io.micronaut.openapi.JAXBElement = "io.micronaut.openapi.MyJaxbElement"
-      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt; = "io.micronaut.openapi.MyJaxbElement2"
-      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt; = "io.micronaut.openapi.MyJaxbElement3"
+      jakarta.xml.bind.JAXBElement = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement"
+      jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt; = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2"
+      jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt; = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"
     }
   }
 }</code></pre>
@@ -1718,9 +2105,9 @@ micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlE
   micronaut {
     openapi {
       schema {
-        "io.micronaut.openapi.JAXBElement" = "io.micronaut.openapi.MyJaxbElement"
-        "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;" = "io.micronaut.openapi.MyJaxbElement2"
-        "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;" = "io.micronaut.openapi.MyJaxbElement3"
+        "jakarta.xml.bind.JAXBElement" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement"
+        "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2"
+        "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"
       }
     }
   }
@@ -1733,9 +2120,9 @@ micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlE
   "micronaut": {
     "openapi": {
       "schema": {
-        "io.micronaut.openapi.JAXBElement": "io.micronaut.openapi.MyJaxbElement",
-        "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;": "io.micronaut.openapi.MyJaxbElement2",
-        "io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;": "io.micronaut.openapi.MyJaxbElement3"
+        "jakarta.xml.bind.JAXBElement": "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement",
+        "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;": "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2",
+        "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;": "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"
       }
     }
   }
@@ -1885,7 +2272,7 @@ micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
 <div class="paragraph">
 <p>For example, given:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class BaseCategory {
     public List&lt;BaseCategory&gt; children;
@@ -1894,6 +2281,44 @@ micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
 class LocalizedCategory extends BaseCategory {
     public String displayName;
     public String locale;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Introspected
+@dataclass
+class BaseCategory:
+    children: list["BaseCategory"] = field(default_factory=list)
+
+@Introspected
+@dataclass
+class LocalizedCategory(BaseCategory):
+    displayName: str = ""
+    locale: str = ""</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open class BaseCategory {
+    var children: List&lt;BaseCategory&gt;? = null
+}
+
+class LocalizedCategory : BaseCategory() {
+    var displayName: String? = null
+    var locale: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">class BaseCategory {
+    public List&lt;BaseCategory&gt; children
+}
+
+class LocalizedCategory extends BaseCategory {
+    public String displayName
+    public String locale
 }</code></pre>
 </div>
 </div>
@@ -2067,7 +2492,7 @@ LocalizedCategory:
 <div class="paragraph">
 <p>Dynamic-refs mode also collapses single-variable generic wrappers into one reusable template plus inline <code>$defs</code> bindings, instead of duplicating a concrete schema per type argument. Given:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Response&lt;T&gt; {
     public T data;
@@ -2076,6 +2501,44 @@ LocalizedCategory:
 class Page&lt;T&gt; {
     public List&lt;T&gt; items;
     public int total;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Introspected
+@dataclass
+class Response(Generic[T]):
+    data: T
+
+@Introspected
+@dataclass
+class Page(Generic[T]):
+    items: list[T]
+    total: int</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class Response&lt;T&gt; {
+    var data: T? = null
+}
+
+class Page&lt;T&gt; {
+    var items: List&lt;T&gt;? = null
+    var total: Int = 0
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">class Response&lt;T&gt; {
+    public T data
+}
+
+class Page&lt;T&gt; {
+    public List&lt;T&gt; items
+    public int total
 }</code></pre>
 </div>
 </div>
@@ -2460,16 +2923,47 @@ public class HelloController {
 <div class="listingblock multi-language-sample">
 <div class="title">Using Swagger Annotations</div>
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http import MediaType
+from micronaut.http.annotation import Controller, Get
+from jakarta.validation.constraints import NotBlank
+from reactor.core.publisher import Mono
+
+from io.swagger.v3.oas.annotations import Operation, Parameter
+from io.swagger.v3.oas.annotations.media import Content, Schema
+from io.swagger.v3.oas.annotations.responses import ApiResponse
+from io.swagger.v3.oas.annotations.tags import Tag
+
+@Controller
+class HelloController:
+
+    @Get(uri="/greetings/{name}", produces=MediaType.TEXT_PLAIN)
+    @Operation(summary="Greets a person", description="A friendly greeting is returned")
+    @ApiResponse(content=Content(mediaType="text/plain", schema=Schema(type="string")))
+    @ApiResponse(responseCode="400", description="Invalid Name Supplied")
+    @ApiResponse(responseCode="404", description="Person not found")
+    @Tag(name="greeting")
+    def greetings(self, name: Annotated[str, Parameter(description="The name of the person"), NotBlank]) -&gt; Mono[str]:
+        """
+        @param name The person's name
+        @return The greeting message
+        """
+        return Mono.just("Hello " + name + ", How are you doing?")</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import jakarta.validation.constraints.NotBlank
 import reactor.core.publisher.Mono
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-
 
 @Controller
 open class HelloController {
@@ -2484,8 +2978,8 @@ open class HelloController {
     @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
-    open fun greetings(name: String): Mono&lt;String&gt; {
-        return Mono.just("Hello $name, how are you doing?")
+    open fun greetings(@Parameter(description = "The name of the person") @NotBlank name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name, How are you doing?")
     }
 }</code></pre>
 </div>
@@ -2493,7 +2987,19 @@ open class HelloController {
 <div class="listingblock multi-language-sample">
 <div class="title">Using Swagger Annotations</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Controller
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotBlank
+import reactor.core.publisher.Mono
+
+@Controller
 class HelloController {
 
     /**
@@ -2578,13 +3084,13 @@ paths:
 <p>If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
 generation of the Schema by using the <code>@Schema</code> annotation on your POJO. For example:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Using the @Schema Annotation</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
-class Pet {
+@Schema(name="MyPet", description="Pet description") // <b class="conum">(1)</b>
+public class Pet {
 
     private PetType type;
     private int age;
@@ -2597,7 +3103,7 @@ class Pet {
     /**
      * The age
      */
-    @Schema(description="Pet age", maximum="20") <i class="conum" data-value="2"></i><b>(2)</b>
+    @Schema(description="Pet age", maximum="20") // <b class="conum">(2)</b>
     public int getAge() {
         return age;
     }
@@ -2618,9 +3124,112 @@ class Pet {
     public PetType getType() {
         return type;
     }
-}
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from io.swagger.v3.oas.annotations.media import Schema
 
-enum PetType {
+@Schema(name="MyPet", description="Pet description")  # <b class="conum">(1)</b>
+@Introspected
+@dataclass
+class Pet:
+    type: PetType | None
+    age: Annotated[int, Schema(description="Pet age", maximum="20")]  # <b class="conum">(2)</b>
+    """The age"""
+    name: Annotated[str, Schema(description="Pet name", maxLength=20)]</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(name = "MyPet", description = "Pet description") // <b class="conum">(1)</b>
+class Pet {
+
+    var type: PetType? = null
+
+    /**
+     * The age
+     */
+    @get:Schema(description = "Pet age", maximum = "20") // <b class="conum">(2)</b>
+    var age: Int = 0
+
+    @get:Schema(description = "Pet name", maxLength = 20)
+    var name: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(name="MyPet", description="Pet description") // <b class="conum">(1)</b>
+class Pet {
+
+    private PetType type
+    private int age
+    private String name
+
+    void setAge(int a) {
+        age = a
+    }
+
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20") // <b class="conum">(2)</b>
+    int getAge() {
+        return age
+    }
+
+    void setName(String n) {
+        name = n
+    }
+
+    @Schema(description="Pet name", maxLength=20)
+    String getName() {
+        return name
+    }
+
+    void setType(PetType t) {
+        type = t
+    }
+
+    PetType getType() {
+        return type
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public enum PetType {
+    DOG, CAT
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">class PetType(Enum):
+    DOG = "DOG"
+    CAT = "CAT"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">enum class PetType {
+    DOG, CAT
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">enum PetType {
     DOG, CAT
 }</code></pre>
 </div>
@@ -2653,12 +3262,63 @@ enum PetType {
 <div class="paragraph">
 <p>For example if the aforementioned <code>Pet</code> class cannot be annotated with <code>@Schema</code> you can define a meta annotation:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Swagger Meta Annotation</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Documented
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
+@Schema(name = "MyPet", description = "Pet description")
+@interface MyAnn {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger Meta Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from io.swagger.v3.oas.annotations.media import Schema
+
+@Schema(name="MyPet", description="Pet description")
+def MyAnn(target):
+    return target</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger Meta Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.swagger.v3.oas.annotations.media.Schema
+
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
+@Schema(name = "MyPet", description = "Pet description")
+annotation class MyAnn</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger Meta Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.media.Schema
+
+import java.lang.annotation.Documented
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.Target
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME
+
+@Documented
+@Retention(RUNTIME)
+@Target([ElementType.PARAMETER, ElementType.FIELD])
 @Schema(name = "MyPet", description = "Pet description")
 @interface MyAnn {
 }</code></pre>
@@ -2680,7 +3340,7 @@ enum PetType {
 <div class="paragraph">
 <p>If a method return type includes generics then these will be included when calculating the schema name. For example the following:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Swagger returns types and generics</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Response&lt;T&gt; {
@@ -2701,21 +3361,115 @@ class MyController {
 
     @Put("/")
     public Response&lt;Pet&gt; updatePet(Pet pet) {
-        ...
+        Response&lt;Pet&gt; response = new Response&lt;&gt;();
+        response.setResult(pet);
+        return response;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger returns types and generics</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Introspected
+@dataclass
+class Response(Generic[T]):
+    result: T
+
+@Controller
+class MyController:
+
+    @Put("/")
+    def updatePet(self, pet: Annotated[Pet, Body]) -&gt; Response[Pet]:
+        return Response(pet)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger returns types and generics</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class Response&lt;T&gt;(var result: T)
+
+@Controller
+class MyController {
+
+    @Put("/")
+    fun updatePet(pet: Pet): Response&lt;Pet&gt; {
+        return Response(pet)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Swagger returns types and generics</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">class Response&lt;T&gt; {
+
+    private T r
+
+    T getResult() {
+        return r
+    }
+
+    void setResult(T r) {
+        this.r = r
+    }
+}
+
+@Controller
+class MyController {
+
+    @Put("/")
+    Response&lt;Pet&gt; updatePet(Pet pet) {
+        Response&lt;Pet&gt; response = new Response&lt;&gt;()
+        response.result = pet
+        return response
     }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Will result in a schema called <code>#/components/schemas/Response&lt;Pet&gt;</code> being generated. If you wish to alter the name of the schema you can do so with the <code>@Schema</code> annotation:</p>
+<p>Will result in a schema called <code>#/components/schemas/Response_Pet_</code> being generated. If you wish to alter the name of the schema you can do so with the <code>@Schema</code> annotation:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Changing the name of response schema</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Put("/")
 @Schema(name = "ResponseOfPet")
 public Response&lt;Pet&gt; updatePet(Pet pet) {
-    ...
+    Response&lt;Pet&gt; response = new Response&lt;&gt;();
+    response.setResult(pet);
+    return response;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Changing the name of response schema</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Put("/")
+@Schema(name="ResponseOfPet")
+def updatePet(self, pet: Annotated[Pet, Body]) -&gt; Response[Pet]:
+    return Response(pet)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Changing the name of response schema</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Put("/")
+@Schema(name = "ResponseOfPet")
+fun updatePet(pet: Pet): Response&lt;Pet&gt; {
+    return Response(pet)
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Changing the name of response schema</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Put("/")
+@Schema(name = "ResponseOfPet")
+Response&lt;Pet&gt; updatePet(Pet pet) {
+    Response&lt;Pet&gt; response = new Response&lt;&gt;()
+    response.result = pet
+    return response
 }</code></pre>
 </div>
 </div>
@@ -2738,14 +3492,16 @@ annotation is defined on type or on property (getter). That means that if you ha
 annotation without <code>name</code> set, Micronaut will accidentally override one definition with another. So in that case you should
 set <code>name</code> on <code>@Schema</code> annotation.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Schema name resolution</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "A pet") <i class="conum" data-value="1"></i><b>(1)</b>
+@Schema(description = "A pet") // <b class="conum">(1)</b>
 class Pet {
 }
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 class Owner {
 
@@ -2753,19 +3509,97 @@ class Owner {
     private Pet cat;
     private Pet dog;
 
-    @Schema(description = "Pet that is a bird") <i class="conum" data-value="2"></i><b>(2)</b>
+    @Schema(description = "Pet that is a bird") // <b class="conum">(2)</b>
     public Pet getBird() {
         return bird;
     }
 
-    @Schema(description = "Pet that is a cat") <i class="conum" data-value="3"></i><b>(3)</b>
+    @Schema(description = "Pet that is a cat") // <b class="conum">(3)</b>
     public Pet getCat() {
         return cat;
     }
 
-    @Schema(name = "Dog", description = "Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
+    @Schema(name = "Dog", description = "Pet that is a dog") // <b class="conum">(4)</b>
     public Pet getDog() {
         return dog;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema name resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from io.swagger.v3.oas.annotations.media import Schema
+
+@Schema(description="A pet")  # <b class="conum">(1)</b>
+@Introspected
+@dataclass
+class Pet:
+    name: str
+
+from io.swagger.v3.oas.annotations.media import Schema
+
+@Introspected
+@dataclass
+class Owner:
+    bird: Annotated[Pet, Schema(description="Pet that is a bird")]  # <b class="conum">(2)</b>
+    cat: Annotated[Pet, Schema(description="Pet that is a cat")]  # <b class="conum">(3)</b>
+    dog: Annotated[Pet, Schema(name="Dog", description="Pet that is a dog")]  # <b class="conum">(4)</b></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema name resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "A pet") // <b class="conum">(1)</b>
+class Pet
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+class Owner {
+
+    @get:Schema(description = "Pet that is a bird") // <b class="conum">(2)</b>
+    var bird: Pet? = null
+
+    @get:Schema(description = "Pet that is a cat") // <b class="conum">(3)</b>
+    var cat: Pet? = null
+
+    @get:Schema(name = "Dog", description = "Pet that is a dog") // <b class="conum">(4)</b>
+    var dog: Pet? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema name resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "A pet") // <b class="conum">(1)</b>
+class Pet {
+}
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+class Owner {
+
+    private Pet bird
+    private Pet cat
+    private Pet dog
+
+    @Schema(description = "Pet that is a bird") // <b class="conum">(2)</b>
+    Pet getBird() {
+        return bird
+    }
+
+    @Schema(description = "Pet that is a cat") // <b class="conum">(3)</b>
+    Pet getCat() {
+        return cat
+    }
+
+    @Schema(name = "Dog", description = "Pet that is a dog") // <b class="conum">(4)</b>
+    Pet getDog() {
+        return dog
     }
 }</code></pre>
 </div>
@@ -2803,27 +3637,96 @@ class Owner {
 <div class="paragraph">
 <p>You can apply <code>@Schema</code> annotation to type or property. But it&#8217;s important to note, that Micronaut will prioritize <code>@Schema</code> on property over <code>@Schema</code> on type.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">Schema annotation resolution</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description="Pet") <i class="conum" data-value="1"></i><b>(1)</b>
+@Schema(description="Pet") // <b class="conum">(1)</b>
 class Pet {
 }
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 class Owner {
 
     private Pet cat;
     private Pet dog;
 
-    public Pet getCat() { <i class="conum" data-value="2"></i><b>(2)</b>
+    public Pet getCat() { // <b class="conum">(2)</b>
         return cat;
     }
 
-    @Schema(name="MyPet", description="This is my pet") <i class="conum" data-value="3"></i><b>(3)</b>
+    @Schema(name="MyPet", description="This is my pet") // <b class="conum">(3)</b>
     public Pet getDog() {
         return dog;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema annotation resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from io.swagger.v3.oas.annotations.media import Schema
+
+@Schema(description="Pet")  # <b class="conum">(1)</b>
+@Introspected
+@dataclass
+class Pet:
+    name: str
+
+from io.swagger.v3.oas.annotations.media import Schema
+
+@Introspected
+@dataclass
+class Owner:
+    cat: Pet  # <b class="conum">(2)</b>
+    dog: Annotated[Pet, Schema(name="MyPet", description="This is my pet")]  # <b class="conum">(3)</b></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema annotation resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Pet") // <b class="conum">(1)</b>
+class Pet
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+class Owner {
+
+    var cat: Pet? = null // <b class="conum">(2)</b>
+
+    @get:Schema(name = "MyPet", description = "This is my pet") // <b class="conum">(3)</b>
+    var dog: Pet? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Schema annotation resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description="Pet") // <b class="conum">(1)</b>
+class Pet {
+}
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+class Owner {
+
+    private Pet cat
+    private Pet dog
+
+    Pet getCat() { // <b class="conum">(2)</b>
+        return cat
+    }
+
+    @Schema(name="MyPet", description="This is my pet") // <b class="conum">(3)</b>
+    Pet getDog() {
+        return dog
     }
 
 }</code></pre>
@@ -3150,9 +4053,46 @@ This solves the problem when you have several different controllers, but with sa
 <div class="paragraph">
 <p>For example, when you have 2 controllers with same operations, but use generics:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDecorator(opIdPrefix = "cats-", opIdSuffix = "-suffix")
+@Controller("/cats")
+interface MyCatsOperations extends Api&lt;MyRequest, MyResponse&gt; {
+}
+
+@OpenAPIDecorator("dogs-")
+@Controller("/dogs")
+interface MyDogsOperations extends Api&lt;MyRequest, MyResponse&gt; {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@OpenAPIDecorator(opIdPrefix="cats-", opIdSuffix="-suffix")
+@Controller("/cats")
+class MyCatsOperations(Api[MyRequest, MyResponse]):
+    pass
+
+@OpenAPIDecorator("dogs-")
+@Controller("/dogs")
+class MyDogsOperations(Api[MyRequest, MyResponse]):
+    pass</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@OpenAPIDecorator(opIdPrefix = "cats-", opIdSuffix = "-suffix")
+@Controller("/cats")
+interface MyCatsOperations : Api&lt;MyRequest, MyResponse&gt;
+
+@OpenAPIDecorator("dogs-")
+@Controller("/dogs")
+interface MyDogsOperations : Api&lt;MyRequest, MyResponse&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@OpenAPIDecorator(opIdPrefix = "cats-", opIdSuffix = "-suffix")
 @Controller("/cats")
 interface MyCatsOperations extends Api&lt;MyRequest, MyResponse&gt; {
 }
@@ -3180,29 +4120,122 @@ you can use <code>@OpenAPIExtraSchema</code> annotaion.</p>
 <div class="paragraph">
 <p>To add current class to openapi file just add <code>@OpenAPIExtraSchema</code> annotation without any parameters:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIExtraSchema
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
+
+@OpenAPIExtraSchema
 class UnusedSchema {
 
     public String field1;
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.openapi.annotation import OpenAPIExtraSchema
+
+@OpenAPIExtraSchema
+@Introspected
+@dataclass
+class UnusedSchema:
+    field1: str</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.openapi.annotation.OpenAPIExtraSchema
+
+@OpenAPIExtraSchema
+class UnusedSchema {
+
+    var field1: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.openapi.annotation.OpenAPIExtraSchema
+
+@OpenAPIExtraSchema
+class UnusedSchema {
+
+    public String field1
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>Another way, you can set classnames or packages to include / exclude extra schemas from final openapi file:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIExtraSchema(
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
+
+@OpenAPIExtraSchema(
     // classes to add
     classes = UnusedModel1.class,
     // excluded classes, which marked with `@OpenAPIExtraSchema` annotation
     excludeClasses = ExcludedModel.class,
     // exclude classes by packages
-    excludePackages = "io.micronaut.openapi.exclude",
+    excludePackages = "io.micronaut.configuration.openapi.docs.extraschema.exclude",
     // include classes by packages
-    packages = "io.micronaut.openapi.extra"
+    packages = "io.micronaut.configuration.openapi.docs.extraschema.extra"
+)
+class Application {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.openapi.annotation import OpenAPIExtraSchema
+
+from .ExcludedModel import ExcludedModel
+from .UnusedModel1 import UnusedModel1
+
+@OpenAPIExtraSchema(
+    # classes to add
+    classes=UnusedModel1,
+    # excluded classes, which marked with `@OpenAPIExtraSchema` annotation
+    excludeClasses=ExcludedModel,
+    # exclude classes by packages
+    excludePackages="micronaut.configuration.openapi.docs.extraschema.exclude",
+    # include classes by packages
+    packages="micronaut.configuration.openapi.docs.extraschema.extra",
+)
+class Application:
+    pass</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.openapi.annotation.OpenAPIExtraSchema
+
+@OpenAPIExtraSchema(
+    // classes to add
+    classes = [UnusedModel1::class],
+    // excluded classes, which marked with `@OpenAPIExtraSchema` annotation
+    excludeClasses = [ExcludedModel::class],
+    // exclude classes by packages
+    excludePackages = ["io.micronaut.configuration.openapi.docs.extraschema.exclude"],
+    // include classes by packages
+    packages = ["io.micronaut.configuration.openapi.docs.extraschema.extra"]
+)
+class Application</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.openapi.annotation.OpenAPIExtraSchema
+
+@OpenAPIExtraSchema(
+    // classes to add
+    classes = UnusedModel1,
+    // excluded classes, which marked with `@OpenAPIExtraSchema` annotation
+    excludeClasses = ExcludedModel,
+    // exclude classes by packages
+    excludePackages = "io.micronaut.configuration.openapi.docs.extraschema.exclude",
+    // include classes by packages
+    packages = "io.micronaut.configuration.openapi.docs.extraschema.extra"
 )
 class Application {
 }</code></pre>
@@ -3226,9 +4259,14 @@ as well as specify groups from which this endpoint should be excluded. You can a
 <div class="paragraph">
 <p>For example, you have a controller like this:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+
+@Controller
 public class ApiController {
 
     @OpenAPIGroup(exclude = "v2")
@@ -3247,6 +4285,84 @@ public class ApiController {
     @Post("/save")
     public String save(Object body) {
         return "OK!";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http.annotation import Body, Controller, Get, Post
+from micronaut.openapi.annotation import OpenAPIGroup
+
+@Controller
+class ApiController:
+
+    @OpenAPIGroup(exclude="v2")
+    @Get("/read/{id}")
+    def read(self, id: str) -&gt; str:
+        return "OK!"
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    def save2(self, id: str, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"
+
+    @OpenAPIGroup(["v1", "v2"])
+    @Post("/save")
+    def save(self, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.openapi.annotation.OpenAPIGroup
+
+@Controller
+class ApiController {
+
+    @OpenAPIGroup(exclude = ["v2"])
+    @Get("/read/{id}")
+    fun read(id: String): String = "OK!"
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    fun save2(id: String, body: Any): String = "OK!"
+
+    @OpenAPIGroup("v1", "v2")
+    @Post("/save")
+    fun save(body: Any): String = "OK!"
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.openapi.annotation.OpenAPIGroup
+
+@Controller
+class ApiController {
+
+    @OpenAPIGroup(exclude = "v2")
+    @Get("/read/{id}")
+    String read(String id) {
+        return "OK!"
+    }
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    String save2(String id, Object body) {
+        return "OK!"
+    }
+
+    @OpenAPIGroup(["v1", "v2"])
+    @Post("/save")
+    String save(Object body) {
+        return "OK!"
     }
 }</code></pre>
 </div>
@@ -3278,9 +4394,16 @@ different swagger files as you want from one project.</p>
 <div class="paragraph">
 <p>An annotation can be added at the class level or at the package level.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIGroupInfo(
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
+import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+@OpenAPIGroupInfo(
         names = "v1",
         info = @OpenAPIDefinition(
             info = @Info(
@@ -3321,6 +4444,154 @@ public class Application {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.openapi.annotation import OpenAPIGroupInfo
+from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+@OpenAPIGroupInfo(
+    names="v1",
+    info=OpenAPIDefinition(
+        info=Info(
+            title="Public api v1",
+            version="v1",
+            description="This is API version 1",
+            license=License(name="Apache 2.0", url="https://foo.bar"),
+            contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+        )
+    ),
+)
+@OpenAPIGroupInfo(
+    names="v2",
+    info=OpenAPIDefinition(
+        info=Info(
+            title="Public api v2",
+            version="v2",
+            description="This is API version 2",
+            license=License(name="Apache 2.0", url="https://foo.bar"),
+            contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+        )
+    ),
+)
+@OpenAPIDefinition(
+    info=Info(
+        title="Private api",
+        version="${service.version}",
+        description="This is API version 2",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.openapi.annotation.OpenAPIGroupInfo
+import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIGroupInfo(
+        names = ["v1"],
+        info = OpenAPIDefinition(
+            info = Info(
+                    title = "Public api v1",
+                    version = "v1",
+                    description = "This is API version 1",
+                    license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIGroupInfo(
+        names = ["v2"],
+        info = OpenAPIDefinition(
+            info = Info(
+                    title = "Public api v2",
+                    version = "v2",
+                    description = "This is API version 2",
+                    license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIDefinition(
+        info = Info(
+                title = "Private api",
+                version = "\${service.version}",
+                description = "This is API version 2",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.openapi.annotation.OpenAPIGroupInfo
+import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+@OpenAPIGroupInfo(
+        names = "v1",
+        info = @OpenAPIDefinition(
+            info = @Info(
+                    title = "Public api v1",
+                    version = "v1",
+                    description = "This is API version 1",
+                    license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIGroupInfo(
+        names = "v2",
+        info = @OpenAPIDefinition(
+            info = @Info(
+                    title = "Public api v2",
+                    version = "v2",
+                    description = "This is API version 2",
+                    license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Private api",
+                version = '${service.version}',
+                description = "This is API version 2",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
+    }
+}</code></pre>
+</div>
+</div>
 
 <h2 id="openApiInclude"><a class="anchor" href="#openApiInclude"></a>17.5 @OpenAPIInclude</h2>
 
@@ -3336,17 +4607,18 @@ public class Application {
 <a href="../api/io/micronaut/management/endpoint/annotation/Endpoint.html">Endpoint</a> already compiled
 classes in the OpenAPI processing.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${service.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @OpenAPIInclude(
         // you can specify classes to include
         classes = {
@@ -3365,10 +4637,167 @@ classes in the OpenAPI processing.</p>
         tags = @Tag(name = "Management"),
         security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
 )
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
 public class Application {
 
     public static void main(String[] args) {
         Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+from micronaut.management.endpoint.env import EnvironmentEndpoint
+from micronaut.openapi.annotation import OpenAPIInclude
+from micronaut.security.endpoints import LoginController, LogoutController
+from io.swagger.v3.oas.annotations.security import SecurityRequirement
+from io.swagger.v3.oas.annotations.tags import Tag
+
+@OpenAPIInclude(
+    # you can specify classes to include
+    classes=[LoginController, LogoutController],
+    # or / and you can specify packages to include
+    packages=[
+        "io.different.package.with.controllers",
+        "io.different.package.with.controllers2",
+    ],
+    tags=Tag(name="Security"),
+)
+@OpenAPIInclude(
+    classes=EnvironmentEndpoint,
+    tags=Tag(name="Management"),
+    security=SecurityRequirement(name="BEARER", scopes=["ADMIN"]),
+)
+
+@OpenAPIDefinition(
+    info=Info(
+        title="Hello World",
+        version="0.0",
+        description="My API",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.micronaut.management.endpoint.env.EnvironmentEndpoint
+import io.micronaut.openapi.annotation.OpenAPIInclude
+import io.micronaut.security.endpoints.LoginController
+import io.micronaut.security.endpoints.LogoutController
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+
+@OpenAPIInclude(
+        // you can specify classes to include
+        classes = [
+                LoginController::class,
+                LogoutController::class
+        ],
+        // or / and you can specify packages to include
+        packages = [
+            "io.different.package.with.controllers",
+            "io.different.package.with.controllers2",
+        ],
+        tags = [Tag(name = "Security")]
+)
+@OpenAPIInclude(
+        classes = [EnvironmentEndpoint::class],
+        tags = [Tag(name = "Management")],
+        security = [SecurityRequirement(name = "BEARER", scopes = ["ADMIN"])]
+)
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.micronaut.management.endpoint.env.EnvironmentEndpoint
+import io.micronaut.openapi.annotation.OpenAPIInclude
+import io.micronaut.security.endpoints.LoginController
+import io.micronaut.security.endpoints.LogoutController
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+
+@OpenAPIInclude(
+        // you can specify classes to include
+        classes = [
+                LoginController,
+                LogoutController
+        ],
+        // or / and you can specify packages to include
+        packages = [
+            "io.different.package.with.controllers",
+            "io.different.package.with.controllers2",
+        ],
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = EnvironmentEndpoint,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = ["ADMIN"])
+)
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
     }
 }</code></pre>
 </div>
@@ -3386,17 +4815,18 @@ public class Application {
 <div class="paragraph">
 <p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIExclude.html">OpenAPIExclude</a> to exclude selected controllers / endpoints from the OpenAPI processing.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${service.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+import io.micronaut.configuration.openapi.docs.exclude.InternalApi;
+import io.micronaut.configuration.openapi.docs.exclude.OldApi;
+import io.micronaut.openapi.annotation.OpenAPIExclude;
+
 @OpenAPIExclude(
         // you can specify classes to exclude
         classes = {
@@ -3409,10 +4839,142 @@ public class Application {
             "io.exclude.package.with.controllers2",
         }
 )
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
 public class Application {
 
     public static void main(String[] args) {
         Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+from micronaut.openapi.annotation import OpenAPIExclude
+
+from .exclude.InternalApi import InternalApi
+from .exclude.OldApi import OldApi
+
+@OpenAPIExclude(
+    # you can specify classes to exclude
+    classes=[OldApi, InternalApi],
+    # or / and you can specify packages to exclude
+    packages=[
+        "micronaut.configuration.openapi.docs.exclude.package1",
+        "micronaut.configuration.openapi.docs.exclude.package2",
+    ],
+)
+
+@OpenAPIDefinition(
+    info=Info(
+        title="Hello World",
+        version="0.0",
+        description="My API",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.micronaut.configuration.openapi.docs.exclude.InternalApi
+import io.micronaut.configuration.openapi.docs.exclude.OldApi
+import io.micronaut.openapi.annotation.OpenAPIExclude
+
+@OpenAPIExclude(
+        // you can specify classes to exclude
+        classes = [
+                OldApi::class,
+                InternalApi::class,
+        ],
+        // or / and you can specify packages to exclude
+        packages = [
+            "io.exclude.package.with.controllers",
+            "io.exclude.package.with.controllers2",
+        ]
+)
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.micronaut.configuration.openapi.docs.exclude.InternalApi
+import io.micronaut.configuration.openapi.docs.exclude.OldApi
+import io.micronaut.openapi.annotation.OpenAPIExclude
+
+@OpenAPIExclude(
+        // you can specify classes to exclude
+        classes = [
+                OldApi,
+                InternalApi,
+        ],
+        // or / and you can specify packages to exclude
+        packages = [
+            "io.exclude.package.with.controllers",
+            "io.exclude.package.with.controllers2",
+        ]
+)
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
     }
 }</code></pre>
 </div>
@@ -3488,7 +5050,89 @@ public class Application {
 <div class="paragraph">
 <p>Annotation <a href="../api/io/micronaut/openapi/annotation/OpenAPIRequest.html">OpenAPIRequest</a> can be used as alternative to <strong>io.micronaut.http.annotation.RequestBean</strong> to mark parameter as wrapped request details. It useful, when you haven&#8217;t micronaut-http in dependencies. For example, when you use micronaut-openapi with spring-boot application.</p>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example of using <code>@OpenAPIRequest</code> annotation with a Spring Boot application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.openapi.annotation.OpenAPIRequest;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
+
+
+@RestController
+@RequestMapping("/my-api")
+public class MyController {
+
+    @PostMapping(value = "/testMultipart/{pathVar}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void testMultipart(@OpenAPIRequest WrappedRq rq) {
+        System.out.println(rq);
+    }
+
+    /**
+     * Wrapped request data
+     */
+    public static class WrappedRq {
+
+        /**
+         * This is path variable
+         */
+        private String pathVar;
+        /**
+         * This is request param
+         */
+        @Parameter(in = QUERY) // you need to set, that this is @RequestParam by swagger annotation!
+        private String queryVar;
+        /**
+         * This is fileName request body part
+         */
+        // Part from multipart body
+        private String fileName;
+        /**
+         * This is file request body part
+         */
+        // Part from multipart body
+        private MultipartFile file;
+
+        public String getPathVar() {
+            return pathVar;
+        }
+
+        public void setPathVar(String pathVar) {
+            this.pathVar = pathVar;
+        }
+
+        public String getQueryVar() {
+            return queryVar;
+        }
+
+        public void setQueryVar(String queryVar) {
+            this.queryVar = queryVar;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public MultipartFile getFile() {
+            return file;
+        }
+
+        public void setFile(MultipartFile file) {
+            this.file = file;
+        }
+    }
+}</code></pre>
+</div>
+</div>
 
 <h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>17.10 @AccessorsStyle</h2>
 
@@ -3505,10 +5149,13 @@ public class Application {
 <div class="paragraph">
 <p>This is useful when defining getters and setters in a "fluent" way or when using Lombok for that:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Introspected
-@AccessorsStyle(readPrefixes = "", writePrefixes = "") <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.core.annotation.AccessorsStyle;
+import io.micronaut.core.annotation.Introspected;
+
+@Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "") // <b class="conum">(1)</b>
 class Person {
 
     private String name;
@@ -3521,7 +5168,7 @@ class Person {
         this.totalGoals = totalGoals;
     }
 
-    public String name() { <i class="conum" data-value="2"></i><b>(2)</b>
+    public String name() { // <b class="conum">(2)</b>
         return name;
     }
 
@@ -3533,7 +5180,7 @@ class Person {
         return totalGoals;
     }
 
-    public void name(String name) { <i class="conum" data-value="2"></i><b>(2)</b>
+    public void name(String name) { // <b class="conum">(2)</b>
         this.name = name;
     }
 
@@ -3547,6 +5194,100 @@ class Person {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.core.annotation import Introspected
+
+@Introspected
+@dataclass
+class Person:
+    name: str
+    debtValue: int
+    totalGoals: int</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.core.annotation.AccessorsStyle
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+@AccessorsStyle(readPrefixes = [""], writePrefixes = [""]) // <b class="conum">(1)</b>
+class Person(private var name: String, private var debtValue: Int, private var totalGoals: Int) {
+
+    fun name(): String { // <b class="conum">(2)</b>
+        return name
+    }
+
+    fun debtValue(): Int {
+        return debtValue
+    }
+
+    fun totalGoals(): Int {
+        return totalGoals
+    }
+
+    fun name(name: String) { // <b class="conum">(2)</b>
+        this.name = name
+    }
+
+    fun debtValue(debtValue: Int) {
+        this.debtValue = debtValue
+    }
+
+    fun totalGoals(totalGoals: Int) {
+        this.totalGoals = totalGoals
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.core.annotation.AccessorsStyle
+import io.micronaut.core.annotation.Introspected
+
+@Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "") // <b class="conum">(1)</b>
+class Person {
+
+    private String name
+    private Integer debtValue
+    private Integer totalGoals
+
+    Person(String name, Integer debtValue, Integer totalGoals) {
+        this.name = name
+        this.debtValue = debtValue
+        this.totalGoals = totalGoals
+    }
+
+    String name() { // <b class="conum">(2)</b>
+        return name
+    }
+
+    Integer debtValue() {
+        return debtValue
+    }
+
+    Integer totalGoals() {
+        return totalGoals
+    }
+
+    void name(String name) { // <b class="conum">(2)</b>
+        this.name = name
+    }
+
+    void debtValue(Integer debtValue) {
+        this.debtValue = debtValue
+    }
+
+    void totalGoals(Integer totalGoals) {
+        this.totalGoals = totalGoals
+    }
+}</code></pre>
+</div>
+</div>
+<div class="openblock lang-java lang-kotlin lang-groovy">
+<div class="content">
 <div class="colist arabic">
 <table>
 <tr>
@@ -3561,6 +5302,11 @@ class Person {
 </div>
 <div class="paragraph">
 <p>Using <code>@AccessorsStyle</code> will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.</p>
+</div>
+</div>
+</div>
+<div class="paragraph lang-python">
+<p>Python classes expose their attributes directly, so no accessor style needs to be configured: the schema is generated from the attributes of the introspected class.</p>
 </div>
 
 <h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>18 Merging Schemas</h1>
@@ -3740,14 +5486,18 @@ paths:
 
 
 <div class="paragraph">
-<p>Typically, tags are set at the controller level, using annotations, to group multiple endpoints into a logical group, something like this:</p>
+<p>Typically, tags are set at the controller level, using the <code>@Tag</code> annotation, to group multiple endpoints into a logical group.
+Instead, you can enable auto-generation of tags by class name or by package, so a controller like the following does not need any <code>@Tag</code> annotation:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+
+/**
  * User main operations.
  */
-@Tag("user-operations") // don't need to add this annotation anymore
 @Controller
 public class UserOperationsController {
 
@@ -3768,8 +5518,81 @@ public class UserOperationsController {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http.annotation import Body, Controller, Get, Post
+
+@Controller
+class UserOperationsController:
+    """User main operations."""
+
+    @Get("/read/{id}")
+    def read(self, id: str) -&gt; str:
+        return "OK!"
+
+    @Post("/save/{id}")
+    def save2(self, id: str, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"
+
+    @Post("/save")
+    def save(self, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+
+/**
+ * User main operations.
+ */
+@Controller
+class UserOperationsController {
+
+    @Get("/read/{id}")
+    fun read(id: String): String = "OK!"
+
+    @Post("/save/{id}")
+    fun save2(id: String, body: Any): String = "OK!"
+
+    @Post("/save")
+    fun save(body: Any): String = "OK!"
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+
+/**
+ * User main operations.
+ */
+@Controller
+class UserOperationsController {
+
+    @Get("/read/{id}")
+    String read(String id) {
+        return "OK!"
+    }
+
+    @Post("/save/{id}")
+    String save2(String id, Object body) {
+        return "OK!"
+    }
+
+    @Post("/save")
+    String save(Object body) {
+        return "OK!"
+    }
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
-<p>Now you can enable auto-generation of tags by class name or by package. Just enable it by property:</p>
+<p>Just enable it by property:</p>
 </div>
 <div class="listingblock">
 <div class="title">openapi.properties</div>
@@ -4434,9 +6257,21 @@ in the Swagger UI, the requests issued incorporate a valid token.</p>
 <div class="paragraph">
 <p>Then, you configure the <code>@SecurityScheme</code>:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@SecurityScheme(name = "openid",
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.OAuthFlow;
+import io.swagger.v3.oas.annotations.security.OAuthFlows;
+import io.swagger.v3.oas.annotations.security.OAuthScope;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+@SecurityScheme(name = "openid",
         type = SecuritySchemeType.OAUTH2,
         scheme = "bearer",
         bearerFormat = "jwt",
@@ -4449,9 +6284,10 @@ in the Swagger UI, the requests issued incorporate a valid token.</p>
                 )
         )
 )
+
 @OpenAPIDefinition(
         info = @Info(
-                title = "API service",
+                title = "Hello World",
                 version = "0.0",
                 description = "My API",
                 license = @License(name = "Apache 2.0", url = "https://foo.bar"),
@@ -4459,8 +6295,140 @@ in the Swagger UI, the requests issued incorporate a valid token.</p>
         )
 )
 public class Application {
+
     public static void main(String[] args) {
-        Micronaut.run(Application.class, args);
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.runtime import Micronaut
+from io.swagger.v3.oas.annotations import OpenAPIDefinition
+from io.swagger.v3.oas.annotations.info import Contact, Info, License
+
+from io.swagger.v3.oas.annotations.enums import SecuritySchemeType
+from io.swagger.v3.oas.annotations.security import OAuthFlow, OAuthFlows, OAuthScope, SecurityScheme
+
+@SecurityScheme(
+    name="openid",
+    type=SecuritySchemeType.OAUTH2,
+    scheme="bearer",
+    bearerFormat="jwt",
+    flows=OAuthFlows(
+        authorizationCode=OAuthFlow(
+            authorizationUrl="https://mycompany.okta.com/oauth2/default/v1/authorize",
+            tokenUrl="https://mycompany.okta.com/oauth2/default/v1/token",
+            refreshUrl="",
+            scopes=OAuthScope(name="openid", description="OpenID role"),
+        )
+    ),
+)
+
+@OpenAPIDefinition(
+    info=Info(
+        title="Hello World",
+        version="0.0",
+        description="My API",
+        license=License(name="Apache 2.0", url="https://foo.bar"),
+        contact=Contact(url="https://gigantic-server.com", name="Fred", email="Fred@gigagantic-server.com"),
+    )
+)
+class Application:
+    pass
+
+
+if __name__ == "__main__":
+    Micronaut.run(Application)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.security.OAuthFlow
+import io.swagger.v3.oas.annotations.security.OAuthFlows
+import io.swagger.v3.oas.annotations.security.OAuthScope
+import io.swagger.v3.oas.annotations.security.SecurityScheme
+
+@SecurityScheme(name = "openid",
+        type = SecuritySchemeType.OAUTH2,
+        scheme = "bearer",
+        bearerFormat = "jwt",
+        flows = OAuthFlows(
+                authorizationCode = OAuthFlow(
+                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
+                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
+                        refreshUrl = "",
+                        scopes = [OAuthScope(name = "openid", description = "OpenID role")]
+                )
+        )
+)
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.security.OAuthFlow
+import io.swagger.v3.oas.annotations.security.OAuthFlows
+import io.swagger.v3.oas.annotations.security.OAuthScope
+import io.swagger.v3.oas.annotations.security.SecurityScheme
+
+@SecurityScheme(name = "openid",
+        type = SecuritySchemeType.OAUTH2,
+        scheme = "bearer",
+        bearerFormat = "jwt",
+        flows = @OAuthFlows(
+                authorizationCode = @OAuthFlow(
+                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
+                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
+                        refreshUrl = "",
+                        scopes = [@OAuthScope(name = "openid", description = "OpenID role")]
+                )
+        )
+)
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
     }
 }</code></pre>
 </div>
@@ -4468,7 +6436,7 @@ public class Application {
 <div class="paragraph">
 <p>And the appropriate <code>@SecurityRequirement</code> on controllers e.g.:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -4484,6 +6452,63 @@ public class OrderController {
     @SecurityRequirement(name = "openid", scopes = "openid")
     public String index() {
         return "Example Response";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http.annotation import Controller, Get
+from micronaut.security.annotation import Secured
+from micronaut.security.rules import SecurityRule
+from io.swagger.v3.oas.annotations.security import SecurityRequirement
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+class OrderController:
+
+    @Get
+    @SecurityRequirement(name="openid", scopes="openid")
+    def index(self) -&gt; str:
+        return "Example Response"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+class OrderController {
+
+    @Get
+    @SecurityRequirement(name = "openid", scopes = ["openid"])
+    fun index(): String {
+        return "Example Response"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+class OrderController {
+
+    @Get
+    @SecurityRequirement(name = "openid", scopes = "openid")
+    String index() {
+        return "Example Response"
     }
 }</code></pre>
 </div>
@@ -5921,10 +7946,15 @@ with version from your <code>application.yml</code>.</p>
 <div class="paragraph">
 <p>For example:</p>
 </div>
-<div class="listingblock">
-<div class="title">VersionedController.java</div>
+<div class="listingblock multi-language-sample">
+<div class="title">VersionedController</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller("/versioned")
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.core.version.annotation.Version;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+
+@Controller("/versioned")
 public class VersionedController {
 
     @Version("1")
@@ -5943,15 +7973,128 @@ public class VersionedController {
     public String common() {
         return null;
     }
+}
 
-    public static class UserDto {
+import jakarta.validation.constraints.NotNull;
 
-        public String name;
-        public int age;
-        public String secondName;
-        @NotNull
-        public String address;
+public class UserDto {
+
+    public String name;
+    public int age;
+    public String secondName;
+    @NotNull
+    public String address;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">VersionedController</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.core.version.annotation import Version
+from micronaut.http.annotation import Controller, Get, Post
+
+@Controller("/versioned")
+class VersionedController:
+
+    @Version("1")
+    @Get("/hello")
+    def helloV1(self) -&gt; str:
+        return "helloV1"
+
+    @Version("2")
+    @Post("/hello")
+    def helloV2(self, userDto: UserDto) -&gt; str:
+        return "helloV2"
+
+    @Post("/common")
+    def common(self) -&gt; str:
+        return None
+
+from jakarta.validation.constraints import NotNull
+from micronaut.core.annotation import Introspected
+
+@Introspected
+@dataclass
+class UserDto:
+    name: str | None = None
+    age: int = 0
+    secondName: str | None = None
+    address: Annotated[str, NotNull] = None</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">VersionedController</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.core.version.annotation.Version
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+
+@Controller("/versioned")
+class VersionedController {
+
+    @Version("1")
+    @Get("/hello")
+    fun helloV1(): String = "helloV1"
+
+    @Version("2")
+    @Post("/hello")
+    fun helloV2(userDto: UserDto): String = "helloV2"
+
+    @Post("/common")
+    fun common(): String? = null
+}
+
+import jakarta.validation.constraints.NotNull
+
+class UserDto {
+
+    var name: String? = null
+    var age: Int = 0
+    var secondName: String? = null
+    @field:NotNull
+    var address: String? = null
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">VersionedController</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.core.version.annotation.Version
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+
+@Controller("/versioned")
+class VersionedController {
+
+    @Version("1")
+    @Get("/hello")
+    String helloV1() {
+        return "helloV1"
     }
+
+    @Version("2")
+    @Post("/hello")
+    String helloV2(UserDto userDto) {
+        return "helloV2"
+    }
+
+    @Post("/common")
+    String common() {
+        return null
+    }
+}
+
+import jakarta.validation.constraints.NotNull
+
+class UserDto {
+
+    public String name
+    public int age
+    public String secondName
+    @NotNull
+    public String address
 }</code></pre>
 </div>
 </div>
@@ -6036,12 +8179,12 @@ micronaut.router.versioning.parameter.names=version</code></pre>
 <p>After processing the annotation processor, you will see 2 swagger files:</p>
 </div>
 <div class="listingblock">
-<div class="title">Generated swagger-1.yml</div>
+<div class="title">Generated service-1.0.0-1.yml</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
 info:
-  title: Api
-  version: "1.0"
+  title: Service
+  version: 1.0.0
 paths:
   /versioned/common:
     post:
@@ -6078,12 +8221,12 @@ paths:
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Generated swagger-2.yml</div>
+<div class="title">Generated service-1.0.0-2.yml</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
 info:
-  title: Api
-  version: "2.0"
+  title: Service
+  version: 1.0.0
 paths:
   /versioned/common:
     post:
@@ -6170,10 +8313,21 @@ if you do not want to add annotations in the code.</p>
 <div class="paragraph">
 <p>Usage example:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+
+@Controller
 public class ApiController {
+
+    @OpenAPIGroup(exclude = "v2")
+    @Get("/read/{id}")
+    public String read(String id) {
+        return "OK!";
+    }
 
     @OpenAPIGroup("v2")
     @Post("/save/{id}")
@@ -6185,6 +8339,84 @@ public class ApiController {
     @Post("/save")
     public String save(Object body) {
         return "OK!";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from micronaut.http.annotation import Body, Controller, Get, Post
+from micronaut.openapi.annotation import OpenAPIGroup
+
+@Controller
+class ApiController:
+
+    @OpenAPIGroup(exclude="v2")
+    @Get("/read/{id}")
+    def read(self, id: str) -&gt; str:
+        return "OK!"
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    def save2(self, id: str, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"
+
+    @OpenAPIGroup(["v1", "v2"])
+    @Post("/save")
+    def save(self, body: Annotated[object, Body]) -&gt; str:
+        return "OK!"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.openapi.annotation.OpenAPIGroup
+
+@Controller
+class ApiController {
+
+    @OpenAPIGroup(exclude = ["v2"])
+    @Get("/read/{id}")
+    fun read(id: String): String = "OK!"
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    fun save2(id: String, body: Any): String = "OK!"
+
+    @OpenAPIGroup("v1", "v2")
+    @Post("/save")
+    fun save(body: Any): String = "OK!"
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
+import io.micronaut.openapi.annotation.OpenAPIGroup
+
+@Controller
+class ApiController {
+
+    @OpenAPIGroup(exclude = "v2")
+    @Get("/read/{id}")
+    String read(String id) {
+        return "OK!"
+    }
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    String save2(String id, Object body) {
+        return "OK!"
+    }
+
+    @OpenAPIGroup(["v1", "v2"])
+    @Post("/save")
+    String save(Object body) {
+        return "OK!"
     }
 }</code></pre>
 </div>
@@ -6415,7 +8647,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <div class="paragraph">
 <p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">HttpServerFilter for static context-path</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
@@ -6451,13 +8683,100 @@ public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
 }</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter for static context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from java.time import Duration
+from micronaut.context.annotation import Requires, Value
+from micronaut.core.async_.publisher import Publishers
+from micronaut.http import HttpMethod, HttpRequest, MutableHttpResponse
+from micronaut.http.annotation import Filter
+from micronaut.http.cookie import Cookie
+from micronaut.http.filter import HttpServerFilter, ServerFilterChain
+from org.reactivestreams import Publisher
+
+@Requires(property="micronaut.server.context-path")
+@Filter(methods=[HttpMethod.GET, HttpMethod.HEAD], patterns=["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"])
+class OpenApiViewCookieContextPathFilter(HttpServerFilter):
+
+    def __init__(self, contextPath: Annotated[str, Value("${micronaut.server.context-path}")]):
+        self.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2))
+
+    def doFilter(self, request: HttpRequest, chain: ServerFilterChain) -&gt; Publisher[MutableHttpResponse]:
+        return Publishers.map(chain.proceed(request), lambda response: response.cookie(self.contextPathCookie))</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter for static context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.context.annotation.Requires
+import io.micronaut.context.annotation.Value
+import io.micronaut.core.async.publisher.Publishers
+import io.micronaut.http.HttpMethod
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.MutableHttpResponse
+import io.micronaut.http.annotation.Filter
+import io.micronaut.http.cookie.Cookie
+import io.micronaut.http.filter.HttpServerFilter
+import io.micronaut.http.filter.ServerFilterChain
+import org.reactivestreams.Publisher
+import java.time.Duration
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = [HttpMethod.GET, HttpMethod.HEAD], patterns = ["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"])
+class OpenApiViewCookieContextPathFilter(@Value("\${micronaut.server.context-path}") contextPath: String) : HttpServerFilter {
+
+    private val contextPathCookie: Cookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L))
+
+    override fun doFilter(request: HttpRequest&lt;*&gt;, chain: ServerFilterChain): Publisher&lt;MutableHttpResponse&lt;*&gt;&gt; {
+        return Publishers.map(chain.proceed(request)) { response -&gt; response.cookie(contextPathCookie) }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter for static context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import java.time.Duration
+
+import org.reactivestreams.Publisher
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.annotation.Value
+import io.micronaut.core.async.publisher.Publishers
+import io.micronaut.http.HttpMethod
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.MutableHttpResponse
+import io.micronaut.http.annotation.Filter
+import io.micronaut.http.cookie.Cookie
+import io.micronaut.http.filter.HttpServerFilter
+import io.micronaut.http.filter.ServerFilterChain
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = [HttpMethod.GET, HttpMethod.HEAD], patterns = ["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"])
+class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+
+    private final Cookie contextPathCookie
+
+    OpenApiViewCookieContextPathFilter(@Value('${micronaut.server.context-path}') String contextPath) {
+        contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L))
+    }
+
+    @Override
+    Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie))
+    }
+
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_from_http_header">From HTTP Header</h3>
 <div class="paragraph">
 <p>The <code>HttpServerFilter</code> looks very similar to the one above. The main difference is that it parses the <code>context-path</code> value from the request headers.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock multi-language-sample">
 <div class="title">HttpServerFilter from request headers</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
@@ -6476,29 +8795,143 @@ import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 
 @Filter(
-	methods = {HttpMethod.GET, HttpMethod.HEAD},
-	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}
+    methods = {HttpMethod.GET, HttpMethod.HEAD},
+    patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}
 )
 @Requires(property = "micronaut.server.context-path-header")
 public class OpenApiContextPathFilter implements HttpServerFilter {
 
-	private final String contextPathHeader;
+    private final String contextPathHeader;
 
-	OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
-		this.contextPathHeader = contextPathHeader;
-	}
+    OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
+        this.contextPathHeader = contextPathHeader;
+    }
 
-	@Override
-	public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
-		final String contextPath = request.getHeaders().get(contextPathHeader);
+    @Override
+    public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        final String contextPath = request.getHeaders().get(contextPathHeader);
 
-		if (contextPath != null) {
-			Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
-			return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
-		} else {
-			return chain.proceed(request);
-		}
-	}
+        if (contextPath != null) {
+            Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+            return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+        } else {
+            return chain.proceed(request);
+        }
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter from request headers</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from java.time import Duration
+from micronaut.context.annotation import Requires, Value
+from micronaut.core.async_.publisher import Publishers
+from micronaut.http import HttpMethod, HttpRequest, MutableHttpResponse
+from micronaut.http.annotation import Filter
+from micronaut.http.cookie import Cookie
+from micronaut.http.filter import HttpServerFilter, ServerFilterChain
+from org.reactivestreams import Publisher
+
+@Filter(
+    methods=[HttpMethod.GET, HttpMethod.HEAD],
+    patterns=["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"],
+)
+@Requires(property="micronaut.server.context-path-header")
+class OpenApiContextPathFilter(HttpServerFilter):
+
+    def __init__(self, contextPathHeader: Annotated[str, Value("${micronaut.server.context-path-header}")]):
+        self.contextPathHeader = contextPathHeader
+
+    def doFilter(self, request: HttpRequest, chain: ServerFilterChain) -&gt; Publisher[MutableHttpResponse]:
+        contextPath = request.getHeaders().get(self.contextPathHeader)
+
+        if contextPath is not None:
+            contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2))
+            return Publishers.map(chain.proceed(request), lambda response: response.cookie(contextPathCookie))
+        else:
+            return chain.proceed(request)</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter from request headers</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.context.annotation.Requires
+import io.micronaut.context.annotation.Value
+import io.micronaut.core.async.publisher.Publishers
+import io.micronaut.http.HttpMethod
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.MutableHttpResponse
+import io.micronaut.http.annotation.Filter
+import io.micronaut.http.cookie.Cookie
+import io.micronaut.http.filter.HttpServerFilter
+import io.micronaut.http.filter.ServerFilterChain
+import org.reactivestreams.Publisher
+import java.time.Duration
+
+@Filter(
+    methods = [HttpMethod.GET, HttpMethod.HEAD],
+    patterns = ["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"]
+)
+@Requires(property = "micronaut.server.context-path-header")
+class OpenApiContextPathFilter(@Value("\${micronaut.server.context-path-header}") private val contextPathHeader: String) : HttpServerFilter {
+
+    override fun doFilter(request: HttpRequest&lt;*&gt;, chain: ServerFilterChain): Publisher&lt;MutableHttpResponse&lt;*&gt;&gt; {
+        val contextPath = request.headers[contextPathHeader]
+
+        return if (contextPath != null) {
+            val contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L))
+            Publishers.map(chain.proceed(request)) { response -&gt; response.cookie(contextPathCookie) }
+        } else {
+            chain.proceed(request)
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">HttpServerFilter from request headers</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import java.time.Duration
+
+import org.reactivestreams.Publisher
+
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.annotation.Value
+import io.micronaut.core.async.publisher.Publishers
+import io.micronaut.http.HttpMethod
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.MutableHttpResponse
+import io.micronaut.http.annotation.Filter
+import io.micronaut.http.cookie.Cookie
+import io.micronaut.http.filter.HttpServerFilter
+import io.micronaut.http.filter.ServerFilterChain
+
+@Filter(
+    methods = [HttpMethod.GET, HttpMethod.HEAD],
+    patterns = ["/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"]
+)
+@Requires(property = "micronaut.server.context-path-header")
+class OpenApiContextPathFilter implements HttpServerFilter {
+
+    private final String contextPathHeader
+
+    OpenApiContextPathFilter(@Value('${micronaut.server.context-path-header}') String contextPathHeader) {
+        this.contextPathHeader = contextPathHeader
+    }
+
+    @Override
+    Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        final String contextPath = request.headers.get(contextPathHeader)
+
+        if (contextPath != null) {
+            Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L))
+            return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie))
+        } else {
+            return chain.proceed(request)
+        }
+    }
 
 }</code></pre>
 </div>
@@ -6763,7 +9196,89 @@ tasks.compileKotlin {
 <div class="paragraph">
 <p>If you use wrapped request data for controller method, you need to add annotation <code>@RequestBean</code> (<code>io.micronaut.http.annotation.RequestBean</code>) for this parameter.</p>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example Swagger UI resources routing config</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.openapi.annotation.OpenAPIRequest;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
+
+
+@RestController
+@RequestMapping("/my-api")
+public class MyController {
+
+    @PostMapping(value = "/testMultipart/{pathVar}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void testMultipart(@OpenAPIRequest WrappedRq rq) {
+        System.out.println(rq);
+    }
+
+    /**
+     * Wrapped request data
+     */
+    public static class WrappedRq {
+
+        /**
+         * This is path variable
+         */
+        private String pathVar;
+        /**
+         * This is request param
+         */
+        @Parameter(in = QUERY) // you need to set, that this is @RequestParam by swagger annotation!
+        private String queryVar;
+        /**
+         * This is fileName request body part
+         */
+        // Part from multipart body
+        private String fileName;
+        /**
+         * This is file request body part
+         */
+        // Part from multipart body
+        private MultipartFile file;
+
+        public String getPathVar() {
+            return pathVar;
+        }
+
+        public void setPathVar(String pathVar) {
+            this.pathVar = pathVar;
+        }
+
+        public String getQueryVar() {
+            return queryVar;
+        }
+
+        public void setQueryVar(String queryVar) {
+            this.queryVar = queryVar;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public MultipartFile getFile() {
+            return file;
+        }
+
+        public void setFile(MultipartFile file) {
+            this.file = file;
+        }
+    }
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>For this controller will be created this OpenAPI specification:</p>
 </div>
