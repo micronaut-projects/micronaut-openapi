@@ -1,7 +1,7 @@
 It is possible to tweak the OpenAPI processing via standard way with micronaut environments (application.yml file).
 
 .application.yml Example
-[source,yaml]
+[configuration]
 ----
 micronaut:
   openapi:
@@ -15,7 +15,7 @@ micronaut:
 Also, you can use properties from `application.yml` file for placeholders.
 
 .application.yml Sample properties for placeholders
-[source,yaml]
+[configuration]
 ----
 my:
   api:
