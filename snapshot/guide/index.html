@@ -903,8 +903,16 @@ openapi.description=A nice API</code></pre>
 <div class="paragraph">
 <p>It is possible to tweak the OpenAPI processing via standard way with micronaut environments (application.yml file).</p>
 </div>
-<div class="listingblock">
+<div class="openblock">
 <div class="title">application.yml Example</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.target.file=myspecfile.yml
+micronaut.openapi.property.naming.strategy=KEBAB_CASE</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   openapi:
@@ -915,15 +923,119 @@ openapi.description=A nice API</code></pre>
         strategy: KEBAB_CASE</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {target = {file = "myspecfile.yml"}, property = {naming = {strategy = "KEBAB_CASE"}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  openapi {
+    target {
+      file = "myspecfile.yml"
+    }
+    property {
+      naming {
+        strategy = "KEBAB_CASE"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    openapi {
+      target {
+        file = "myspecfile.yml"
+      }
+      property {
+        naming {
+          strategy = "KEBAB_CASE"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "openapi": {
+      "target": {
+        "file": "myspecfile.yml"
+      },
+      "property": {
+        "naming": {
+          "strategy": "KEBAB_CASE"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>Also, you can use properties from <code>application.yml</code> file for placeholders.</p>
 </div>
-<div class="listingblock">
+<div class="openblock">
 <div class="title">application.yml Sample properties for placeholders</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">my.api.title=Hello World</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">my:
   api:
     title: Hello World</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">my = {api = {title = "Hello World"}}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">my {
+  api {
+    title = "Hello World"
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  my {
+    api {
+      title = "Hello World"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "my": {
+    "api": {
+      "title": "Hello World"
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
