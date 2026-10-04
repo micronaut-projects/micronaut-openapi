@@ -11,7 +11,7 @@ managed-evo-inflector = "2.0"
 
 jspecify = "1.0.1"
 jdt-annotation = "2.4.100"
-android-annotation = "1.10.0"
+android-annotation = "1.11.0"
 spotbugs-annotations = "4.10.4"
 jackson = "2.22.2"
 openapi-generator = "7.25.0"
