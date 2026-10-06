@@ -75,6 +75,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EX
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ADDITIONAL_FILES_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_IGNORED_PARAMETER_TYPES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
@@ -124,6 +125,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXCLUDE_CLASSES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXCLUDE_PACKAGES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_IGNORED_PARAMETER_TYPES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
@@ -1546,6 +1548,23 @@ public final class ConfigUtils {
         ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES, includeExcludeProperties, context);
 
         return includeExcludeProperties;
+    }
+
+    /**
+     * @param context visitor context
+     * @return fully qualified names of the additional types to ignore as controller method parameters
+     * @since 7.4.0
+     */
+    public static List<String> getIgnoredParameterTypes(VisitorContext context) {
+
+        List<String> ignoredParameterTypes = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_IGNORED_PARAMETER_TYPES, LIST_OF_STRING, context);
+        if (ignoredParameterTypes != null) {
+            return ignoredParameterTypes;
+        }
+        ignoredParameterTypes = getListStringsProperty(MICRONAUT_OPENAPI_IGNORED_PARAMETER_TYPES, Collections.emptyList(), context);
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_IGNORED_PARAMETER_TYPES, ignoredParameterTypes, context);
+
+        return ignoredParameterTypes;
     }
 
     public static DocsFormat getDocsFormat(@Nullable VisitorContext context) {

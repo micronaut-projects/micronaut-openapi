@@ -884,7 +884,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                   List<PathItem> pathItems) {
         ClassElement parameterType = parameter.getGenericType();
 
-        if (isIgnoredParameter(parameter)) {
+        if (isIgnoredParameter(parameter, context)) {
             return;
         }
         var hasSwaggerRequestBodyImpl = false;
@@ -1052,7 +1052,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         for (var property : properties) {
             // Skip properties ignored by Jackson or Swagger annotations.
-            if (isIgnoredParameter(property)) {
+            if (isIgnoredParameter(property, context)) {
                 continue;
             }
 
@@ -1239,7 +1239,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             var paramIn = parameterAnn != null ? parameterAnn.stringValue(PROP_IN).orElse(null) : null;
             if (parameterAnn == null || !parameterAnn.booleanValue(PROP_HIDDEN).orElse(false)
                 && (paramIn == null || paramIn.equals(ParameterIn.DEFAULT.toString()))) {
-                if (isExtraBodyParameter(parameter, permitsRequestBody, matchTemplates, pathVariables, queryParams)) {
+                if (isExtraBodyParameter(parameter, permitsRequestBody, matchTemplates, pathVariables, queryParams, context)) {
                     extraBodyParameters.add(parameter);
                     isBodyParameter = true;
                 } else {

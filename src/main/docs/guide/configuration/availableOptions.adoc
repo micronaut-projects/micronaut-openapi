@@ -7,6 +7,7 @@
 |`*micronaut.openapi.server.context.path*` | System property for server context path. |
 |`*micronaut.openapi.exclude.classes*` | System property to specify list of classes which must be excluded from the final OpenAPI specification. |
 |`*micronaut.openapi.exclude.packages*` | System property to specify list of packages, containing controllers / endpoints, which must be excluded from the final OpenAPI specification. |
+|`*micronaut.openapi.ignored-parameter-types*` | System property to specify list of fully qualified type names. A controller method parameter is not included in the final OpenAPI specification if its type is assignable to one of them. These are in addition to the types which are always ignored, such as `java.security.Principal` or `io.micronaut.http.HttpRequest`. |
 |`*micronaut.openapi.property.naming.strategy*` | System property for naming strategy. One jackson PropertyNamingStrategy. | Default: `LOWER_CAMEL_CASE`
 |`*micronaut.openapi.property.property.include*` | System property for default property inclusion - default Jackson include mode. Available values: "USE_DEFAULTS" and "ALWAYS". | Default: `USE_DEFAULTS`
 |`*micronaut.openapi.response.read-successful-from-code*` | If this property true, then successful response will be created from code, if successful code didn't set in swagger annotations. Otherwise, if swagger annotations are specified, the code will be ignored and responses will be read only from swagger annotations. | Default: `true`

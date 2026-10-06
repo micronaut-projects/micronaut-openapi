@@ -50,6 +50,10 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_OPENAPI_INCLUDE_EXCLUDE_PROPERTIES = "micronaut.internal.openapi.include-exclude.properties";
     /**
+     * Loaded additional ignored parameter types.
+     */
+    String MICRONAUT_INTERNAL_OPENAPI_IGNORED_PARAMETER_TYPES = "micronaut.internal.openapi.ignored-parameter-types";
+    /**
      * Loaded openapi properties from file.
      */
     String MICRONAUT_INTERNAL_OPENAPI_PROPERTIES = "micronaut.internal.openapi.properties";

@@ -421,6 +421,18 @@ public interface OpenApiConfigProperty {
      * List of packages, containing controllers / endpoints, which must be excluded from the final OpenAPI specification.
      */
     String MICRONAUT_OPENAPI_EXCLUDE_PACKAGES = "micronaut.openapi.exclude.packages";
+    /**
+     * List of fully qualified type names. A controller method parameter is not included in the OpenAPI
+     * specification if its type is assignable to one of them.
+     * <p>
+     * These are in addition to the types which are always ignored, such as {@code java.security.Principal},
+     * {@code io.micronaut.security.authentication.Authentication} and {@code io.micronaut.http.HttpRequest}.
+     * Use it for a type which is not sent by the caller, for example one bound from the request by your own
+     * {@code io.micronaut.http.bind.binders.TypedRequestArgumentBinder}.
+     *
+     * @since 7.4.0
+     */
+    String MICRONAUT_OPENAPI_IGNORED_PARAMETER_TYPES = "micronaut.openapi.ignored-parameter-types";
 
     /**
      * System property that enables interpret primary constructor arguments as required properties.

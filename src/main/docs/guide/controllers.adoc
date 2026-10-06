@@ -50,3 +50,15 @@ Notice how the docstring of the method is used to fill out the description of th
 
 [.lang-groovy]
 Groovy doc comments are not available to the compiler, so the parameter and response descriptions are not generated for Groovy; use the Swagger annotations described in the next section instead.
+
+A controller method parameter which is not sent by the caller is left out of the specification. That is the case for a parameter annotated with `@Hidden` or `@Parameter(hidden = true)`, and for a parameter of a type such as `java.security.Principal`, `io.micronaut.security.authentication.Authentication` or `io.micronaut.http.HttpRequest`.
+
+To leave out every parameter of a type of your own, for example one which is bound from the request by a `TypedRequestArgumentBinder`, list the type in the `micronaut.openapi.ignored-parameter-types` property:
+
+.openapi.properties
+[source,properties]
+----
+micronaut.openapi.ignored-parameter-types=com.example.SignedInUser,com.example.Tenant
+----
+
+A parameter is left out if its type is assignable to one of the listed types, so listing an interface covers its implementations.

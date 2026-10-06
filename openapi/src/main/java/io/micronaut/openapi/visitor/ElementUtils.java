@@ -28,6 +28,7 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.multipart.StreamingFileUpload;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -80,6 +81,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getIgnoredParameterTypes;
 import static io.micronaut.openapi.visitor.ConfigUtils.getIncludeExcludeProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
@@ -262,7 +264,8 @@ public final class ElementUtils {
     public static boolean isExtraBodyParameter(@NonNull TypedElement parameter, boolean permitsRequestBody,
                                                List<UriMatchTemplate> matchTemplates,
                                                Map<String, VarMetadata> pathVariables,
-                                               Map<String, VarMetadata> queryParams) {
+                                               Map<String, VarMetadata> queryParams,
+                                               @Nullable VisitorContext context) {
 
         if (isWrappedBodyParameter(parameter)) {
             return false;
@@ -281,7 +284,7 @@ public final class ElementUtils {
         if (!permitsRequestBody) {
             return false;
         }
-        if (isIgnoredParameter(parameter)) {
+        if (isIgnoredParameter(parameter, context)) {
             return false;
         }
 
@@ -375,6 +378,31 @@ public final class ElementUtils {
 
     public static boolean isJavaBasicType(String typeName) {
         return ClassUtils.isJavaBasicType(typeName);
+    }
+
+    /**
+     * Checks whether a parameter must be left out of the OpenAPI specification, also taking into account the
+     * types configured with {@link OpenApiConfigProperty#MICRONAUT_OPENAPI_IGNORED_PARAMETER_TYPES}.
+     *
+     * @param parameter parameter element
+     * @param context visitor context
+     * @return true if the parameter must be ignored
+     */
+    public static boolean isIgnoredParameter(@NonNull TypedElement parameter, @Nullable VisitorContext context) {
+        return isIgnoredParameter(parameter)
+            || isConfiguredIgnoredParameterType(parameter.getType(), context);
+    }
+
+    private static boolean isConfiguredIgnoredParameterType(@Nullable ClassElement parameterType, @Nullable VisitorContext context) {
+        if (parameterType == null || context == null) {
+            return false;
+        }
+        for (String ignoredType : getIgnoredParameterTypes(context)) {
+            if (parameterType.isAssignable(ignoredType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isIgnoredParameter(@NonNull TypedElement parameter) {
