@@ -286,7 +286,7 @@ class JsonNodeJackson {
 }
 
 class MyNodeImpl {
-   public String prop1; 
+   public String prop1;
 }
 
 @Serdeable
