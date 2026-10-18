@@ -328,4 +328,68 @@ class MyBean {}
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
+
+    void "test custom OpenAPI schema for boxed primitive"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-schema-for-boxed-primitive.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.data.model.Page;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class OpenApiController {
+
+    @Get
+    public MyDto get() {
+        return null;
+    }
+}
+
+class FakeNumber {
+
+    public String text;
+}
+
+class MyDto {
+
+    public Long bigNumber;
+    public Float fancyNumber;
+    public Integer fakeNumber;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Schema myDtoSchema = openAPI.components.schemas.MyDto
+        Schema fakeNumberSchema = openAPI.components.schemas.FakeNumber
+
+        then:
+
+        myDtoSchema
+        myDtoSchema.type == 'object'
+        myDtoSchema.properties.bigNumber
+        myDtoSchema.properties.bigNumber.type == 'string'
+        myDtoSchema.properties.fancyNumber
+        myDtoSchema.properties.fancyNumber.type == 'number'
+        myDtoSchema.properties.fancyNumber.format == 'double'
+        myDtoSchema.properties.fakeNumber
+        myDtoSchema.properties.fakeNumber.$ref == '#/components/schemas/FakeNumber'
+        fakeNumberSchema
+        fakeNumberSchema.type == 'object'
+        fakeNumberSchema.properties.text
+        fakeNumberSchema.properties.text.type == 'string'
+
+        cleanup:
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
+    }
 }
