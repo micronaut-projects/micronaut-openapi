@@ -1028,6 +1028,7 @@ public final class SchemaDefinitionUtils {
                         }
                         type = customTypeSchema.withTypeArguments(inheritedTypeArgs);
                     }
+                    typeName = type.getName();
                 }
 
                 if (isArray == null) {
