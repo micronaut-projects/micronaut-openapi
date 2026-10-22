@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: Discriminator enum default
+  version: 1.0.0
+paths:
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResult'
+components:
+  schemas:
+    Base:
+      type: object
+      properties:
+        success:
+          type: boolean
+    CreateJob:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            jobType:
+              type: string
+              enum:
+                - Create
+              default: Create
+    PreviewJob:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            jobType:
+              type: string
+              enum:
+                - Preview
+              default: Preview
+    JobResult:
+      oneOf:
+        - $ref: '#/components/schemas/CreateJob'
+        - $ref: '#/components/schemas/PreviewJob'
+      discriminator:
+        propertyName: jobType
+        mapping:
+          Create: '#/components/schemas/CreateJob'
+          Preview: '#/components/schemas/PreviewJob'

@@ -2625,11 +2625,47 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         prop.required = true;
         prop.isReadOnly = false;
         prop.vendorExtensions.put("overridden", true);
+        convertEnumDefaultToDiscriminatorType(prop, discriminator);
         prop.openApiType = discriminator.getPropertyType();
         prop.dataType = discriminator.getPropertyType();
         prop.datatypeWithEnum = discriminator.getPropertyType();
         prop.baseType = discriminator.getPropertyType();
         processGenericAnnotations(prop, useBeanValidation, isGenerateHardNullable(), false, false, false, false, false, false, null);
+    }
+
+    /**
+     * Discriminator property type is replaced by discriminator type (usually String), but the default value
+     * of an enum property is rendered as an enum constant, so it needs to be replaced by the enum value.
+     */
+    private void convertEnumDefaultToDiscriminatorType(CodegenProperty prop, CodegenDiscriminator discriminator) {
+        var defaultValueInit = prop.vendorExtensions.get("defaultValueInit");
+        var enumConstPrefix = prop.dataType + ".";
+        if (defaultValueInit == null
+            || discriminator.getPropertyType().equals(prop.dataType)
+            || !defaultValueInit.toString().startsWith(enumConstPrefix)) {
+            return;
+        }
+        String newDefaultValueInit = null;
+        if ("String".equals(discriminator.getPropertyType()) && prop.allowableValues != null
+            && prop.allowableValues.get("enumVars") instanceof List<?> enumVars) {
+
+            var enumVarName = defaultValueInit.toString().substring(enumConstPrefix.length());
+            for (var enumVar : enumVars) {
+                if (enumVar instanceof Map<?, ?> enumVarMap
+                    && enumVarName.equals(enumVarMap.get("name"))
+                    && Boolean.TRUE.equals(enumVarMap.get("isString"))) {
+                    newDefaultValueInit = (String) enumVarMap.get("value");
+                    break;
+                }
+            }
+        }
+        if (newDefaultValueInit == null) {
+            prop.vendorExtensions.remove("defaultValueInit");
+            prop.defaultValue = null;
+        } else {
+            prop.vendorExtensions.put("defaultValueInit", newDefaultValueInit);
+            prop.defaultValue = newDefaultValueInit;
+        }
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {

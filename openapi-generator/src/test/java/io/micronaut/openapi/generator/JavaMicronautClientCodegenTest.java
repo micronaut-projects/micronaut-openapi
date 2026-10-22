@@ -505,6 +505,16 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testDiscriminatorEnumWithDefault() {
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-discriminator-enum-default.yml", true);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CreateJob.java", "protected String jobType = \"Create\";");
+        assertFileContains(path + "model/PreviewJob.java", "protected String jobType = \"Preview\";");
+    }
+
+    @Test
     void testUuidWithModelNameSuffix() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.setModelNameSuffix("Dto");
