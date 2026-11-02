@@ -30,11 +30,11 @@ import org.openapitools.codegen.utils.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.micronaut.openapi.generator.Extension.EXT_ROLES;
-import static io.micronaut.openapi.generator.Utils.addUserParameter;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
@@ -52,6 +52,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_AOT = "aot";
     public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
     public static final String OPT_USER_PARAMETER_CLASS = "userParameterClass";
+    public static final String OPT_PER_OPERATION_USER_PARAMETER_CLASS = UserParameterResolver.OPT_NAME;
 
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
     public static final String ANONYMOUS_ROLE = "SecurityRule.IS_ANONYMOUS";
@@ -78,6 +79,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean aot;
     protected UserParameterMode userParameterMode = UserParameterMode.NONE;
     protected String userParameterClass;
+    protected Map<String, String> perOperationUserParameterClass = new LinkedHashMap<>();
+    private UserParameterResolver userParameterResolver;
 
     JavaMicronautServerCodegen() {
 
@@ -115,6 +118,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(userModeOption);
 
         cliOptions.add(CliOption.newString(OPT_USER_PARAMETER_CLASS, "User-defined authentication parameter class name"));
+
+        cliOptions.add(CliOption.newString(OPT_PER_OPERATION_USER_PARAMETER_CLASS, UserParameterResolver.CLI_DESCRIPTION));
 
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
@@ -212,6 +217,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
         writePropertyBack(OPT_USER_PARAMETER_CLASS, userParameterClass);
 
+        if (additionalProperties.containsKey(OPT_PER_OPERATION_USER_PARAMETER_CLASS)) {
+            perOperationUserParameterClass = UserParameterResolver.parsePerOperationProperty(additionalProperties.get(OPT_PER_OPERATION_USER_PARAMETER_CLASS));
+        }
+        userParameterResolver = UserParameterResolver.of(userParameterMode, userParameterClass, perOperationUserParameterClass);
+        writePropertyBack(OPT_PER_OPERATION_USER_PARAMETER_CLASS, perOperationUserParameterClass);
+
         // Api file
         apiTemplateFiles.clear();
         apiTemplateFiles.put("server/controller-interface.mustache", ".java");
@@ -298,17 +309,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
         if (useAuth) {
 
-            var alreadyAddedPrincipalImport = false;
-            final String importClassFullName;
-            final String importClassName;
-
-            if (userParameterMode.equals(UserParameterMode.CUSTOM)) {
-                importClassFullName = userParameterClass;
-                importClassName = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
-            } else {
-                importClassFullName = userParameterMode.getClassFullName();
-                importClassName = userParameterMode.getClassName();
-            }
+            var userParameterClasses = new ArrayList<String>();
 
             for (CodegenOperation operation : allOperations) {
 
@@ -341,17 +342,15 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
                 operation.vendorExtensions.put(EXT_ROLES, roles);
 
-                if (userParameterMode != UserParameterMode.NONE) {
-                    var isAnonymous = roles.contains(ANONYMOUS_ROLE);
-                    var isDenyAll = roles.contains(DENY_ALL_ROLE);
-                    addUserParameter(operation, userParameterMode, userParameterClass, isAnonymous, isDenyAll);
-
-                    if (importClassFullName != null && !alreadyAddedPrincipalImport) {
-                        objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
-                        alreadyAddedPrincipalImport = true;
-                    }
+                var isAnonymous = roles.contains(ANONYMOUS_ROLE);
+                var isDenyAll = roles.contains(DENY_ALL_ROLE);
+                var addedClass = userParameterResolver.apply(operation, isAnonymous, isDenyAll);
+                if (addedClass != null) {
+                    userParameterClasses.add(addedClass);
                 }
             }
+
+            UserParameterResolver.addImports(objs, userParameterClasses);
         }
 
         objs = super.postProcessOperationsWithModels(objs, allModels);
@@ -435,6 +434,10 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         this.userParameterClass = userParameterClass;
     }
 
+    public void setPerOperationUserParameterClass(Map<String, String> perOperationUserParameterClass) {
+        this.perOperationUserParameterClass = UserParameterResolver.validatePerOperation(perOperationUserParameterClass);
+    }
+
     static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -444,6 +447,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean useAuth = true;
         private String userParameterMode = UserParameterMode.NONE.name();
         private String userParameterClass;
+        private Map<String, String> perOperationUserParameterClass = Map.of();
         private boolean lombok;
         private boolean plural = true;
         private boolean fluxForArrays;
@@ -502,6 +506,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         @Override
+        public JavaMicronautServerOptionsBuilder withPerOperationUserParameterClass(Map<String, String> perOperationUserParameterClass) {
+            this.perOperationUserParameterClass = perOperationUserParameterClass;
+            return this;
+        }
+
+        @Override
         public JavaMicronautServerOptionsBuilder withLombok(boolean lombok) {
             this.lombok = lombok;
             return this;
@@ -552,6 +562,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 useAuth,
                 userParameterMode,
                 userParameterClass,
+                perOperationUserParameterClass,
                 lombok,
                 plural,
                 fluxForArrays,
@@ -572,6 +583,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean useAuth,
         String userParameterMode,
         String userParameterClass,
+        Map<String, String> perOperationUserParameterClass,
         boolean lombok,
         boolean plural,
         boolean fluxForArrays,
