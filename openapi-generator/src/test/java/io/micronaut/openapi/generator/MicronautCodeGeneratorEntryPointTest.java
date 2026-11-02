@@ -2,11 +2,15 @@ package io.micronaut.openapi.generator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import static io.micronaut.openapi.generator.AbstractMicronautCodegenTest.assertFileContains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -101,6 +105,49 @@ class MicronautCodeGeneratorEntryPointTest {
         assertThrows(IllegalArgumentException.class, entrypoint::generate);
     }
 
+    @Test
+    @DisplayName("Per-operation user parameter class is applied by the Java server generator")
+    void testJavaServerPerOperationUserParameterClassIsApplied(@TempDir File outputDir) throws IOException {
+        MicronautCodeGeneratorEntryPoint.builder()
+            .forJavaServer(spec -> spec
+                .withAuthentication(true)
+                .withPerOperationUserParameterClass(Map.of("save", "com.example.SaveUser", "save-public", "com.example.PublicUser")))
+            .withOptions(options -> options.withLang(MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.JAVA))
+            .withDefinitionFile(new File("src/test/resources/3_0/security.yml").toURI())
+            .withOutputDirectory(outputDir)
+            .withOutputs(MicronautCodeGeneratorEntryPoint.OutputKind.APIS)
+            .build()
+            .generate();
+
+        var api = outputDir.toPath().resolve("src/main/java/org/openapitools/api/DefaultApi.java").toString();
+        assertFileContains(api,
+            "import com.example.SaveUser;",
+            "import com.example.PublicUser;",
+            "SaveUser authentication",
+            "@Nullable(inherited = true) PublicUser authentication");
+    }
+
+    @Test
+    @DisplayName("Per-operation user parameter class is applied by the Kotlin server generator")
+    void testKotlinServerPerOperationUserParameterClassIsApplied(@TempDir File outputDir) throws IOException {
+        MicronautCodeGeneratorEntryPoint.builder()
+            .forKotlinServer(spec -> spec
+                .withAuthentication(true)
+                .withPerOperationUserParameterClass(Map.of("save", "com.example.SaveUser", "save-public", "com.example.PublicUser")))
+            .withOptions(options -> options.withLang(MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.KOTLIN))
+            .withDefinitionFile(new File("src/test/resources/3_0/security.yml").toURI())
+            .withOutputDirectory(outputDir)
+            .withOutputs(MicronautCodeGeneratorEntryPoint.OutputKind.APIS)
+            .build()
+            .generate();
+
+        var api = outputDir.toPath().resolve("src/main/kotlin/org/openapitools/api/DefaultApi.kt").toString();
+        assertFileContains(api,
+            "import com.example.SaveUser",
+            "import com.example.PublicUser",
+            "authentication: SaveUser",
+            "@Nullable authentication: PublicUser? = null");
+    }
 
     private static class TestGenerator extends AbstractMicronautJavaCodegen<TestBuilder> {
 
