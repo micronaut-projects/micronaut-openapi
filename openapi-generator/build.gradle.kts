@@ -24,6 +24,7 @@ dependencies {
     testImplementation(mnTest.junit.jupiter.params)
     testImplementation(libs.kotlin.compile.testing)
     testImplementation(mn.kotlin.compiler.embeddable)
+    testImplementation(mnLogging.logback.classic)
 
     testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
