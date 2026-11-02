@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
+import java.util.Map;
+
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1519,6 +1521,99 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun savePublic(
                         @Nullable authentication: CustomUserParameter? = null,
+                    ): Mono<Void>
+                """
+        );
+    }
+
+    private static SourceFile stubClass(String name) {
+        return SourceFile.Companion.kotlin(
+            "com/example/" + name + ".kt",
+            """
+            package com.example
+
+            class %s
+            """.formatted(name),
+            true
+        );
+    }
+
+    @Test
+    void testPerOperationUserParameterClassOverridesGlobal() {
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUserParameterMode(UserParameterMode.AUTHENTICATION.name());
+        codegen.setPerOperationUserParameterClass(Map.of(
+            "save", "com.example.SaveUser",
+            "save-public", "com.example.PublicUser",
+            "denyAllOp", "com.example.DenyUser"
+        ));
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", false, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath, stubClass("SaveUser"), stubClass("PublicUser"));
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            "import com.example.SaveUser",
+            "import com.example.PublicUser",
+            "import io.micronaut.security.authentication.Authentication",
+            """
+                    @Get("/pet")
+                    @Secured("read", "admin")
+                    fun get(
+                        authentication: Authentication,
+                    ): Mono<Void>
+                """,
+            """
+                    @Post("/pet")
+                    @Secured("write", "admin")
+                    fun save(
+                        authentication: SaveUser,
+                    ): Mono<Void>
+                """,
+            """
+                    fun savePublic(
+                        @Nullable authentication: PublicUser? = null,
+                    ): Mono<Void>
+                """,
+            "fun denyAllOp(): Mono<Void>"
+        );
+        assertFileNotContains(path + "DefaultApi.kt", "import com.example.DenyUser");
+    }
+
+    @Test
+    void testPerOperationUserParameterClassWithModeNone() {
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setPerOperationUserParameterClass(Map.of("get", "com.example.GetUser"));
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", false, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath, stubClass("GetUser"));
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            "import com.example.GetUser",
+            """
+                    fun get(
+                        authentication: GetUser,
+                    ): Mono<Void>
+                """,
+            "fun save(): Mono<Void>"
+        );
+        assertFileNotContains(path + "DefaultApi.kt", "import io.micronaut.security.authentication.Authentication");
+    }
+
+    @Test
+    void testPerOperationUserParameterClassFromStringProperty() {
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_PER_OPERATION_USER_PARAMETER_CLASS, "save=com.example.SaveUser");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", false, SUPPORTING_FILES, APIS, MODELS);
+
+        assertFilesCompile(outputPath, stubClass("SaveUser"));
+
+        String path = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(path + "DefaultApi.kt",
+            """
+                    fun save(
+                        authentication: SaveUser,
                     ): Mono<Void>
                 """
         );
