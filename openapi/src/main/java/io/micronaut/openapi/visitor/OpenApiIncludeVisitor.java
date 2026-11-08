@@ -67,6 +67,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             return;
         }
         for (var includeAnn : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
+            ContextUtils.addOriginatingElement(element, context);
             var description = includeAnn.stringValue(PROP_DESCRIPTION).orElse(null);
             var extensionAnns = includeAnn.getAnnotations(PROP_EXTENSIONS, Extension.class);
             var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);

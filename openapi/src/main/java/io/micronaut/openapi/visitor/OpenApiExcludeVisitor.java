@@ -67,6 +67,7 @@ public class OpenApiExcludeVisitor implements TypeElementVisitor<OpenAPIExcludes
             return;
         }
         for (var excludeAnn : element.getAnnotationValuesByType(OpenAPIExclude.class)) {
+            ContextUtils.addOriginatingElement(element, context);
             String[] classesValue = excludeAnn.stringValues();
             if (ArrayUtils.isEmpty(classesValue)) {
                 classesValue = excludeAnn.stringValues(PROP_CLASSES);

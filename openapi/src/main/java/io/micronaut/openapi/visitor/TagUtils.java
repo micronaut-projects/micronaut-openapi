@@ -199,6 +199,8 @@ public final class TagUtils {
         }
         Tag tagByPackage = null;
         if (isTagGenerationByPackageEnabled(context)) {
+            // the Javadoc of package-info describes the tag
+            ContextUtils.addOriginatingElement(element.getPackage(), context);
             tagByPackage = generateTag(element.getPackageName(), element.getPackage().getDocumentation().orElse(null), true, context);
         }
         if (tagByClass == null && tagByPackage == null) {
