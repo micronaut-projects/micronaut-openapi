@@ -206,7 +206,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME = "enumUnknownDefaultCaseName";
     public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS = "additionalOneOfTypeAnnotations";
-    public static final String ADDITIONAL_ENUM_TYPE_ANNOTATIONS = "additionalEnumTypeAnnotations";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -250,7 +249,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
     protected Map<String, CodegenModel> allModels = new HashMap<>();
     protected List<String> additionalOneOfTypeAnnotations = new LinkedList<>();
-    protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
     // simple class name -> full qualified class name
     protected Map<String, String> importsToDrop = new HashMap<>();
 
