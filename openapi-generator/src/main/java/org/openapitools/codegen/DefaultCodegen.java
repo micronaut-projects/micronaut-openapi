@@ -1438,7 +1438,6 @@ public class DefaultCodegen implements CodegenConfig {
         return schemaMapping;
     }
 
-    @Override
     public Set<String> forcedGenerateSchemas() {
         return forcedGenerateSchemas;
     }
