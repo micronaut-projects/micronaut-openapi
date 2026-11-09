@@ -211,13 +211,10 @@ public final class ContextUtils {
      * members from: the schema of the type reads their annotations and Javadoc too. Arrays contribute their component
      * type. The classes of the JDK are left out, as they are never compiled with the application.
      *
-     * @param type The type, or {@code null}
+     * @param type The type
      * @param context The visitor context
      */
-    public static void addOriginatingType(@Nullable ClassElement type, VisitorContext context) {
-        if (type == null) {
-            return;
-        }
+    public static void addOriginatingType(ClassElement type, VisitorContext context) {
         var pending = new ArrayDeque<ClassElement>();
         var seen = new HashSet<String>();
         pending.add(type);

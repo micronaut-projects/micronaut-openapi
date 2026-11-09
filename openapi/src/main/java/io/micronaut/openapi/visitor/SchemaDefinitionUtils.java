@@ -318,9 +318,7 @@ public final class SchemaDefinitionUtils {
                                        @Nullable Element definingElement, List<MediaType> mediaTypes,
                                        @Nullable ClassElement jsonViewClass) {
 
-        if (type instanceof ClassElement classEl) {
-            ContextUtils.addOriginatingType(classEl, context);
-        }
+        addOriginatingSchemaType(type, context);
         var schema = createSchema();
         processSchemaAnn(schema, context, definingElement, (ClassElement) type, schemaValue);
 
@@ -351,6 +349,12 @@ public final class SchemaDefinitionUtils {
             checkAllOf(schema);
         }
         return schema;
+    }
+
+    private static void addOriginatingSchemaType(@Nullable Element type, VisitorContext context) {
+        if (type instanceof ClassElement classEl) {
+            ContextUtils.addOriginatingType(classEl, context);
+        }
     }
 
     @Nullable
