@@ -167,7 +167,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (ignore(element, context)) {
             if (isEndpointClass(element)) {
                 // disabled, hidden or excluded for now: shown again, it goes back into the document
-                ContextUtils.addOriginatingElement(element, context);
+                ContextUtils.addOriginatingType(element, context);
             }
             return;
         }

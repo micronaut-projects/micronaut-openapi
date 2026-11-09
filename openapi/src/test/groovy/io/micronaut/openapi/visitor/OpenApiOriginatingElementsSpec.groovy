@@ -50,10 +50,12 @@ class OpenApiOriginatingElementsSpec extends Specification {
 
         then:
         // Application has @OpenAPIDefinition, Pet is a schema without an annotation and BaseDto its superclass,
-        // PetApi, the superclass of PetController, declares its operation, HiddenController is a controller hidden for now
+        // PetApi, the superclass of PetController, declares its operation, and its own superclass TaggedApi declares no
+        // method but the tag PetController inherits, HiddenController is a controller hidden for now
         // and StatusApi, the superclass of StatusController, declares an operation hidden for now;
         // PetService, a bean, and Owner, an introspected class no endpoint returns, are not described
-        document == ['Application.java', 'BaseDto.java', 'HiddenController.java', 'Pet.java', 'PetApi.java', 'PetController.java', 'StatusApi.java', 'StatusController.java'] as Set
+        document == ['Application.java', 'BaseDto.java', 'HiddenController.java', 'Pet.java', 'PetApi.java', 'PetController.java', 'StatusApi.java', 'StatusController.java', 'TaggedApi.java'] as Set
+        Files.readString(dir.resolve('classes/META-INF/swagger/demo-1.yml')).contains('- pets')
     }
 
     void "a compilation of classes the document does not describe writes no document"() {
@@ -85,7 +87,7 @@ package test;
 
 import io.micronaut.http.annotation.Get;
 
-public abstract class PetApi {
+public abstract class PetApi extends TaggedApi {
 
     /**
      * Finds a pet.
@@ -151,6 +153,15 @@ public abstract class StatusApi {
     public String status() {
         return "";
     }
+}
+''',
+        'test/TaggedApi.java': '''
+package test;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "pets")
+public abstract class TaggedApi {
 }
 ''',
         'test/StatusController.java': '''

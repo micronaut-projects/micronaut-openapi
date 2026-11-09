@@ -239,11 +239,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (ignore(element, context)) {
             if (isEndpointClass(element)) {
                 // hidden or excluded for now: shown again, it goes back into the document
-                ContextUtils.addOriginatingElement(element, context);
+                ContextUtils.addOriginatingType(element, context);
             }
             return;
         }
-        ContextUtils.addOriginatingElement(element, context);
+        // with its supertypes, whose inherited annotations, such as tags, the document reads from the class
+        ContextUtils.addOriginatingType(element, context);
         incrementVisitedElements(context);
         processSecuritySchemes(element, context);
         processTags(element, context);
