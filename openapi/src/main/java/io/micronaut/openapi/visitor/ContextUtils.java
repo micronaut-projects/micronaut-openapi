@@ -230,7 +230,9 @@ public final class ContextUtils {
             if (current.isPrimitive() || name.startsWith("java.") || name.startsWith("javax.") || !seen.add(name)) {
                 continue;
             }
-            addOriginatingElement(current, context);
+            // the declaration, not the view of a type use, such as one with type-use annotations, which the
+            // compiler may not accept as originating a file
+            addOriginatingElement(context.getClassElement(name).orElse(current), context);
             current.getSuperType().ifPresent(pending::add);
             pending.addAll(current.getInterfaces());
         }
