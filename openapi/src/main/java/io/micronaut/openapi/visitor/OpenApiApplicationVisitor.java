@@ -643,23 +643,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 boolean isYaml = StringUtils.isEmpty(isJson) || !isJson.equalsIgnoreCase(StringUtils.TRUE);
                 String ext = isYaml ? EXT_YML : EXT_JSON;
 
-                for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
-
-                    OpenApiInfo openApiInfo = entry.getValue();
-
-                    openApi = openApiInfo.getOpenApi();
-
-                    openApi = postProcessOpenApi(openApi, context);
-                    openApiInfo.setOpenApi(openApi);
-                    // need to set test reference to openApi after post-processing
-                    if (Utils.isTestMode()) {
-                        Utils.setTestReference(openApi);
-                    }
-
-                    var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
-                    documentTitle = titleAndFilename.getFirst();
-                    openApiInfo.setFilename(titleAndFilename.getSecond());
-                }
+                documentTitle = postProcessOpenApiInfos(openApiInfos, ext, documentTitle, context);
 
                 writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
             }
@@ -671,6 +655,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             warn("Error:\n" + Utils.printStackTrace(e), context);
             throw e;
         }
+    }
+
+    private String postProcessOpenApiInfos(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String ext, String defaultTitle, VisitorContext context) {
+        String documentTitle = defaultTitle;
+        for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
+
+            OpenApiInfo openApiInfo = entry.getValue();
+
+            OpenAPI openApi = postProcessOpenApi(openApiInfo.getOpenApi(), context);
+            openApiInfo.setOpenApi(openApi);
+            // need to set test reference to openApi after post-processing
+            if (Utils.isTestMode()) {
+                Utils.setTestReference(openApi);
+            }
+
+            var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
+            documentTitle = titleAndFilename.getFirst();
+            openApiInfo.setFilename(titleAndFilename.getSecond());
+        }
+        return documentTitle;
     }
 
     private Map<Pair<String, String>, OpenApiInfo> divideOpenapiByGroupsAndVersions(OpenAPI openApi, VisitorContext context) {
