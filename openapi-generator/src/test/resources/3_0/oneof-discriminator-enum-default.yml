@@ -46,12 +46,24 @@ components:
               enum:
                 - Preview
               default: Preview
+    InvalidJob:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            jobType:
+              type: string
+              enum:
+                - Known
+              default: Unknown
     JobResult:
       oneOf:
         - $ref: '#/components/schemas/CreateJob'
         - $ref: '#/components/schemas/PreviewJob'
+        - $ref: '#/components/schemas/InvalidJob'
       discriminator:
         propertyName: jobType
         mapping:
           Create: '#/components/schemas/CreateJob'
           Preview: '#/components/schemas/PreviewJob'
+          Unknown: '#/components/schemas/InvalidJob'
