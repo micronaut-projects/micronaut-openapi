@@ -1,5 +1,7 @@
 [versions]
 managed-swagger = "3.0.0"
+# swagger-core stays on 2.x (Jackson 2) until swagger-parser and openapi-generator move to Jackson 3
+managed-swagger-core = "2.2.55"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.24.1"
 # deprecated, use managed-flexmark
@@ -56,7 +58,7 @@ js-scalar = "1.49.5"
 
 [libraries]
 # Managed
-managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
+managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-core" }
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
 
