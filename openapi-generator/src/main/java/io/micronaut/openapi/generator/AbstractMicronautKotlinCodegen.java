@@ -206,7 +206,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_ENUM_UNKNOWN_DEFAULT_CASE_NAME = "enumUnknownDefaultCaseName";
     public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS = "additionalOneOfTypeAnnotations";
-    public static final String ADDITIONAL_ENUM_TYPE_ANNOTATIONS = "additionalEnumTypeAnnotations";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -250,7 +249,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
     protected Map<String, CodegenModel> allModels = new HashMap<>();
     protected List<String> additionalOneOfTypeAnnotations = new LinkedList<>();
-    protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
     // simple class name -> full qualified class name
     protected Map<String, String> importsToDrop = new HashMap<>();
 
@@ -368,7 +366,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
-        cliOptions.add(CliOption.newString(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, "Additional annotations for enum type (class level annotations)"));
         cliOptions.add(CliOption.newString(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, "Additional annotations for oneOf interfaces (class level annotations). List separated by semicolon(;) or new line (Linux or Windows)"));
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_ENUM_CONVERTERS, "Generate or not custom enum converters for enum query values and path variables", generateEnumConverters));

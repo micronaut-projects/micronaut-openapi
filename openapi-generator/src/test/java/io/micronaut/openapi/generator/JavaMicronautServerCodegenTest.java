@@ -332,6 +332,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/CreateJob.java", "protected String jobType = \"Create\";");
         assertFileContains(path + "model/PreviewJob.java", "protected String jobType = \"Preview\";");
+        assertFileNotContains(path + "model/InvalidJob.java", "protected String jobType =");
     }
 
     @Test
