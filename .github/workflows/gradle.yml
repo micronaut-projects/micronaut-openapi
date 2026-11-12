@@ -64,7 +64,8 @@ jobs:
           ./gradlew jacocoReport check --no-daemon --continue
 
       - name: "🔎 Run static analysis"
-        if: env.SONAR_TOKEN != '' && matrix.java == '17'
+        # The SonarQube Cloud scanner requires Java 21 or newer
+        if: env.SONAR_TOKEN != '' && matrix.java == '21'
         run: |
           ./gradlew sonar --no-parallel --continue
 
