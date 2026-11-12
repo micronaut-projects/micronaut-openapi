@@ -1,7 +1,7 @@
 [versions]
 managed-swagger = "2.2.46"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.22.1"
+managed-jsoup = "1.23.2"
 # deprecated, use managed-flexmark
 managed-html2md-converter = "0.64.8"
 managed-flexmark = "0.64.8"
@@ -22,11 +22,12 @@ commons-lang3 = "3.20.0"
 commons-codec = "1.21.0"
 commons-io = "2.21.0"
 commons-text = "1.15.0"
-guava = "33.5.0-jre"
+guava = "33.7.2-jre"
 commonmark = "0.27.1"
+freemarker = "2.3.35"
 kotlin-compile-testing = "1.6.0"
 
-micronaut = "4.10.18"
+micronaut = "4.10.37"
 micronaut-platform = "4.10.10"
 micronaut-jaxrs = "4.10.0"
 micronaut-views = "5.9.0"
@@ -107,6 +108,7 @@ commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "co
 commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-data-rest = { module = "org.springframework.boot:spring-boot-starter-data-rest" }
