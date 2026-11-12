@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.generator;
 
+import java.util.Map;
+
 /**
  * Configures options which are specific to the server code.
  */
@@ -89,6 +91,17 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withUserParameterClass(String userParameterClass);
+
+    /**
+     * Specifies the class to be used for the user parameter of individual operations in generated controllers.
+     * The map is from the operationId written in the spec to the fully qualified class name.
+     * It overrides the user parameter mode and class for the listed operations.
+     *
+     * @param perOperationUserParameterClass the map from spec operationId to fully qualified class name
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withPerOperationUserParameterClass(Map<String, String> perOperationUserParameterClass);
 
     /**
      * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
