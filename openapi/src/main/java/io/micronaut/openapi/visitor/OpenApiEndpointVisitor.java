@@ -165,6 +165,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
             }
         }
         if (ignore(element, context)) {
+            if (isEndpointClass(element)) {
+                // disabled, hidden or excluded for now: shown again, it goes back into the document
+                ContextUtils.addOriginatingType(element, context);
+            }
             return;
         }
         if (servers == null) {
@@ -214,6 +218,12 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
             }
         }
         super.visitClass(element, context);
+    }
+
+    @Override
+    protected boolean isEndpointClass(ClassElement element) {
+        return element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")
+            || element.isAnnotationPresent("org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint");
     }
 
     @Override

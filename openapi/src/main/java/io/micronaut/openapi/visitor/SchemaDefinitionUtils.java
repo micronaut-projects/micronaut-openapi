@@ -318,6 +318,7 @@ public final class SchemaDefinitionUtils {
                                        @Nullable Element definingElement, List<MediaType> mediaTypes,
                                        @Nullable ClassElement jsonViewClass) {
 
+        addOriginatingSchemaType(type, context);
         var schema = createSchema();
         processSchemaAnn(schema, context, definingElement, (ClassElement) type, schemaValue);
 
@@ -350,6 +351,12 @@ public final class SchemaDefinitionUtils {
         return schema;
     }
 
+    private static void addOriginatingSchemaType(@Nullable Element type, VisitorContext context) {
+        if (type instanceof ClassElement classEl) {
+            ContextUtils.addOriginatingType(classEl, context);
+        }
+    }
+
     @Nullable
     public static Schema<?> getSchemaDefinition(OpenAPI openApi,
                                                 VisitorContext context,
@@ -359,6 +366,9 @@ public final class SchemaDefinitionUtils {
                                                 List<MediaType> mediaTypes,
                                                 @Nullable ClassElement jsonViewClass
     ) {
+
+        // the schema reads the annotations and the Javadoc of the type and of the types it inherits from
+        ContextUtils.addOriginatingType(type, context);
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = null;
         if (definingElement != null) {

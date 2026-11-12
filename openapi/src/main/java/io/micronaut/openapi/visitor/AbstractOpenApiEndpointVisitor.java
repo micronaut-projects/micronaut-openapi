@@ -215,6 +215,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     protected ExternalDocumentation classExternalDocs;
 
     /**
+     * Whether the class is one this visitor documents, whether or not it is hidden or excluded now. Such a class
+     * contributes to the document either way: hiding it or showing it again changes the document.
+     *
+     * @param element The class
+     * @return True if the class is an endpoint this visitor documents
+     * @since 7.3.1
+     */
+    protected boolean isEndpointClass(ClassElement element) {
+        return element.isAnnotationPresent(Controller.class);
+    }
+
+    /**
      * Executed when a class is encountered that matches the generic class.
      *
      * @param element The element
@@ -225,9 +237,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         if (ignore(element, context)) {
+            if (isEndpointClass(element)) {
+                // hidden or excluded for now: shown again, it goes back into the document
+                ContextUtils.addOriginatingType(element, context);
+            }
             return;
         }
-        ContextUtils.addOriginatingElement(element, context);
+        // with its supertypes, whose inherited annotations, such as tags, the document reads from the class
+        ContextUtils.addOriginatingType(element, context);
         incrementVisitedElements(context);
         processSecuritySchemes(element, context);
         processTags(element, context);
@@ -438,7 +455,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
-        ContextUtils.addOriginatingElement(element, context);
+        // the method may be declared by a supertype of the class, whose source contributes its Javadoc and annotations,
+        // and a method of an endpoint hidden for now goes back into the document when shown again
+        boolean endpointMethod = isEndpointClass(element.getOwningType());
+        if (endpointMethod) {
+            ContextUtils.addOriginatingElement(element, context);
+        }
         if (ignore(element, context)) {
             return;
         }
@@ -449,6 +471,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<UriMatchTemplate> matchTemplates = uriMatchTemplates(element, context);
         if (CollectionUtils.isEmpty(matchTemplates)) {
             return;
+        }
+        if (!endpointMethod) {
+            ContextUtils.addOriginatingElement(element, context);
         }
         incrementVisitedElements(context);
         OpenAPI openApi = Utils.resolveOpenApi(context);

@@ -30,7 +30,9 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -202,6 +204,35 @@ public final class ContextUtils {
             put(ORIGINATING_ELEMENTS, elements, context);
         }
         elements.add(element);
+    }
+
+    /**
+     * Records a type the OpenAPI output describes as contributing to it, with the supertypes and interfaces it inherits
+     * members from: the schema of the type reads their annotations and Javadoc too. Arrays contribute their component
+     * type. The classes of the JDK are left out, as they are never compiled with the application.
+     *
+     * @param type The type
+     * @param context The visitor context
+     */
+    public static void addOriginatingType(ClassElement type, VisitorContext context) {
+        var pending = new ArrayDeque<ClassElement>();
+        var seen = new HashSet<String>();
+        pending.add(type);
+        while (!pending.isEmpty()) {
+            var current = pending.poll();
+            if (current.isArray()) {
+                current = current.fromArray();
+            }
+            String name = current.getName();
+            if (current.isPrimitive() || name.startsWith("java.") || name.startsWith("javax.") || !seen.add(name)) {
+                continue;
+            }
+            // the declaration, not the view of a type use, such as one with type-use annotations, which the
+            // compiler may not accept as originating a file
+            addOriginatingElement(context.getClassElement(name).orElse(current), context);
+            current.getSuperType().ifPresent(pending::add);
+            pending.addAll(current.getInterfaces());
+        }
     }
 
     /**
