@@ -268,6 +268,11 @@ This includes a flat property type (e.g.</div>
 <dd>
 <div class="block">Records an element contributing to the OpenAPI output for the current visitor context.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#addOriginatingType(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addOriginatingType(ClassElement, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>
+<div class="block">Records a type the OpenAPI output describes as contributing to it, with the supertypes and interfaces it inherits
+members from: the schema of the type reads their annotations and Javadoc too.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/GeneratorUtils.html#addParameterDeprecatedExtension(io.micronaut.inject.ast.TypedElement,io.swagger.v3.oas.models.parameters.Parameter,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">addParameterDeprecatedExtension(TypedElement, Parameter, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/GeneratorUtils.html" title="class in io.micronaut.openapi.visitor">GeneratorUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#addParameterMappings(java.util.List)" class="member-name-link">addParameterMappings(List)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -3438,6 +3443,12 @@ recursive types.</div>
 <dd>
 <div class="block">Boolean value indicating the state of the option for post-processing file using environment variables.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#isEndpointClass(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isEndpointClass(ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dd>
+<div class="block">Whether the class is one this visitor documents, whether or not it is hidden or excluded now.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#isEndpointClass(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isEndpointClass(ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#isEndpointsEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isEndpointsEnabled(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isEnum(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isEnum(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
