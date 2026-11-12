@@ -16,6 +16,11 @@
 /**
  * Service provider interface for the mappers used by the OpenAPI visitor.
  *
+ * <p>This API is experimental until a second implementation besides Jackson exists, and may change in a minor release.</p>
+ *
  * @since 8.0.0
  */
+@Experimental
 package io.micronaut.openapi.mapper;
+
+import io.micronaut.core.annotation.Experimental;

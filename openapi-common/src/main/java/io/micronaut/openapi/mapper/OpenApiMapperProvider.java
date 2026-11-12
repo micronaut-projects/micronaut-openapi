@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.mapper;
 
+import io.micronaut.core.annotation.Experimental;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.json.tree.JsonNode;
 
@@ -31,6 +32,7 @@ import java.util.function.UnaryOperator;
  *
  * @since 8.0.0
  */
+@Experimental
 public interface OpenApiMapperProvider {
 
     /**
@@ -46,19 +48,21 @@ public interface OpenApiMapperProvider {
      * value and so on. Trees exchanged with the visitor are {@link io.micronaut.json.tree.JsonNode} instances.</p>
      *
      * @param type The mapper type
-     * @param openapi31 Whether the document is OpenAPI 3.1
+     * @param version The OpenAPI version of the document
      * @return The mapper
      */
-    JsonMapper getMapper(OpenApiMapperType type, boolean openapi31);
+    JsonMapper getMapper(OpenApiMapperType type, OpenApiVersion version);
 
     /**
      * Updates an existing value from a tree and returns the result.
      *
-     * <p>The result may be a different instance than {@code valueToUpdate}, for example when the type has a custom
-     * deserializer that cannot merge into an existing instance. The default implementation updates the value in place
-     * with {@link JsonMapper#updateValueFromTree(Object, JsonNode)} and returns it.</p>
+     * <p>The visitor uses this instead of {@link JsonMapper#updateValueFromTree(Object, JsonNode)} because the result
+     * may be a different instance than {@code valueToUpdate}: with Jackson, a type whose deserializer cannot merge into
+     * an existing instance (such as {@code Schema}) is read into a new one, and the visitor must continue with that.
+     * The default implementation updates the value in place with {@code updateValueFromTree} and returns it, which is
+     * what a provider whose deserializers always merge should do.</p>
      *
-     * @param mapper A mapper obtained from {@link #getMapper(OpenApiMapperType, boolean)}
+     * @param mapper A mapper obtained from {@link #getMapper(OpenApiMapperType, OpenApiVersion)}
      * @param valueToUpdate The value to update
      * @param tree The tree to read
      * @param <T> The value type
@@ -85,7 +89,8 @@ public interface OpenApiMapperProvider {
      *
      * @param className The fully qualified class name of the strategy
      * @param classLoader The class loader to load it with
-     * @return The function translating a property name, or empty if the strategy is not supported
+     * @return The function translating a property name, or empty if the provider cannot apply that strategy, in which
+     * case the visitor warns and keeps the property names unchanged
      */
     default Optional<UnaryOperator<String>> findNamingStrategyClass(String className, ClassLoader classLoader) {
         return Optional.empty();

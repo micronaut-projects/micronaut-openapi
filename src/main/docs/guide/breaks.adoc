@@ -8,6 +8,14 @@ The OpenAPI visitor no longer uses Jackson directly to read, write and convert O
 
 The Jackson implementation, the `io.micronaut.openapi.OpenApiUtils` mappers and the Jackson serializers in `io.micronaut.openapi.swagger.core` moved from `micronaut-openapi-common` to the new `micronaut-openapi-jackson` module. The class and package names are unchanged and `micronaut-openapi` depends on `micronaut-openapi-jackson` by default, so most builds need no change. Builds that depend on `micronaut-openapi-common` alone to use `OpenApiUtils` must add `micronaut-openapi-jackson`.
 
+The provider interface in the `io.micronaut.openapi.mapper` package is `@Experimental` and may change in a minor release until a second implementation exists.
+
+`io.micronaut.openapi.swagger.core.util.PrimitiveType` stays in `micronaut-openapi-common` with the same name, and no longer uses Jackson.
+
+The unused `io.micronaut.openapi.swagger.core.jackson.mixin.SchemaConverterMixin` class was removed. It duplicated `SchemaMixin`, which remains in `micronaut-openapi-jackson`.
+
+Do not mix a 7.x `micronaut-openapi-common` jar with 8.x modules: the Jackson classes that moved to `micronaut-openapi-jackson` would then be on the classpath twice. Use the `micronaut-openapi-bom` to keep the module versions aligned.
+
 The internal `OpenApiApplicationVisitor.resolvePlaceholders` methods now take and return `io.micronaut.json.tree.JsonNode`, and `ConfigUtils.getPropertyNamingStrategy` and `ConfigUtils.getTagGenerationNamingStrategy` return a `UnaryOperator<String>`.
 
 == Micronaut OpenAPI 4.0.0

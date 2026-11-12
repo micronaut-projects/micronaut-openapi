@@ -6,7 +6,9 @@ plugins {
 dependencies {
     api(mn.micronaut.json.core)
     api(libs.managed.swagger.models)
-    testImplementation(mnTest.junit.platform.launcher)
+    testImplementation(mnTest.junit.jupiter.api)
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.platform.launcher)
 }
 
 configurations.configureEach {

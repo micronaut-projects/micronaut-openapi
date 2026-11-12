@@ -1882,7 +1882,7 @@ public final class SchemaDefinitionUtils {
             }
 
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true, false);
-            String propertyName = resolvePropertyName(element, classEl, propertySchema);
+            String propertyName = resolvePropertyName(element, classEl, propertySchema, context);
             propertyName = normalizePropertyName(propertyName, classEl, elementType);
             propertySchema.setRequired(null);
             Schema<?> propertySchemaFinal = propertySchema;
@@ -3477,7 +3477,7 @@ public final class SchemaDefinitionUtils {
         return resultTypeName;
     }
 
-    private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema) {
+    private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema, VisitorContext context) {
         String name = propertySchema.getName() != null ? propertySchema.getName() : element.getName();
 
         if (element.isAnnotationPresent(Body.class)) {
@@ -3502,7 +3502,14 @@ public final class SchemaDefinitionUtils {
                 return name;
             }
             Optional<UnaryOperator<String>> strategy = propertyNamingStrategyInstances.computeIfAbsent(propertyNamingStrategyClass.get(),
-                clazz -> Utils.getMapperProvider().findNamingStrategyClass(clazz, SchemaDefinitionUtils.class.getClassLoader()));
+                clazz -> {
+                    var resolved = Utils.getMapperProvider().findNamingStrategyClass(clazz, SchemaDefinitionUtils.class.getClassLoader());
+                    if (resolved.isEmpty()) {
+                        warn("Naming strategy " + clazz + " from @JsonNaming on " + classElement.getName() + " is not supported by the '"
+                            + Utils.getMapperProvider().getName() + "' OpenAPI mapper, property names are left unchanged", context, classElement);
+                    }
+                    return resolved;
+                });
             if (strategy.isPresent()) {
                 return strategy.get().apply(name);
             }

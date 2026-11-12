@@ -6,6 +6,7 @@ import io.micronaut.json.JsonStreamConfig;
 import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -170,11 +171,11 @@ class JacksonOpenApiJsonMapperTest {
         var provider = new JacksonOpenApiMapperProvider();
         for (OpenApiMapperType type : OpenApiMapperType.values()) {
             for (boolean openapi31 : new boolean[] {false, true}) {
-                assertInstanceOf(JacksonOpenApiJsonMapper.class, provider.getMapper(type, openapi31));
+                assertInstanceOf(JacksonOpenApiJsonMapper.class, provider.getMapper(type, OpenApiVersion.of(openapi31)));
             }
         }
-        JsonMapper convert31 = provider.getMapper(OpenApiMapperType.CONVERT, true);
+        JsonMapper convert31 = provider.getMapper(OpenApiMapperType.CONVERT, OpenApiVersion.of(true));
         assertSame(OpenApiUtils.CONVERT_JSON_MAPPER_31, ((JacksonOpenApiJsonMapper) convert31).getObjectMapper());
-        assertSame(OpenApiUtils.YAML_MAPPER_31, ((JacksonOpenApiJsonMapper) provider.getMapper(OpenApiMapperType.YAML, true)).getObjectMapper());
+        assertSame(OpenApiUtils.YAML_MAPPER_31, ((JacksonOpenApiJsonMapper) provider.getMapper(OpenApiMapperType.YAML, OpenApiVersion.of(true))).getObjectMapper());
     }
 }

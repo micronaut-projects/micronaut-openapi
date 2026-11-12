@@ -24,6 +24,7 @@ import io.micronaut.json.JsonMapper;
 import io.micronaut.openapi.mapper.OpenApiMapperProvider;
 import io.micronaut.openapi.mapper.OpenApiMapperProviders;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -389,18 +390,19 @@ public final class Utils {
     public static OpenApiMapperProvider getMapperProvider() {
         var provider = mapperProvider;
         if (provider == null) {
-            provider = OpenApiMapperProviders.select(null, Utils.class.getClassLoader());
+            // used before init(), for example outside a compilation: only the system property can select a provider
+            provider = OpenApiMapperProviders.select(System.getProperty(OpenApiMapperProviders.MAPPER_PROPERTY), Utils.class.getClassLoader());
             mapperProvider = provider;
         }
         return provider;
     }
 
     public static JsonMapper getJsonMapper() {
-        return getMapperProvider().getMapper(OpenApiMapperType.JSON, openapi31);
+        return getMapperProvider().getMapper(OpenApiMapperType.JSON, OpenApiVersion.of(openapi31));
     }
 
     public static JsonMapper getYamlMapper() {
-        return getMapperProvider().getMapper(OpenApiMapperType.YAML, openapi31);
+        return getMapperProvider().getMapper(OpenApiMapperType.YAML, OpenApiVersion.of(openapi31));
     }
 
     public static boolean isOpenapi31() {
@@ -413,7 +415,7 @@ public final class Utils {
     }
 
     public static JsonMapper getConvertMapper() {
-        return getMapperProvider().getMapper(OpenApiMapperType.CONVERT, openapi31);
+        return getMapperProvider().getMapper(OpenApiMapperType.CONVERT, OpenApiVersion.of(openapi31));
     }
 
     public static void clean() {

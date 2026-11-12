@@ -28,6 +28,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
@@ -748,7 +749,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (operation == null) {
             Operation opCopy = null;
             try {
-                var jsonMapper30 = Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, false);
+                var jsonMapper30 = Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, OpenApiVersion.V3_0);
                 opCopy = MapperUtils.convertValue(jsonMapper30, endpointInfo.getOperation(), Operation.class);
                 if (endpointGroupInfo != null) {
                     addExtensions(opCopy, endpointGroupInfo.getExtensions());

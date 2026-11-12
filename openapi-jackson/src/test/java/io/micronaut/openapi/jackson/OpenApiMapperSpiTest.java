@@ -5,6 +5,7 @@ import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.mapper.OpenApiMapperProvider;
 import io.micronaut.openapi.mapper.OpenApiMapperProviders;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import io.swagger.v3.oas.models.info.Info;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,7 @@ class OpenApiMapperSpiTest {
     @Test
     void defaultMethodsUpdateInPlaceAndResolveNoStrategies() throws Exception {
         OpenApiMapperProvider provider = new TestOpenApiMapperProvider();
-        var mapper = provider.getMapper(OpenApiMapperType.CONVERT, false);
+        var mapper = provider.getMapper(OpenApiMapperType.CONVERT, OpenApiVersion.of(false));
         var info = new Info();
 
         Info updated = provider.updateValue(mapper, info, JsonNode.createObjectNode(Map.of("title", JsonNode.createStringNode("t"))));
@@ -64,7 +65,7 @@ class OpenApiMapperSpiTest {
     @Test
     void jacksonProviderHandlesForeignMappersAndAllNamingStrategies() throws Exception {
         var provider = new JacksonOpenApiMapperProvider();
-        var foreign = new TestOpenApiMapperProvider().getMapper(OpenApiMapperType.JSON, false);
+        var foreign = new TestOpenApiMapperProvider().getMapper(OpenApiMapperType.JSON, OpenApiVersion.of(false));
         var info = new Info();
         assertSame(info, provider.updateValue(new DelegatingMapper(foreign), info, JsonNode.createObjectNode(Map.of("title", JsonNode.createStringNode("t")))));
         assertEquals("t", info.getTitle());

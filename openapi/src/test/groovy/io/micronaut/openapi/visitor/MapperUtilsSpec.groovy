@@ -3,6 +3,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.core.type.Argument
 import io.micronaut.json.tree.JsonNode
 import io.micronaut.openapi.mapper.OpenApiMapperType
+import io.micronaut.openapi.mapper.OpenApiVersion
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
@@ -14,9 +15,9 @@ import java.nio.file.Files
 class MapperUtilsSpec extends Specification {
 
     @Shared
-    def json = Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, false)
+    def json = Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, OpenApiVersion.of(false))
     @Shared
-    def yaml = Utils.getMapperProvider().getMapper(OpenApiMapperType.YAML, false)
+    def yaml = Utils.getMapperProvider().getMapper(OpenApiMapperType.YAML, OpenApiVersion.of(false))
 
     void "reads and writes values"() {
         given:

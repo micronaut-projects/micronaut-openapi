@@ -4,6 +4,7 @@ import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.mapper.OpenApiMapperProvider;
 import io.micronaut.openapi.mapper.OpenApiMapperProviders;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.IntegerSchema;
@@ -45,7 +46,7 @@ class OpenApiMapperProvidersTest {
         var openApi = new OpenAPI().info(info);
         openApi.schemaRequirement("k", new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name("k"));
 
-        String yaml = new String(provider.getMapper(OpenApiMapperType.YAML, false).writeValueAsBytes(openApi), StandardCharsets.UTF_8);
+        String yaml = new String(provider.getMapper(OpenApiMapperType.YAML, OpenApiVersion.of(false)).writeValueAsBytes(openApi), StandardCharsets.UTF_8);
 
         assertTrue(yaml.contains("x-a: 1"), yaml);
         assertTrue(yaml.contains("type: apiKey"), yaml);
@@ -54,7 +55,7 @@ class OpenApiMapperProvidersTest {
 
     @Test
     void convertsThroughMicronautTrees() throws Exception {
-        var mapper = OpenApiMapperProviders.select(null, classLoader).getMapper(OpenApiMapperType.CONVERT, false);
+        var mapper = OpenApiMapperProviders.select(null, classLoader).getMapper(OpenApiMapperType.CONVERT, OpenApiVersion.of(false));
         JsonNode tree = JsonNode.from(Map.of("type", "apiKey", "in", "header", "name", "k"));
 
         SecurityScheme scheme = mapper.readValueFromTree(tree, SecurityScheme.class);
@@ -66,7 +67,7 @@ class OpenApiMapperProvidersTest {
 
     @Test
     void treeRoundTripKeepsExplicitNulls() throws Exception {
-        var mapper = OpenApiMapperProviders.select(null, classLoader).getMapper(OpenApiMapperType.JSON, false);
+        var mapper = OpenApiMapperProviders.select(null, classLoader).getMapper(OpenApiMapperType.JSON, OpenApiVersion.of(false));
         var id = new IntegerSchema();
         id.setExample(null);
         id.setExampleSetFlag(true);

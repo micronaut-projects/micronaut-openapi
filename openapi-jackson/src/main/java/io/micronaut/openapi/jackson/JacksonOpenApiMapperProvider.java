@@ -20,6 +20,7 @@ import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.mapper.OpenApiMapperProvider;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.PropertyNamingStrategy;
 
@@ -53,7 +54,8 @@ public final class JacksonOpenApiMapperProvider implements OpenApiMapperProvider
     }
 
     @Override
-    public JsonMapper getMapper(OpenApiMapperType type, boolean openapi31) {
+    public JsonMapper getMapper(OpenApiMapperType type, OpenApiVersion version) {
+        boolean openapi31 = version == OpenApiVersion.V3_1;
         return switch (type) {
             case JSON -> openapi31 ? json31 : json;
             case YAML -> openapi31 ? yaml31 : yaml;

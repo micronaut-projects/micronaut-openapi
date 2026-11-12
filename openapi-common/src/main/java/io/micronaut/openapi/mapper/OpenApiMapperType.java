@@ -15,11 +15,13 @@
  */
 package io.micronaut.openapi.mapper;
 
+import io.micronaut.core.annotation.Experimental;
 /**
  * The kinds of mapper the OpenAPI visitor needs.
  *
  * @since 8.0.0
  */
+@Experimental
 public enum OpenApiMapperType {
 
     /**

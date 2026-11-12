@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.mapper;
 
+import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  *
  * @since 8.0.0
  */
+@Experimental
 public final class OpenApiMapperProviders {
 
     /**

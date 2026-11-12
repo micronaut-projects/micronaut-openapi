@@ -54,6 +54,7 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.json.JsonMapper;
 import io.micronaut.json.tree.JsonNode;
 import io.micronaut.openapi.mapper.OpenApiMapperType;
+import io.micronaut.openapi.mapper.OpenApiVersion;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.File;
@@ -168,7 +169,7 @@ public final class ConvertUtils {
      * @return The OpenAPI 3.0 JSON mapper, used to build trees from annotation values whatever the document version
      */
     private static JsonMapper jsonMapper30() {
-        return Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, false);
+        return Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, OpenApiVersion.V3_0);
     }
 
     public static Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context) {
