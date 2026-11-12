@@ -15,8 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
@@ -64,6 +62,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -211,14 +210,14 @@ public final class SchemaUtils {
         for (var propAnn : extension.getAnnotations(PROP_PROPERTIES, ExtensionProperty.class)) {
             var propertyName = propAnn.getRequiredValue(PROP_NAME, String.class);
             var propertyValue = propAnn.getRequiredValue(String.class);
-            JsonNode processedValue;
+            Object processedValue;
             final boolean propertyAsJson = propAnn.get(PROP_PARSE_VALUE, boolean.class, false);
             if (StringUtils.hasText(propertyName) && StringUtils.hasText(propertyValue)) {
                 if (key.isEmpty()) {
                     decoratedName = prependIfMissing(propertyName, PREFIX_X);
                     if (propertyAsJson) {
                         try {
-                            processedValue = Utils.getJsonMapper().readTree(propertyValue);
+                            processedValue = MapperUtils.readValue(Utils.getJsonMapper(), propertyValue, Object.class);
                             map.put(decoratedName, processedValue);
                         } catch (Exception e) {
                             map.put(decoratedName, propertyValue);
@@ -236,7 +235,7 @@ public final class SchemaUtils {
                     var mapValue = (Map<String, Object>) value;
                     if (propertyAsJson) {
                         try {
-                            processedValue = Utils.getJsonMapper().readTree(propertyValue);
+                            processedValue = MapperUtils.readValue(Utils.getJsonMapper(), propertyValue, Object.class);
                             mapValue.put(propertyName, processedValue);
                         } catch (Exception e) {
                             mapValue.put(propertyName, propertyValue);
@@ -1568,7 +1567,7 @@ public final class SchemaUtils {
             }
             try {
                 schema.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
-            } catch (JacksonException e) {
+            } catch (UncheckedIOException e) {
                 warn("Can't convert " + allowableValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), context, element);
                 schema.addEnumItemObject(allowableValue);
             }

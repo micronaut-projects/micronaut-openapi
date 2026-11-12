@@ -30,8 +30,8 @@ import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
-import tools.jackson.core.JacksonException;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -313,8 +313,8 @@ public final class OpenApiNormalizeUtils {
                 String type = schema.getType();
                 String serializedDefaultValue;
                 try {
-                    serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
-                } catch (JacksonException e) {
+                    serializedDefaultValue = defaultValue != null ? MapperUtils.writeValueAsString(Utils.getJsonMapper(), defaultValue) : null;
+                } catch (UncheckedIOException e) {
                     return null;
                 }
                 schema.setDefault(null);
@@ -324,8 +324,8 @@ public final class OpenApiNormalizeUtils {
                 Object allOfDefaultValue = allOfSchema.getDefault();
                 String serializedAllOfDefaultValue;
                 try {
-                    serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
-                } catch (JacksonException e) {
+                    serializedAllOfDefaultValue = allOfDefaultValue != null ? MapperUtils.writeValueAsString(Utils.getJsonMapper(), allOfDefaultValue) : null;
+                } catch (UncheckedIOException e) {
                     return null;
                 }
                 boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);

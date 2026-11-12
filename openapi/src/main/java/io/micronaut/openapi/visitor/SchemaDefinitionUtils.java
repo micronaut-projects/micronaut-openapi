@@ -82,13 +82,10 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.PropertyNamingStrategy;
-import tools.jackson.databind.annotation.JsonNaming;
+import io.micronaut.json.tree.JsonNode;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -115,6 +112,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -282,9 +280,13 @@ public final class SchemaDefinitionUtils {
      */
     private static Map<String, Integer> schemaNameSuffixCounterMap = new HashMap<>();
     /**
-     * {@link PropertyNamingStrategy} instances cache.
+     * Naming strategies resolved from {@code @JsonNaming}, by strategy class name.
      */
-    private static Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
+    private static Map<String, Optional<UnaryOperator<String>>> propertyNamingStrategyInstances = new HashMap<>();
+    /**
+     * Jackson's {@code @JsonNaming} annotation, referenced by name so that the visitor does not depend on Jackson databind.
+     */
+    private static final String JSON_NAMING_ANNOTATION = "tools.jackson.databind.annotation.JsonNaming";
 
     private SchemaDefinitionUtils() {
     }
@@ -751,7 +753,7 @@ public final class SchemaDefinitionUtils {
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schema.getType(), schema.getFormat(), context));
-                } catch (JacksonException e) {
+                } catch (UncheckedIOException e) {
                     warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ":\n" + Utils.printStackTrace(e), context, element);
                     if (!TYPE_STRING.equals(schema.getType())) {
                         info("Changing enum type from " + type.getName() + " to " + TYPE_STRING, context, element);
@@ -1466,11 +1468,11 @@ public final class SchemaDefinitionUtils {
                                                         type = SchemaUtils.getType(type, new HashSet<>(Arrays.asList((String[]) headerSchema.get(PROP_ONE_TYPES))));
                                                     }
                                                 }
-                                                var headerExampleStr = Utils.getConvertMapper().writeValueAsString(headerExample);
+                                                var headerExampleStr = MapperUtils.writeValueAsString(Utils.getConvertMapper(), headerExample);
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
-                                            } catch (JacksonException e) {
+                                            } catch (UncheckedIOException _) {
                                                 // do nothing
                                             }
                                         }
@@ -1802,7 +1804,7 @@ public final class SchemaDefinitionUtils {
         JsonNode node = toJson(annotationName, values, context, jsonViewClass);
         try {
             return ConvertUtils.treeToValue(node, type, context);
-        } catch (JacksonException e) {
+        } catch (UncheckedIOException e) {
             warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return null;
@@ -1819,11 +1821,11 @@ public final class SchemaDefinitionUtils {
      */
     public static JsonNode toJson(String annotationName, Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> newValues = toValueMap(annotationName, values, context, jsonViewClass);
-        return Utils.getJsonMapper().valueToTree(newValues);
+        return MapperUtils.valueToTree(Utils.getJsonMapper(), newValues);
     }
 
     public static JsonNode toJson(Map<CharSequence, Object> values) {
-        return Utils.getJsonMapper().valueToTree(values);
+        return MapperUtils.valueToTree(Utils.getJsonMapper(), values);
     }
 
     /**
@@ -1880,7 +1882,7 @@ public final class SchemaDefinitionUtils {
             }
 
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null, true, false);
-            String propertyName = resolvePropertyName(element, classEl, propertySchema);
+            String propertyName = resolvePropertyName(element, classEl, propertySchema, context);
             propertyName = normalizePropertyName(propertyName, classEl, elementType);
             propertySchema.setRequired(null);
             Schema<?> propertySchemaFinal = propertySchema;
@@ -3241,13 +3243,13 @@ public final class SchemaDefinitionUtils {
         // need to set placeholders to set correct values and types to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
-            Schema<?> updatedSchema = Utils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
+            Schema<?> updatedSchema = MapperUtils.updateValue(Utils.getJsonMapper(), schemaToBind, schemaJson);
             if (updatedSchema != null) {
                 schemaToBind = updatedSchema;
             } else {
                 warn("Error reading Swagger Schema for element [" + element + "]: " + schemaJson, context, element);
             }
-        } catch (JacksonException e) {
+        } catch (UncheckedIOException e) {
             warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
         // fix for example = "null"
@@ -3475,7 +3477,7 @@ public final class SchemaDefinitionUtils {
         return resultTypeName;
     }
 
-    private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema) {
+    private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema, VisitorContext context) {
         String name = propertySchema.getName() != null ? propertySchema.getName() : element.getName();
 
         if (element.isAnnotationPresent(Body.class)) {
@@ -3493,21 +3495,23 @@ public final class SchemaDefinitionUtils {
         if (isAnnotationPresent(element, JsonProperty.class)) {
             return stringValue(element, JsonProperty.class, PROP_VALUE).orElse(name);
         }
-        if (classElement != null && classElement.hasAnnotation(JsonNaming.class)) {
+        if (classElement != null && classElement.hasAnnotation(JSON_NAMING_ANNOTATION)) {
             // INVESTIGATE: "classValue" doesn't work in this case
-            Optional<String> propertyNamingStrategyClass = classElement.stringValue(JsonNaming.class);
+            Optional<String> propertyNamingStrategyClass = classElement.stringValue(JSON_NAMING_ANNOTATION);
             if (propertyNamingStrategyClass.isEmpty()) {
                 return name;
             }
-            PropertyNamingStrategy strategy = propertyNamingStrategyInstances.computeIfAbsent(propertyNamingStrategyClass.get(), clazz -> {
-                try {
-                    return (PropertyNamingStrategy) Class.forName(propertyNamingStrategyClass.get()).getConstructor().newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException("Cannot instantiate: " + clazz);
-                }
-            });
-            if (strategy instanceof PropertyNamingStrategies.NamingBase) {
-                return strategy.nameForField(null, null, name);
+            Optional<UnaryOperator<String>> strategy = propertyNamingStrategyInstances.computeIfAbsent(propertyNamingStrategyClass.get(),
+                clazz -> {
+                    var resolved = Utils.getMapperProvider().findNamingStrategyClass(clazz, SchemaDefinitionUtils.class.getClassLoader());
+                    if (resolved.isEmpty()) {
+                        warn("Naming strategy " + clazz + " from @JsonNaming on " + classElement.getName() + " is not supported by the '"
+                            + Utils.getMapperProvider().getName() + "' OpenAPI mapper, property names are left unchanged", context, classElement);
+                    }
+                    return resolved;
+                });
+            if (strategy.isPresent()) {
+                return strategy.get().apply(name);
             }
         }
         return name;
@@ -3585,11 +3589,11 @@ public final class SchemaDefinitionUtils {
                 boolean isRequired = wrappedPropertySchema.getRequired() != null && wrappedPropertySchema.getRequired().contains(propertyName);
                 if (StringUtils.isNotEmpty(suffix) || StringUtils.isNotEmpty(prefix)) {
                     propertyName = prefix + propertyName + suffix;
-                    propertySchema = Utils.getJsonMapper().readValue(Utils.getJsonMapper().writeValueAsString(prop.getValue()), Schema.class);
+                    propertySchema = MapperUtils.readValue(Utils.getJsonMapper(), MapperUtils.writeValueAsString(Utils.getJsonMapper(), prop.getValue()), Schema.class);
                     propertySchema.setName(propertyName);
                 }
                 addProperty(parentSchema, propertyName, propertySchema, isRequired);
-            } catch (JacksonException e) {
+            } catch (UncheckedIOException e) {
                 warn("Exception cloning property " + e.getMessage(), context);
             }
         }
