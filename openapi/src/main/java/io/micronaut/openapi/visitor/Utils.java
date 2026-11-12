@@ -398,6 +398,23 @@ public final class Utils {
 
     public static void clean() {
         openapi31 = false;
+        testReference = null;
+        testReferences = null;
+        testFileName = null;
+        testYamlReference = null;
+        testJsonReference = null;
+        System.clearProperty(BIND_TYPE_AND_TYPES);
+        releaseCompilationState();
+    }
+
+    /**
+     * Releases what the visitors keep of a compilation in static fields. The classes of the visitors outlive a
+     * compilation wherever their class loader is kept for the next one, in a compiler daemon or in development mode, and
+     * the next compilation would otherwise start with the schemas, endpoints and groups of the previous one. What the
+     * document just written is read with stays, the test references, the OpenAPI version and the binding of the schema
+     * types, so that it can be read once the compilation is over; the next compilation sets them again when it starts.
+     */
+    static void releaseCompilationState() {
         initialized = false;
         openApis = null;
         endpointInfos = null;
@@ -407,13 +424,7 @@ public final class Utils {
         allKnownGroups = null;
         allKnownVersions = null;
 
-        testReference = null;
-        testReferences = null;
-        testFileName = null;
-        testYamlReference = null;
-        testJsonReference = null;
         creatorConstructorsCache = new HashMap<>();
-        System.clearProperty(BIND_TYPE_AND_TYPES);
         OperationUtils.clean();
         SchemaDefinitionUtils.clean();
         OpenApiExtraSchemaVisitor.clean();

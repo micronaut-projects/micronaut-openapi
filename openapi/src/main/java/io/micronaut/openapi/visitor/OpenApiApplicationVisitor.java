@@ -162,6 +162,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final int MAX_ITERATIONS = 100;
     private ClassElement classElement;
     private int visitedElements = -1;
+    private boolean compilationFinished;
 
     @Override
     public void start(@NonNull VisitorContext context) {
@@ -580,8 +581,39 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return Utils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
+    /**
+     * Notes that every round of the compilation is over. What the visitors keep of the compilation in static fields is
+     * released at the end of the call to {@link #finish(VisitorContext)} that follows, the last one of the compilation,
+     * rather than here: KSP and Groovy call {@code finish} once, after this method, and that call writes the document.
+     * This visitor finishes after the extra schema visitor, which reads that state in its own {@code finish}.
+     *
+     * <p>Without the release, a compiler that keeps the classes of the processors for the next compilation, as a daemon
+     * or development mode does, would start the next document with the extra schemas and schema names of this one: an
+     * extra schema removed would stay, and a class renamed would get its schema name with a suffix.</p>
+     *
+     * <p>Micronaut calls this method from 5.3.0, where {@code TypeElementVisitor} declares it. Earlier versions never call
+     * it, and the state stays with the classes as before.</p>
+     *
+     * @param context The visitor context
+     */
+    public void finishCompilation(@NonNull VisitorContext context) {
+        compilationFinished = true;
+    }
+
     @Override
     public void finish(@NonNull VisitorContext context) {
+        try {
+            finishDocument(context);
+        } finally {
+            if (compilationFinished) {
+                compilationFinished = false;
+                visitedElements = -1;
+                Utils.releaseCompilationState();
+            }
+        }
+    }
+
+    private void finishDocument(VisitorContext context) {
         try {
             if (!isOpenApiEnabled(context)) {
                 return;
@@ -611,23 +643,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 boolean isYaml = StringUtils.isEmpty(isJson) || !isJson.equalsIgnoreCase(StringUtils.TRUE);
                 String ext = isYaml ? EXT_YML : EXT_JSON;
 
-                for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
-
-                    OpenApiInfo openApiInfo = entry.getValue();
-
-                    openApi = openApiInfo.getOpenApi();
-
-                    openApi = postProcessOpenApi(openApi, context);
-                    openApiInfo.setOpenApi(openApi);
-                    // need to set test reference to openApi after post-processing
-                    if (Utils.isTestMode()) {
-                        Utils.setTestReference(openApi);
-                    }
-
-                    var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
-                    documentTitle = titleAndFilename.getFirst();
-                    openApiInfo.setFilename(titleAndFilename.getSecond());
-                }
+                documentTitle = postProcessOpenApiInfos(openApiInfos, ext, documentTitle, context);
 
                 writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
             }
@@ -639,6 +655,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             warn("Error:\n" + Utils.printStackTrace(e), context);
             throw e;
         }
+    }
+
+    private String postProcessOpenApiInfos(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String ext, String defaultTitle, VisitorContext context) {
+        String documentTitle = defaultTitle;
+        for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
+
+            OpenApiInfo openApiInfo = entry.getValue();
+
+            OpenAPI openApi = postProcessOpenApi(openApiInfo.getOpenApi(), context);
+            openApiInfo.setOpenApi(openApi);
+            // need to set test reference to openApi after post-processing
+            if (Utils.isTestMode()) {
+                Utils.setTestReference(openApi);
+            }
+
+            var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
+            documentTitle = titleAndFilename.getFirst();
+            openApiInfo.setFilename(titleAndFilename.getSecond());
+        }
+        return documentTitle;
     }
 
     private Map<Pair<String, String>, OpenApiInfo> divideOpenapiByGroupsAndVersions(OpenAPI openApi, VisitorContext context) {
