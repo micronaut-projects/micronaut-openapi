@@ -925,7 +925,11 @@ micronaut.openapi.property.naming.strategy=KEBAB_CASE</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {target = {file = "myspecfile.yml"}, property = {naming = {strategy = "KEBAB_CASE"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.target]
+file = "myspecfile.yml"
+
+[micronaut.openapi.property.naming]
+strategy = "KEBAB_CASE"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1002,7 +1006,8 @@ micronaut.openapi.property.naming.strategy=KEBAB_CASE</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">my = {api = {title = "Hello World"}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[my.api]
+title = "Hello World"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1656,7 +1661,9 @@ micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1931,7 +1938,9 @@ micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {schema = {"org.somepackage.MyComplexType" = "java.lang.String", "org.somepackage.MyComplexType2" = "java.lang.Integer"}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.schema]
+"org.somepackage.MyComplexType" = "java.lang.String"
+"org.somepackage.MyComplexType2" = "java.lang.Integer"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2195,7 +2204,10 @@ micronaut.openapi.schema.jakarta.xml.bind.JAXBElement&lt;io.micronaut.configurat
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {schema = {"jakarta.xml.bind.JAXBElement" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement", "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2", "jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.schema]
+"jakarta.xml.bind.JAXBElement" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement"
+"jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement2&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement2"
+"jakarta.xml.bind.JAXBElement&lt;io.micronaut.configuration.openapi.docs.customserializers.XmlElement3&gt;" = "io.micronaut.configuration.openapi.docs.customserializers.MyJaxbElement3"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2289,7 +2301,9 @@ micronaut.openapi.schema-postfix.org.api.v2_0_0=200</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {schema-postfix = {"org.api.v1_0_0" = 100, "org.api.v2_0_0" = 200}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.schema-postfix]
+"org.api.v1_0_0" = 100
+"org.api.v2_0_0" = 200</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2510,7 +2524,11 @@ micronaut.openapi.schema.dynamic-refs.enabled=true</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {openapi31 = {enabled = true}, schema = {dynamic-refs = {enabled = true}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.openapi31]
+enabled = true
+
+[micronaut.openapi.schema.dynamic-refs]
+enabled = true</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -5845,7 +5863,9 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swaggerYAML/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swaggerYAML/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -6222,7 +6242,13 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, swagger-ui = {paths = "classpath:META-INF/swagger/views/swagger-ui", mapping = "/swagger-ui/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.swagger-ui]
+paths = "classpath:META-INF/swagger/views/swagger-ui"
+mapping = "/swagger-ui/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -6678,7 +6704,31 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {security = {enabled = true, token = {jwt = {enabled = true, signatures = {jwks = {okta = {url = "https://mycompany.okta.com/oauth2/default/v1/keys"}}}}}, intercept-url-map = [{pattern = "/swagger-ui/**", httpMethod = "GET", access = ["isAnonymous()"]}, {pattern = "/swagger/**", access = ["isAnonymous()"]}]}, router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, swagger-ui = {paths = "classpath:META-INF/swagger/views/swagger-ui", mapping = "/swagger-ui/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.security]
+enabled = true
+
+[micronaut.security.token.jwt]
+enabled = true
+
+[micronaut.security.token.jwt.signatures.jwks.okta]
+url = "https://mycompany.okta.com/oauth2/default/v1/keys"
+
+[[micronaut.security.intercept-url-map]]
+pattern = "/swagger-ui/**"
+httpMethod = "GET"
+access = ["isAnonymous()"]
+
+[[micronaut.security.intercept-url-map]]
+pattern = "/swagger/**"
+access = ["isAnonymous()"]
+
+[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.swagger-ui]
+paths = "classpath:META-INF/swagger/views/swagger-ui"
+mapping = "/swagger-ui/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -6973,7 +7023,13 @@ micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, redoc = {paths = "classpath:META-INF/swagger/views/redoc", mapping = "/redoc/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.redoc]
+paths = "classpath:META-INF/swagger/views/redoc"
+mapping = "/redoc/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -7199,7 +7255,13 @@ micronaut.router.static-resources.openapi-explorer.mapping=/openapi-explorer/**<
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, openapi-explorer = {paths = "classpath:META-INF/swagger/views/openapi-explorer", mapping = "/openapi-explorer/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.openapi-explorer]
+paths = "classpath:META-INF/swagger/views/openapi-explorer"
+mapping = "/openapi-explorer/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -7477,7 +7539,13 @@ micronaut.router.static-resources.scalar.mapping=/scalar/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, scalar = {paths = "classpath:META-INF/swagger/views/scalar", mapping = "/scalar/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.scalar]
+paths = "classpath:META-INF/swagger/views/scalar"
+mapping = "/scalar/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -7772,7 +7840,13 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {static-resources = {swagger = {paths = "classpath:META-INF/swagger", mapping = "/swagger/**"}, rapidoc = {paths = "classpath:META-INF/swagger/views/rapidoc", mapping = "/rapidoc/**"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.static-resources.swagger]
+paths = "classpath:META-INF/swagger"
+mapping = "/swagger/**"
+
+[micronaut.router.static-resources.rapidoc]
+paths = "classpath:META-INF/swagger/views/rapidoc"
+mapping = "/rapidoc/**"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -8233,7 +8307,12 @@ micronaut.router.versioning.parameter.names=version</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {router = {versioning = {enabled = true, parameter = {enabled = true, names = "version"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.router.versioning]
+enabled = true
+
+[micronaut.router.versioning.parameter]
+enabled = true
+names = "version"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -8581,7 +8660,19 @@ micronaut.openapi.groups.v3.testv3group.packages-exclude[1]=com.micronaut.contro
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {openapi = {groups = {v1 = {display-name = "My API v1", primary = true, filename = "myapiv1", common-exclude = true, packages = "com.micronaut.controller.v1.*", packages-exclude = ["com.micronaut.controller.v1", "com.micronaut.controller"]}, v2 = {display-name = "My API v2"}, "v3.testv3group" = {packages-exclude = ["com.micronaut.controller.v3", "com.micronaut.controller"]}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.openapi.groups.v1]
+display-name = "My API v1"
+primary = true
+filename = "myapiv1"
+common-exclude = true
+packages = "com.micronaut.controller.v1.*"
+packages-exclude = ["com.micronaut.controller.v1", "com.micronaut.controller"]
+
+[micronaut.openapi.groups.v2]
+display-name = "My API v2"
+
+[micronaut.openapi.groups."v3.testv3group"]
+packages-exclude = ["com.micronaut.controller.v3", "com.micronaut.controller"]</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
