@@ -83,3 +83,18 @@ tasks.test {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
     maxHeapSize = "2048m"
 }
+
+// The binary compatibility baseline is resolved by micronaut-build through a detached configuration
+// that carries no attributes, so Gradle cannot choose between the JRE and Android variants of Guava
+// (or the shadowed and plain variants of Caffeine). Request standard JVM runtime variants explicitly.
+tasks.named<me.champeau.gradle.japicmp.JapicmpTask>("japiCmp") {
+    (oldClasspath.from + oldArchives.from).filterIsInstance<Configuration>().forEach { baseline ->
+        baseline.attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
+            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.STANDARD_JVM))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+        }
+    }
+}
