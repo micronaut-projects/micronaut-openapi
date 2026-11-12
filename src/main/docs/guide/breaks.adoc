@@ -1,5 +1,15 @@
 This section documents breaking changes between Micronaut OpenAPI versions:
 
+== Micronaut OpenAPI 8.0.0
+
+=== Pluggable mapper and the `micronaut-openapi-jackson` module
+
+The OpenAPI visitor no longer uses Jackson directly to read, write and convert OpenAPI models. It uses the `io.micronaut.openapi.mapper.OpenApiMapperProvider` service provider interface from `micronaut-openapi-common`, and works with Micronaut `io.micronaut.json.JsonMapper` and `io.micronaut.json.tree.JsonNode` types. The provider can be selected with the `micronaut.openapi.mapper` processing option when more than one is available.
+
+The Jackson implementation, the `io.micronaut.openapi.OpenApiUtils` mappers and the Jackson serializers in `io.micronaut.openapi.swagger.core` moved from `micronaut-openapi-common` to the new `micronaut-openapi-jackson` module. The class and package names are unchanged and `micronaut-openapi` depends on `micronaut-openapi-jackson` by default, so most builds need no change. Builds that depend on `micronaut-openapi-common` alone to use `OpenApiUtils` must add `micronaut-openapi-jackson`.
+
+The internal `OpenApiApplicationVisitor.resolvePlaceholders` methods now take and return `io.micronaut.json.tree.JsonNode`, and `ConfigUtils.getPropertyNamingStrategy` and `ConfigUtils.getTagGenerationNamingStrategy` return a `UnaryOperator<String>`.
+
 == Micronaut OpenAPI 4.0.0
 
 Micronaut OpenAPI no longer generates `200` or `default` HTTP status code responses when using `@ApiResponse` annotation. It's up to the user to define all the appropriate status codes.

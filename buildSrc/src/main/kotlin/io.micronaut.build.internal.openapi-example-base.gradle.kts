@@ -16,7 +16,7 @@ val mnLogging = versionCatalogs.named("mnLogging")
 
 dependencies {
     // the generated OpenAPI documents are asserted by the tests
-    testImplementation(project(":micronaut-openapi-common"))
+    testImplementation(project(":micronaut-openapi-jackson"))
     testImplementation(mnTest.findLibrary("micronaut-test-junit5").get())
     testImplementation(mnTest.findLibrary("junit-jupiter-api").get())
     testRuntimeOnly(mnTest.findLibrary("junit-jupiter-engine").get())

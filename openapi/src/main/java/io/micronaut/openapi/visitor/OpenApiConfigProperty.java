@@ -142,6 +142,14 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH = "micronaut.openapi.server.context.path";
     /**
+     * Selects the mapper implementation used to read, write and convert OpenAPI models when more than one
+     * {@link io.micronaut.openapi.mapper.OpenApiMapperProvider} is on the annotation processor classpath,
+     * for example {@code jackson} or {@code serde}.
+     *
+     * @since 8.0.0
+     */
+    String MICRONAUT_OPENAPI_MAPPER = io.micronaut.openapi.mapper.OpenApiMapperProviders.MAPPER_PROPERTY;
+    /**
      * System property for naming strategy. One Jackson PropertyNamingStrategy.
      */
     String MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY = "micronaut.openapi.property.naming.strategy";
@@ -530,6 +538,7 @@ public interface OpenApiConfigProperty {
      */
     Set<String> ALL = Set.of(
         MICRONAUT_OPENAPI_ENABLED,
+        MICRONAUT_OPENAPI_MAPPER,
         MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
         MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
         MICRONAUT_OPENAPI_PROPERTY_INCLUDE,

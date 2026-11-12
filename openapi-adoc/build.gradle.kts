@@ -9,7 +9,7 @@ dependencies {
     api(libs.managed.jsoup)
     api(mnViews.freemarker)
 
-    implementation(projects.micronautOpenapiCommon)
+    implementation(projects.micronautOpenapiJackson)
 
     testImplementation(mnTest.micronaut.test.junit5)
 

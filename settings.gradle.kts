@@ -42,6 +42,7 @@ include(
     "openapi-annotations",
     "openapi-bom",
     "openapi-common",
+    "openapi-jackson",
     "openapi-generator",
     "test-suite-client-generator-java",
     "test-suite-client-generator-kotlin-kapt",

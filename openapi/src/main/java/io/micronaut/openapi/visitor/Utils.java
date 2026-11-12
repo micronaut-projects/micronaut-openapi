@@ -20,7 +20,10 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.json.JsonMapper;
+import io.micronaut.openapi.mapper.OpenApiMapperProvider;
+import io.micronaut.openapi.mapper.OpenApiMapperProviders;
+import io.micronaut.openapi.mapper.OpenApiMapperType;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -29,7 +32,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.tags.Tag;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,6 +56,10 @@ import static io.swagger.v3.oas.models.media.Schema.BIND_TYPE_AND_TYPES;
 @Internal
 public final class Utils {
 
+    /**
+     * The OpenAPI version written when OpenAPI 3.1 is enabled.
+     */
+    public static final String OPENAPI_31_VERSION = "3.1.0";
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     public static final String ATTR_TEST_SPRING_ACTUATOR = "io.micronaut.OPENAPI_TEST_SPRING_ACTUATOR";
@@ -64,6 +70,7 @@ public final class Utils {
     private static Map<String, MethodElement> creatorConstructorsCache = new HashMap<>();
 
     private static boolean openapi31;
+    private static OpenApiMapperProvider mapperProvider;
     private static boolean initialized;
     private static Set<String> allKnownVersions;
     private static Set<String> allKnownGroups;
@@ -104,6 +111,7 @@ public final class Utils {
             return;
         }
         setOpenapi31(ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context));
+        mapperProvider = OpenApiMapperProviders.select(ConfigUtils.getConfigProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_MAPPER, context), Utils.class.getClassLoader());
         javadocParser = new JavadocParser(getDocsFormat(context), context);
         initialized = true;
     }
@@ -237,7 +245,7 @@ public final class Utils {
         if (openApi == null) {
             openApi = new OpenAPI();
             if (Utils.isOpenapi31()) {
-                openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                openApi.openapi(OPENAPI_31_VERSION)
                     .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
                     .specVersion(SpecVersion.V31);
             }
@@ -375,12 +383,24 @@ public final class Utils {
         return creatorConstructorsCache;
     }
 
-    public static ObjectMapper getJsonMapper() {
-        return openapi31 ? OpenApiUtils.getJsonMapper31() : OpenApiUtils.getJsonMapper();
+    /**
+     * @return The mapper provider selected for this compilation, see {@link OpenApiConfigProperty#MICRONAUT_OPENAPI_MAPPER}
+     */
+    public static OpenApiMapperProvider getMapperProvider() {
+        var provider = mapperProvider;
+        if (provider == null) {
+            provider = OpenApiMapperProviders.select(null, Utils.class.getClassLoader());
+            mapperProvider = provider;
+        }
+        return provider;
     }
 
-    public static ObjectMapper getYamlMapper() {
-        return openapi31 ? OpenApiUtils.getYamlMapper31() : OpenApiUtils.getYamlMapper();
+    public static JsonMapper getJsonMapper() {
+        return getMapperProvider().getMapper(OpenApiMapperType.JSON, openapi31);
+    }
+
+    public static JsonMapper getYamlMapper() {
+        return getMapperProvider().getMapper(OpenApiMapperType.YAML, openapi31);
     }
 
     public static boolean isOpenapi31() {
@@ -392,12 +412,13 @@ public final class Utils {
         Utils.openapi31 = openapi31;
     }
 
-    public static ObjectMapper getConvertMapper() {
-        return openapi31 ? OpenApiUtils.getConvertJsonMapper31() : OpenApiUtils.getConvertJsonMapper();
+    public static JsonMapper getConvertMapper() {
+        return getMapperProvider().getMapper(OpenApiMapperType.CONVERT, openapi31);
     }
 
     public static void clean() {
         openapi31 = false;
+        mapperProvider = null;
         testReference = null;
         testReferences = null;
         testFileName = null;

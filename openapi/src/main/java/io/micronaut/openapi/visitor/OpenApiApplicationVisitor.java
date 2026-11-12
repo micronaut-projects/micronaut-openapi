@@ -26,7 +26,8 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
-import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.json.tree.JsonNode;
+import io.micronaut.openapi.mapper.OpenApiMapperType;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
@@ -50,12 +51,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.JsonNodeFactory;
-import tools.jackson.databind.node.ObjectNode;
 
+import java.io.UncheckedIOException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -289,8 +286,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     info("Reading OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + additionalSwaggerFile, context);
                     OpenAPI parsedOpenApi = null;
                     try {
-                        parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(openapiFile, OpenAPI.class);
-                    } catch (JacksonException e) {
+                        parsedOpenApi = MapperUtils.readValue(isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper(), openapiFile, OpenAPI.class);
+                    } catch (UncheckedIOException e) {
                         warn("Unable to read file " + additionalSwaggerFile + ": " + e.getMessage(), context);
                     }
                     copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
@@ -395,8 +392,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         info("Reading OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
         OpenAPI parsedOpenApi = null;
         try {
-            parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
-        } catch (JacksonException e) {
+            parsedOpenApi = MapperUtils.readValue(isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper(), path, OpenAPI.class);
+        } catch (UncheckedIOException e) {
             warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context);
         }
         copyOpenApi(openApi, parsedOpenApi, additionalFilesProps.mergeMode() == REPLACE);
@@ -407,7 +404,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (openApiDefAnn == null) {
             var openApi = new OpenAPI();
             if (Utils.isOpenapi31()) {
-                openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                openApi.openapi(Utils.OPENAPI_31_VERSION)
                     .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
                     .specVersion(SpecVersion.V31);
             }
@@ -419,7 +416,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             openApi = new OpenAPI();
         }
         if (Utils.isOpenapi31()) {
-            openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+            openApi.openapi(Utils.OPENAPI_31_VERSION)
                 .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
                 .specVersion(SpecVersion.V31);
         }
@@ -451,7 +448,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (propertyNamingStrategy == null) {
             return;
         }
-        info("Using " + propertyNamingStrategy.getClass().getSimpleName() + " property naming strategy.", context);
+        info("Using " + ConfigUtils.getConfigProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context) + " property naming strategy.", context);
         if (openApi.getComponents() == null || CollectionUtils.isEmpty(openApi.getComponents().getSchemas())) {
             return;
         }
@@ -460,7 +457,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (properties != null) {
                 var newProps = new LinkedHashMap<String, Schema>(properties.size());
                 for (var entry : properties.entrySet()) {
-                    newProps.put(propertyNamingStrategy.nameForField(null, null, entry.getKey()), entry.getValue());
+                    newProps.put(propertyNamingStrategy.apply(entry.getKey()), entry.getValue());
                 }
                 schema.setProperties(newProps);
             }
@@ -468,7 +465,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(required)) {
                 var newRequired = new ArrayList<String>(required.size());
                 for (var req : required) {
-                    newRequired.add(propertyNamingStrategy.nameForField(null, null, req));
+                    newRequired.add(propertyNamingStrategy.apply(req));
                 }
                 schema.setRequired(newRequired);
             }
@@ -497,36 +494,36 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openApi.setPaths(newPaths);
     }
 
-    public static JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
-        for (int i = 0; i < anode.size(); ++i) {
-            anode.set(i, resolvePlaceholders(anode.get(i), propertyExpander));
-        }
-        return anode;
-    }
-
-    public static JsonNode resolvePlaceholders(ObjectNode objNode, UnaryOperator<String> propertyExpander) {
-        if (objNode.isEmpty()) {
-            return objNode;
-        }
-        final ObjectNode newNode = objNode.objectNode();
-        for (var entry : objNode.properties()) {
-            newNode.set(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
-        }
-        return newNode;
-    }
-
+    /**
+     * Expands the property placeholders in the string values and object keys of a tree.
+     *
+     * @param node The tree
+     * @param propertyExpander The function expanding the placeholders in a string
+     * @return The tree with expanded placeholders; unchanged nodes are reused
+     */
     public static JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
         if (node.isString()) {
-            final String text = node.stringValue();
+            final String text = node.getStringValue();
             if (text == null || text.isBlank()) {
                 return node;
             }
             final String newText = propertyExpander.apply(text);
-            return text.equals(newText) ? node : JsonNodeFactory.instance.stringNode(newText);
+            return text.equals(newText) ? node : JsonNode.createStringNode(newText);
         } else if (node.isArray()) {
-            return resolvePlaceholders((ArrayNode) node, propertyExpander);
+            var values = new ArrayList<JsonNode>(node.size());
+            for (JsonNode value : node.values()) {
+                values.add(resolvePlaceholders(value, propertyExpander));
+            }
+            return JsonNode.createArrayNode(values);
         } else if (node.isObject()) {
-            return resolvePlaceholders((ObjectNode) node, propertyExpander);
+            if (node.size() == 0) {
+                return node;
+            }
+            var values = new LinkedHashMap<String, JsonNode>();
+            for (var entry : node.entries()) {
+                values.put(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
+            }
+            return JsonNode.createObjectNode(values);
         } else {
             return node;
         }
@@ -577,8 +574,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
             info("Expanding properties: " + expandableProperties, context);
         }
-        JsonNode root = resolvePlaceholders(Utils.getYamlMapper().convertValue(openApi, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
-        return Utils.getYamlMapper().convertValue(root, OpenAPI.class);
+        var yamlMapper = Utils.getYamlMapper();
+        JsonNode root = resolvePlaceholders(MapperUtils.valueToTree(yamlMapper, openApi), s -> expandProperties(s, expandableProperties, context));
+        return MapperUtils.treeToValue(yamlMapper, root, OpenAPI.class);
     }
 
     /**
@@ -750,11 +748,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (operation == null) {
             Operation opCopy = null;
             try {
-                opCopy = OpenApiUtils.getJsonMapper().treeToValue(OpenApiUtils.getJsonMapper().valueToTree(endpointInfo.getOperation()), Operation.class);
+                var jsonMapper30 = Utils.getMapperProvider().getMapper(OpenApiMapperType.JSON, false);
+                opCopy = MapperUtils.convertValue(jsonMapper30, endpointInfo.getOperation(), Operation.class);
                 if (endpointGroupInfo != null) {
                     addExtensions(opCopy, endpointGroupInfo.getExtensions());
                 }
-            } catch (JacksonException e) {
+            } catch (UncheckedIOException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
             }
             setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), opCopy != null ? opCopy : endpointInfo.getOperation());
@@ -808,8 +807,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             OpenAPI openApiCopy;
             try {
-                openApiCopy = Utils.getJsonMapper().treeToValue(Utils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
-            } catch (JacksonException e) {
+                openApiCopy = MapperUtils.convertValue(Utils.getJsonMapper(), openApi, OpenAPI.class);
+            } catch (UncheckedIOException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
                 return null;
             }
@@ -950,7 +949,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemasCopy.remove(schemaName);
                 // replace original schemas map to schemas map without processing schema
                 openApi.getComponents().setSchemas(schemasCopy);
-                String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
+                String openApiJson = MapperUtils.writeValueAsString(Utils.getJsonMapper(), openApi);
                 if (!openApiJson.contains(QUOTE + COMPONENTS_SCHEMAS_REF + schemaName + QUOTE)) {
                     schemas.remove(schemaName);
                     removed = true;
@@ -961,7 +960,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemas.remove(schemaName);
             }
             openApi.getComponents().setSchemas(schemas);
-        } catch (JacksonException e) {
+        } catch (UncheckedIOException e) {
             // do nothing
         }
         return removed;
@@ -1054,7 +1053,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 addGeneratedResource("swagger", context);
             }
             try (Writer writer = generatedFile != null ? generatedFile.openWriter() : getFileWriter(specFile)) {
-                objectMapper.writeValue(writer, openApiInfo.getOpenApi());
+                MapperUtils.writeValue(objectMapper, writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
                     if (isYaml) {
