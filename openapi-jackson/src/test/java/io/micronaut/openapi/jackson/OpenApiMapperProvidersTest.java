@@ -34,7 +34,7 @@ class OpenApiMapperProvidersTest {
     void failsForUnknownProvider() {
         var e = assertThrows(IllegalStateException.class, () -> OpenApiMapperProviders.select("serde", classLoader));
         assertTrue(e.getMessage().contains(OpenApiMapperProviders.MAPPER_PROPERTY), e.getMessage());
-        assertTrue(e.getMessage().contains("Available: jackson"), e.getMessage());
+        assertTrue(e.getMessage().contains("Available: jackson, test"), e.getMessage());
     }
 
     @Test

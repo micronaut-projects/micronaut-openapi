@@ -1472,7 +1472,7 @@ public final class SchemaDefinitionUtils {
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
                                                 linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
-                                            } catch (UncheckedIOException e) {
+                                            } catch (UncheckedIOException _) {
                                                 // do nothing
                                             }
                                         }

@@ -504,7 +504,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     public static JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
         if (node.isString()) {
             final String text = node.getStringValue();
-            if (text == null || text.isBlank()) {
+            if (text.isBlank()) {
                 return node;
             }
             final String newText = propertyExpander.apply(text);
@@ -960,7 +960,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemas.remove(schemaName);
             }
             openApi.getComponents().setSchemas(schemas);
-        } catch (UncheckedIOException e) {
+        } catch (UncheckedIOException _) {
             // do nothing
         }
         return removed;

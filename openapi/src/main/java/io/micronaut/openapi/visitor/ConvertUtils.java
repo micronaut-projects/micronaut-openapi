@@ -278,7 +278,7 @@ public final class ConvertUtils {
         if (object instanceof String string) {
             try {
                 return MapperUtils.readValue(getConvertMapper(), string, MAP_TYPE_REFERENCE);
-            } catch (UncheckedIOException e) {
+            } catch (UncheckedIOException _) {
                 return null;
             }
         }
@@ -296,68 +296,67 @@ public final class ConvertUtils {
      * @throws UncheckedIOException if error
      */
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) {
-
-        var fixed = false;
-        T value;
-        try {
-            value = MapperUtils.treeToValue(getConvertMapper(), jn, clazz);
-        } catch (Exception e) {
-            // maybe exception with groovy
-            if (context.getLanguage() == VisitorContext.Language.GROOVY) {
-                value = fixForGroovy(jn, clazz, null);
-                fixed = true;
-            } else {
-                throw e;
-            }
-        }
-        if (!fixed && context.getLanguage() == VisitorContext.Language.GROOVY) {
-            value = fixForGroovy(jn, clazz, null);
-        }
-
+        T value = readValue(jn, clazz, context);
         if (value == null) {
             return null;
         }
 
-        var finalValue = value;
-
         var exts = resolveExtensions(jn);
         if (exts != null) {
-            BeanMap.of(finalValue).put(PROP_EXTENSIONS, exts);
+            BeanMap.of(value).put(PROP_EXTENSIONS, exts);
         }
         String elType = MapperUtils.stringValue(jn.get(PROP_TYPE));
         String elFormat = MapperUtils.stringValue(jn.get(PROP_ONE_FORMAT));
-        String defaultValueStr = MapperUtils.stringValue(jn.get(PROP_DEFAULT_VALUE));
-        // fix for default value
-        Object defaultValue;
-        try {
-            defaultValue = ConvertUtils.normalizeValue(defaultValueStr, elType, elFormat, context);
-        } catch (UncheckedIOException e) {
-            defaultValue = defaultValueStr;
-        }
 
         BeanMap<T> beanMap = BeanMap.of(value);
+        // fix for default value
+        Object defaultValue = normalizeOrRaw(MapperUtils.stringValue(jn.get(PROP_DEFAULT_VALUE)), elType, elFormat, context);
         if (defaultValue != null) {
             beanMap.put(PROP_DEFAULT, defaultValue);
         }
-
-        JsonNode allowableValuesNode = jn.get(PROP_ALLOWABLE_VALUES);
-        if (allowableValuesNode != null && allowableValuesNode.isArray()) {
-            var allowableValues = new ArrayList<>(allowableValuesNode.size());
-            for (JsonNode allowableValueNode : allowableValuesNode.values()) {
-                if (allowableValueNode == null) {
-                    continue;
-                }
-                String allowableValueStr = MapperUtils.stringValue(allowableValueNode);
-                try {
-                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueStr, elType, elFormat, context));
-                } catch (UncheckedIOException e) {
-                    allowableValues.add(allowableValueStr);
-                }
-            }
+        List<Object> allowableValues = normalizeAllowableValues(jn.get(PROP_ALLOWABLE_VALUES), elType, elFormat, context);
+        if (allowableValues != null) {
             beanMap.put(PROP_ALLOWABLE_VALUES, allowableValues);
         }
-
         return value;
+    }
+
+    /**
+     * Reads a value from a tree, applying the Groovy workarounds when compiling Groovy sources.
+     */
+    private static <T> T readValue(JsonNode jn, Class<T> clazz, VisitorContext context) {
+        boolean groovy = context.getLanguage() == VisitorContext.Language.GROOVY;
+        try {
+            T value = MapperUtils.treeToValue(getConvertMapper(), jn, clazz);
+            return groovy ? fixForGroovy(jn, clazz) : value;
+        } catch (Exception e) {
+            // maybe exception with groovy
+            if (groovy) {
+                return fixForGroovy(jn, clazz);
+            }
+            throw e;
+        }
+    }
+
+    private static Object normalizeOrRaw(String valueStr, String elType, String elFormat, VisitorContext context) {
+        try {
+            return ConvertUtils.normalizeValue(valueStr, elType, elFormat, context);
+        } catch (UncheckedIOException _) {
+            return valueStr;
+        }
+    }
+
+    private static List<Object> normalizeAllowableValues(JsonNode allowableValuesNode, String elType, String elFormat, VisitorContext context) {
+        if (allowableValuesNode == null || !allowableValuesNode.isArray()) {
+            return null;
+        }
+        var allowableValues = new ArrayList<>(allowableValuesNode.size());
+        for (JsonNode allowableValueNode : allowableValuesNode.values()) {
+            if (allowableValueNode != null) {
+                allowableValues.add(normalizeOrRaw(MapperUtils.stringValue(allowableValueNode), elType, elFormat, context));
+            }
+        }
+        return allowableValues;
     }
 
     private static <T> Map<String, T> deserMap(JsonNode mapNode, Class<T> clazz) {
@@ -372,7 +371,7 @@ public final class ConvertUtils {
         return !result.isEmpty() ? result : null;
     }
 
-    private static <T> T fixForGroovy(JsonNode jn, Class<T> clazz, Exception e) {
+    private static <T> T fixForGroovy(JsonNode jn, Class<T> clazz) {
 
         // fix for problem with groovy. Jackson throw exception with Operation class with content and mediaType
         // see https://github.com/micronaut-projects/micronaut-openapi/issues/1418
@@ -407,66 +406,41 @@ public final class ConvertUtils {
         if (parentNode == null) {
             return null;
         }
-        Map<String, Example> examples = null;
-        Map<String, Encoding> encoding = null;
-        Map<String, Object> extensions = null;
-        Schema<?> schema = null;
-        JsonNode mediaTypeNode = null;
-
         var contentNode = parentNode.get(PROP_CONTENT);
-        if (contentNode != null) {
-            // if content object has "mediaType" property, then that object is single Content-object
-            // otherwise, we have multiple content objects
-            // we don't need to fix anything for multiple objects
-            var contentFieldNames = new ArrayList<String>();
-            for (var entry : contentNode.entries()) {
-                contentFieldNames.add(entry.getKey());
-            }
-            if (contentFieldNames.stream().noneMatch(CONTENT_PROPS::contains)) {
-                return MapperUtils.treeToValue(getConvertMapper(), parentNode, clazz);
-            }
-
-            examples = deserMap(contentNode.get(PROP_EXAMPLES), Example.class);
-            encoding = deserMap(contentNode.get(PROP_ENCODING), Encoding.class);
-            extensions = deserMap(contentNode.get(PROP_EXTENSIONS), Object.class);
-            var schemaNode = contentNode.get(PROP_SCHEMA);
-            if (schemaNode != null) {
-                schema = MapperUtils.treeToValue(getConvertMapper(), schemaNode, Schema.class);
-            }
-
-            mediaTypeNode = contentNode.get(PROP_MEDIA_TYPE);
-            parentNode = MapperUtils.with(parentNode, PROP_CONTENT,
-                MapperUtils.without(contentNode, PROP_EXAMPLES, PROP_ENCODING, PROP_EXTENSIONS, PROP_MEDIA_TYPE));
+        // if content object has "mediaType" property, then that object is single Content-object
+        // otherwise, we have multiple content objects
+        // we don't need to fix anything for multiple objects
+        if (contentNode == null || !isSingleContent(contentNode)) {
+            return MapperUtils.treeToValue(getConvertMapper(), parentNode, clazz);
         }
-        var value = MapperUtils.treeToValue(getConvertMapper(), parentNode, clazz);
-        Content content = null;
-        if (value instanceof ApiResponse apiResponse) {
-            content = apiResponse.getContent();
-        } else if (value instanceof Header header) {
-            content = header.getContent();
-        } else if (value instanceof Parameter parameter) {
-            content = parameter.getContent();
-        } else if (value instanceof RequestBody requestBody) {
-            content = requestBody.getContent();
-        }
-
+        var singleContent = SingleContent.read(contentNode);
+        var withoutContentProps = MapperUtils.with(parentNode, PROP_CONTENT,
+            MapperUtils.without(contentNode, PROP_EXAMPLES, PROP_ENCODING, PROP_EXTENSIONS, PROP_MEDIA_TYPE));
+        var value = MapperUtils.treeToValue(getConvertMapper(), withoutContentProps, clazz);
+        Content content = contentOf(value);
         if (content != null) {
-            var mediaType = content.get(PROP_SCHEMA);
-            content.remove(PROP_SCHEMA);
-            if (mediaType == null) {
-                mediaType = new MediaType();
-            }
-            var contentType = mediaTypeNode != null ? MapperUtils.stringValue(mediaTypeNode) : io.micronaut.http.MediaType.APPLICATION_JSON;
-            content.put(contentType, mediaType);
-            mediaType.setExamples(examples);
-            mediaType.setEncoding(encoding);
-            if (extensions != null) {
-                extensions.forEach(mediaType::addExtension);
-            }
-            mediaType.setSchema(schema);
+            singleContent.applyTo(content);
         }
-
         return value;
+    }
+
+    private static boolean isSingleContent(JsonNode contentNode) {
+        for (var entry : contentNode.entries()) {
+            if (CONTENT_PROPS.contains(entry.getKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Content contentOf(Object value) {
+        return switch (value) {
+            case ApiResponse apiResponse -> apiResponse.getContent();
+            case Header header -> header.getContent();
+            case Parameter parameter -> parameter.getContent();
+            case RequestBody requestBody -> requestBody.getContent();
+            case null, default -> null;
+        };
     }
 
     public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) {
@@ -489,7 +463,7 @@ public final class ConvertUtils {
             if (extensionsNode != null) {
                 return MapperUtils.treeToValue(getConvertMapper(), extensionsNode, MAP_TYPE_REFERENCE);
             }
-        } catch (UncheckedIOException e) {
+        } catch (UncheckedIOException _) {
             // Ignore
         }
         return null;
@@ -555,7 +529,7 @@ public final class ConvertUtils {
                     }
                     resolveComponents(openApi).addSecuritySchemes(name, securityScheme);
                 }
-            } catch (UncheckedIOException e) {
+            } catch (UncheckedIOException _) {
                 // ignore
             }
         }
@@ -855,5 +829,48 @@ public final class ConvertUtils {
             }
         }
         return params;
+    }
+
+    /**
+     * The parts of a single, flattened Content object (one with a {@code mediaType} property) written by Groovy.
+     *
+     * @param examples The examples
+     * @param encoding The encodings
+     * @param extensions The extensions
+     * @param schema The schema
+     * @param contentType The content type
+     */
+    private record SingleContent(Map<String, Example> examples,
+                                 Map<String, Encoding> encoding,
+                                 Map<String, Object> extensions,
+                                 Schema<?> schema,
+                                 String contentType) {
+
+        static SingleContent read(JsonNode contentNode) {
+            var schemaNode = contentNode.get(PROP_SCHEMA);
+            var mediaTypeNode = contentNode.get(PROP_MEDIA_TYPE);
+            return new SingleContent(
+                deserMap(contentNode.get(PROP_EXAMPLES), Example.class),
+                deserMap(contentNode.get(PROP_ENCODING), Encoding.class),
+                deserMap(contentNode.get(PROP_EXTENSIONS), Object.class),
+                schemaNode != null ? MapperUtils.treeToValue(getConvertMapper(), schemaNode, Schema.class) : null,
+                mediaTypeNode != null ? MapperUtils.stringValue(mediaTypeNode) : io.micronaut.http.MediaType.APPLICATION_JSON
+            );
+        }
+
+        void applyTo(Content content) {
+            var mediaType = content.get(PROP_SCHEMA);
+            content.remove(PROP_SCHEMA);
+            if (mediaType == null) {
+                mediaType = new MediaType();
+            }
+            content.put(contentType, mediaType);
+            mediaType.setExamples(examples);
+            mediaType.setEncoding(encoding);
+            if (extensions != null) {
+                extensions.forEach(mediaType::addExtension);
+            }
+            mediaType.setSchema(schema);
+        }
     }
 }

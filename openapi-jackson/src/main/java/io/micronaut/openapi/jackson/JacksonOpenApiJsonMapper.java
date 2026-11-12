@@ -288,9 +288,8 @@ public final class JacksonOpenApiJsonMapper implements JsonMapper {
         if (node.isNumber()) {
             return JsonNode.createNumberNodeImpl(node.numberValue());
         }
-        // binary and POJO nodes: fall back to their plain Java value
-        Object value = objectMapper.convertValue(node, Object.class);
-        return value == null ? JsonNode.nullNode() : JsonNode.from(value);
+        // binary nodes are written as base64 strings in JSON; POJO nodes by their text value
+        return JsonNode.createStringNode(node.asString());
     }
 
     private static IOException wrap(RuntimeException e) {
