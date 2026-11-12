@@ -78,6 +78,13 @@ configurations {
 }
 
 tasks.test {
+    doFirst {
+        systemProperty("micronaut.openapi.test.processor.classpath", files(
+            sourceSets.main.get().runtimeClasspath,
+            sourceSets.main.get().compileClasspath,
+            sourceSets.test.get().output
+        ).asPath)
+    }
     maxParallelForks = Runtime.getRuntime().availableProcessors()
     maxHeapSize = "2048m"
 }
