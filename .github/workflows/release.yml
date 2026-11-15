@@ -51,13 +51,12 @@ jobs:
             .github/scripts/vulnerability-audit.sh
           fi
       - name: Run pre-release
-        uses: micronaut-projects/github-actions/pre-release@bd80048acde40b1c50534529f8160b0a6a19d63b # master
+        uses: micronaut-projects/github-actions/pre-release@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
         env:
           MICRONAUT_BUILD_EMAIL: ${{ secrets.MICRONAUT_BUILD_EMAIL }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to Sonatype OSSRH
-        id: publish
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
@@ -72,12 +71,6 @@ jobs:
           # Publish both locally and to Sonatype.
           # The artifacts stored locally will be used to generate the SLSA provenance.
           ./gradlew publishToMavenCentral --publishing-type=AUTOMATIC
-          # Read the current version from gradle.properties.
-          VERSION=$(./gradlew properties | grep 'version:' | awk '{print $2}')
-          # Read the project group from gradle.properties.
-          GROUP_PATH=$(./gradlew properties| grep "projectGroup" | awk '{print $2}' | sed 's/\./\//g')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "group=$GROUP_PATH" >> "$GITHUB_OUTPUT"
       - name: Generate subject
         id: hash
         run: |
@@ -116,13 +109,13 @@ jobs:
           GH_TOKEN_PUBLIC_REPOS_READONLY: ${{ secrets.GH_TOKEN_PUBLIC_REPOS_READONLY }}
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
       - name: Export Gradle Properties
-        uses: micronaut-projects/github-actions/export-gradle-properties@bd80048acde40b1c50534529f8160b0a6a19d63b # master
+        uses: micronaut-projects/github-actions/export-gradle-properties@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
       - name: LATEST_TAG
         run: |
           echo "LATEST_TAG=$(curl -s -L --proto '=https' --proto-redir '=https' -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name')" >> $GITHUB_ENV
       - name: Publish to Github Pages
         if: success()
-        uses: micronaut-projects/github-pages-deploy-action@f038553bfd54ac983dc35178906333ce37d1e5a5 # master
+        uses: micronaut-projects/github-pages-deploy-action@76d63aafbab7108d74e83be4e5b3b0501382e829 # master
         env:
           BETA: ${{ !(github.event.release.tag_name == env.LATEST_TAG) || github.event.release.draft || github.event.release.prerelease || contains(steps.release_version.outputs.release_version, 'M') || contains(steps.release_version.outputs.release_version, 'RC') }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -135,7 +128,7 @@ jobs:
           DEVELOCITY_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
       - name: Run post-release
         if: success()
-        uses: micronaut-projects/github-actions/post-release@bd80048acde40b1c50534529f8160b0a6a19d63b # master
+        uses: micronaut-projects/github-actions/post-release@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
         env:
           MICRONAUT_BUILD_EMAIL: ${{ secrets.MICRONAUT_BUILD_EMAIL }}
         with:
