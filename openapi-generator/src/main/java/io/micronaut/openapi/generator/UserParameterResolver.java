@@ -21,7 +21,6 @@ import org.openapitools.codegen.model.OperationsMap;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -164,14 +163,17 @@ final class UserParameterResolver {
     }
 
     /**
-     * Adds the imports of the user parameter classes to the operations of a controller.
+     * Adds the imports of the built-in user parameter classes to the operations of a controller. Custom classes are fully qualified in the parameters.
      *
      * @param objs the operations of the controller
      * @param classes the fully qualified class names returned by {@link #apply(CodegenOperation, boolean, boolean)}
      */
     static void addImports(OperationsMap objs, Collection<String> classes) {
-        for (var fqn : new LinkedHashSet<>(classes)) {
-            objs.getImports().add(Map.of("import", fqn, "classname", fqn.substring(fqn.lastIndexOf('.') + 1)));
+        for (var mode : UserParameterMode.values()) {
+            if (mode.getClassFullName() == null || !classes.contains(mode.getClassFullName())) {
+                continue;
+            }
+            objs.getImports().add(Map.of("import", mode.getClassFullName(), "classname", mode.getClassName()));
         }
     }
 }

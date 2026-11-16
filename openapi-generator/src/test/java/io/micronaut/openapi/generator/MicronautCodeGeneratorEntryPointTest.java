@@ -121,10 +121,8 @@ class MicronautCodeGeneratorEntryPointTest {
 
         var api = outputDir.toPath().resolve("src/main/java/org/openapitools/api/DefaultApi.java").toString();
         assertFileContains(api,
-            "import com.example.SaveUser;",
-            "import com.example.PublicUser;",
-            "SaveUser authentication",
-            "@Nullable(inherited = true) PublicUser authentication");
+            "com.example.SaveUser authentication",
+            "@Nullable(inherited = true) com.example.PublicUser authentication");
     }
 
     @Test
@@ -143,10 +141,8 @@ class MicronautCodeGeneratorEntryPointTest {
 
         var api = outputDir.toPath().resolve("src/main/kotlin/org/openapitools/api/DefaultApi.kt").toString();
         assertFileContains(api,
-            "import com.example.SaveUser",
-            "import com.example.PublicUser",
-            "authentication: SaveUser",
-            "@Nullable authentication: PublicUser? = null");
+            "authentication: com.example.SaveUser",
+            "@Nullable authentication: com.example.PublicUser? = null");
     }
 
     private static class TestGenerator extends AbstractMicronautJavaCodegen<TestBuilder> {

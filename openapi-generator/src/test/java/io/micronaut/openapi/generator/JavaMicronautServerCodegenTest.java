@@ -1319,7 +1319,6 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.java",
-            "import com.example.CustomUserParameter;",
             """
                     @Post("/deny-all-endpoint")
                     @Secured(SecurityRule.DENY_ALL)
@@ -1329,21 +1328,21 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/pet")
                     @Secured({"read", "admin"})
                     Mono<Void> get(
-                        CustomUserParameter authentication
+                        com.example.CustomUserParameter authentication
                     );
                 """,
             """
                     @Post("/pet")
                     @Secured({"write", "admin"})
                     Mono<Void> save(
-                        CustomUserParameter authentication
+                        com.example.CustomUserParameter authentication
                     );
                 """,
             """
                     @Post("/pet-public")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     Mono<Void> savePublic(
-                        @Nullable(inherited = true) CustomUserParameter authentication
+                        @Nullable(inherited = true) com.example.CustomUserParameter authentication
                     );
                 """
         );
@@ -1377,8 +1376,6 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.java",
-            "import com.example.SaveUser;",
-            "import com.example.PublicUser;",
             "import io.micronaut.security.authentication.Authentication;",
             """
                     @Get("/pet")
@@ -1391,12 +1388,12 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/pet")
                     @Secured({"write", "admin"})
                     Mono<Void> save(
-                        SaveUser authentication
+                        com.example.SaveUser authentication
                     );
                 """,
             """
                     Mono<Void> savePublic(
-                        @Nullable(inherited = true) PublicUser authentication
+                        @Nullable(inherited = true) com.example.PublicUser authentication
                     );
                 """,
             "Mono<Void> denyAllOp();"
@@ -1414,10 +1411,9 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.java",
-            "import com.example.GetUser;",
             """
                     Mono<Void> get(
-                        GetUser authentication
+                        com.example.GetUser authentication
                     );
                 """,
             "Mono<Void> save();"
@@ -1437,7 +1433,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "DefaultApi.java",
             """
                     Mono<Void> save(
-                        SaveUser authentication
+                        com.example.SaveUser authentication
                     );
                 """
         );

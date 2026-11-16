@@ -1496,7 +1496,6 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/kotlin/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.kt",
-            "import com.example.CustomUserParameter",
             """
                     @Post("/deny-all-endpoint")
                     @Secured(SecurityRule.DENY_ALL)
@@ -1506,21 +1505,21 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/pet")
                     @Secured("read", "admin")
                     fun get(
-                        authentication: CustomUserParameter,
+                        authentication: com.example.CustomUserParameter,
                     ): Mono<Void>
                 """,
             """
                     @Post("/pet")
                     @Secured("write", "admin")
                     fun save(
-                        authentication: CustomUserParameter,
+                        authentication: com.example.CustomUserParameter,
                     ): Mono<Void>
                 """,
             """
                     @Post("/pet-public")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun savePublic(
-                        @Nullable authentication: CustomUserParameter? = null,
+                        @Nullable authentication: com.example.CustomUserParameter? = null,
                     ): Mono<Void>
                 """
         );
@@ -1553,8 +1552,6 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/kotlin/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.kt",
-            "import com.example.SaveUser",
-            "import com.example.PublicUser",
             "import io.micronaut.security.authentication.Authentication",
             """
                     @Get("/pet")
@@ -1567,12 +1564,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Post("/pet")
                     @Secured("write", "admin")
                     fun save(
-                        authentication: SaveUser,
+                        authentication: com.example.SaveUser,
                     ): Mono<Void>
                 """,
             """
                     fun savePublic(
-                        @Nullable authentication: PublicUser? = null,
+                        @Nullable authentication: com.example.PublicUser? = null,
                     ): Mono<Void>
                 """,
             "fun denyAllOp(): Mono<Void>"
@@ -1590,10 +1587,9 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String path = outputPath + "src/main/kotlin/org/openapitools/api/";
         assertFileContains(path + "DefaultApi.kt",
-            "import com.example.GetUser",
             """
                     fun get(
-                        authentication: GetUser,
+                        authentication: com.example.GetUser,
                     ): Mono<Void>
                 """,
             "fun save(): Mono<Void>"
@@ -1613,7 +1609,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "DefaultApi.kt",
             """
                     fun save(
-                        authentication: SaveUser,
+                        authentication: com.example.SaveUser,
                     ): Mono<Void>
                 """
         );

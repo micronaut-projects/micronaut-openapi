@@ -129,7 +129,7 @@ class UserParameterResolverTest {
         var save = op("save");
         assertEquals(SAVE_USER, resolver.apply(save, false, false));
         var param = save.allParams.get(save.allParams.size() - 1);
-        assertEquals("SaveUser", param.dataType);
+        assertEquals(SAVE_USER, param.dataType);
         assertEquals("authentication", param.paramName);
         var get = op("get");
         assertEquals(AUTHENTICATION, resolver.apply(get, false, false));
@@ -142,7 +142,7 @@ class UserParameterResolverTest {
         var save = op("save");
         assertEquals(SAVE_USER, resolver.apply(save, false, false));
         assertEquals(1, save.allParams.size());
-        assertEquals("SaveUser", save.allParams.get(0).dataType);
+        assertEquals(SAVE_USER, save.allParams.get(0).dataType);
         assertEquals("authentication", save.allParams.get(0).paramName);
         var get = op("get");
         assertNull(resolver.apply(get, false, false));
@@ -156,10 +156,10 @@ class UserParameterResolverTest {
     }
 
     @Test
-    void addsDeduplicatedImports() {
+    void importsOnlyBuiltInClasses() {
         var objs = operations();
         UserParameterResolver.addImports(objs, List.of(SAVE_USER, AUTHENTICATION, SAVE_USER));
-        assertEquals(List.of(importOf(SAVE_USER), importOf(AUTHENTICATION)), objs.getImports());
+        assertEquals(List.of(importOf(AUTHENTICATION)), objs.getImports());
     }
 
     @Test
