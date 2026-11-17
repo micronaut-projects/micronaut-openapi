@@ -1417,6 +1417,11 @@ public final class ConfigUtils {
 
         var configuration = new ApplicationContextConfiguration() {
             @Override
+            public boolean isEnvironmentLoggingEnabled() {
+                return false;
+            }
+
+            @Override
             public @NonNull Optional<MutableConversionService> getConversionService() {
                 var conversionService = new DefaultMutableConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
