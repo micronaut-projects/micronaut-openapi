@@ -241,20 +241,20 @@ class MyBean {}
 
         operation.parameters.forEach {
             if (it.name == "myApiHeader1") {
-                it.in == "header"
-                it.schema.type == "string"
+                assert it.in == "header"
+                assert it.schema.type == "string"
                 found1 = true
             } else if (it.name == "myApiHeader2") {
-                it.in == "header"
-                it.schema.type == "string"
+                assert it.in == "header"
+                assert it.schema.type == "string"
                 found2 = true
             } else if (it.name == "myApiParam1") {
-                it.in == "query"
-                it.schema.type == "string"
+                assert it.in == "query"
+                assert it.schema.type == "string"
                 found3 = true
             } else if (it.name == "myApiParam2") {
-                it.in == "query"
-                it.schema.type == "string"
+                assert it.in == "query"
+                assert it.schema.type == "string"
                 found4 = true
             }
         }
