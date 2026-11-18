@@ -30,11 +30,11 @@ import org.openapitools.codegen.utils.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.micronaut.openapi.generator.Extension.EXT_ROLES;
-import static io.micronaut.openapi.generator.Utils.addUserParameter;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
@@ -51,6 +51,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     public static final String OPT_AOT = "aot";
     public static final String OPT_USER_PARAMETER_MODE = "userParameterMode";
     public static final String OPT_USER_PARAMETER_CLASS = "userParameterClass";
+    public static final String OPT_PER_OPERATION_USER_PARAMETER_CLASS = UserParameterResolver.OPT_NAME;
 
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
     public static final String ANONYMOUS_ROLE = "SecurityRule.IS_ANONYMOUS";
@@ -75,7 +76,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
     protected UserParameterMode userParameterMode = UserParameterMode.NONE;
-    private String userParameterClass;
+    protected String userParameterClass;
+    protected Map<String, String> perOperationUserParameterClass = new LinkedHashMap<>();
+    private UserParameterResolver userParameterResolver;
 
     KotlinMicronautServerCodegen() {
 
@@ -109,6 +112,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         userModeOptionsMap.put(UserParameterMode.AUTHENTICATION.name(), "Add io.micronaut.security.authentication.Authentication authentication parameter to each controller method");
         userModeOption.setEnum(userModeOptionsMap);
         cliOptions.add(userModeOption);
+
+        cliOptions.add(CliOption.newString(OPT_PER_OPERATION_USER_PARAMETER_CLASS, UserParameterResolver.CLI_DESCRIPTION));
 
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
@@ -210,6 +215,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         writePropertyBack(OPT_USER_PARAMETER_MODE, userParameterMode.name());
         writePropertyBack(OPT_USER_PARAMETER_CLASS, userParameterClass);
 
+        if (additionalProperties.containsKey(OPT_PER_OPERATION_USER_PARAMETER_CLASS)) {
+            perOperationUserParameterClass = UserParameterResolver.parsePerOperationProperty(additionalProperties.get(OPT_PER_OPERATION_USER_PARAMETER_CLASS));
+        }
+        userParameterResolver = UserParameterResolver.of(userParameterMode, userParameterClass, perOperationUserParameterClass);
+        writePropertyBack(OPT_PER_OPERATION_USER_PARAMETER_CLASS, perOperationUserParameterClass);
+
         // Api file
         apiTemplateFiles.clear();
         apiTemplateFiles.put("server/controller-interface.mustache", ".kt");
@@ -290,17 +301,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
         if (useAuth) {
 
-            var alreadyAddedPrincipalImport = false;
-            final String importClassFullName;
-            final String importClassName;
-
-            if (userParameterClass != null) {
-                importClassFullName = userParameterClass;
-                importClassName = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
-            } else {
-                importClassFullName = userParameterMode.getClassFullName();
-                importClassName = userParameterMode.getClassName();
-            }
+            var userParameterClasses = new ArrayList<String>();
 
             for (CodegenOperation operation : allOperations) {
 
@@ -333,17 +334,15 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
                 operation.vendorExtensions.put(EXT_ROLES, roles);
 
-                if (userParameterMode != UserParameterMode.NONE) {
-                    var isAnonymous = roles.contains(ANONYMOUS_ROLE);
-                    var isDenyAll = roles.contains(DENY_ALL_ROLE);
-                    addUserParameter(operation, userParameterMode, userParameterClass, isAnonymous, isDenyAll);
-
-                    if (importClassFullName != null && !alreadyAddedPrincipalImport) {
-                        objs.getImports().add(Map.of("import", importClassFullName, "classname", importClassName));
-                        alreadyAddedPrincipalImport = true;
-                    }
+                var isAnonymous = roles.contains(ANONYMOUS_ROLE);
+                var isDenyAll = roles.contains(DENY_ALL_ROLE);
+                var addedClass = userParameterResolver.apply(operation, isAnonymous, isDenyAll);
+                if (addedClass != null) {
+                    userParameterClasses.add(addedClass);
                 }
             }
+
+            UserParameterResolver.addImports(objs, userParameterClasses);
         }
 
         objs = super.postProcessOperationsWithModels(objs, allModels);
@@ -413,6 +412,10 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         this.userParameterClass = userParameterClass;
     }
 
+    public void setPerOperationUserParameterClass(Map<String, String> perOperationUserParameterClass) {
+        this.perOperationUserParameterClass = UserParameterResolver.validatePerOperation(perOperationUserParameterClass);
+    }
+
     static class DefaultServerOptionsBuilder implements KotlinMicronautServerOptionsBuilder {
 
         private String controllerPackage;
@@ -423,6 +426,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean useAuth = true;
         private String userParameterMode = UserParameterMode.NONE.name();
         private String userParameterClass;
+        private Map<String, String> perOperationUserParameterClass = Map.of();
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
@@ -474,6 +478,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         @Override
         public KotlinMicronautServerOptionsBuilder withUserParameterClass(String userParameterClass) {
             this.userParameterClass = userParameterClass;
+            return this;
+        }
+
+        @Override
+        public KotlinMicronautServerOptionsBuilder withPerOperationUserParameterClass(Map<String, String> perOperationUserParameterClass) {
+            this.perOperationUserParameterClass = perOperationUserParameterClass;
             return this;
         }
 
@@ -558,6 +568,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 useAuth,
                 userParameterMode,
                 userParameterClass,
+                perOperationUserParameterClass,
                 plural,
                 fluxForArrays,
                 generatedAnnotation,
@@ -582,6 +593,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean useAuth,
         String userParameterMode,
         String userParameterClass,
+        Map<String, String> perOperationUserParameterClass,
         boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,

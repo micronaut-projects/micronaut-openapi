@@ -827,7 +827,7 @@ public final class Utils {
         userParam.description = userParameterMode.getParamDescription();
 
         if (userParameterMode.equals(UserParameterMode.CUSTOM)) {
-            userParam.dataType = userParameterClass.substring(userParameterClass.lastIndexOf('.') + 1);
+            userParam.dataType = userParameterClass;
         } else {
             userParam.dataType = userParameterMode.getClassName();
         }
