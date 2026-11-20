@@ -80,9 +80,9 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
+import io.micronaut.json.tree.JsonNode;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -809,7 +809,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         for (var exampleAnn : exampleAnns) {
             try {
                 var exampleMap = toValueMap(exampleAnn.getAnnotationName(), exampleAnn.getValues(), context, null);
-                result.put((String) exampleMap.get(PROP_NAME), Utils.getJsonMapper().convertValue(exampleMap, Example.class));
+                result.put((String) exampleMap.get(PROP_NAME), MapperUtils.convertValue(Utils.getJsonMapper(), exampleMap, Example.class));
             } catch (Exception e) {
                 warn("Error reading Parameter example " + exampleAnn + " for element [" + element + "]: " + e.getMessage(), context, element);
             }
@@ -1331,18 +1331,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
             processExplode(paramAnn, paramValues);
 
-            JsonNode jsonNode = Utils.getJsonMapper().valueToTree(paramValues);
+            JsonNode jsonNode = MapperUtils.valueToTree(Utils.getJsonMapper(), paramValues);
 
             if (newParameter == null) {
                 try {
                     newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
-                    if (jsonNode.has(PROP_SCHEMA)) {
+                    if (MapperUtils.has(jsonNode, PROP_SCHEMA)) {
                         JsonNode schemaNode = jsonNode.get(PROP_SCHEMA);
-                        if (schemaNode.has(PROP_REF_DOLLAR)) {
+                        if (MapperUtils.has(schemaNode, PROP_REF_DOLLAR)) {
                             if (newParameter == null) {
                                 newParameter = new Parameter();
                             }
-                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asString()));
+                            newParameter.schema(createSchema().$ref(MapperUtils.stringValue(schemaNode.get(PROP_REF_DOLLAR))));
                         }
                     }
                 } catch (Exception e) {
@@ -1351,7 +1351,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             } else {
                 try {
                     Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
-                    Map<CharSequence, Object> target = Utils.getConvertMapper().convertValue(newParameter, MAP_TYPE);
+                    Map<CharSequence, Object> target = MapperUtils.convertValue(Utils.getConvertMapper(), newParameter, MAP_TYPE);
                     if (v == null) {
                         for (CharSequence name : paramValues.keySet()) {
                             Object o = paramValues.get(name.toString());
@@ -1371,8 +1371,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             }
                         }
                     }
-                    newParameter = Utils.getConvertMapper().convertValue(target, Parameter.class);
-                } catch (JacksonException e) {
+                    newParameter = MapperUtils.convertValue(Utils.getConvertMapper(), target, Parameter.class);
+                } catch (UncheckedIOException e) {
                     warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }
             }
@@ -2150,7 +2150,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         // This is the correct strategy for mapping POJO properties to Query parameters.
         var namingStrategy = ConfigUtils.getPropertyNamingStrategy(context);
         if (namingStrategy != null) {
-            return namingStrategy.nameForField(null, null, element.getName());
+            return namingStrategy.apply(element.getName());
         }
 
         return element.getName();

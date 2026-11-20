@@ -115,7 +115,7 @@ abstract class AbstractOpenApiVisitor {
                 var propertyAsJson = prop.get(PROP_PARSE_VALUE, boolean.class, false);
                 if (propertyAsJson) {
                     try {
-                        processedValue = Utils.getJsonMapper().readTree(propValue);
+                        processedValue = MapperUtils.readValue(Utils.getJsonMapper(), propValue, Object.class);
                         extMap.put(propName, processedValue);
                     } catch (Exception e) {
                         extMap.put(propName, processedValue);

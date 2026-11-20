@@ -45,7 +45,7 @@ dependencies {
     testImplementation(mnTest.micronaut.test.spock)
     testImplementation(mn.micronaut.http.client)
     testImplementation(projects.micronautOpenapi)
-    testImplementation(projects.micronautOpenapiCommon)
+    testImplementation(projects.micronautOpenapiJackson)
 
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)

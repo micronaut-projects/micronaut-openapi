@@ -48,5 +48,85 @@
     "type": "io.micronaut.openapi.generator.AbstractMicronautJavaCodegen",
     "member": "Field wrapInHttpResponse",
     "reason": "Removed in M11"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConfigUtils",
+    "member": "Method io.micronaut.openapi.visitor.ConfigUtils.getPropertyNamingStrategy(io.micronaut.inject.visitor.VisitorContext)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConfigUtils",
+    "member": "Method io.micronaut.openapi.visitor.ConfigUtils.getTagGenerationNamingStrategy(io.micronaut.inject.visitor.VisitorContext)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConvertUtils",
+    "member": "Field MAP_TYPE",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConvertUtils",
+    "member": "Field MAP_TYPE_REFERENCE",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConvertUtils",
+    "member": "Method io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions(tools.jackson.databind.JsonNode)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConvertUtils",
+    "member": "Method io.micronaut.openapi.visitor.ConvertUtils.toJson(java.util.Map,io.micronaut.inject.visitor.VisitorContext)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.ConvertUtils",
+    "member": "Method io.micronaut.openapi.visitor.ConvertUtils.treeToValue(tools.jackson.databind.JsonNode,java.lang.Class,io.micronaut.inject.visitor.VisitorContext)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Class io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Method io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders(tools.jackson.databind.JsonNode,java.util.function.UnaryOperator)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Method io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders(tools.jackson.databind.node.ArrayNode,java.util.function.UnaryOperator)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Method io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders(tools.jackson.databind.node.ObjectNode,java.util.function.UnaryOperator)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.SchemaDefinitionUtils",
+    "member": "Method io.micronaut.openapi.visitor.SchemaDefinitionUtils.toJson(java.lang.String,java.util.Map,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.ClassElement)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.SchemaDefinitionUtils",
+    "member": "Method io.micronaut.openapi.visitor.SchemaDefinitionUtils.toJson(java.util.Map)",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.Utils",
+    "member": "Method io.micronaut.openapi.visitor.Utils.getConvertMapper()",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.Utils",
+    "member": "Method io.micronaut.openapi.visitor.Utils.getJsonMapper()",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.Utils",
+    "member": "Method io.micronaut.openapi.visitor.Utils.getYamlMapper()",
+    "reason": "8.0.0: internal visitor API uses the mapper SPI (io.micronaut.json) instead of Jackson databind"
   }
 ]

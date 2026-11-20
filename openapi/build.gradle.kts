@@ -15,8 +15,9 @@ dependencies {
 
     api(projects.micronautOpenapiAnnotations)
     api(projects.micronautOpenapiCommon)
-    api(mn.jackson.databind)
-    api(mn.jackson.dataformat.yaml)
+    // Jackson is the default mapper implementation; see OpenApiMapperProvider
+    api(projects.micronautOpenapiJackson)
+    api(mn.jackson.annotations)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
     api(libs.managed.flexmark.html2md.converter) {

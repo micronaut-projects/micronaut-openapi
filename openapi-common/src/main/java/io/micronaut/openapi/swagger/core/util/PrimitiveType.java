@@ -27,10 +27,13 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
-import tools.jackson.databind.type.TypeFactory;
 
 import java.io.File;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -342,7 +345,6 @@ public enum PrimitiveType {
      */
     private static final Set<String> nonSystemTypePackages = ConcurrentHashMap.newKeySet();
 
-    private static final TypeFactory TYPE_FACTORY = TypeFactory.createDefaultInstance();
 
     /**
      * Alternative names for primitive types that have to be supported for
@@ -527,7 +529,7 @@ public enum PrimitiveType {
     }
 
     public static PrimitiveType fromTypeAndFormat(Type type, String format) {
-        final Class<?> raw = TYPE_FACTORY.constructType(type).getRawClass();
+        final Class<?> raw = rawClass(type);
         final Collection<PrimitiveType> keys = MULTI_KEY_CLASSES.get(raw);
         if (keys == null || keys.isEmpty() || format == null || format.isBlank()) {
             return fromType(type);
@@ -541,7 +543,7 @@ public enum PrimitiveType {
     }
 
     public static PrimitiveType fromType(Type type) {
-        final Class<?> raw = TYPE_FACTORY.constructType(type).getRawClass();
+        final Class<?> raw = rawClass(type);
         final PrimitiveType key = KEY_CLASSES.get(raw);
         if (key != null && !customExcludedClasses.contains(raw.getName())) {
             return key;
@@ -662,5 +664,24 @@ public enum PrimitiveType {
     public static void enablePartialTime() {
         customClasses().put("org.joda.time.LocalTime", PrimitiveType.PARTIAL_TIME);
         customClasses().put(LocalTime.class.getName(), PrimitiveType.PARTIAL_TIME);
+    }
+
+    /**
+     * Resolves the raw class of a type, as Jackson's {@code TypeFactory.constructType(type).getRawClass()} does:
+     * parameterized types resolve to their raw class, arrays to an array of their component's raw class, and type
+     * variables and wildcards to their first upper bound.
+     *
+     * @param type The type
+     * @return The raw class
+     */
+    static Class<?> rawClass(Type type) {
+        return switch (type) {
+            case Class<?> cls -> cls;
+            case ParameterizedType parameterized -> rawClass(parameterized.getRawType());
+            case GenericArrayType array -> rawClass(array.getGenericComponentType()).arrayType();
+            case TypeVariable<?> variable -> rawClass(variable.getBounds()[0]);
+            case WildcardType wildcard -> rawClass(wildcard.getUpperBounds()[0]);
+            case null, default -> Object.class;
+        };
     }
 }

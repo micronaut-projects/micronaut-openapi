@@ -286,7 +286,7 @@ public final class TagUtils {
             if (isPackageName) {
                 tagName = camelCase(tagName.replace(DOT, UNDERSCORE));
             }
-            tagName = namingStrategy.nameForField(null, null, tagName);
+            tagName = namingStrategy.apply(tagName);
         }
 
         var tag = new Tag()

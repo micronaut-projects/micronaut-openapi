@@ -34,7 +34,7 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(mnTest.junit.jupiter.api)
-    testImplementation(projects.micronautOpenapiCommon)
+    testImplementation(projects.micronautOpenapiJackson)
 
     testRuntimeOnly(mnLogging.logback.classic)
     testRuntimeOnly(mnTest.junit.platform.engine)
