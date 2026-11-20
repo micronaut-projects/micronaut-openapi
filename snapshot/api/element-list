@@ -8,7 +8,9 @@ io.micronaut.openapi.annotation.transformers
 io.micronaut.openapi.generator
 io.micronaut.openapi.info
 io.micronaut.openapi.introspections
+io.micronaut.openapi.jackson
 io.micronaut.openapi.javadoc
+io.micronaut.openapi.mapper
 io.micronaut.openapi.postprocessors
 io.micronaut.openapi.swagger.core.jackson
 io.micronaut.openapi.swagger.core.jackson.mixin
