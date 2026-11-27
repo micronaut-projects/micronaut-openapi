@@ -99,7 +99,6 @@
             <property name="accessModifiers" value="public, protected"/>
         </module>
         <module name="JavadocType"/>
-        <module name="JavadocStyle"/>
         <module name="MissingJavadocType">
             <property name="severity" value="warning"/>
         </module>
