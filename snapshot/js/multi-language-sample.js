@@ -7,6 +7,7 @@ var LANG_JAVA = "java";
 var LANG_GROOVY = "groovy";
 var LANG_KOTLIN = "kotlin";
 var LANG_PYTHON = "python";
+var LANG_TYPESCRIPT = "typescript";
 var CONFIG_YAML = "yaml";
 var CONFIG_TOML = "toml";
 var CONFIG_HOCON = "hocon";
@@ -16,7 +17,7 @@ var CONFIG_GROOVY = "groovy-config";
 var MICRONAUT_SUPPORTED_BUILDS = [BUILD_GRADLE, BUILD_GRADLE_GROOVY, BUILD_GRADLE_KOTLIN, BUILD_MAVEN, BUILD_PYRONAUT];
 // JVM builds: selecting one of them while Python is the preferred language switches the language back to Java
 var MICRONAUT_JVM_BUILDS = [BUILD_GRADLE, BUILD_GRADLE_GROOVY, BUILD_GRADLE_KOTLIN, BUILD_MAVEN];
-var MICRONAUT_SUPPORTED_LANGS = [LANG_JAVA, LANG_GROOVY, LANG_KOTLIN, LANG_PYTHON];
+var MICRONAUT_SUPPORTED_LANGS = [LANG_JAVA, LANG_GROOVY, LANG_KOTLIN, LANG_PYTHON, LANG_TYPESCRIPT];
 var MICRONAUT_SUPPORTED_CONFIG_LANGS = [CONFIG_YAML, CONFIG_TOML, CONFIG_HOCON, CONFIG_PROPERTIES, CONFIG_GROOVY, CONFIG_JSON];
 var DEFAULT_SUPPORTED_LANG = LANG_JAVA;
 var DEFAULT_BUILD = BUILD_GRADLE;
@@ -105,6 +106,9 @@ function postProcessCodeBlocks() {
         }
         if (CONFIG_JSON === string) {
             return "JSON";
+        }
+        if (LANG_TYPESCRIPT === string) {
+            return "TypeScript";
         }
         var langSlices = string.split("-");
         var title = capitalizeWord(langSlices[0]);
