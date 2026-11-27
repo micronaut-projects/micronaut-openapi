@@ -184,6 +184,7 @@ class RequestBodyControllerTest(
     }
 
     @Test
+    @Disabled("Generated serializers in serde 3.2 mishandle the wildcard map values in kapt stubs: https://github.com/micronaut-projects/micronaut-serialization/issues/1498")
     fun testSendModelWithDeepMapProperty() {
         val model = ModelWithMapProperty(deepMap = mapOf(
                 "characteristics" to mapOf("color" to "pink"),
@@ -204,6 +205,7 @@ class RequestBodyControllerTest(
     }
 
     @Test
+    @Disabled("Generated serializers in serde 3.2 mishandle the wildcard map values in kapt stubs: https://github.com/micronaut-projects/micronaut-serialization/issues/1498")
     fun testSendModelWithDeepMapModelProperty() {
         val model = ModelWithMapProperty(deepObjectMap = mapOf(
                 "polygons" to mapOf(
